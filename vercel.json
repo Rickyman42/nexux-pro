@@ -2,8 +2,5 @@
   "buildCommand": "pnpm build",
   "outputDirectory": "dist",
   "installCommand": "pnpm install",
-  "framework": "astro",
-  "rewrites": [
-    { "source": "/api/leads/:path*", "destination": "http://87.221.84.96/api/leads/:path*" }
-  ]
+  "framework": "astro"
 }
