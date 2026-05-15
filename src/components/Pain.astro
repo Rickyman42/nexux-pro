@@ -1,0 +1,384 @@
+---
+---
+<section class="pain" id="dolor">
+  <div class="container-nx">
+    <div class="pain-header">
+      <div class="eyebrow">El problema invisible</div>
+      <h2 class="h-section pain-title">
+        Cada llamada perdida es <em>una clienta que no vuelve.</em>
+      </h2>
+      <p class="pain-sub">
+        Mientras tú estás secando, cortando o tiñendo, el teléfono no para de sonar.
+        Instagram acumula mensajes. WhatsApp también. Y cuando puedes responder, ya es tarde.
+      </p>
+    </div>
+
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+        </div>
+        <h3>Llamadas que nadie coge</h3>
+        <p>Las clientas que no encuentran respuesta llaman al salón de al lado. Y normalmente, no vuelven.</p>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </div>
+        <h3>Instagram sin responder</h3>
+        <p>Mensajes acumulándose mientras trabajas. Cada DM ignorado son entre €30 y €120 que se van con la competencia.</p>
+      </div>
+
+      <div class="pain-card">
+        <div class="pain-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3>Agenda hecha a mano</h3>
+        <p>Citas dobles, huecos vacíos, clientas que no avisan. El caos del cuaderno tiene un coste real al mes.</p>
+      </div>
+    </div>
+
+    <!-- Calculadora ROI -->
+    <div class="calc-wrap" id="calculadora">
+      <div class="calc-header">
+        <div class="eyebrow">Calculadora real</div>
+        <h3 class="calc-h">¿Cuánto pierdes al año por no contestar?</h3>
+        <p class="calc-sub">Ajusta los valores. La cifra cambia en tiempo real.</p>
+      </div>
+
+      <div class="calc-grid">
+        <div class="calc-inputs">
+          <div class="calc-field">
+            <label for="precio">Precio medio de una clienta</label>
+            <div class="input-row">
+              <input type="range" id="precio" min="20" max="120" step="5" value="40" />
+              <div class="input-val"><span id="precio-val">40</span><span class="unit">€</span></div>
+            </div>
+          </div>
+
+          <div class="calc-field">
+            <label for="perdidas">Llamadas / mensajes sin responder al día</label>
+            <div class="input-row">
+              <input type="range" id="perdidas" min="1" max="10" step="1" value="3" />
+              <div class="input-val"><span id="perdidas-val">3</span></div>
+            </div>
+          </div>
+
+          <div class="calc-field">
+            <label for="conversion">Cuántas se habrían convertido en cita (%)</label>
+            <div class="input-row">
+              <input type="range" id="conversion" min="20" max="80" step="5" value="50" />
+              <div class="input-val"><span id="conversion-val">50</span><span class="unit">%</span></div>
+            </div>
+          </div>
+
+          <div class="calc-field">
+            <label for="dias">Días trabajados al mes</label>
+            <div class="input-row">
+              <input type="range" id="dias" min="15" max="26" step="1" value="22" />
+              <div class="input-val"><span id="dias-val">22</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-output">
+          <div class="output-label">Estás perdiendo cada año</div>
+          <div class="output-num" id="output-num">
+            <span class="prefix">−</span><span id="loss">7.920</span><span class="unit-large">€</span>
+          </div>
+          <div class="output-sub">Equivale a <strong id="citas-perdidas">198 citas</strong> que se fueron a la competencia.</div>
+
+          <div class="output-divider"></div>
+
+          <div class="output-roi">
+            <div class="roi-line">
+              <span class="roi-label">Nexux Pro cuesta</span>
+              <span class="roi-val">2.988 €/año</span>
+            </div>
+            <div class="roi-line roi-result">
+              <span class="roi-label">Recuperas</span>
+              <span class="roi-val" id="recovered">+4.932 €</span>
+            </div>
+            <div class="roi-x">
+              ROI: <strong id="roi-x">×2,6</strong> tu inversión
+            </div>
+          </div>
+
+          <a href="#hablar" class="btn-primary calc-cta" data-track="calc_cta">
+            Quiero recuperar ese dinero
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function() {
+    function fmt(n) {
+      return Math.round(n).toLocaleString('es-ES');
+    }
+    function calc() {
+      const precio = +document.getElementById('precio').value;
+      const perdidas = +document.getElementById('perdidas').value;
+      const conv = +document.getElementById('conversion').value / 100;
+      const dias = +document.getElementById('dias').value;
+
+      const citasMes = perdidas * conv * dias;
+      const lossMonth = citasMes * precio;
+      const lossYear = lossMonth * 12;
+
+      document.getElementById('precio-val').textContent = precio;
+      document.getElementById('perdidas-val').textContent = perdidas;
+      document.getElementById('conversion-val').textContent = conv * 100;
+      document.getElementById('dias-val').textContent = dias;
+
+      document.getElementById('loss').textContent = fmt(lossYear);
+      document.getElementById('citas-perdidas').textContent = fmt(citasMes * 12) + ' citas';
+
+      const cost = 2988;
+      const recovered = lossYear - cost;
+      const roi = lossYear / cost;
+      document.getElementById('recovered').textContent = (recovered >= 0 ? '+' : '') + fmt(recovered) + ' €';
+      document.getElementById('roi-x').textContent = '×' + roi.toFixed(1).replace('.', ',');
+    }
+
+    function attach() {
+      ['precio', 'perdidas', 'conversion', 'dias'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', calc);
+      });
+      calc();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', attach);
+    } else {
+      attach();
+    }
+  })();
+</script>
+
+<style>
+  .pain {
+    padding: 7rem 0;
+    position: relative;
+  }
+  @media (max-width: 768px) { .pain { padding: 4rem 0; } }
+
+  .pain-header {
+    max-width: 720px;
+    margin: 0 auto 4rem;
+    text-align: center;
+  }
+  .pain-header .eyebrow { display: inline-block; margin-bottom: 1.25rem; }
+  .pain-title { margin-bottom: 1.25rem; }
+  .pain-sub {
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .pain-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-bottom: 6rem;
+  }
+  @media (min-width: 768px) {
+    .pain-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .pain-card {
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.4s var(--nx-ease);
+  }
+  .pain-card:hover {
+    border-color: rgba(255, 107, 107, 0.3);
+    transform: translateY(-3px);
+  }
+  .pain-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: rgba(255, 107, 107, 0.08);
+    color: var(--nx-danger);
+    display: grid;
+    place-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .pain-card h3 {
+    font-family: var(--nx-font-serif);
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+    color: var(--nx-ink);
+  }
+  .pain-card p {
+    color: var(--nx-ink-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Calculadora */
+  .calc-wrap {
+    background:
+      radial-gradient(ellipse at top left, rgba(78,205,196,0.08), transparent 60%),
+      var(--nx-deep);
+    border: 1px solid var(--nx-line-hover);
+    border-radius: 28px;
+    padding: 3rem 2rem;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.5);
+  }
+  @media (min-width: 768px) {
+    .calc-wrap { padding: 4rem 3.5rem; }
+  }
+
+  .calc-header { text-align: center; margin-bottom: 3rem; }
+  .calc-header .eyebrow { margin-bottom: 1rem; display: inline-block; }
+  .calc-h {
+    font-family: var(--nx-font-serif);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+  }
+  .calc-sub { color: var(--nx-ink-muted); font-size: 0.95rem; }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  @media (min-width: 900px) {
+    .calc-grid { grid-template-columns: 1fr 1fr; gap: 4rem; }
+  }
+
+  .calc-field { margin-bottom: 1.75rem; }
+  .calc-field label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--nx-ink-muted);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.01em;
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--nx-surface);
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--nx-magnet);
+    border: 3px solid var(--nx-void);
+    box-shadow: 0 0 0 1px var(--nx-magnet), 0 4px 12px rgba(78,205,196,0.4);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--nx-magnet);
+    border: 3px solid var(--nx-void);
+    cursor: pointer;
+  }
+
+  .input-val {
+    min-width: 75px;
+    text-align: right;
+    font-family: var(--nx-font-serif);
+    font-size: 1.6rem;
+    color: var(--nx-ink);
+    line-height: 1;
+  }
+  .input-val .unit {
+    font-size: 0.95rem;
+    color: var(--nx-ink-muted);
+    margin-left: 0.15rem;
+  }
+
+  .calc-output {
+    background: var(--nx-void);
+    border: 1px solid var(--nx-line);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    position: sticky;
+    top: 100px;
+  }
+  .output-label {
+    font-size: 0.8rem;
+    color: var(--nx-ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+  }
+  .output-num {
+    font-family: var(--nx-font-serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1;
+    color: var(--nx-danger);
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .output-num .prefix { font-size: 0.7em; opacity: 0.7; margin-right: 0.1em; }
+  .output-num .unit-large { font-size: 0.55em; margin-left: 0.1em; }
+  .output-sub {
+    color: var(--nx-ink-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+  .output-sub strong { color: var(--nx-ink); }
+
+  .output-divider {
+    height: 1px;
+    background: var(--nx-line);
+    margin: 1.75rem 0;
+  }
+
+  .output-roi { margin-bottom: 1.75rem; }
+  .roi-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+  .roi-label { color: var(--nx-ink-muted); }
+  .roi-val { color: var(--nx-ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .roi-result .roi-val { color: var(--nx-success); font-weight: 600; }
+  .roi-x {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(78,205,196,0.08);
+    border: 1px solid rgba(78,205,196,0.2);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: var(--nx-ink-muted);
+  }
+  .roi-x strong { color: var(--nx-magnet); font-size: 1.15rem; }
+
+  .calc-cta {
+    width: 100%;
+    justify-content: center;
+  }
+</style>

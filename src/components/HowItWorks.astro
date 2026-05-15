@@ -1,0 +1,168 @@
+---
+---
+<section class="how" id="como-funciona">
+  <div class="container-nx">
+    <div class="how-header">
+      <div class="eyebrow">Cómo funciona</div>
+      <h2 class="h-section">
+        Tres pasos. <em>Cero complicaciones.</em>
+      </h2>
+      <p class="how-sub">
+        En menos de 7 días tu peluquería tiene a Lara trabajando 24 horas. Tú no instalas nada,
+        no tocas nada, no aprendes nada nuevo.
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Hablamos contigo 20 minutos</h3>
+          <p>Nos cuentas cómo funciona tu salón: precios, horarios, servicios, tu estilo. Lara aprende a hablar como tú hablas.</p>
+        </div>
+        <div class="step-visual" aria-hidden="true">
+          <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none">
+            <circle cx="100" cy="100" r="60" stroke="var(--nx-magnet)" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>
+            <circle cx="100" cy="100" r="40" fill="var(--nx-magnet-halo)"/>
+            <path d="M70 95 Q100 75 130 95 L130 115 Q100 135 70 115 Z" fill="var(--nx-magnet)" opacity="0.9"/>
+            <circle cx="85" cy="100" r="3" fill="var(--nx-void)"/>
+            <circle cx="115" cy="100" r="3" fill="var(--nx-void)"/>
+            <path d="M88 110 Q100 118 112 110" stroke="var(--nx-void)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Configuramos a Lara por ti</h3>
+          <p>Conectamos Instagram, WhatsApp, tu número de teléfono y tu agenda. Tú no haces nada. Te enviamos pruebas para validar el tono antes de activar.</p>
+        </div>
+        <div class="step-visual" aria-hidden="true">
+          <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none">
+            <rect x="60" y="50" width="80" height="100" rx="12" stroke="var(--nx-magnet)" stroke-width="1.5" fill="var(--nx-deep)"/>
+            <circle cx="100" cy="75" r="8" fill="var(--nx-magnet)"/>
+            <rect x="75" y="90" width="50" height="4" rx="2" fill="var(--nx-line-hover)"/>
+            <rect x="75" y="102" width="38" height="4" rx="2" fill="var(--nx-line-hover)"/>
+            <rect x="75" y="120" width="50" height="20" rx="6" fill="var(--nx-magnet)" opacity="0.3"/>
+            <path d="M80 130 L90 135 L120 122" stroke="var(--nx-magnet)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Lara empieza a llenarte la agenda</h3>
+          <p>Desde el primer día, Lara responde, agenda y cuida a tus clientas. Tú recibes un resumen diario por WhatsApp con las citas del día siguiente.</p>
+        </div>
+        <div class="step-visual" aria-hidden="true">
+          <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none">
+            <rect x="45" y="55" width="110" height="90" rx="8" stroke="var(--nx-magnet)" stroke-width="1.5" fill="var(--nx-deep)"/>
+            <rect x="45" y="55" width="110" height="20" rx="8" fill="var(--nx-magnet)" opacity="0.2"/>
+            <rect x="60" y="85" width="20" height="20" rx="3" fill="var(--nx-magnet-halo)" stroke="var(--nx-magnet)" stroke-width="1"/>
+            <rect x="90" y="85" width="20" height="20" rx="3" fill="var(--nx-magnet)" opacity="0.6"/>
+            <rect x="120" y="85" width="20" height="20" rx="3" fill="var(--nx-magnet-halo)" stroke="var(--nx-magnet)" stroke-width="1"/>
+            <rect x="60" y="115" width="20" height="20" rx="3" fill="var(--nx-magnet)" opacity="0.8"/>
+            <rect x="90" y="115" width="20" height="20" rx="3" fill="var(--nx-magnet-halo)" stroke="var(--nx-magnet)" stroke-width="1"/>
+            <rect x="120" y="115" width="20" height="20" rx="3" fill="var(--nx-magnet)" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how { padding: 7rem 0; }
+  @media (max-width: 768px) { .how { padding: 4rem 0; } }
+
+  .how-header {
+    max-width: 720px;
+    margin: 0 auto 5rem;
+    text-align: center;
+  }
+  .how-header .eyebrow { display: inline-block; margin-bottom: 1.25rem; }
+  .how-sub {
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 580px;
+    margin: 1.25rem auto 0;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    padding: 2.25rem;
+    background: linear-gradient(135deg, var(--nx-deep), var(--nx-void));
+    border: 1px solid var(--nx-line);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s var(--nx-ease);
+  }
+  .step::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, var(--nx-magnet-halo), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .step:hover {
+    border-color: rgba(78, 205, 196, 0.25);
+    transform: translateX(4px);
+  }
+  .step:hover::before { opacity: 1; }
+
+  .step-num {
+    font-family: var(--nx-font-serif);
+    font-size: 3.5rem;
+    color: var(--nx-magnet);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-style: italic;
+    opacity: 0.85;
+  }
+
+  .step-content { position: relative; z-index: 1; }
+  .step-content h3 {
+    font-family: var(--nx-font-serif);
+    font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--nx-ink);
+    line-height: 1.2;
+  }
+  .step-content p {
+    color: var(--nx-ink-muted);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    max-width: 520px;
+  }
+
+  .step-visual {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .step {
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      padding: 1.75rem;
+    }
+    .step-visual { display: none; }
+    .step-num { font-size: 2.5rem; }
+  }
+</style>

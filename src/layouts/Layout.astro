@@ -1,0 +1,82 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Nexux Pro — IA que atiende a tus clientas mientras tú trabajas',
+  description = 'Tu peluquería en piloto automático. Lara, tu asistente IA, agenda citas, responde Instagram y WhatsApp 24h. Sin contratar a nadie.'
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://nexux.pro" />
+  <meta property="og:image" content="https://nexux.pro/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://nexux.pro" />
+
+  <!-- Plausible (privacy-first analytics, gratis self-hosted) -->
+  <script defer data-domain="nexux.pro" src="https://plausible.io/js/script.tagged-events.outbound-links.js"></script>
+
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-PLACEHOLDER', { anonymize_ip: true });
+    window.gtag = gtag;
+  </script>
+
+  <!-- Meta Pixel -->
+  <script is:inline>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'PLACEHOLDER_PIXEL_ID');
+    fbq('track', 'PageView');
+  </script>
+
+  <!-- Schema.org -->
+  <script type="application/ld+json" is:inline>
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Asistente IA para peluquerías",
+    "provider": {
+      "@type": "Organization",
+      "name": "Nexux Innovación Digital S.L.",
+      "url": "https://nexux.pro"
+    },
+    "areaServed": "ES",
+    "description": "Asistente de inteligencia artificial que agenda citas, responde mensajes y captura clientas 24 horas para peluquerías y centros de estética.",
+    "offers": [
+      { "@type": "Offer", "name": "Starter", "price": "249", "priceCurrency": "EUR" },
+      { "@type": "Offer", "name": "Pro", "price": "449", "priceCurrency": "EUR" },
+      { "@type": "Offer", "name": "Total", "price": "749", "priceCurrency": "EUR" }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+<body>
+  <main>
+    <slot />
+  </main>
+  <style is:global>
+    @import '../styles/global.css';
+  </style>
+</body>
+</html>

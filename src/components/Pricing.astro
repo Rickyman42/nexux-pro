@@ -1,0 +1,254 @@
+---
+const plans = [
+  {
+    name: 'Starter',
+    badge: null,
+    price: '249',
+    sub: 'Para salones que empiezan a profesionalizarse',
+    features: [
+      'Lara responde Instagram + WhatsApp 24h',
+      'Agenda de citas integrada',
+      'Recordatorios automáticos por WhatsApp',
+      'Resumen diario al cierre',
+      'Hasta 300 conversaciones/mes',
+    ],
+    cta: 'Empezar con Starter',
+    highlight: false,
+  },
+  {
+    name: 'Pro',
+    badge: 'Más elegido',
+    price: '449',
+    sub: 'Para salones con flujo constante de clientas',
+    features: [
+      'Todo lo del Starter',
+      'Lara atiende llamadas perdidas (voz)',
+      'Mini-web con tus servicios y precios',
+      'Captura de clientas nuevas con publicidad incluida',
+      'Conversaciones ilimitadas',
+      'Reportes mensuales de ROI',
+    ],
+    cta: 'Empezar con Pro',
+    highlight: true,
+  },
+  {
+    name: 'Total',
+    badge: 'Premium',
+    price: '749',
+    sub: 'Para cadenas o salones con varios profesionales',
+    features: [
+      'Todo lo del Pro',
+      'Multi-empleada (asigna a cada profesional)',
+      'Blog automático para Google con SEO',
+      'Campañas Meta Ads gestionadas',
+      'Analítica completa de clientas',
+      'Onboarding presencial (Madrid/Barcelona)',
+    ],
+    cta: 'Hablar de Total',
+    highlight: false,
+  },
+];
+---
+<section class="pricing" id="paquetes">
+  <div class="container-nx">
+    <div class="pricing-header">
+      <div class="eyebrow">Paquetes</div>
+      <h2 class="h-section">
+        Elige el tuyo. <em>Sin permanencia.</em>
+      </h2>
+      <p class="pricing-sub">
+        Todos los paquetes incluyen configuración completa, formación y soporte por WhatsApp.
+        Si en 30 días no cubre su coste con citas nuevas, te devolvemos el dinero.
+      </p>
+    </div>
+
+    <div class="plans">
+      {plans.map(plan => (
+        <div class={`plan ${plan.highlight ? 'plan-highlight' : ''}`}>
+          {plan.badge && <div class="plan-badge">{plan.badge}</div>}
+          <div class="plan-head">
+            <h3 class="plan-name">{plan.name}</h3>
+            <p class="plan-sub">{plan.sub}</p>
+          </div>
+          <div class="plan-price">
+            <span class="price-num">{plan.price}</span>
+            <span class="price-unit">€<span>/mes</span></span>
+          </div>
+          <ul class="plan-features">
+            {plan.features.map(f => (
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+          <a href="#hablar" class={plan.highlight ? 'btn-primary plan-cta' : 'btn-ghost plan-cta'} data-track={`pricing_${plan.name.toLowerCase()}`}>
+            {plan.cta}
+          </a>
+        </div>
+      ))}
+    </div>
+
+    <div class="guarantee">
+      <div class="guarantee-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <div>
+        <strong>30 días de garantía total.</strong>
+        Si Lara no cubre su coste con citas nuevas durante el primer mes, te devolvemos cada euro.
+        Sin preguntas, sin papeleo.
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing { padding: 7rem 0; background: linear-gradient(180deg, transparent, rgba(78,205,196,0.02), transparent); }
+  @media (max-width: 768px) { .pricing { padding: 4rem 0; } }
+
+  .pricing-header { max-width: 720px; margin: 0 auto 4rem; text-align: center; }
+  .pricing-header .eyebrow { display: inline-block; margin-bottom: 1.25rem; }
+  .pricing-sub {
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 580px;
+    margin: 1.25rem auto 0;
+  }
+
+  .plans {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+  }
+  @media (min-width: 900px) {
+    .plans { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+  }
+
+  .plan {
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s var(--nx-ease);
+  }
+  .plan:hover {
+    border-color: var(--nx-line-hover);
+    transform: translateY(-4px);
+  }
+  .plan-highlight {
+    background:
+      radial-gradient(ellipse at top, rgba(78,205,196,0.1), transparent 60%),
+      var(--nx-deep);
+    border-color: rgba(78, 205, 196, 0.3);
+    box-shadow: 0 30px 60px -20px rgba(78, 205, 196, 0.15);
+  }
+  .plan-highlight:hover { border-color: var(--nx-magnet); }
+
+  .plan-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--nx-magnet);
+    color: var(--nx-void);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .plan-head { margin-bottom: 1.5rem; }
+  .plan-name {
+    font-family: var(--nx-font-serif);
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--nx-ink);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+  .plan-sub {
+    color: var(--nx-ink-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--nx-line);
+  }
+  .price-num {
+    font-family: var(--nx-font-serif);
+    font-size: 3.5rem;
+    color: var(--nx-magnet);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .price-unit {
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+  }
+  .price-unit span { font-size: 0.85rem; opacity: 0.7; margin-left: 0.1rem; }
+
+  .plan-features {
+    list-style: none;
+    flex: 1;
+    margin-bottom: 2rem;
+  }
+  .plan-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: var(--nx-ink);
+    font-size: 0.93rem;
+    line-height: 1.5;
+  }
+  .plan-features svg {
+    color: var(--nx-magnet);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .plan-cta { width: 100%; justify-content: center; }
+
+  .guarantee {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 16px;
+    color: var(--nx-ink-muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .guarantee strong { color: var(--nx-ink); display: block; margin-bottom: 0.2rem; }
+  .guarantee-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--nx-magnet-halo);
+    color: var(--nx-magnet);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 600px) {
+    .guarantee { flex-direction: column; text-align: center; }
+  }
+</style>

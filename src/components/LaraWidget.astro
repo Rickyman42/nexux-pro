@@ -1,0 +1,561 @@
+---
+---
+<!-- Floating launcher button -->
+<button id="lara-launcher" class="lara-launcher" aria-label="Habla con Lara" data-track="lara_open">
+  <div class="lara-launcher-inner">
+    <div class="lara-avatar-mini">L</div>
+    <div class="lara-launch-text">
+      <div class="lara-launch-title">Habla con Lara</div>
+      <div class="lara-launch-sub">Responde al momento</div>
+    </div>
+  </div>
+  <div class="lara-pulse"></div>
+</button>
+
+<!-- Chat window -->
+<div id="lara-chat" class="lara-chat" aria-hidden="true">
+  <div class="lara-head">
+    <div class="lara-head-left">
+      <div class="lara-avatar">L</div>
+      <div>
+        <div class="lara-name">Lara <span class="lara-tag">Asistente IA</span></div>
+        <div class="lara-status"><span class="online-dot-mini"></span> Aquí para ayudarte</div>
+      </div>
+    </div>
+    <button id="lara-close" class="lara-close" aria-label="Cerrar chat">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="lara-body" id="lara-body"></div>
+  <div class="lara-input-wrap">
+    <input type="text" id="lara-input" placeholder="Escribe tu respuesta..." autocomplete="off" />
+    <button id="lara-send" class="lara-send" aria-label="Enviar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+  <div class="lara-foot">Conversación protegida · Tus datos no se comparten</div>
+</div>
+
+<div id="hablar"></div>
+
+<script is:inline>
+(function() {
+  const flow = [
+    {
+      id: 'welcome',
+      bot: '¡Hola! 👋 Soy Lara, la asistente IA que va a vivir en tu peluquería.<br/><br/>Cuéntame, ¿cómo te llamas?',
+      field: 'nombre',
+      validate: v => v.length >= 2,
+    },
+    {
+      id: 'salon',
+      bot: (data) => `Encantada, ${data.nombre} 🌸. ¿Cómo se llama tu peluquería o centro de estética?`,
+      field: 'salon',
+      validate: v => v.length >= 2,
+    },
+    {
+      id: 'ciudad',
+      bot: (data) => `${data.salon}, qué bonito. ¿En qué ciudad estás?`,
+      field: 'ciudad',
+      validate: v => v.length >= 2,
+    },
+    {
+      id: 'reservas',
+      bot: '¿Cómo gestionas hoy las citas? ¿Tienes algún sistema online o las apuntas a mano?',
+      field: 'reservas',
+      validate: v => v.length >= 2,
+      suggestions: ['A mano', 'En el ordenador', 'Booksy / Fresha', 'No tengo nada'],
+    },
+    {
+      id: 'dolor',
+      bot: (data) => `Entendido. ¿Qué es lo que más te frustra del día a día? (puedes contarme lo que quieras, te leo entera)`,
+      field: 'dolor',
+      validate: v => v.length >= 5,
+    },
+    {
+      id: 'telefono',
+      bot: 'Última pregunta y te llamamos en menos de 24 horas con un plan a medida. ¿Cuál es tu teléfono?',
+      field: 'telefono',
+      validate: v => /^[+\d\s\-()]{9,}$/.test(v),
+    },
+    {
+      id: 'final',
+      bot: (data) => `¡Listo, ${data.nombre}! 💚<br/><br/>He guardado todo lo que me has contado. Ricardo (el fundador de Nexux) te llamará al ${data.telefono} en menos de 24 horas con una propuesta concreta para ${data.salon}.<br/><br/>Mientras tanto, no te preocupes por nada. Esto es lo que voy a hacer YO en tu salón cada día. 🚀`,
+      field: null,
+      final: true,
+    },
+  ];
+
+  const state = {
+    step: 0,
+    data: {},
+    opened: false,
+    finished: false,
+  };
+
+  function $(id) { return document.getElementById(id); }
+
+  function track(event, props = {}) {
+    if (window.gtag) gtag('event', event, props);
+    if (window.fbq) fbq('trackCustom', event, props);
+    if (window.plausible) plausible(event, { props });
+  }
+
+  function addMsg(text, who) {
+    const body = $('lara-body');
+    const msg = document.createElement('div');
+    msg.className = 'lara-msg lara-msg-' + who;
+    msg.innerHTML = text;
+    body.appendChild(msg);
+    requestAnimationFrame(() => msg.classList.add('show'));
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function addTyping() {
+    const body = $('lara-body');
+    const t = document.createElement('div');
+    t.className = 'lara-msg lara-msg-bot lara-typing';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    t.id = 'lara-typing';
+    body.appendChild(t);
+    body.scrollTop = body.scrollHeight;
+  }
+  function removeTyping() {
+    const t = $('lara-typing');
+    if (t) t.remove();
+  }
+
+  function addSuggestions(suggestions) {
+    const body = $('lara-body');
+    const wrap = document.createElement('div');
+    wrap.className = 'lara-chips';
+    wrap.id = 'lara-chips';
+    suggestions.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'lara-chip';
+      b.textContent = s;
+      b.onclick = () => {
+        $('lara-input').value = s;
+        handleSend();
+      };
+      wrap.appendChild(b);
+    });
+    body.appendChild(wrap);
+    body.scrollTop = body.scrollHeight;
+  }
+  function removeSuggestions() {
+    const c = $('lara-chips');
+    if (c) c.remove();
+  }
+
+  async function showStep(idx) {
+    const step = flow[idx];
+    if (!step) return;
+    removeSuggestions();
+    addTyping();
+    await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
+    removeTyping();
+    const text = typeof step.bot === 'function' ? step.bot(state.data) : step.bot;
+    addMsg(text, 'bot');
+    if (step.suggestions) {
+      setTimeout(() => addSuggestions(step.suggestions), 200);
+    }
+    if (step.final) {
+      $('lara-input').disabled = true;
+      $('lara-send').disabled = true;
+      state.finished = true;
+      sendLead();
+      track('lara_lead_complete', state.data);
+    }
+  }
+
+  function sendLead() {
+    const payload = {
+      ...state.data,
+      source: 'nexux.pro',
+      timestamp: new Date().toISOString(),
+      utm: new URLSearchParams(location.search).toString(),
+    };
+    fetch('/api/leads/pro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      // Fallback: enviar a webhook genérico
+      console.warn('Lead local-only fallback', payload);
+    });
+  }
+
+  async function handleSend() {
+    if (state.finished) return;
+    const input = $('lara-input');
+    const value = input.value.trim();
+    if (!value) return;
+    const step = flow[state.step];
+    if (!step || !step.field) return;
+    if (!step.validate(value)) {
+      addMsg(value, 'user');
+      addTyping();
+      await new Promise(r => setTimeout(r, 700));
+      removeTyping();
+      addMsg('Mmm, ¿podrías afinarlo un poquito? Para poder ayudarte mejor 🌷', 'bot');
+      input.value = '';
+      return;
+    }
+    addMsg(value, 'user');
+    state.data[step.field] = value;
+    input.value = '';
+    track('lara_step_' + step.id, { value });
+    state.step += 1;
+    showStep(state.step);
+  }
+
+  function open() {
+    if (state.opened) return;
+    state.opened = true;
+    $('lara-chat').classList.add('open');
+    $('lara-launcher').classList.add('hidden');
+    track('lara_opened');
+    if (state.step === 0 && $('lara-body').children.length === 0) {
+      showStep(0);
+    }
+  }
+
+  function close() {
+    state.opened = false;
+    $('lara-chat').classList.remove('open');
+    $('lara-launcher').classList.remove('hidden');
+  }
+
+  function init() {
+    $('lara-launcher').addEventListener('click', open);
+    $('lara-close').addEventListener('click', close);
+    $('lara-send').addEventListener('click', handleSend);
+    $('lara-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleSend();
+    });
+
+    // Anchor #hablar abre el chat
+    document.querySelectorAll('a[href="#hablar"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        open();
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+<style is:global>
+  .lara-launcher {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    background: var(--nx-magnet);
+    color: var(--nx-void);
+    border: none;
+    border-radius: 999px;
+    padding: 0.875rem 1.25rem 0.875rem 0.875rem;
+    box-shadow:
+      0 20px 40px -10px rgba(78,205,196,0.5),
+      0 0 0 6px rgba(78,205,196,0.15);
+    cursor: pointer;
+    transition: transform 0.3s var(--nx-ease);
+    animation: launcher-in 0.6s var(--nx-ease) 1.5s backwards;
+  }
+  @keyframes launcher-in {
+    from { transform: translateY(40px) scale(0.8); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .lara-launcher.hidden { display: none; }
+  .lara-launcher:hover { transform: translateY(-3px) scale(1.02); }
+  .lara-launcher-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 2;
+  }
+  .lara-avatar-mini {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--nx-void);
+    color: var(--nx-magnet);
+    display: grid;
+    place-items: center;
+    font-family: var(--nx-font-serif);
+    font-style: italic;
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+  .lara-launch-text { text-align: left; }
+  .lara-launch-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .lara-launch-sub {
+    font-size: 0.72rem;
+    opacity: 0.7;
+    margin-top: 0.1rem;
+  }
+  .lara-pulse {
+    position: absolute;
+    inset: -4px;
+    border-radius: 999px;
+    border: 2px solid var(--nx-magnet);
+    animation: lara-pulse 2.2s ease-out infinite;
+    pointer-events: none;
+  }
+  @keyframes lara-pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
+  .lara-chat {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 600px;
+    max-height: calc(100vh - 48px);
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line-hover);
+    border-radius: 24px;
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+    pointer-events: none;
+    transition: all 0.35s var(--nx-ease);
+  }
+  .lara-chat.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .lara-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--nx-line);
+    background: linear-gradient(180deg, rgba(78,205,196,0.06), transparent);
+  }
+  .lara-head-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .lara-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--nx-magnet), var(--nx-magnet-deep));
+    color: var(--nx-void);
+    display: grid;
+    place-items: center;
+    font-family: var(--nx-font-serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  .lara-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--nx-ink);
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .lara-tag {
+    font-size: 0.65rem;
+    background: var(--nx-magnet-halo);
+    color: var(--nx-magnet);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .lara-status {
+    font-size: 0.72rem;
+    color: var(--nx-ink-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.15rem;
+  }
+  .online-dot-mini {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--nx-success);
+    box-shadow: 0 0 4px var(--nx-success);
+  }
+  .lara-close {
+    background: transparent;
+    border: none;
+    color: var(--nx-ink-muted);
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .lara-close:hover { background: var(--nx-surface); color: var(--nx-ink); }
+
+  .lara-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    background: var(--nx-void);
+  }
+  .lara-body::-webkit-scrollbar { width: 4px; }
+  .lara-body::-webkit-scrollbar-thumb {
+    background: var(--nx-line-hover);
+    border-radius: 999px;
+  }
+
+  .lara-msg {
+    padding: 0.7rem 1rem;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 85%;
+    word-wrap: break-word;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .lara-msg.show { opacity: 1; transform: translateY(0); }
+  .lara-msg-user {
+    background: linear-gradient(135deg, var(--nx-magnet), var(--nx-magnet-deep));
+    color: var(--nx-void);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    font-weight: 500;
+  }
+  .lara-msg-bot {
+    background: var(--nx-surface);
+    color: var(--nx-ink);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .lara-typing {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .lara-typing span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--nx-ink-muted);
+    animation: typing-bounce 1.2s infinite;
+  }
+  .lara-typing span:nth-child(2) { animation-delay: 0.2s; }
+  .lara-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  .lara-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-self: flex-start;
+    margin-top: 0.25rem;
+  }
+  .lara-chip {
+    background: transparent;
+    border: 1px solid var(--nx-line-hover);
+    color: var(--nx-ink);
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lara-chip:hover {
+    border-color: var(--nx-magnet);
+    color: var(--nx-magnet);
+    background: var(--nx-magnet-halo);
+  }
+
+  .lara-input-wrap {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--nx-line);
+    background: var(--nx-deep);
+  }
+  #lara-input {
+    flex: 1;
+    background: var(--nx-void);
+    border: 1px solid var(--nx-line);
+    color: var(--nx-ink);
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-family: var(--nx-font-sans);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #lara-input:focus { border-color: var(--nx-magnet); }
+  #lara-input:disabled { opacity: 0.5; }
+  .lara-send {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--nx-magnet);
+    color: var(--nx-void);
+    border: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .lara-send:hover:not(:disabled) {
+    background: var(--nx-magnet-glow);
+    transform: translateX(2px);
+  }
+  .lara-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .lara-foot {
+    text-align: center;
+    padding: 0.4rem;
+    font-size: 0.68rem;
+    color: var(--nx-ink-faint);
+    background: var(--nx-deep);
+    border-top: 1px solid var(--nx-line);
+  }
+
+  @media (max-width: 500px) {
+    .lara-launcher {
+      bottom: 16px; right: 16px;
+      padding: 0.7rem 1rem 0.7rem 0.7rem;
+    }
+    .lara-launch-text { display: none; }
+    .lara-chat {
+      bottom: 0; right: 0; left: 0;
+      width: 100%;
+      max-width: 100%;
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+  }
+</style>
