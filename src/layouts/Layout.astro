@@ -12,7 +12,7 @@ const {
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>{title}</title>
   <meta name="description" content={description} />
@@ -21,62 +21,155 @@ const {
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nexux.pro" />
   <meta property="og:image" content="https://nexux.pro/og-image.jpg" />
+  <meta property="og:locale" content="es_ES" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://nexux.pro" />
-
-  <!-- Plausible (privacy-first analytics, gratis self-hosted) -->
-  <script defer data-domain="nexux.pro" src="https://plausible.io/js/script.tagged-events.outbound-links.js"></script>
-
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER"></script>
-  <script is:inline>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-PLACEHOLDER', { anonymize_ip: true });
-    window.gtag = gtag;
-  </script>
-
-  <!-- Meta Pixel -->
-  <script is:inline>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-    document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', 'PLACEHOLDER_PIXEL_ID');
-    fbq('track', 'PageView');
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
   <!-- Schema.org -->
-  <script type="application/ld+json" is:inline>
-  {
+  <script type="application/ld+json" is:inline set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    "serviceType": "Asistente IA para peluquerías",
+    "serviceType": "Asistente IA para peluquerías y centros de estética",
     "provider": {
       "@type": "Organization",
       "name": "Nexux Innovación Digital S.L.",
-      "url": "https://nexux.pro"
+      "url": "https://nexux.pro",
+      "logo": "https://nexux.pro/favicon.svg"
     },
-    "areaServed": "ES",
+    "areaServed": { "@type": "Country", "name": "España" },
     "description": "Asistente de inteligencia artificial que agenda citas, responde mensajes y captura clientas 24 horas para peluquerías y centros de estética.",
     "offers": [
       { "@type": "Offer", "name": "Starter", "price": "249", "priceCurrency": "EUR" },
       { "@type": "Offer", "name": "Pro", "price": "449", "priceCurrency": "EUR" },
       { "@type": "Offer", "name": "Total", "price": "749", "priceCurrency": "EUR" }
     ]
-  }
+  })}></script>
+
+  <!-- Trackers: GA4 + Meta Pixel — sólo con consentimiento -->
+  <script is:inline>
+    function nxLoadTrackers() {
+      if (window._nxTrackersLoaded) return;
+      window._nxTrackersLoaded = true;
+      // GA4
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-GS6BCN6TMJ';
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', 'G-GS6BCN6TMJ', { anonymize_ip: true });
+      // Meta Pixel
+      !function(f,b,e,v,n,t,ss)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;ss=b.getElementsByTagName(e)[0];
+      ss.parentNode.insertBefore(t,ss)}(window,document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1467739621760495');
+      fbq('track', 'PageView');
+    }
+    if (localStorage.getItem('nx_cookie_consent') === 'accepted') { nxLoadTrackers(); }
+    document.addEventListener('nx:consent-granted', nxLoadTrackers);
   </script>
 
-  <link rel="stylesheet" href="/src/styles/global.css" />
+  <!-- Plausible (privacy-first, no requiere consent) -->
+  <script defer data-domain="nexux.pro" src="https://plausible.io/js/script.tagged-events.outbound-links.js"></script>
+
+  <!-- Generic track helper for data-track attributes -->
+  <script is:inline>
+    document.addEventListener('click', function(e) {
+      var t = e.target.closest('[data-track]');
+      if (!t) return;
+      var name = t.getAttribute('data-track');
+      if (window.gtag) gtag('event', name);
+      if (window.fbq) fbq('trackCustom', name);
+      if (window.plausible) plausible(name);
+    }, { passive: true });
+  </script>
 </head>
 <body>
   <main>
     <slot />
   </main>
+
+  <!-- Cookie consent banner -->
+  <div id="nx-cookie-banner" class="cookie-banner" role="dialog" aria-label="Consentimiento de cookies" hidden>
+    <div class="cookie-text">
+      <strong>🍪 Usamos cookies para mejorar la experiencia.</strong><br/>
+      Analítica (GA4) y publicidad (Meta) sólo si las aceptas. Tú decides.
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-reject" class="btn-ghost cookie-btn">Sólo necesarias</button>
+      <button id="cookie-accept" class="btn-primary cookie-btn">Aceptar todo</button>
+    </div>
+  </div>
+
+  <script is:inline>
+    (function() {
+      var banner = document.getElementById('nx-cookie-banner');
+      var stored = localStorage.getItem('nx_cookie_consent');
+      if (!stored) banner.removeAttribute('hidden');
+
+      document.getElementById('cookie-accept').addEventListener('click', function() {
+        localStorage.setItem('nx_cookie_consent', 'accepted');
+        document.dispatchEvent(new CustomEvent('nx:consent-granted'));
+        banner.setAttribute('hidden', '');
+      });
+      document.getElementById('cookie-reject').addEventListener('click', function() {
+        localStorage.setItem('nx_cookie_consent', 'rejected');
+        banner.setAttribute('hidden', '');
+      });
+    })();
+  </script>
+
   <style is:global>
     @import '../styles/global.css';
+
+    .cookie-banner {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      max-width: 540px;
+      margin: 0 auto;
+      z-index: 200;
+      background: var(--nx-deep);
+      border: 1px solid var(--nx-line-hover);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      backdrop-filter: blur(20px);
+      animation: cookie-slide 0.5s var(--nx-ease) 1s backwards;
+    }
+    @keyframes cookie-slide {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .cookie-text {
+      font-size: 0.88rem;
+      color: var(--nx-ink-muted);
+      line-height: 1.5;
+    }
+    .cookie-text strong { color: var(--nx-ink); display: block; margin-bottom: 0.2rem; }
+    .cookie-actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+    }
+    .cookie-btn { padding: 0.55rem 1rem !important; font-size: 0.85rem !important; }
+    @media (max-width: 600px) {
+      .cookie-actions { flex-direction: column-reverse; }
+      .cookie-btn { width: 100%; justify-content: center; }
+    }
   </style>
 </body>
 </html>
