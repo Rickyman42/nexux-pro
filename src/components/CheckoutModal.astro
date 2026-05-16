@@ -1,0 +1,158 @@
+<div id="checkout-modal" class="checkout-overlay" aria-modal="true" role="dialog" hidden>
+  <div class="checkout-panel">
+    <div class="checkout-header">
+      <span id="checkout-plan-label" class="eyebrow">Plan</span>
+      <button id="checkout-close" class="checkout-close" type="button" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div id="checkout-loading" class="checkout-loading">
+      <div class="checkout-spinner" aria-hidden="true"></div>
+      <p>Preparando el pago seguro…</p>
+    </div>
+
+    <div id="checkout-error" class="checkout-error" hidden>
+      <p>❌ Error al cargar el pago. <a href="/#hablar">Habla con Ricardo</a>.</p>
+    </div>
+
+    <div id="stripe-checkout-mount"></div>
+  </div>
+</div>
+
+<style>
+  .checkout-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+  }
+
+  .checkout-panel {
+    width: min(100%, 520px);
+    margin: auto;
+    padding: 2rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 28px;
+    box-shadow: 0 28px 80px -40px rgba(0, 0, 0, 0.8);
+    animation: checkout-panel-in 0.28s var(--nx-ease);
+  }
+
+  @keyframes checkout-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .checkout-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .checkout-close {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--nx-line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--nx-ink);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s var(--nx-ease);
+  }
+
+  .checkout-close:hover {
+    color: var(--nx-magnet);
+    border-color: var(--nx-magnet);
+  }
+
+  .checkout-loading,
+  .checkout-error {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    color: var(--nx-ink-muted);
+  }
+
+  .checkout-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 3px solid rgba(78, 205, 196, 0.16);
+    border-top-color: var(--nx-magnet);
+    animation: checkout-spin 0.85s linear infinite;
+  }
+
+  @keyframes checkout-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .checkout-error a {
+    color: var(--nx-magnet);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  #stripe-checkout-mount:empty {
+    display: none;
+  }
+
+  .checkout-success-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 600;
+    background: var(--nx-magnet);
+    color: var(--nx-void);
+    padding: 1rem 1.5rem;
+    animation: cookie-slide 0.4s var(--nx-ease);
+  }
+
+  .checkout-success-inner {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    max-width: 680px;
+    margin: 0 auto;
+    font-weight: 600;
+  }
+
+  .checkout-success-inner p {
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  @media (max-width: 640px) {
+    .checkout-overlay {
+      padding: 1rem;
+      align-items: end;
+    }
+
+    .checkout-panel {
+      width: 100%;
+      padding: 1.25rem;
+      border-radius: 22px;
+    }
+
+    .checkout-success-inner {
+      align-items: flex-start;
+    }
+  }
+</style>
