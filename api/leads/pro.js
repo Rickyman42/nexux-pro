@@ -1,8 +1,5 @@
 // Vercel serverless function — recibe leads del bot Lara
-// Notifica Telegram + persiste en Vercel KV (opcional) o solo Telegram.
-
 export default async function handler(req, res) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -16,7 +13,7 @@ export default async function handler(req, res) {
   const missing = required.filter(k => !lead[k]);
   if (missing.length) return res.status(400).json({ error: 'missing_fields', fields: missing });
 
-  if (String(lead.nombre).length > 200 || String(lead.dolor || '').length > 2000) {
+  if (String(lead.nombre).length > 200 || String(lead.mayor_dolor || '').length > 2000) {
     return res.status(400).json({ error: 'fields_too_long' });
   }
 
@@ -24,17 +21,25 @@ export default async function handler(req, res) {
   const CHAT = process.env.TELEGRAM_CHAT_ID;
 
   if (TOKEN && CHAT) {
+    const planLabel = {
+      starter: '🌱 Starter (249€/mes)',
+      pro: '⭐ Pro (449€/mes)',
+      total: '💎 Total (749€/mes)',
+    }[lead._plan] || lead._plan || '—';
+
     const text = [
       '🎯 *NUEVO LEAD NEXUX.PRO*',
       '',
       `👤 *${escMd(lead.nombre)}*`,
       `💇 ${escMd(lead.salon)}`,
-      `📍 ${escMd(lead.ciudad || '—')}`,
       `📞 ${escMd(lead.telefono)}`,
       '',
-      `🗂 Sistema actual: ${escMd(lead.reservas || '—')}`,
-      `💬 Dolor: _${escMd(lead.dolor || '—')}_`,
+      `📱 Canal principal: ${escMd(lead.canal || '—')}`,
+      `👥 Equipo: ${escMd(lead.trabajadoras || '—')}`,
+      `📉 Citas perdidas/sem: ${escMd(lead.citas_perdidas || '—')}`,
+      `💬 Dolor principal: ${escMd(lead.mayor_dolor || '—')}`,
       '',
+      `🎯 Plan recomendado: ${planLabel}`,
       `🔗 UTM: ${escMd(lead.utm || '(directo)')}`,
       `⏱ ${new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })}`,
     ].join('\n');
@@ -55,7 +60,6 @@ export default async function handler(req, res) {
     }
   }
 
-  // Opcional: persistir en Brevo lista de contactos
   if (process.env.BREVO_API_KEY) {
     try {
       await fetch('https://api.brevo.com/v3/contacts', {
@@ -70,8 +74,9 @@ export default async function handler(req, res) {
             FIRSTNAME: lead.nombre,
             SMS: lead.telefono,
             SALON: lead.salon,
-            CIUDAD: lead.ciudad,
-            DOLOR: lead.dolor,
+            CANAL: lead.canal,
+            DOLOR: lead.mayor_dolor,
+            PLAN: lead._plan,
           },
           listIds: process.env.BREVO_LIST_ID ? [Number(process.env.BREVO_LIST_ID)] : [],
           updateEnabled: true,
