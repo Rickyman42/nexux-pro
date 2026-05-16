@@ -1,0 +1,20 @@
+---
+import PlanDetail from '../../components/PlanDetail.astro';
+import { planEntries, type PlanData, type PlanSlug } from '../../data/plans';
+import Layout from '../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return planEntries.map(([slug, plan]) => ({
+    params: { plan: slug },
+    props: { slug, plan },
+  }));
+}
+
+const { slug, plan } = Astro.props as { slug: PlanSlug; plan: PlanData };
+const canonical = `https://nexux.pro/paquetes/${slug}`;
+const title = `${plan.name} | Nexux Pro`;
+const description = `${plan.name}: ${plan.sub}. Desde ${plan.price}€/mes con configuración completa y garantía de 30 días.`;
+---
+<Layout title={title} description={description} canonical={canonical}>
+  <PlanDetail plan={plan} slug={slug} />
+</Layout>

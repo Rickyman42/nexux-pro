@@ -6,9 +6,9 @@ const plans = [
     price: '249',
     sub: 'Para salones que empiezan a profesionalizarse',
     features: [
-      'Lara responde Instagram + WhatsApp 24h',
+      'Lara responde Instagram + WhatsApp o Telegram 24h',
       'Agenda de citas integrada',
-      'Recordatorios automáticos por WhatsApp',
+      'Recordatorios automáticos (WhatsApp o Telegram)',
       'Resumen diario al cierre',
       'Hasta 300 conversaciones/mes',
     ],
@@ -82,11 +82,24 @@ const plans = [
               </li>
             ))}
           </ul>
+          <a href={`/paquetes/${plan.name.toLowerCase()}`} class="plan-details-link">
+            Ver todos los detalles →
+          </a>
           <a href="#hablar" class={plan.highlight ? 'btn-primary plan-cta' : 'btn-ghost plan-cta'} data-track={`pricing_${plan.name.toLowerCase()}`}>
             {plan.cta}
           </a>
         </div>
       ))}
+    </div>
+
+    <div class="channel-note">
+      <div class="channel-note-icon">💬</div>
+      <div>
+        <strong>¿WhatsApp o Telegram?</strong>
+        Lara funciona con los dos canales. Telegram es oficial, gratuito y sin riesgo de bloqueo — lo recomendamos para empezar.
+        WhatsApp conecta vía protocolo Web (como WhatsApp Web), lo que conlleva un riesgo bajo pero real de que WhatsApp bloquee el número.
+        Te asesoramos sobre qué canal encaja mejor con tu salón antes de la configuración.
+      </div>
     </div>
 
     <div class="guarantee">
@@ -221,7 +234,35 @@ const plans = [
     margin-top: 0.2rem;
   }
 
+  .plan-details-link {
+    display: block;
+    text-align: center;
+    color: var(--nx-ink-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .plan-details-link:hover { color: var(--nx-magnet); }
+
   .plan-cta { width: 100%; justify-content: center; }
+
+  .channel-note {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    max-width: 720px;
+    margin: 0 auto 1.5rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(78,205,196,0.05);
+    border: 1px solid rgba(78,205,196,0.2);
+    border-radius: 16px;
+    color: var(--nx-ink-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .channel-note strong { color: var(--nx-ink); display: block; margin-bottom: 0.25rem; }
+  .channel-note-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
 
   .guarantee {
     display: flex;

@@ -6,7 +6,7 @@
     <div class="lara-avatar-mini">L</div>
     <div class="lara-launch-text">
       <div class="lara-launch-title">Habla con Lara</div>
-      <div class="lara-launch-sub">Responde al momento</div>
+      <div class="lara-launch-sub">Descubre tu plan ideal</div>
     </div>
   </div>
   <div class="lara-pulse"></div>
@@ -19,7 +19,7 @@
       <div class="lara-avatar">L</div>
       <div>
         <div class="lara-name">Lara <span class="lara-tag">Asistente IA</span></div>
-        <div class="lara-status"><span class="online-dot-mini"></span> Aquí para ayudarte</div>
+        <div class="lara-status"><span class="online-dot-mini"></span> Lista para ayudarte</div>
       </div>
     </div>
     <button id="lara-close" class="lara-close" aria-label="Cerrar chat">
@@ -40,49 +40,131 @@
 
 <script is:inline>
 (function() {
+
+  const PLANES = {
+    starter: {
+      nombre: 'Starter',
+      precio: '249 €/mes',
+      emoji: '🌱',
+      puntos: [
+        'Lara responde WhatsApp 24h sin que hagas nada',
+        'Agenda citas automáticamente y sin errores',
+        'Nunca más una cita perdida por no contestar',
+      ],
+      desc: 'Perfecto si empiezas: tu asistente siempre activa en WhatsApp.'
+    },
+    pro: {
+      nombre: 'Pro',
+      precio: '449 €/mes',
+      emoji: '⚡',
+      puntos: [
+        'WhatsApp + Instagram DMs cubiertos 24h',
+        'Recupera automáticamente clientas que llevan meses sin venir',
+        'Analítica de qué servicios te dan más dinero',
+      ],
+      desc: 'El más elegido: cubre todos tus canales y hace crecer tu cartera de clientas.'
+    },
+    total: {
+      nombre: 'Total',
+      precio: '749 €/mes',
+      emoji: '👑',
+      puntos: [
+        'Todo lo anterior, sin límites de mensajes ni trabajadoras',
+        'Campañas de marketing automatizadas cada mes',
+        'Tu asistente con nombre y personalidad propios',
+      ],
+      desc: 'Para salones que quieren dominar su zona: marketing, agenda y atención en piloto automático.'
+    }
+  };
+
+  function recomendar(data) {
+    const esGrande = ['4-8', '+8'].includes(data.trabajadoras);
+    const conInstagram = ['Instagram', 'Por todos lados'].includes(data.canal);
+    const muchasPerdidas = data.citas_perdidas === 'Más de 5';
+    const todo = data.mayor_dolor === 'Todo a la vez';
+    const captarClientas = data.mayor_dolor === 'Recuperar clientas';
+
+    if (esGrande || todo || (conInstagram && muchasPerdidas)) return 'total';
+    if (conInstagram || captarClientas || data.citas_perdidas === '3-5' || data.trabajadoras === '2-3') return 'pro';
+    return 'starter';
+  }
+
   const flow = [
     {
       id: 'welcome',
-      bot: '¡Hola! 👋 Soy Lara, la asistente IA que va a vivir en tu peluquería.<br/><br/>Cuéntame, ¿cómo te llamas?',
+      bot: '¡Hola! 👋 Soy Lara, la asistente IA que gestiona peluquerías mientras las dueñas trabajan.<br/><br/>¿Cómo te llamas?',
       field: 'nombre',
       validate: v => v.length >= 2,
     },
     {
       id: 'salon',
-      bot: (data) => `Encantada, ${data.nombre} 🌸. ¿Cómo se llama tu peluquería o centro de estética?`,
+      bot: (data) => `Encantada, ${data.nombre} 🌸. ¿Cómo se llama tu salón o centro?`,
       field: 'salon',
       validate: v => v.length >= 2,
     },
     {
-      id: 'ciudad',
-      bot: (data) => `${data.salon}, qué bonito. ¿En qué ciudad estás?`,
-      field: 'ciudad',
+      id: 'canal',
+      bot: '¿Por dónde te contactan más tus clientas?',
+      field: 'canal',
       validate: v => v.length >= 2,
+      suggestions: ['WhatsApp', 'Instagram', 'Teléfono', 'Por todos lados'],
     },
     {
-      id: 'reservas',
-      bot: '¿Cómo gestionas hoy las citas? ¿Tienes algún sistema online o las apuntas a mano?',
-      field: 'reservas',
-      validate: v => v.length >= 2,
-      suggestions: ['A mano', 'En el ordenador', 'Booksy / Fresha', 'No tengo nada'],
+      id: 'trabajadoras',
+      bot: '¿Cuántas personas trabajáis en el salón?',
+      field: 'trabajadoras',
+      validate: v => v.length >= 1,
+      suggestions: ['Solo yo', '2-3', '4-8', '+8'],
     },
     {
-      id: 'dolor',
-      bot: (data) => `Entendido. ¿Qué es lo que más te frustra del día a día? (puedes contarme lo que quieras, te leo entera)`,
-      field: 'dolor',
-      validate: v => v.length >= 5,
+      id: 'citas_perdidas',
+      bot: (data) => `${data.salon}, ¿cuántas citas crees que se os escapan a la semana por no contestar a tiempo?`,
+      field: 'citas_perdidas',
+      validate: v => v.length >= 1,
+      suggestions: ['1-2', '3-5', 'Más de 5', 'No lo sé bien'],
+    },
+    {
+      id: 'mayor_dolor',
+      bot: '¿Qué es lo que más te come el tiempo en el día a día?',
+      field: 'mayor_dolor',
+      validate: v => v.length >= 2,
+      suggestions: ['Responder mensajes', 'Gestionar la agenda', 'Recuperar clientas', 'Todo a la vez'],
+    },
+    {
+      id: 'recomendacion',
+      bot: (data) => {
+        const planKey = recomendar(data);
+        data._plan = planKey;
+        const p = PLANES[planKey];
+        return `Con lo que me has contado, el plan que mejor encaja para <strong>${data.salon}</strong> es:<br/><br/>` +
+          `<div class="lara-plan-card">` +
+          `<div class="lara-plan-header">${p.emoji} <strong>Plan ${p.nombre}</strong> · <span class="lara-plan-price">${p.precio}</span></div>` +
+          `<ul class="lara-plan-list">${p.puntos.map(pt => `<li>${pt}</li>`).join('')}</ul>` +
+          `<div class="lara-plan-desc">${p.desc}</div>` +
+          `</div>`;
+      },
+      field: null,
+      autoNext: true,
+      autoNextDelay: 1400,
     },
     {
       id: 'telefono',
-      bot: 'Última pregunta y te llamamos en menos de 24 horas con un plan a medida. ¿Cuál es tu teléfono?',
+      bot: (data) => {
+        const p = PLANES[data._plan || 'pro'];
+        return `Para activar el <strong>Plan ${p.nombre}</strong> solo necesito un dato más.<br/>¿Cuál es tu teléfono? Te confirmo la activación por WhatsApp en menos de 24h.`;
+      },
       field: 'telefono',
       validate: v => /^[+\d\s\-()]{9,}$/.test(v),
     },
     {
       id: 'final',
-      bot: (data) => `¡Listo, ${data.nombre}! 💚<br/><br/>He guardado todo lo que me has contado. Ricardo (el fundador de Nexux) te llamará al ${data.telefono} en menos de 24 horas con una propuesta concreta para ${data.salon}.<br/><br/>Mientras tanto, no te preocupes por nada. Esto es lo que voy a hacer YO en tu salón cada día. 🚀`,
+      bot: (data) => {
+        const p = PLANES[data._plan || 'pro'];
+        return `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu solicitud para el <strong>Plan ${p.nombre}</strong> de ${data.salon}. Recibirás un mensaje en el ${data.telefono} con todos los pasos para activar Lara en tu salón.`;
+      },
       field: null,
       final: true,
+      showCTA: true,
     },
   ];
 
@@ -95,10 +177,10 @@
 
   function $(id) { return document.getElementById(id); }
 
-  function track(event, props = {}) {
-    if (window.gtag) gtag('event', event, props);
-    if (window.fbq) fbq('trackCustom', event, props);
-    if (window.plausible) plausible(event, { props });
+  function track(event, props) {
+    if (window.gtag) gtag('event', event, props || {});
+    if (window.fbq) fbq('trackCustom', event, props || {});
+    if (window.plausible) plausible(event, { props: props || {} });
   }
 
   function addMsg(text, who) {
@@ -120,6 +202,7 @@
     body.appendChild(t);
     body.scrollTop = body.scrollHeight;
   }
+
   function removeTyping() {
     const t = $('lara-typing');
     if (t) t.remove();
@@ -143,29 +226,57 @@
     body.appendChild(wrap);
     body.scrollTop = body.scrollHeight;
   }
+
   function removeSuggestions() {
     const c = $('lara-chips');
     if (c) c.remove();
+  }
+
+  function addCTA() {
+    const body = $('lara-body');
+    const wrap = document.createElement('div');
+    wrap.className = 'lara-cta-wrap';
+    const p = PLANES[state.data._plan || 'pro'];
+    const btn = document.createElement('button');
+    btn.className = 'lara-cta-btn';
+    btn.textContent = `Ver detalles del Plan ${p.nombre} →`;
+    btn.onclick = () => {
+      close();
+      const el = document.getElementById('paquetes') || document.getElementById('precios');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    };
+    wrap.appendChild(btn);
+    body.appendChild(wrap);
+    body.scrollTop = body.scrollHeight;
   }
 
   async function showStep(idx) {
     const step = flow[idx];
     if (!step) return;
     removeSuggestions();
+    const delay = step.autoNext ? 700 : 900 + Math.random() * 600;
     addTyping();
-    await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
+    await new Promise(r => setTimeout(r, delay));
     removeTyping();
     const text = typeof step.bot === 'function' ? step.bot(state.data) : step.bot;
     addMsg(text, 'bot');
     if (step.suggestions) {
       setTimeout(() => addSuggestions(step.suggestions), 200);
     }
+    if (step.autoNext) {
+      setTimeout(() => {
+        state.step += 1;
+        showStep(state.step);
+      }, step.autoNextDelay || 1200);
+      return;
+    }
     if (step.final) {
+      if (step.showCTA) setTimeout(addCTA, 500);
       $('lara-input').disabled = true;
       $('lara-send').disabled = true;
       state.finished = true;
       sendLead();
-      track('lara_lead_complete', state.data);
+      track('lara_lead_complete', { plan: state.data._plan });
     }
   }
 
@@ -180,10 +291,7 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    }).catch(() => {
-      // Fallback: enviar a webhook genérico
-      console.warn('Lead local-only fallback', payload);
-    });
+    }).catch(() => {});
   }
 
   async function handleSend() {
@@ -198,7 +306,7 @@
       addTyping();
       await new Promise(r => setTimeout(r, 700));
       removeTyping();
-      addMsg('Mmm, ¿podrías afinarlo un poquito? Para poder ayudarte mejor 🌷', 'bot');
+      addMsg('Mmm, ¿podrías concretar un poquito más? 🌷', 'bot');
       input.value = '';
       return;
     }
@@ -214,6 +322,7 @@
     if (state.opened) return;
     state.opened = true;
     $('lara-chat').classList.add('open');
+    $('lara-chat').setAttribute('aria-hidden', 'false');
     $('lara-launcher').classList.add('hidden');
     track('lara_opened');
     if (state.step === 0 && $('lara-body').children.length === 0) {
@@ -224,6 +333,7 @@
   function close() {
     state.opened = false;
     $('lara-chat').classList.remove('open');
+    $('lara-chat').setAttribute('aria-hidden', 'true');
     $('lara-launcher').classList.remove('hidden');
   }
 
@@ -234,13 +344,8 @@
     $('lara-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') handleSend();
     });
-
-    // Anchor #hablar abre el chat
     document.querySelectorAll('a[href="#hablar"]').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        open();
-      });
+      a.addEventListener('click', e => { e.preventDefault(); open(); });
     });
   }
 
@@ -325,7 +430,7 @@
     right: 24px;
     width: 380px;
     max-width: calc(100vw - 32px);
-    height: 600px;
+    height: 620px;
     max-height: calc(100vh - 48px);
     background: var(--nx-deep);
     border: 1px solid var(--nx-line-hover);
@@ -435,7 +540,7 @@
     border-radius: 18px;
     font-size: 0.9rem;
     line-height: 1.5;
-    max-width: 85%;
+    max-width: 88%;
     word-wrap: break-word;
     opacity: 0;
     transform: translateY(8px);
@@ -493,6 +598,80 @@
     border-color: var(--nx-magnet);
     color: var(--nx-magnet);
     background: var(--nx-magnet-halo);
+  }
+
+  /* Plan recommendation card */
+  .lara-plan-card {
+    background: var(--nx-void);
+    border: 1px solid var(--nx-magnet);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 0 20px -8px rgba(78,205,196,0.3);
+  }
+  .lara-plan-header {
+    font-size: 0.95rem;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+  .lara-plan-price {
+    color: var(--nx-magnet);
+    font-weight: 700;
+  }
+  .lara-plan-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.6rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .lara-plan-list li {
+    font-size: 0.82rem;
+    color: var(--nx-ink-muted);
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .lara-plan-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--nx-magnet);
+    font-weight: 700;
+  }
+  .lara-plan-desc {
+    font-size: 0.78rem;
+    color: var(--nx-ink-faint);
+    font-style: italic;
+    border-top: 1px solid var(--nx-line);
+    padding-top: 0.5rem;
+    margin-top: 0.3rem;
+  }
+
+  /* Final CTA */
+  .lara-cta-wrap {
+    align-self: stretch;
+    margin-top: 0.25rem;
+  }
+  .lara-cta-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--nx-magnet), var(--nx-magnet-deep));
+    color: var(--nx-void);
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--nx-font-sans);
+  }
+  .lara-cta-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -6px rgba(78,205,196,0.5);
   }
 
   .lara-input-wrap {

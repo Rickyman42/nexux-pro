@@ -1,0 +1,456 @@
+---
+import type { PlanData, PlanSlug } from '../data/plans';
+
+interface Props {
+  plan: PlanData;
+  slug: PlanSlug;
+}
+
+const { plan, slug } = Astro.props as Props;
+---
+<section class="plan-detail">
+  <div class="plan-detail-glow" aria-hidden="true"></div>
+
+  <div class="container-nx plan-detail-shell">
+    <div class="plan-hero">
+      <a href="/#paquetes" class="plan-back">← Volver a paquetes</a>
+
+      {plan.badge && <div class="plan-badge">{plan.badge}</div>}
+
+      <div class="plan-copy">
+        <p class="eyebrow">Nexux Pro</p>
+        <h1 class="plan-title">{plan.name}</h1>
+        <p class="plan-sub">{plan.sub}</p>
+      </div>
+
+      <div class="plan-purchase-card">
+        <div class="plan-price">
+          <span class="plan-price-value">{plan.price}€</span>
+          <span class="plan-price-unit">/mes</span>
+        </div>
+
+        <div class="plan-actions">
+          <a href={plan.lemonsqueezy_url} class="btn-primary plan-action-primary" data-track={`plan_${slug}_checkout_top`}>
+            Empezar con {plan.name} →
+          </a>
+          <a href="https://nexux.pro/#hablar" class="btn-ghost plan-action-secondary" data-track={`plan_${slug}_talk`}>
+            Hablar con Ricardo
+          </a>
+        </div>
+
+        <p class="plan-guarantee">30 días de garantía o te devolvemos el dinero.</p>
+      </div>
+    </div>
+
+    <div class="plan-grid">
+      <section class="plan-panel">
+        <h2 class="h-section">Para quién <em>es</em></h2>
+        <ul class="plan-fit-list">
+          {plan.for.map(item => (
+            <li>
+              <span class="plan-fit-icon">✓</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="plan-panel">
+        <h2 class="h-section">Todo lo que <em>incluye</em></h2>
+        <div class="plan-feature-list">
+          {plan.features.map(feature => (
+            <article class="plan-feature-card">
+              <div class="plan-feature-head">
+                <span class="plan-feature-icon" aria-hidden="true">{feature.icon}</span>
+                <h3>{feature.title}</h3>
+              </div>
+              {feature.detail && <p>{feature.detail}</p>}
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+
+    <section class="plan-panel plan-faq-panel">
+      <div class="plan-panel-heading">
+        <p class="eyebrow">FAQ</p>
+        <h2 class="h-section">Preguntas <em>habituales</em></h2>
+      </div>
+
+      <div class="plan-faq-list">
+        {plan.faqs.map((faq, index) => (
+          <details class="plan-faq-item" open={index === 0}>
+            <summary>
+              <span>{faq.q}</span>
+              <span class="plan-faq-plus" aria-hidden="true">+</span>
+            </summary>
+            <p>{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="plan-final-cta">
+      <div>
+        <p class="eyebrow">Siguiente paso</p>
+        <h2 class="h-section">¿Lista para <em>empezar</em>?</h2>
+        <p>
+          Activamos tu asistente, configuramos el canal y dejamos la agenda funcionando contigo desde el día uno.
+        </p>
+      </div>
+
+      <div class="plan-final-actions">
+        <a href={plan.lemonsqueezy_url} class="btn-primary" data-track={`plan_${slug}_checkout_bottom`}>
+          Comprar {plan.name} →
+        </a>
+        <span>30 días de garantía o te devolvemos el dinero.</span>
+      </div>
+    </section>
+  </div>
+</section>
+
+<style>
+  .plan-detail {
+    position: relative;
+    padding: 7rem 0 5rem;
+    background:
+      radial-gradient(circle at top, rgba(78, 205, 196, 0.12), transparent 30%),
+      linear-gradient(180deg, rgba(19, 22, 30, 0.95), var(--nx-void) 24%, var(--nx-void));
+    overflow: clip;
+  }
+
+  .plan-detail-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 10% 15%, rgba(78, 205, 196, 0.1), transparent 28%),
+      radial-gradient(circle at 85% 20%, rgba(78, 205, 196, 0.08), transparent 24%);
+    opacity: 0.7;
+  }
+
+  .plan-detail-shell {
+    position: relative;
+    z-index: 1;
+  }
+
+  .plan-hero {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .plan-back {
+    width: fit-content;
+    color: var(--nx-ink-muted);
+    font-size: 0.92rem;
+    transition: color 0.2s var(--nx-ease);
+  }
+
+  .plan-back:hover { color: var(--nx-magnet); }
+
+  .plan-badge {
+    width: fit-content;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(78, 205, 196, 0.14);
+    border: 1px solid rgba(78, 205, 196, 0.25);
+    color: var(--nx-magnet);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .plan-copy {
+    max-width: 780px;
+  }
+
+  .plan-copy .eyebrow {
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+
+  .plan-title {
+    font-family: var(--nx-font-serif);
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--nx-ink);
+  }
+
+  .plan-sub {
+    margin-top: 1.1rem;
+    max-width: 52rem;
+    color: var(--nx-ink-muted);
+    font-size: clamp(1.02rem, 2.2vw, 1.2rem);
+    line-height: 1.7;
+  }
+
+  .plan-purchase-card {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.6rem;
+    max-width: 30rem;
+    background: rgba(19, 22, 30, 0.88);
+    border: 1px solid rgba(242, 242, 236, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(18px);
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--nx-line);
+  }
+
+  .plan-price-value {
+    font-family: var(--nx-font-serif);
+    font-size: clamp(3rem, 7vw, 4.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--nx-magnet);
+  }
+
+  .plan-price-unit {
+    color: var(--nx-ink-muted);
+    font-size: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .plan-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .plan-action-primary,
+  .plan-action-secondary {
+    justify-content: center;
+    min-width: 13.5rem;
+  }
+
+  .plan-guarantee {
+    color: var(--nx-ink-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .plan-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin: 2.5rem 0 1.5rem;
+  }
+
+  .plan-panel {
+    padding: 2rem;
+    background: linear-gradient(180deg, rgba(26, 30, 40, 0.9), rgba(19, 22, 30, 0.92));
+    border: 1px solid var(--nx-line);
+    border-radius: 28px;
+  }
+
+  .plan-fit-list {
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .plan-fit-list li {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    color: var(--nx-ink);
+    line-height: 1.55;
+  }
+
+  .plan-fit-icon {
+    color: var(--nx-magnet);
+    font-weight: 700;
+    margin-top: 0.1rem;
+  }
+
+  .plan-feature-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .plan-feature-card {
+    padding: 1.2rem 1.25rem;
+    background: rgba(11, 13, 18, 0.46);
+    border: 1px solid rgba(242, 242, 236, 0.06);
+    border-radius: 20px;
+  }
+
+  .plan-feature-head {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+
+  .plan-feature-head h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--nx-ink);
+  }
+
+  .plan-feature-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+
+  .plan-feature-card p {
+    margin-top: 0.75rem;
+    color: var(--nx-ink-muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  .plan-faq-panel {
+    margin-top: 1.5rem;
+  }
+
+  .plan-panel-heading .eyebrow {
+    display: inline-block;
+    margin-bottom: 0.9rem;
+  }
+
+  .plan-faq-list {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.5rem;
+  }
+
+  .plan-faq-item {
+    background: rgba(11, 13, 18, 0.5);
+    border: 1px solid rgba(242, 242, 236, 0.06);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .plan-faq-item summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.15rem 1.25rem;
+    cursor: pointer;
+    color: var(--nx-ink);
+    font-weight: 500;
+  }
+
+  .plan-faq-item summary::-webkit-details-marker { display: none; }
+
+  .plan-faq-plus {
+    font-size: 1.3rem;
+    color: var(--nx-magnet);
+    transition: transform 0.2s var(--nx-ease);
+  }
+
+  .plan-faq-item[open] .plan-faq-plus { transform: rotate(45deg); }
+
+  .plan-faq-item p {
+    padding: 0 1.25rem 1.2rem;
+    color: var(--nx-ink-muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  .plan-final-cta {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+    background:
+      linear-gradient(135deg, rgba(78, 205, 196, 0.14), rgba(78, 205, 196, 0.04)),
+      rgba(19, 22, 30, 0.85);
+    border: 1px solid rgba(78, 205, 196, 0.2);
+    border-radius: 28px;
+  }
+
+  .plan-final-cta .eyebrow {
+    display: inline-block;
+    margin-bottom: 0.9rem;
+  }
+
+  .plan-final-cta p {
+    margin-top: 0.9rem;
+    max-width: 42rem;
+    color: var(--nx-ink-muted);
+    line-height: 1.7;
+  }
+
+  .plan-final-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .plan-final-actions span {
+    color: var(--nx-ink-muted);
+    font-size: 0.92rem;
+  }
+
+  @media (min-width: 960px) {
+    .plan-hero {
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 26rem);
+      align-items: end;
+    }
+
+    .plan-back,
+    .plan-badge,
+    .plan-copy {
+      grid-column: 1;
+    }
+
+    .plan-purchase-card {
+      grid-column: 2;
+      grid-row: 1 / span 4;
+      justify-self: end;
+      width: 100%;
+    }
+
+    .plan-grid {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      align-items: start;
+    }
+
+    .plan-final-cta {
+      grid-template-columns: minmax(0, 1.2fr) auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .plan-detail {
+      padding: 5.5rem 0 4rem;
+    }
+
+    .plan-panel,
+    .plan-final-cta {
+      padding: 1.5rem;
+      border-radius: 22px;
+    }
+
+    .plan-purchase-card {
+      padding: 1.35rem;
+      border-radius: 20px;
+    }
+
+    .plan-action-primary,
+    .plan-action-secondary {
+      width: 100%;
+    }
+  }
+</style>

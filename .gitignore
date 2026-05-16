@@ -7,3 +7,4 @@ leads.jsonl
 .env
 .env.*
 !.env.example
+.vercel

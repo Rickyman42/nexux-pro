@@ -2,10 +2,12 @@
 export interface Props {
   title?: string;
   description?: string;
+  canonical?: string;
 }
 const {
   title = 'Nexux Pro — IA que atiende a tus clientas mientras tú trabajas',
-  description = 'Tu peluquería en piloto automático. Lara, tu asistente IA, agenda citas, responde Instagram y WhatsApp 24h. Sin contratar a nadie.'
+  description = 'Tu peluquería en piloto automático. Lara, tu asistente IA, agenda citas, responde Instagram y WhatsApp 24h. Sin contratar a nadie.',
+  canonical = 'https://nexux.pro'
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -19,11 +21,11 @@ const {
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://nexux.pro" />
+  <meta property="og:url" content={canonical} />
   <meta property="og:image" content="https://nexux.pro/og-image.jpg" />
   <meta property="og:locale" content="es_ES" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href="https://nexux.pro" />
+  <link rel="canonical" href={canonical} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
