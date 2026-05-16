@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const canonical = 'https://nexux.pro/404';
+---
+<Layout
+  title="404 | Nexux Pro"
+  description="La pagina que buscas no existe en Nexux Pro."
+  canonical={canonical}
+>
+  <section class="error-page">
+    <div class="container-nx">
+      <div class="error-page-inner">
+        <div class="error-code">404</div>
+        <h1>Esta pagina <em>no existe</em></h1>
+        <p>
+          Puede que el enlace este roto o que esta URL ya no este disponible. Desde aqui puedes volver a la home o
+          abrir la conversacion con Lara.
+        </p>
+        <div class="error-actions">
+          <a href="/" class="btn-primary">Volver al inicio</a>
+          <a href="/#hablar" class="btn-ghost">Hablar con Lara</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
