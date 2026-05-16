@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   const params = new URLSearchParams();
   params.append('ui_mode', 'embedded_page');
   params.append('mode', 'subscription');
-  params.append('return_url', `${origin}/paquetes/${plan}?session_id={CHECKOUT_SESSION_ID}`);
+  params.append('return_url', `${origin}/gracias?plan=${plan}`);
   params.append('metadata[plan]', plan);
 
   if (priceId) {

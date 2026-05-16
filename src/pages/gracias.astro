@@ -1,0 +1,148 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout
+  title="¡Pago completado! — Nexux Pro"
+  description="Tu plan Nexux está activándose. Te contactamos en menos de 24h."
+  canonical="https://nexux.pro/gracias"
+>
+  <section class="gracias-wrap">
+    <div class="gracias-card">
+      <div class="gracias-icon">🎉</div>
+      <h1 class="gracias-title">¡Pago completado!</h1>
+      <p class="gracias-sub">
+        Hemos recibido tu pedido correctamente. En menos de <strong>24&nbsp;horas</strong> te
+        contactamos para activar Lara en tu salón y dejarlo todo listo.
+      </p>
+
+      <div class="gracias-steps">
+        <div class="gracias-step">
+          <span class="step-num">1</span>
+          <div>
+            <strong>Revisa tu email</strong>
+            <p>Te hemos enviado una confirmación con los detalles de tu plan.</p>
+          </div>
+        </div>
+        <div class="gracias-step">
+          <span class="step-num">2</span>
+          <div>
+            <strong>Ricardo te escribe</strong>
+            <p>Nuestro equipo se pone en contacto contigo para la configuración inicial.</p>
+          </div>
+        </div>
+        <div class="gracias-step">
+          <span class="step-num">3</span>
+          <div>
+            <strong>Lara lista en tu salón</strong>
+            <p>La configuración completa tarda menos de un día. Sin instalar nada.</p>
+          </div>
+        </div>
+      </div>
+
+      <a href="/" class="btn-primary gracias-cta">Volver a nexux.pro</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .gracias-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem;
+    background: var(--nx-void);
+  }
+
+  .gracias-card {
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 28px;
+    padding: 3rem 2.5rem;
+    max-width: 540px;
+    width: 100%;
+    text-align: center;
+    animation: fadeUp 0.5s var(--nx-ease) both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .gracias-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.25rem;
+    line-height: 1;
+  }
+
+  .gracias-title {
+    font-family: var(--nx-font-serif);
+    font-size: 2.25rem;
+    font-style: italic;
+    color: var(--nx-ink);
+    margin: 0 0 1rem;
+    line-height: 1.15;
+  }
+
+  .gracias-sub {
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin: 0 0 2.5rem;
+  }
+  .gracias-sub strong { color: var(--nx-ink); }
+
+  .gracias-steps {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .gracias-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--nx-magnet-halo);
+    border: 1px solid rgba(78, 205, 196, 0.3);
+    color: var(--nx-magnet);
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .gracias-step strong {
+    display: block;
+    color: var(--nx-ink);
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .gracias-step p {
+    color: var(--nx-ink-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .gracias-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 540px) {
+    .gracias-card { padding: 2.5rem 1.5rem; }
+    .gracias-title { font-size: 1.75rem; }
+  }
+</style>
