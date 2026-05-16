@@ -21,8 +21,50 @@ import Footer from '../components/Footer.astro';
   <Testimonials />
   <LaraWidget />
   <CheckoutModal />
+  <section class="cities-nav">
+    <div class="container-nx">
+      <p class="cities-nav-label">Nexux Pro disponible en toda Espana:</p>
+      <div class="cities-nav-links">
+        {['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao', 'Zaragoza'].map(ciudad => (
+          <a href={`/ciudad/${ciudad.toLowerCase()}`} class="city-link">{ciudad}</a>
+        ))}
+      </div>
+    </div>
+  </section>
   <Footer />
   <script>
     import '../scripts/checkout.ts';
   </script>
 </Layout>
+
+<style>
+  .cities-nav {
+    padding: 2rem 0 3rem;
+    border-top: 1px solid var(--nx-line);
+  }
+
+  .cities-nav-label {
+    color: var(--nx-ink-muted);
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .cities-nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .city-link {
+    color: var(--nx-ink-muted);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .city-link:hover {
+    color: var(--nx-magnet);
+  }
+</style>

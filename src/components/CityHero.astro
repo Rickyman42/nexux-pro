@@ -1,0 +1,97 @@
+---
+import type { CiudadData } from '../data/ciudades';
+
+interface Props {
+  ciudad: CiudadData;
+}
+
+const { ciudad } = Astro.props as Props;
+---
+<section class="city-hero">
+  <div class="container-nx">
+    <div class="city-hero-inner">
+      <div class="eyebrow">Nexux Pro en {ciudad.name}</div>
+      <h1>{ciudad.headline}</h1>
+      <p class="city-sub">{ciudad.sub}</p>
+
+      <div class="city-stats">
+        {ciudad.stats.map(stat => (
+          <div class="city-stat">
+            <strong>{stat.value}</strong>
+            <span>{stat.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div class="city-cta">
+        <button type="button" data-checkout-plan="pro" class="btn-primary" data-track={`city_${ciudad.slug}_checkout`}>
+          Quiero esto para mi salon →
+        </button>
+        <a href="/#hablar" class="btn-ghost" data-track={`city_${ciudad.slug}_talk`}>
+          Hablar primero
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .city-hero {
+    padding: 8rem 0 5rem;
+    background: var(--nx-void);
+  }
+
+  .city-hero-inner {
+    max-width: 680px;
+  }
+
+  .city-hero .eyebrow {
+    margin-bottom: 1.25rem;
+  }
+
+  .city-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-style: italic;
+    font-family: var(--nx-font-serif);
+    color: var(--nx-ink);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .city-sub {
+    color: var(--nx-ink-muted);
+    font-size: 1.15rem;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+    max-width: 580px;
+  }
+
+  .city-stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .city-stat strong {
+    display: block;
+    font-family: var(--nx-font-serif);
+    font-size: 2rem;
+    color: var(--nx-magnet);
+    line-height: 1;
+  }
+
+  .city-stat span {
+    color: var(--nx-ink-muted);
+    font-size: 0.8rem;
+    display: block;
+    margin-top: 0.25rem;
+  }
+
+  .city-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+</style>
