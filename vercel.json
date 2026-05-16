@@ -2,5 +2,11 @@
   "buildCommand": "pnpm build",
   "outputDirectory": "dist",
   "installCommand": "pnpm install",
-  "framework": "astro"
+  "framework": "astro",
+  "rewrites": [
+    {
+      "source": "/webhook/stripe",
+      "destination": "/api/webhook/stripe"
+    }
+  ]
 }

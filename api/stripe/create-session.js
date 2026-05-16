@@ -26,6 +26,7 @@ export default async function handler(req, res) {
   params.append('ui_mode', 'embedded_page');
   params.append('mode', 'subscription');
   params.append('return_url', `${origin}/paquetes/${plan}?session_id={CHECKOUT_SESSION_ID}`);
+  params.append('metadata[plan]', plan);
 
   if (priceId) {
     params.append('line_items[0][price]', priceId);
@@ -51,7 +52,7 @@ export default async function handler(req, res) {
     if (!r.ok) {
       const err = await r.json().catch(() => ({}));
       console.error('[stripe] session error:', err);
-      return res.status(500).json({ error: "session_create_failed", detail: err?.error?.message || JSON.stringify(err) });
+      return res.status(500).json({ error: 'session_create_failed' });
     }
     const session = await r.json();
     res.json({ clientSecret: session.client_secret });
