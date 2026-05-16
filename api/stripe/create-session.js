@@ -44,6 +44,7 @@ export default async function handler(req, res) {
       headers: {
         'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Stripe-Version': '2025-08-27.basil',
       },
       body: params.toString(),
     });
