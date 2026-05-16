@@ -15,7 +15,7 @@ export interface PlanData {
   name: string;
   price: number;
   sub: string;
-  lemonsqueezy_url: string;
+  stripe_url: string;
   color: string;
   badge?: string;
   for: string[];
@@ -28,7 +28,7 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     name: 'Starter',
     price: 249,
     sub: 'Para salones que empiezan a profesionalizarse',
-    lemonsqueezy_url: 'https://nexux.lemonsqueezy.com/buy/starter',
+    stripe_url: 'https://buy.stripe.com/starter_placeholder',
     color: '#4ECDC4',
     for: [
       'Salones unipersonales',
@@ -81,7 +81,7 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     name: 'Pro',
     price: 449,
     sub: 'Para salones con flujo constante de clientas',
-    lemonsqueezy_url: 'https://nexux.lemonsqueezy.com/buy/pro',
+    stripe_url: 'https://buy.stripe.com/pro_placeholder',
     badge: 'Más elegido',
     color: '#4ECDC4',
     for: [
@@ -136,7 +136,7 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     name: 'Total',
     price: 749,
     sub: 'Para cadenas o salones con varios profesionales',
-    lemonsqueezy_url: 'https://nexux.lemonsqueezy.com/buy/total',
+    stripe_url: 'https://buy.stripe.com/total_placeholder',
     badge: 'Premium',
     color: '#4ECDC4',
     for: [

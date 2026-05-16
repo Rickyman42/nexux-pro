@@ -30,7 +30,7 @@ const { plan, slug } = Astro.props as Props;
         </div>
 
         <div class="plan-actions">
-          <a href={plan.lemonsqueezy_url} class="btn-primary plan-action-primary" data-track={`plan_${slug}_checkout_top`}>
+          <a href={plan.stripe_url} class="btn-primary plan-action-primary" data-track={`plan_${slug}_checkout_top`}>
             Empezar con {plan.name} →
           </a>
           <a href="https://nexux.pro/#hablar" class="btn-ghost plan-action-secondary" data-track={`plan_${slug}_talk`}>
@@ -100,7 +100,7 @@ const { plan, slug } = Astro.props as Props;
       </div>
 
       <div class="plan-final-actions">
-        <a href={plan.lemonsqueezy_url} class="btn-primary" data-track={`plan_${slug}_checkout_bottom`}>
+        <a href={plan.stripe_url} class="btn-primary" data-track={`plan_${slug}_checkout_bottom`}>
           Comprar {plan.name} →
         </a>
         <span>30 días de garantía o te devolvemos el dinero.</span>
