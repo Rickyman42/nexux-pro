@@ -236,15 +236,12 @@
     const body = $('lara-body');
     const wrap = document.createElement('div');
     wrap.className = 'lara-cta-wrap';
-    const p = PLANES[state.data._plan || 'pro'];
+    const planKey = state.data._plan || 'pro';
+    const p = PLANES[planKey];
     const btn = document.createElement('button');
     btn.className = 'lara-cta-btn';
-    btn.textContent = `Ver detalles del Plan ${p.nombre} →`;
-    btn.onclick = () => {
-      close();
-      const el = document.getElementById('paquetes') || document.getElementById('precios');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    };
+    btn.setAttribute('data-checkout-plan', planKey);
+    btn.textContent = `Activar Plan ${p.nombre} — ${p.precio} →`;
     wrap.appendChild(btn);
     body.appendChild(wrap);
     body.scrollTop = body.scrollHeight;

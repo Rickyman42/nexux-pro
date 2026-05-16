@@ -110,11 +110,13 @@ function initCheckout() {
     if (event.key === 'Escape') closeCheckout();
   });
 
-  document.querySelectorAll<HTMLButtonElement>('[data-checkout-plan]').forEach(button => {
-    button.addEventListener('click', () => {
+  // Event delegation — catches dynamically added [data-checkout-plan] buttons (e.g. LaraWidget CTA)
+  document.addEventListener('click', event => {
+    const button = (event.target as Element).closest('[data-checkout-plan]');
+    if (button) {
       const plan = button.getAttribute('data-checkout-plan');
       if (plan) void openCheckout(plan);
-    });
+    }
   });
 
   const params = new URLSearchParams(window.location.search);
