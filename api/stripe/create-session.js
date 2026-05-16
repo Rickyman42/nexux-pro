@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     if (!r.ok) {
       const err = await r.json().catch(() => ({}));
       console.error('[stripe] session error:', err);
-      return res.status(500).json({ error: 'session_create_failed' });
+      return res.status(500).json({ error: "session_create_failed", detail: err?.error?.message || JSON.stringify(err) });
     }
     const session = await r.json();
     res.json({ clientSecret: session.client_secret });
