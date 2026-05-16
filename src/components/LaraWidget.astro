@@ -284,6 +284,13 @@
       timestamp: new Date().toISOString(),
       utm: new URLSearchParams(location.search).toString(),
     };
+
+    try {
+      sessionStorage.setItem('laraData', JSON.stringify(state.data));
+    } catch (e) {
+      console.warn('[lara] sessionStorage unavailable', e);
+    }
+
     fetch('/api/leads/pro', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

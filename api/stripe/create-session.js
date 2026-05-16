@@ -28,6 +28,14 @@ export default async function handler(req, res) {
   params.append('return_url', `${origin}/gracias?plan=${plan}`);
   params.append('metadata[plan]', plan);
 
+  const metadataFields = ['nombre', 'salon', 'telefono', 'ciudad', 'canal', 'trabajadoras'];
+  for (const key of metadataFields) {
+    const value = body[key];
+    if (value !== undefined && value !== null && value !== '') {
+      params.append(`metadata[${key}]`, String(value).slice(0, 500));
+    }
+  }
+
   if (priceId) {
     params.append('line_items[0][price]', priceId);
     params.append('line_items[0][quantity]', '1');

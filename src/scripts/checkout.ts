@@ -31,6 +31,29 @@ function getElements() {
   };
 }
 
+function getCheckoutBody(plan: string) {
+  let laraData: Record<string, any> = {};
+  try {
+    laraData = JSON.parse(sessionStorage.getItem('laraData') || '{}');
+  } catch {}
+
+  let ciudadFromUrl: string | undefined;
+  const match = location.pathname.match(/^\/ciudad\/([a-z]+)/);
+  if (match) {
+    ciudadFromUrl = match[1].charAt(0).toUpperCase() + match[1].slice(1);
+  }
+
+  return {
+    plan,
+    nombre: laraData.nombre,
+    salon: laraData.salon,
+    telefono: laraData.telefono,
+    ciudad: laraData.ciudad || ciudadFromUrl,
+    canal: laraData.canal,
+    trabajadoras: laraData.trabajadoras,
+  };
+}
+
 export async function openCheckout(plan: string) {
   const { modal, loading, errorEl, mount, label } = getElements();
   if (!modal || !loading || !errorEl || !mount || !label) return;
@@ -43,13 +66,17 @@ export async function openCheckout(plan: string) {
   label.textContent = PLAN_LABELS[plan] || plan;
 
   try {
+    const body = getCheckoutBody(plan);
     const res = await fetch('/api/stripe/create-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify(body),
     });
 
-    if (!res.ok) throw new Error('session_failed');
+    if (!res.ok) {
+      console.error('[checkout] create-session failed', await res.text());
+      throw new Error('session_failed');
+    }
 
     const { clientSecret } = await res.json();
     if (!clientSecret) throw new Error('missing_client_secret');
