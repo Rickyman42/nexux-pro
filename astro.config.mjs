@@ -5,7 +5,9 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://nexux.pro',
-  integrations: [sitemap()],
+  integrations: [sitemap({
+    filter: (page) => !page.includes('/gracias'),
+  })],
   vite: {
     plugins: [tailwindcss()],
   },
