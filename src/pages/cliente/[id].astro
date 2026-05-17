@@ -1,0 +1,735 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { getClientData, type Appointment } from '../../lib/portal-client';
+
+const { id: clientId } = Astro.params;
+const token = Astro.cookies.get('nexux_token')?.value;
+
+if (!clientId || !token) {
+  return Astro.redirect(`/cliente/${clientId ?? ''}/login`);
+}
+
+const data = await getClientData(clientId, token);
+if (!data) {
+  return Astro.redirect('/acceso-denegado');
+}
+
+const dateFormatter = new Intl.DateTimeFormat('es-ES', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'long',
+});
+
+const timeFormatter = new Intl.DateTimeFormat('es-ES', {
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+const todayKey = new Date().toDateString();
+const todayAppointments = data.nextAppointments.filter(item => new Date(item.datetime).toDateString() === todayKey).length;
+const limitedProgress = data.metrics.conversationLimit
+  ? Math.min(100, Math.round((data.metrics.conversationCount / data.metrics.conversationLimit) * 100))
+  : 100;
+const planLabel = data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
+const qrImageSrc = data.qrPngBase64
+  ? data.qrPngBase64.startsWith('data:image')
+    ? data.qrPngBase64
+    : `data:image/png;base64,${data.qrPngBase64}`
+  : null;
+
+const weekdayLabels: [string, string][] = [
+  ['monday', 'Lunes'],
+  ['tuesday', 'Martes'],
+  ['wednesday', 'Miercoles'],
+  ['thursday', 'Jueves'],
+  ['friday', 'Viernes'],
+  ['saturday', 'Sabado'],
+  ['sunday', 'Domingo'],
+];
+
+function renderAppointmentDate(item: Appointment) {
+  const date = new Date(item.datetime);
+  return {
+    date: dateFormatter.format(date),
+    time: timeFormatter.format(date),
+  };
+}
+---
+<Layout
+  title={`Portal - ${data.name}`}
+  description={`Portal del cliente ${data.name} en Nexux Pro.`}
+  canonical={`https://nexux.pro/cliente/${clientId}`}
+>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex,nofollow" />
+  </Fragment>
+
+  <section class="portal-page">
+    <div class="container-nx">
+      <header class="portal-header">
+        <div>
+          <p class="eyebrow">Portal cliente</p>
+          <h1>Lara - {data.name}</h1>
+        </div>
+        <div class="portal-badges">
+          <span class="portal-badge portal-badge-plan">Plan {planLabel}</span>
+          <span class={`portal-badge ${data.active ? 'portal-badge-live' : 'portal-badge-off'}`}>
+            {data.active ? 'Activo' : 'Inactivo'}
+          </span>
+        </div>
+      </header>
+
+      <section class="portal-grid">
+        <article class="portal-card">
+          <div class="portal-card-head">
+            <h2>Estado del bot</h2>
+          </div>
+          <div class="portal-status-grid">
+            <div class="portal-status-item">
+              <strong>WhatsApp</strong>
+              <span>
+                {data.channels.whatsapp.connected
+                  ? `Conectado (${data.channels.whatsapp.provider})`
+                  : data.botStatus === 'pending_qr'
+                    ? 'Pendiente de QR'
+                    : 'Desconectado'}
+              </span>
+            </div>
+            <div class="portal-status-item">
+              <strong>Telegram</strong>
+              <span>{data.channels.telegram.ownerLinked ? 'Vinculado' : 'Pendiente de vincular'}</span>
+            </div>
+          </div>
+
+          {data.botStatus === 'pending_qr' && (
+            <div class="portal-qr-block">
+              <p>
+                WhatsApp esta pendiente de vinculacion. {data.qrPngBase64 ? 'Escanea el QR desde tu movil.' : 'Te enviaremos un QR valido en breve desde soporte.'}
+              </p>
+              {qrImageSrc && (
+                <img
+                  src={qrImageSrc}
+                  alt="QR para vincular WhatsApp"
+                  class="portal-qr-image"
+                />
+              )}
+            </div>
+          )}
+        </article>
+
+        <article class="portal-card">
+          <div class="portal-card-head">
+            <h2>Proximas citas</h2>
+            <span class="portal-mini-badge">{todayAppointments} hoy</span>
+          </div>
+
+          {data.nextAppointments.length ? (
+            <div class="portal-table-wrap">
+              <table class="portal-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Clienta</th>
+                    <th>Servicio</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.nextAppointments.slice(0, 10).map(item => {
+                    const row = renderAppointmentDate(item);
+                    return (
+                      <tr>
+                        <td>{row.date}</td>
+                        <td>{row.time}</td>
+                        <td>{item.clientName || item.clientPhone}</td>
+                        <td>{item.service}</td>
+                        <td>
+                          <span class={`portal-status-chip ${item.status === 'confirmed' ? 'portal-status-confirmed' : 'portal-status-cancelled'}`}>
+                            {item.status === 'confirmed' ? 'Confirmada' : 'Cancelada'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p class="portal-empty">Aun no hay citas registradas. Cuando Lara reserve las primeras, apareceran aqui.</p>
+          )}
+        </article>
+      </section>
+
+      <section class="portal-metrics">
+        <article class="portal-metric-card">
+          <span>Conversaciones</span>
+          <strong>
+            {data.metrics.conversationCount}{data.metrics.conversationLimit ? `/${data.metrics.conversationLimit}` : ''}
+          </strong>
+          {data.plan === 'starter' && data.metrics.conversationLimit && (
+            <div class="portal-progress">
+              <div class="portal-progress-bar" style={`width:${limitedProgress}%`}></div>
+            </div>
+          )}
+        </article>
+        <article class="portal-metric-card">
+          <span>Citas reservadas</span>
+          <strong>{data.metrics.appointmentsBooked}</strong>
+        </article>
+        <article class="portal-metric-card">
+          <span>Cancelaciones</span>
+          <strong>{data.metrics.appointmentsCancelled}</strong>
+        </article>
+      </section>
+
+      <details class="portal-card portal-config-card">
+        <summary>
+          <span>Configuracion rapida</span>
+          <span class="portal-summary-hint">Horario y disponibilidad</span>
+        </summary>
+
+        <form id="schedule-form" class="portal-config-form">
+          {weekdayLabels.map(([key, label]) => {
+            const slot = data.schedule[key];
+            return (
+              <div class="portal-schedule-row">
+                <div class="portal-schedule-day">{label}</div>
+                <label class="portal-switch">
+                  <input type="checkbox" name={`${key}_closed`} checked={!slot} />
+                  <span>Cerrado</span>
+                </label>
+                <input type="time" name={`${key}_open`} value={slot?.open ?? '09:00'} disabled={!slot} />
+                <input type="time" name={`${key}_close`} value={slot?.close ?? '19:00'} disabled={!slot} />
+              </div>
+            );
+          })}
+          <button type="submit" class="btn-primary">Guardar horario</button>
+        </form>
+      </details>
+
+      {data.plan !== 'starter' && (
+        <section class="portal-card portal-provider-card">
+          <div class="portal-card-head">
+            <h2>Proveedor WhatsApp</h2>
+          </div>
+          <div class="portal-provider-options">
+            <label class="portal-provider-option">
+              <input type="radio" name="whatsapp_provider" value="baileys" checked={data.channels.whatsapp.provider === 'baileys'} />
+              <span>
+                <strong>Baileys</strong>
+                <small>Tu numero actual - Gratis</small>
+              </span>
+            </label>
+            <label class="portal-provider-option">
+              <input type="radio" name="whatsapp_provider" value="twilio" checked={data.channels.whatsapp.provider === 'twilio'} />
+              <span>
+                <strong>Twilio WhatsApp Business</strong>
+                <small>Numero dedicado - +10EUR/mes</small>
+              </span>
+            </label>
+          </div>
+          <button id="provider-trigger" type="button" class="btn-ghost">Cambiar proveedor -></button>
+        </section>
+      )}
+
+      <footer class="portal-footer">
+        Necesitas ayuda? Contacta a Ricardo:
+        <a href="https://t.me/nexux_support" target="_blank" rel="noopener">t.me/nexux_support</a>
+      </footer>
+    </div>
+  </section>
+
+  <div id="portal-toast" class="portal-toast" hidden>Guardado OK</div>
+
+  {data.plan !== 'starter' && (
+    <dialog id="provider-dialog" class="portal-dialog">
+      <div class="portal-dialog-card">
+        <h3>Cambiar a Twilio WhatsApp Business</h3>
+        <ul>
+          <li>Tu numero actual de WhatsApp dejara de recibir mensajes de Lara.</li>
+          <li>Recibiras un numero nuevo de Twilio en 24-48h.</li>
+          <li>El coste adicional se aplicara en la proxima factura.</li>
+        </ul>
+        <div class="portal-dialog-actions">
+          <button type="button" id="provider-confirm" class="btn-primary">Confirmar cambio</button>
+          <button type="button" id="provider-cancel" class="btn-ghost">Cancelar</button>
+        </div>
+      </div>
+    </dialog>
+  )}
+
+  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter' }}>
+    const toast = document.getElementById('portal-toast');
+    const scheduleForm = document.getElementById('schedule-form');
+
+    function showToast(message) {
+      if (!toast) return;
+      toast.textContent = message;
+      toast.hidden = false;
+      toast.classList.add('portal-toast-show');
+      setTimeout(() => {
+        toast.classList.remove('portal-toast-show');
+        toast.hidden = true;
+      }, 2200);
+    }
+
+    function buildSchedulePayload(form) {
+      const payload = {};
+      ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(day => {
+        const closed = form.elements.namedItem(`${day}_closed`);
+        const open = form.elements.namedItem(`${day}_open`);
+        const close = form.elements.namedItem(`${day}_close`);
+        if (closed instanceof HTMLInputElement && closed.checked) {
+          payload[day] = null;
+          return;
+        }
+        payload[day] = {
+          open: open instanceof HTMLInputElement ? open.value : '09:00',
+          close: close instanceof HTMLInputElement ? close.value : '19:00',
+        };
+      });
+      return payload;
+    }
+
+    scheduleForm?.querySelectorAll('input[type="checkbox"]').forEach(input => {
+      input.addEventListener('change', event => {
+        const target = event.currentTarget;
+        if (!(target instanceof HTMLInputElement)) return;
+        const day = target.name.replace('_closed', '');
+        const open = scheduleForm.elements.namedItem(`${day}_open`);
+        const close = scheduleForm.elements.namedItem(`${day}_close`);
+        if (open instanceof HTMLInputElement) open.disabled = target.checked;
+        if (close instanceof HTMLInputElement) close.disabled = target.checked;
+      });
+    });
+
+    scheduleForm?.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!(scheduleForm instanceof HTMLFormElement)) return;
+
+      const response = await fetch('/api/portal/update-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          config: { schedule: buildSchedulePayload(scheduleForm) },
+        }),
+      }).catch(() => null);
+
+      showToast(response?.ok ? 'Guardado OK' : 'No se pudo guardar');
+    });
+
+    if (!isStarter) {
+      const providerTrigger = document.getElementById('provider-trigger');
+      const providerDialog = document.getElementById('provider-dialog');
+      const providerCancel = document.getElementById('provider-cancel');
+      const providerConfirm = document.getElementById('provider-confirm');
+
+      providerTrigger?.addEventListener('click', () => {
+        const selected = document.querySelector('input[name="whatsapp_provider"]:checked');
+        if (!(selected instanceof HTMLInputElement)) return;
+        if (selected.value === currentProvider) {
+          showToast('No hay cambios pendientes');
+          return;
+        }
+        if (providerDialog instanceof HTMLDialogElement) {
+          providerDialog.showModal();
+        }
+      });
+
+      providerCancel?.addEventListener('click', () => {
+        if (providerDialog instanceof HTMLDialogElement) providerDialog.close();
+      });
+
+      providerConfirm?.addEventListener('click', async () => {
+        const selected = document.querySelector('input[name="whatsapp_provider"]:checked');
+        if (!(selected instanceof HTMLInputElement)) return;
+
+        const response = await fetch('/api/portal/update-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientId,
+            config: { channels: { whatsapp: { provider: selected.value } } },
+          }),
+        }).catch(() => null);
+
+        if (providerDialog instanceof HTMLDialogElement) providerDialog.close();
+        showToast(response?.ok ? 'Cambio solicitado OK' : 'No se pudo solicitar el cambio');
+      });
+    }
+  </script>
+
+  <style>
+    .portal-page {
+      padding: 4.5rem 0 5rem;
+    }
+
+    .portal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--nx-line);
+    }
+
+    .portal-header h1 {
+      margin-top: 0.8rem;
+      font-family: var(--nx-font-serif);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .portal-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .portal-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid var(--nx-line);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .portal-badge-plan {
+      color: var(--nx-magnet);
+      border-color: rgba(78, 205, 196, 0.25);
+      background: rgba(78, 205, 196, 0.08);
+    }
+
+    .portal-badge-live {
+      color: var(--nx-ink);
+    }
+
+    .portal-badge-off {
+      color: var(--nx-ink-muted);
+    }
+
+    .portal-grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: 1fr;
+      margin-top: 2rem;
+    }
+
+    .portal-card,
+    .portal-metric-card {
+      background: var(--nx-deep);
+      border: 1px solid var(--nx-line);
+      border-radius: 24px;
+      padding: 1.5rem;
+    }
+
+    .portal-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .portal-card-head h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .portal-mini-badge {
+      color: var(--nx-magnet);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .portal-status-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .portal-status-item strong,
+    .portal-provider-option strong {
+      display: block;
+      color: var(--nx-ink);
+      font-size: 0.95rem;
+    }
+
+    .portal-status-item span,
+    .portal-empty,
+    .portal-provider-option small,
+    .portal-footer {
+      color: var(--nx-ink-muted);
+      line-height: 1.7;
+    }
+
+    .portal-qr-block {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 18px;
+      background: rgba(78, 205, 196, 0.06);
+      border: 1px solid rgba(78, 205, 196, 0.16);
+    }
+
+    .portal-qr-image {
+      margin-top: 1rem;
+      width: min(100%, 220px);
+      border-radius: 14px;
+      background: #fff;
+      padding: 0.75rem;
+    }
+
+    .portal-table-wrap {
+      overflow-x: auto;
+    }
+
+    .portal-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+    }
+
+    .portal-table th,
+    .portal-table td {
+      text-align: left;
+      padding: 0.9rem 0.75rem;
+      border-bottom: 1px solid var(--nx-line);
+      font-size: 0.9rem;
+    }
+
+    .portal-table th {
+      color: var(--nx-ink);
+      font-weight: 600;
+    }
+
+    .portal-table td {
+      color: var(--nx-ink-muted);
+    }
+
+    .portal-status-chip {
+      display: inline-flex;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .portal-status-confirmed {
+      background: rgba(78, 205, 196, 0.1);
+      color: var(--nx-magnet);
+    }
+
+    .portal-status-cancelled {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff9a9a;
+    }
+
+    .portal-metrics {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: 1.25rem;
+    }
+
+    .portal-metric-card span {
+      color: var(--nx-ink-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .portal-metric-card strong {
+      display: block;
+      margin-top: 0.75rem;
+      font-family: var(--nx-font-serif);
+      font-size: 2.4rem;
+      line-height: 1;
+      color: var(--nx-ink);
+    }
+
+    .portal-progress {
+      margin-top: 1rem;
+      height: 0.5rem;
+      border-radius: 999px;
+      background: rgba(242, 242, 236, 0.08);
+      overflow: hidden;
+    }
+
+    .portal-progress-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--nx-magnet), var(--nx-magnet-glow));
+    }
+
+    .portal-config-card {
+      margin-top: 1.25rem;
+    }
+
+    .portal-config-card summary {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      cursor: pointer;
+      color: var(--nx-ink);
+      font-weight: 600;
+    }
+
+    .portal-config-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .portal-summary-hint {
+      color: var(--nx-ink-muted);
+      font-size: 0.88rem;
+      font-weight: 400;
+    }
+
+    .portal-config-form {
+      display: grid;
+      gap: 0.9rem;
+      margin-top: 1.5rem;
+    }
+
+    .portal-schedule-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 140px) minmax(120px, 140px);
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .portal-schedule-day {
+      color: var(--nx-ink);
+      font-weight: 500;
+    }
+
+    .portal-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--nx-ink-muted);
+      font-size: 0.88rem;
+    }
+
+    .portal-config-form input[type='time'] {
+      width: 100%;
+      padding: 0.8rem 0.9rem;
+      border-radius: 14px;
+      border: 1px solid var(--nx-line);
+      background: rgba(11, 13, 18, 0.55);
+      color: var(--nx-ink);
+      font: inherit;
+    }
+
+    .portal-provider-card {
+      margin-top: 1.25rem;
+    }
+
+    .portal-provider-options {
+      display: grid;
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .portal-provider-option {
+      display: flex;
+      gap: 0.75rem;
+      align-items: start;
+      padding: 1rem;
+      border-radius: 18px;
+      background: rgba(11, 13, 18, 0.45);
+      border: 1px solid var(--nx-line);
+    }
+
+    .portal-footer {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .portal-footer a {
+      color: var(--nx-magnet);
+    }
+
+    .portal-toast {
+      position: fixed;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      padding: 0.9rem 1.1rem;
+      border-radius: 16px;
+      background: rgba(78, 205, 196, 0.14);
+      border: 1px solid rgba(78, 205, 196, 0.22);
+      color: var(--nx-ink);
+      z-index: 150;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.2s var(--nx-ease), transform 0.2s var(--nx-ease);
+    }
+
+    .portal-toast-show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .portal-dialog {
+      margin: auto;
+      border: none;
+      background: transparent;
+      padding: 1rem;
+    }
+
+    .portal-dialog::backdrop {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+    }
+
+    .portal-dialog-card {
+      max-width: 520px;
+      padding: 1.5rem;
+      border-radius: 24px;
+      background: var(--nx-deep);
+      border: 1px solid var(--nx-line);
+    }
+
+    .portal-dialog-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 1rem;
+    }
+
+    .portal-dialog-card ul {
+      padding-left: 1.2rem;
+      color: var(--nx-ink-muted);
+      line-height: 1.7;
+    }
+
+    .portal-dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .portal-header {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .portal-schedule-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</Layout>

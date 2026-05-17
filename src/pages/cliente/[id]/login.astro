@@ -1,0 +1,139 @@
+---
+export const prerender = false;
+
+import Layout from '../../../layouts/Layout.astro';
+
+const { id } = Astro.params;
+---
+<Layout
+  title="Acceso al portal | Nexux Pro"
+  description="Solicita un nuevo enlace de acceso a tu portal de cliente."
+  canonical={`https://nexux.pro/cliente/${id}/login`}
+>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex,nofollow" />
+  </Fragment>
+
+  <section class="portal-auth">
+    <div class="container-nx">
+      <div class="portal-auth-card">
+        <p class="eyebrow">Portal cliente</p>
+        <h1>Sesion caducada o <em>enlace invalido</em></h1>
+        <p class="portal-auth-copy">
+          Introduce tu email para recibir un nuevo enlace de acceso al portal de tu salon.
+        </p>
+
+        <form id="portal-login-form" class="portal-auth-form">
+          <label class="portal-field">
+            <span>Email</span>
+            <input id="portal-email" type="email" name="email" placeholder="tu@email.com" required />
+          </label>
+          <button class="btn-primary" type="submit">Enviar enlace</button>
+        </form>
+
+        <p id="portal-login-message" class="portal-auth-message" hidden>
+          Si el email es correcto, recibiras el enlace en breve.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script define:vars={{ clientId: id }}>
+    const form = document.getElementById('portal-login-form');
+    const message = document.getElementById('portal-login-message');
+
+    form?.addEventListener('submit', async event => {
+      event.preventDefault();
+      const emailInput = document.getElementById('portal-email');
+      const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : '';
+      if (!email) return;
+
+      await fetch('/api/portal/resend-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, email }),
+      }).catch(() => {});
+
+      if (message) {
+        message.hidden = false;
+      }
+      if (form instanceof HTMLFormElement) {
+        form.reset();
+      }
+    });
+  </script>
+
+  <style>
+    .portal-auth {
+      min-height: 100vh;
+      display: grid;
+      align-items: center;
+      padding: 7rem 0;
+    }
+
+    .portal-auth-card {
+      max-width: 560px;
+      padding: 2rem;
+      background: var(--nx-deep);
+      border: 1px solid var(--nx-line);
+      border-radius: 28px;
+    }
+
+    .portal-auth-card .eyebrow {
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .portal-auth-card h1 {
+      font-family: var(--nx-font-serif);
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.05;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+
+    .portal-auth-card h1 em {
+      color: var(--nx-magnet);
+      font-style: italic;
+    }
+
+    .portal-auth-copy {
+      margin-top: 1rem;
+      color: var(--nx-ink-muted);
+      line-height: 1.8;
+    }
+
+    .portal-auth-form {
+      display: grid;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .portal-field {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .portal-field span {
+      color: var(--nx-ink);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .portal-field input {
+      width: 100%;
+      padding: 0.95rem 1rem;
+      border-radius: 16px;
+      border: 1px solid var(--nx-line);
+      background: rgba(11, 13, 18, 0.55);
+      color: var(--nx-ink);
+      font: inherit;
+    }
+
+    .portal-auth-message {
+      margin-top: 1rem;
+      color: var(--nx-magnet);
+      line-height: 1.6;
+    }
+  </style>
+</Layout>

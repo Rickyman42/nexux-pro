@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout
+  title="Acceso denegado | Nexux Pro"
+  description="No hemos podido validar tu acceso al portal de cliente."
+  canonical="https://nexux.pro/acceso-denegado"
+>
+  <section class="error-page">
+    <div class="container-nx">
+      <div class="error-page-inner">
+        <div class="error-code">403</div>
+        <h1>Acceso <em>denegado</em></h1>
+        <p>
+          No hemos podido validar tu sesion del portal. Solicita un nuevo enlace o vuelve a abrir el email de onboarding.
+        </p>
+        <div class="error-actions">
+          <a href="/" class="btn-primary">Volver al inicio</a>
+          <a href="mailto:hola@nexux.pro" class="btn-ghost">Escribir a soporte</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
