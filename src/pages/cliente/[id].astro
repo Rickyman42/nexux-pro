@@ -38,6 +38,8 @@ const qrImageSrc = data.qrPngBase64
     ? data.qrPngBase64
     : `data:image/png;base64,${data.qrPngBase64}`
   : null;
+const ownerTelegramUrl = `https://t.me/NexuxProBot?start=${data.clientId}`;
+const customerTelegramUrl = `https://t.me/NexuxProBot?start=c_${data.clientId}`;
 
 const weekdayLabels: [string, string][] = [
   ['monday', 'Lunes'],
@@ -185,6 +187,33 @@ function renderAppointmentDate(item: Appointment) {
         </article>
       </section>
 
+      <section class="portal-card portal-telegram-card">
+        <div class="portal-card-head">
+          <h2>Telegram</h2>
+          <span class={`portal-status-chip ${data.channels.telegram.ownerLinked ? 'portal-status-confirmed' : 'portal-status-warning'}`}>
+            {data.channels.telegram.ownerLinked ? 'Vinculado' : 'No vinculado'}
+          </span>
+        </div>
+
+        {!data.channels.telegram.ownerLinked && (
+          <div class="portal-telegram-owner">
+            <p>Vincula tu Telegram para recibir avisos de citas y actividad de Lara.</p>
+            <a href={ownerTelegramUrl} class="btn-primary" target="_blank" rel="noopener">Vincular mi Telegram -></a>
+          </div>
+        )}
+
+        <div class="portal-telegram-customer">
+          <div>
+            <strong>Enlace para tus clientas</strong>
+            <p>Compártelo para que puedan iniciar conversacion con Lara en Telegram.</p>
+          </div>
+          <div class="portal-copy-row">
+            <input id="telegram-customer-link" type="text" value={customerTelegramUrl} readonly />
+            <button id="telegram-copy" type="button" class="btn-ghost">Copiar enlace</button>
+          </div>
+        </div>
+      </section>
+
       <details class="portal-card portal-config-card">
         <summary>
           <span>Configuracion rapida</span>
@@ -261,9 +290,11 @@ function renderAppointmentDate(item: Appointment) {
     </dialog>
   )}
 
-  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter' }}>
+  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl }}>
     const toast = document.getElementById('portal-toast');
     const scheduleForm = document.getElementById('schedule-form');
+    const telegramCopy = document.getElementById('telegram-copy');
+    const telegramCustomerLink = document.getElementById('telegram-customer-link');
 
     function showToast(message) {
       if (!toast) return;
@@ -293,6 +324,24 @@ function renderAppointmentDate(item: Appointment) {
       });
       return payload;
     }
+
+    async function copyTelegramLink(url) {
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('¡Copiado!');
+      } catch {
+        if (telegramCustomerLink instanceof HTMLInputElement) {
+          telegramCustomerLink.focus();
+          telegramCustomerLink.select();
+          document.execCommand('copy');
+          showToast('¡Copiado!');
+        }
+      }
+    }
+
+    telegramCopy?.addEventListener('click', () => {
+      copyTelegramLink(customerTelegramUrl);
+    });
 
     scheduleForm?.querySelectorAll('input[type="checkbox"]').forEach(input => {
       input.addEventListener('change', event => {
@@ -537,6 +586,11 @@ function renderAppointmentDate(item: Appointment) {
       color: #ff9a9a;
     }
 
+    .portal-status-warning {
+      background: rgba(255, 204, 102, 0.1);
+      color: #ffd98a;
+    }
+
     .portal-metrics {
       display: grid;
       gap: 1rem;
@@ -576,6 +630,55 @@ function renderAppointmentDate(item: Appointment) {
 
     .portal-config-card {
       margin-top: 1.25rem;
+    }
+
+    .portal-telegram-card {
+      display: grid;
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .portal-telegram-owner,
+    .portal-telegram-customer {
+      display: grid;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: 18px;
+      background: rgba(11, 13, 18, 0.45);
+      border: 1px solid var(--nx-line);
+    }
+
+    .portal-telegram-owner {
+      align-items: center;
+      grid-template-columns: 1fr auto;
+    }
+
+    .portal-telegram-owner p,
+    .portal-telegram-customer p {
+      color: var(--nx-ink-muted);
+      line-height: 1.7;
+    }
+
+    .portal-telegram-customer strong {
+      color: var(--nx-ink);
+      font-size: 0.95rem;
+    }
+
+    .portal-copy-row {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .portal-copy-row input {
+      width: 100%;
+      min-width: 0;
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      border: 1px solid var(--nx-line);
+      background: rgba(11, 13, 18, 0.55);
+      color: var(--nx-ink-muted);
+      font: inherit;
     }
 
     .portal-config-card summary {
@@ -728,6 +831,11 @@ function renderAppointmentDate(item: Appointment) {
       }
 
       .portal-schedule-row {
+        grid-template-columns: 1fr;
+      }
+
+      .portal-telegram-owner,
+      .portal-copy-row {
         grid-template-columns: 1fr;
       }
     }
