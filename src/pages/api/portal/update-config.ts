@@ -14,7 +14,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const body = await request.json().catch(() => ({}));
   const clientId = typeof body.clientId === 'string' ? body.clientId : '';
-  const config = body.config ?? {};
+  // Strip clientId and pass the rest as config (services, schedule, channels, etc.)
+  const { clientId: _cid, ...config } = body;
 
   if (!clientId) {
     return new Response(JSON.stringify({ ok: false, error: 'missing_client' }), {
