@@ -1,7 +1,6 @@
 {
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
-  "framework": "astro",
   "rewrites": [
     {
       "source": "/webhook/stripe",
