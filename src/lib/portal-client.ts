@@ -84,3 +84,34 @@ export async function resendPortalLink(clientId: string, email: string): Promise
     method: 'GET',
   }).catch(() => {});
 }
+
+export async function fetchAllAppointments(clientId: string, token: string): Promise<any[]> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/appointments`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return [];
+    return (await response.json()) as any[];
+  } catch { return []; }
+}
+
+export async function cancelAppointmentById(clientId: string, token: string, aptId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/appointments/${aptId}/cancel`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.ok;
+  } catch { return false; }
+}
+
+export async function createAppointmentManual(clientId: string, token: string, data: { client_name: string; client_phone?: string; service: string; datetime: string; duration_min?: number }): Promise<boolean> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/appointments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+    return response.ok;
+  } catch { return false; }
+}

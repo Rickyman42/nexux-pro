@@ -190,6 +190,21 @@ function renderAppointmentDate(item: Appointment) {
         </article>
       </section>
 
+      <section class="portal-card portal-calendar-card">
+        <div class="portal-card-head">
+          <h2>Calendario de citas</h2>
+          <button class="btn-primary btn-sm" id="open-apt-modal">+ Nueva cita</button>
+        </div>
+        <div class="portal-calendar-nav">
+          <button id="cal-prev" class="btn-ghost">← Semana anterior</button>
+          <span id="cal-week-label"></span>
+          <button id="cal-next" class="btn-ghost">Semana siguiente →</button>
+        </div>
+        <div class="portal-calendar-grid" id="cal-grid">
+          <p class="portal-cal-empty">Cargando...</p>
+        </div>
+      </section>
+
       <section class="portal-card portal-telegram-card">
         <div class="portal-card-head">
           <h2>Telegram</h2>
@@ -312,6 +327,36 @@ function renderAppointmentDate(item: Appointment) {
       </div>
     </dialog>
   )}
+
+  <dialog id="new-apt-modal" class="portal-dialog">
+    <form id="new-apt-form" class="portal-modal-form">
+      <h3>Nueva cita</h3>
+      <label>
+        Nombre cliente
+        <input type="text" name="client_name" required placeholder="Nombre del cliente" />
+      </label>
+      <label>
+        Servicio
+        <input type="text" name="service" required placeholder="Corte, tinte…" />
+      </label>
+      <label>
+        Fecha
+        <input type="date" name="date" required />
+      </label>
+      <label>
+        Hora
+        <input type="time" name="time" required />
+      </label>
+      <label>
+        Duración (min)
+        <input type="number" name="duration_min" value="60" min="15" step="15" />
+      </label>
+      <div class="portal-modal-actions">
+        <button type="submit" class="btn-primary">Reservar cita</button>
+        <button type="button" id="close-apt-modal" class="btn-ghost">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
 
   <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []) }}>
     const toast = document.getElementById('portal-toast');
@@ -493,6 +538,182 @@ function renderAppointmentDate(item: Appointment) {
         showToast(response?.ok ? 'Cambio solicitado OK' : 'No se pudo solicitar el cambio');
       });
     }
+
+    // ── Calendar ───────────────────────────────────────────────────────────
+    (function () {
+      let currentWeekOffset = 0;
+
+      const DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      // Indices 3-6 (Thu-Sun) hidden on mobile — show Mon/Tue/Wed
+      const HIDE_ON_MOBILE = [3, 4, 5, 6];
+
+      function getMondayOfWeek(offset) {
+        const now = new Date();
+        const day = now.getDay(); // 0=Sun
+        const diffToMon = (day === 0 ? -6 : 1 - day);
+        const mon = new Date(now);
+        mon.setDate(now.getDate() + diffToMon + offset * 7);
+        mon.setHours(0, 0, 0, 0);
+        return mon;
+      }
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function fmtDate(d) {
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      }
+
+      function fmtTime(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        return pad(d.getHours()) + ':' + pad(d.getMinutes());
+      }
+
+      function isToday(d) {
+        const t = new Date();
+        return (
+          d.getFullYear() === t.getFullYear() &&
+          d.getMonth() === t.getMonth() &&
+          d.getDate() === t.getDate()
+        );
+      }
+
+      async function loadCalendar() {
+        const grid = document.getElementById('cal-grid');
+        const label = document.getElementById('cal-week-label');
+        if (!grid) return;
+        grid.innerHTML = '<p class="portal-cal-empty">Cargando…</p>';
+
+        let apts = [];
+        try {
+          const res = await fetch('/api/portal/appointments?clientId=' + clientId);
+          if (res.ok) apts = await res.json();
+        } catch (e) {
+          grid.innerHTML = '<p class="portal-cal-empty">Error al cargar citas</p>';
+          return;
+        }
+
+        const monday = getMondayOfWeek(currentWeekOffset);
+
+        const mStr = (monday.getMonth() + 1);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        label.textContent =
+          monday.getDate() + '/' + mStr + ' – ' +
+          sunday.getDate() + '/' + (sunday.getMonth() + 1) + '/' + sunday.getFullYear();
+
+        grid.innerHTML = '';
+
+        for (let i = 0; i < 7; i++) {
+          const day = new Date(monday);
+          day.setDate(monday.getDate() + i);
+          const dayStr = fmtDate(day);
+
+          const dayApts = apts
+            .filter(a => {
+              const d = new Date(a.datetime);
+              return fmtDate(d) === dayStr;
+            })
+            .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+
+          const col = document.createElement('div');
+          col.className = 'portal-cal-day' + (HIDE_ON_MOBILE.includes(i) ? ' hide-mobile' : '');
+
+          const hdr = document.createElement('div');
+          hdr.className = 'portal-cal-day-header' + (isToday(day) ? ' today' : '');
+          hdr.innerHTML = DAY_NAMES[i] + '<span class="cal-date">' + day.getDate() + '</span>';
+          col.appendChild(hdr);
+
+          if (dayApts.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'portal-cal-empty';
+            empty.textContent = '–';
+            col.appendChild(empty);
+          } else {
+            dayApts.forEach(apt => {
+              const card = document.createElement('div');
+              const st = (apt.status || 'confirmed').toLowerCase();
+              card.className = 'portal-cal-apt ' + st;
+
+              card.innerHTML =
+                '<span class="portal-cal-apt-time">' + fmtTime(apt.datetime) + '</span>' +
+                '<span class="portal-cal-apt-name">' + (apt.client_name || '') + '</span>' +
+                '<span class="portal-cal-apt-name" style="font-size:0.7rem">' + (apt.service || '') + '</span>';
+
+              if (st !== 'cancelled') {
+                const btn = document.createElement('button');
+                btn.className = 'portal-cal-apt-cancel';
+                btn.textContent = 'Cancelar';
+                btn.addEventListener('click', async () => {
+                  btn.disabled = true;
+                  try {
+                    await fetch('/api/portal/appointments', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ clientId, action: 'cancel', aptId: apt.id })
+                    });
+                  } catch (_) {}
+                  await loadCalendar();
+                });
+                card.appendChild(btn);
+              }
+
+              col.appendChild(card);
+            });
+          }
+
+          grid.appendChild(col);
+        }
+      }
+
+      // Week navigation
+      document.getElementById('cal-prev')?.addEventListener('click', () => {
+        currentWeekOffset--;
+        loadCalendar();
+      });
+      document.getElementById('cal-next')?.addEventListener('click', () => {
+        currentWeekOffset++;
+        loadCalendar();
+      });
+
+      // Modal
+      const aptModal = document.getElementById('new-apt-modal');
+      document.getElementById('open-apt-modal')?.addEventListener('click', () => {
+        aptModal?.showModal();
+      });
+      document.getElementById('close-apt-modal')?.addEventListener('click', () => {
+        aptModal?.close();
+      });
+
+      // New appointment submit
+      document.getElementById('new-apt-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const date = fd.get('date');
+        const time = fd.get('time');
+        const body = {
+          clientId,
+          client_name:  fd.get('client_name'),
+          service:      fd.get('service'),
+          datetime:     date + 'T' + time + ':00',
+          duration_min: parseInt(fd.get('duration_min'), 10) || 60
+        };
+        try {
+          const r = await fetch('/api/portal/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          if (!r.ok) throw new Error('api error');
+          aptModal?.close();
+          e.target.reset();
+        } catch (_) {}
+        await loadCalendar();
+      });
+
+      // Boot
+      loadCalendar();
+    })();
   </script>
 
   <style>
@@ -967,6 +1188,167 @@ function renderAppointmentDate(item: Appointment) {
       .portal-telegram-owner,
       .portal-copy-row {
         grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Calendar card ─────────────────────────────────────────────────── */
+    .portal-calendar-card {
+      grid-column: 1 / -1;
+      margin-top: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .portal-calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #cal-week-label {
+      flex: 1;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--nx-ink-muted);
+    }
+
+    .portal-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      overflow-x: auto;
+    }
+
+    .portal-cal-day {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 0;
+    }
+
+    .portal-cal-day-header {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--nx-ink-muted);
+      padding: 0.35rem 0.25rem;
+      border-bottom: 1px solid var(--nx-line);
+    }
+
+    .portal-cal-day-header .cal-date {
+      display: block;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--nx-ink);
+      margin-top: 0.1rem;
+    }
+
+    .portal-cal-day-header.today .cal-date {
+      color: var(--nx-accent);
+    }
+
+    .portal-cal-apt {
+      border-radius: 10px;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.75rem;
+      background: rgba(242, 242, 236, 0.04);
+      border: 1px solid var(--nx-line);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .portal-cal-apt.confirmed {
+      background: rgba(0, 200, 120, 0.08);
+      border-color: var(--nx-green);
+    }
+
+    .portal-cal-apt.cancelled {
+      opacity: 0.45;
+      text-decoration: line-through;
+    }
+
+    .portal-cal-apt-time {
+      font-weight: 600;
+      color: var(--nx-ink);
+    }
+
+    .portal-cal-apt-name {
+      color: var(--nx-ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .portal-cal-apt-cancel {
+      align-self: flex-start;
+      font-size: 0.7rem;
+      color: var(--nx-ink-muted);
+      background: transparent;
+      border: 1px solid var(--nx-line);
+      border-radius: 6px;
+      padding: 0.15rem 0.4rem;
+      cursor: pointer;
+      margin-top: 0.25rem;
+    }
+
+    .portal-cal-apt-cancel:hover {
+      border-color: #ee0055;
+      color: #ee0055;
+    }
+
+    .portal-cal-empty {
+      font-size: 0.75rem;
+      color: var(--nx-ink-muted);
+      text-align: center;
+      padding: 0.5rem 0;
+    }
+
+    .portal-modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 320px;
+    }
+
+    .portal-modal-form h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--nx-ink);
+    }
+
+    .portal-modal-form label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--nx-ink-muted);
+    }
+
+    .portal-modal-form input {
+      padding: 0.5rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--nx-line);
+      background: rgba(11, 13, 18, 0.55);
+      color: var(--nx-ink);
+      font-size: 0.875rem;
+    }
+
+    .portal-modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      padding-top: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .portal-calendar-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .portal-cal-day.hide-mobile {
+        display: none;
       }
     }
   </style>
