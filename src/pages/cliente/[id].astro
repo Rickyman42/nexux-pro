@@ -38,8 +38,8 @@ const qrImageSrc = data.qrPngBase64
     ? data.qrPngBase64
     : `data:image/png;base64,${data.qrPngBase64}`
   : null;
-const ownerTelegramUrl = `https://t.me/nexux_soporte_bot?start=${data.clientId}`;
-const customerTelegramUrl = `https://t.me/nexux_soporte_bot?start=c_${data.clientId}`;
+const ownerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=${data.clientId}`;
+const customerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=c_${data.clientId}`;
 const showWhatsApp = !!data.channels.whatsapp?.provider;
 
 const weekdayLabels: [string, string][] = [
@@ -289,7 +289,7 @@ function renderAppointmentDate(item: Appointment) {
 
       <footer class="portal-footer">
         Necesitas ayuda? Contacta a Ricardo:
-        <a href="https://t.me/nexux_soporte_bot" target="_blank" rel="noopener">t.me/nexux_soporte_bot</a>
+        <a href="https://t.me/NexuxProAssistantBot" target="_blank" rel="noopener">t.me/NexuxProAssistantBot</a>
       </footer>
     </div>
   </section>
