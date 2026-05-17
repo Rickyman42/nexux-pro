@@ -368,7 +368,7 @@ async function sendOnboardingEmail(session, provisionResult) {
       body: JSON.stringify({
         sender: { name: 'Ricardo de Nexux', email: 'hola@nexux.pro' },
         to: [{ email: toEmail, name: toName }],
-        subject: `Tu asistente Lara está lista — entra a tu portal`,
+        subject: `Tu asistente está listo — entra a tu portal`,
         htmlContent: htmlBody,
       }),
     });
