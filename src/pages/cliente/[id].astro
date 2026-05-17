@@ -38,8 +38,9 @@ const qrImageSrc = data.qrPngBase64
     ? data.qrPngBase64
     : `data:image/png;base64,${data.qrPngBase64}`
   : null;
-const ownerTelegramUrl = `https://t.me/NexuxProBot?start=${data.clientId}`;
-const customerTelegramUrl = `https://t.me/NexuxProBot?start=c_${data.clientId}`;
+const ownerTelegramUrl = `https://t.me/nexux_soporte_bot?start=${data.clientId}`;
+const customerTelegramUrl = `https://t.me/nexux_soporte_bot?start=c_${data.clientId}`;
+const showWhatsApp = !!data.channels.whatsapp?.provider;
 
 const weekdayLabels: [string, string][] = [
   ['monday', 'Lunes'],
@@ -89,6 +90,7 @@ function renderAppointmentDate(item: Appointment) {
             <h2>Estado del bot</h2>
           </div>
           <div class="portal-status-grid">
+            {showWhatsApp && (
             <div class="portal-status-item">
               <strong>WhatsApp</strong>
               <span>
@@ -99,13 +101,14 @@ function renderAppointmentDate(item: Appointment) {
                     : 'Desconectado'}
               </span>
             </div>
+            )}
             <div class="portal-status-item">
               <strong>Telegram</strong>
               <span>{data.channels.telegram.ownerLinked ? 'Vinculado' : 'Pendiente de vincular'}</span>
             </div>
           </div>
 
-          {data.botStatus === 'pending_qr' && (
+          {showWhatsApp && data.botStatus === 'pending_qr' && (
             <div class="portal-qr-block">
               <p>
                 WhatsApp esta pendiente de vinculacion. {data.qrPngBase64 ? 'Escanea el QR desde tu movil.' : 'Te enviaremos un QR valido en breve desde soporte.'}
@@ -286,7 +289,7 @@ function renderAppointmentDate(item: Appointment) {
 
       <footer class="portal-footer">
         Necesitas ayuda? Contacta a Ricardo:
-        <a href="https://t.me/nexux_support" target="_blank" rel="noopener">t.me/nexux_support</a>
+        <a href="https://t.me/nexux_soporte_bot" target="_blank" rel="noopener">t.me/nexux_soporte_bot</a>
       </footer>
     </div>
   </section>

@@ -6,6 +6,7 @@ import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   site: 'https://nexux.pro',
+  output: 'server',
   adapter: vercel(),
   integrations: [sitemap({
     filter: (page) => !page.includes('/gracias'),
