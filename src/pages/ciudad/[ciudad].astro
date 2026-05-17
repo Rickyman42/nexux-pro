@@ -5,6 +5,7 @@ import Pricing from '../../components/Pricing.astro';
 import { ciudades, type CiudadData } from '../../data/ciudades';
 import Layout from '../../layouts/Layout.astro';
 
+export const prerender = true;
 export function getStaticPaths() {
   return ciudades.map(ciudad => ({
     params: { ciudad: ciudad.slug },

@@ -187,7 +187,7 @@
     const body = $('lara-body');
     const msg = document.createElement('div');
     msg.className = 'lara-msg lara-msg-' + who;
-    msg.innerHTML = text;
+    msg.textContent = text;
     body.appendChild(msg);
     requestAnimationFrame(() => msg.classList.add('show'));
     body.scrollTop = body.scrollHeight;
@@ -546,6 +546,7 @@
     line-height: 1.5;
     max-width: 88%;
     word-wrap: break-word;
+    white-space: pre-wrap;
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.3s, transform 0.3s;
