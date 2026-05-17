@@ -214,6 +214,26 @@ function renderAppointmentDate(item: Appointment) {
         </div>
       </section>
 
+      <details class="portal-card portal-config-card portal-services-card">
+        <summary>
+          <span>Mis servicios</span>
+          <span class="portal-summary-hint">Servicios del salón</span>
+        </summary>
+
+        <div id="services-list-wrap" class="portal-services-table-wrap"></div>
+
+        <div class="portal-services-form">
+          <div class="portal-services-add-row">
+            <input type="text" id="svc-name" placeholder="Nombre del servicio" />
+            <input type="number" id="svc-duration" placeholder="Duración (min)" min="1" />
+            <input type="number" id="svc-price" placeholder="Precio (€)" min="0" step="0.01" />
+            <button type="button" id="svc-add" class="btn-ghost">+ Añadir</button>
+          </div>
+        </div>
+
+        <button type="button" id="svc-save" class="btn-primary">Guardar cambios</button>
+      </details>
+
       <details class="portal-card portal-config-card">
         <summary>
           <span>Configuracion rapida</span>
@@ -290,7 +310,7 @@ function renderAppointmentDate(item: Appointment) {
     </dialog>
   )}
 
-  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl }}>
+  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []) }}>
     const toast = document.getElementById('portal-toast');
     const scheduleForm = document.getElementById('schedule-form');
     const telegramCopy = document.getElementById('telegram-copy');
@@ -370,6 +390,66 @@ function renderAppointmentDate(item: Appointment) {
 
       showToast(response?.ok ? 'Guardado OK' : 'No se pudo guardar');
     });
+
+    // ── Services ───────────────────────────────────────
+    let services = JSON.parse(servicesJson || '[]');
+
+    function renderServices() {
+      const wrap = document.getElementById('services-list-wrap');
+      if (!wrap) return;
+      if (services.length === 0) {
+        wrap.innerHTML = '<p class="portal-empty portal-services-empty">Sin servicios configurados. Añade el primero.</p>';
+        return;
+      }
+      wrap.innerHTML = `
+        <div class="portal-table-wrap">
+          <table class="portal-table">
+            <thead><tr><th>Servicio</th><th>Duración</th><th>Precio</th><th></th></tr></thead>
+            <tbody>${services.map((s, i) => `
+              <tr>
+                <td>${s.name}</td>
+                <td>${s.duration} min</td>
+                <td>${s.price} €</td>
+                <td><button type="button" class="btn-del-svc" data-i="${i}" title="Eliminar">🗑</button></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+      wrap.querySelectorAll('.btn-del-svc').forEach(btn => {
+        btn.addEventListener('click', () => {
+          services.splice(parseInt(btn.dataset.i), 1);
+          renderServices();
+        });
+      });
+    }
+    renderServices();
+
+    document.getElementById('svc-add')?.addEventListener('click', () => {
+      const nameInput = document.getElementById('svc-name');
+      const durInput  = document.getElementById('svc-duration');
+      const priceInput = document.getElementById('svc-price');
+      const name     = nameInput?.value.trim();
+      const duration = parseInt(durInput?.value);
+      const price    = parseFloat(priceInput?.value);
+      if (!name)                        { showToast('Nombre obligatorio'); return; }
+      if (!duration || duration <= 0)   { showToast('Duración inválida'); return; }
+      if (isNaN(price) || price < 0)   { showToast('Precio inválido'); return; }
+      services.push({ name, duration, price });
+      renderServices();
+      nameInput.value = '';
+      durInput.value  = '';
+      priceInput.value = '';
+    });
+
+    document.getElementById('svc-save')?.addEventListener('click', async () => {
+      const response = await fetch('/api/portal/update-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, config: { services } }),
+      }).catch(() => null);
+      showToast(response?.ok ? 'Guardado ✅' : 'No se pudo guardar');
+    });
+    // ── /Services ──────────────────────────────────────
 
     if (!isStarter) {
       const providerTrigger = document.getElementById('provider-trigger');
@@ -824,6 +904,49 @@ function renderAppointmentDate(item: Appointment) {
       margin-top: 1.5rem;
     }
 
+    .portal-services-table-wrap {
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .portal-services-empty {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .portal-services-form {
+      margin-bottom: 1rem;
+    }
+
+    .portal-services-add-row {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .portal-services-add-row input {
+      width: 100%;
+      padding: 0.8rem 0.9rem;
+      border-radius: 14px;
+      border: 1px solid var(--nx-line);
+      background: rgba(11, 13, 18, 0.55);
+      color: var(--nx-ink);
+      font: inherit;
+    }
+
+    .btn-del-svc {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem 0.4rem;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+    }
+
+    .btn-del-svc:hover { opacity: 1; }
+
     @media (max-width: 900px) {
       .portal-header {
         align-items: start;
@@ -831,6 +954,10 @@ function renderAppointmentDate(item: Appointment) {
       }
 
       .portal-schedule-row {
+        grid-template-columns: 1fr;
+      }
+
+      .portal-services-add-row {
         grid-template-columns: 1fr;
       }
 
