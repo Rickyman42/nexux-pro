@@ -113,7 +113,7 @@ async function sendConfirmationEmail(session) {
   if (!toEmail) return;
 
   const plan = session.metadata?.plan || 'pro';
-  const planNames = { starter: 'Lara Starter', pro: 'Lara Pro', total: 'Lara Total' };
+  const planNames = { starter: 'Plan Starter', pro: 'Plan Pro', total: 'Plan Total' };
   const planLabel = planNames[plan] || plan;
   const amount = session.amount_total ? `${(session.amount_total / 100).toFixed(0)}` : '—';
 
@@ -262,7 +262,7 @@ async function sendOnboardingEmail(session, provisionResult) {
   if (!toEmail) return;
 
   const plan = session.metadata?.plan || 'pro';
-  const planNames = { starter: 'Lara Starter', pro: 'Lara Pro', total: 'Lara Total' };
+  const planNames = { starter: 'Plan Starter', pro: 'Plan Pro', total: 'Plan Total' };
   const planLabel = planNames[plan] || plan;
 
   const { clientId, portalUrl, telegramDeepLink, channelSetup, miniWebUrl } = provisionResult;
@@ -368,7 +368,7 @@ async function sendOnboardingEmail(session, provisionResult) {
       body: JSON.stringify({
         sender: { name: 'Ricardo de Nexux', email: 'hola@nexux.pro' },
         to: [{ email: toEmail, name: toName }],
-        subject: `Tu Lara ${planLabel} esta lista - entra a tu portal`,
+        subject: `Tu asistente Lara está lista — entra a tu portal`,
         htmlContent: htmlBody,
       }),
     });
