@@ -48,7 +48,7 @@ const { id } = Astro.params;
       const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : '';
       if (!email) return;
 
-      await fetch('/api/portal/resend-link', {
+      await fetch('/portal-api/resend-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId, email }),

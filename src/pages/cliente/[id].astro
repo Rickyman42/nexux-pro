@@ -427,7 +427,7 @@ function renderAppointmentDate(item: Appointment) {
       event.preventDefault();
       if (!(scheduleForm instanceof HTMLFormElement)) return;
 
-      const response = await fetch('/api/portal/update-config', {
+      const response = await fetch('/portal-api/update-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -491,7 +491,7 @@ function renderAppointmentDate(item: Appointment) {
     });
 
     document.getElementById('svc-save')?.addEventListener('click', async () => {
-      const response = await fetch('/api/portal/update-config', {
+      const response = await fetch('/portal-api/update-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId, config: { services } }),
@@ -526,7 +526,7 @@ function renderAppointmentDate(item: Appointment) {
         const selected = document.querySelector('input[name="whatsapp_provider"]:checked');
         if (!(selected instanceof HTMLInputElement)) return;
 
-        const response = await fetch('/api/portal/update-config', {
+        const response = await fetch('/portal-api/update-config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -587,7 +587,7 @@ function renderAppointmentDate(item: Appointment) {
 
         let apts = [];
         try {
-          const res = await fetch('/api/portal/appointments?clientId=' + clientId);
+          const res = await fetch('/portal-api/appointments?clientId=' + clientId);
           if (res.ok) apts = await res.json();
         } catch (e) {
           grid.innerHTML = '<p class="portal-cal-empty">Error al cargar citas</p>';
@@ -657,7 +657,7 @@ function renderAppointmentDate(item: Appointment) {
                 btn.addEventListener('click', async () => {
                   btn.disabled = true;
                   try {
-                    await fetch('/api/portal/appointments', {
+                    await fetch('/portal-api/appointments', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ clientId, action: 'cancel', aptId: apt.id })
@@ -709,7 +709,7 @@ function renderAppointmentDate(item: Appointment) {
           duration_min: parseInt(fd.get('duration_min'), 10) || 60
         };
         try {
-          const r = await fetch('/api/portal/appointments', {
+          const r = await fetch('/portal-api/appointments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
