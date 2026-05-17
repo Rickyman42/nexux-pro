@@ -38,8 +38,8 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     features: [
       {
         icon: '💬',
-        title: 'Lara responde WhatsApp o Telegram 24h',
-        detail: 'Tu asistente IA responde al instante, a cualquier hora, sin que tú estés.',
+        title: 'Lara responde por Telegram 24h',
+        detail: 'Tu asistente IA responde al instante, a cualquier hora. Telegram es la opción oficial, sin riesgo de bloqueos.',
       },
       {
         icon: '📅',
@@ -91,6 +91,11 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     ],
     features: [
       { icon: '✅', title: 'Todo lo del Starter', detail: '' },
+      {
+        icon: '📱',
+        title: 'WhatsApp Business (Baileys)',
+        detail: 'Lara también responde por WhatsApp. Usa tu número actual — sin coste adicional.',
+      },
       {
         icon: '📞',
         title: 'Lara responde llamadas perdidas',
