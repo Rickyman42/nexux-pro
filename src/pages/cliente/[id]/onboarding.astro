@@ -1,0 +1,723 @@
+---
+export const prerender = false;
+import Layout from '../../../layouts/Layout.astro';
+import { getClientData } from '../../../lib/portal-client';
+
+const { id: clientId } = Astro.params;
+const token = Astro.cookies.get('nexux_token')?.value;
+if (!clientId || !token) return Astro.redirect(`/cliente/${clientId ?? ''}/login`);
+const data = await getClientData(clientId, token);
+if (!data) return Astro.redirect('/acceso-denegado');
+
+const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'Pro' : 'Total';
+---
+
+<Layout title="Configuración inicial — Nexux Pro">
+
+<div id="ob" class="ob-light">
+
+  <header class="ob-hdr">
+    <div class="ob-logo">nexux<strong>pro</strong></div>
+    <div class="ob-prog-wrap">
+      <div class="ob-prog-track"><div class="ob-prog-fill" id="ob-fill" style="width:0%"></div></div>
+      <span class="ob-prog-lbl" id="ob-lbl">Comenzando…</span>
+    </div>
+    <a href={`/cliente/${clientId}`} class="ob-skip-all">Saltar</a>
+  </header>
+
+  <div class="ob-stage">
+
+    <!-- 0: Bienvenida -->
+    <div class="ob-step" id="os-0">
+      <div class="ob-card ob-card-center">
+        <div class="ob-big-emoji">👋</div>
+        <h1 class="ob-h1">Hola, <span class="ob-acc">{data.name}</span></h1>
+        <p class="ob-sub">Configura tu negocio en 5 pasos. Tardas menos de 3 minutos y puedes modificar todo después desde el panel.</p>
+        <span class={"ob-plan-pill ob-pill-" + data.plan}>{planLabel}</span>
+        <button class="ob-btn-primary" id="btn-start">Empezar configuración →</button>
+        <a href={`/cliente/${clientId}`} class="ob-link-sm">Ya lo tengo configurado, ir al panel</a>
+      </div>
+    </div>
+
+    <!-- 1: Servicios -->
+    <div class="ob-step ob-hidden" id="os-1">
+      <div class="ob-card ob-card-wide">
+        <div class="ob-step-hd">
+          <div class="ob-snum">1</div>
+          <div>
+            <h2 class="ob-h2">Tus servicios</h2>
+            <p class="ob-sub">Añade lo que ofrece tu negocio con precio y duración estimada.</p>
+          </div>
+        </div>
+        <div id="svc-list" class="ob-svc-list"></div>
+        <button class="ob-btn-ghost" id="svc-add">+ Añadir servicio</button>
+        <div class="ob-row-actions">
+          <button class="ob-btn-text" id="svc-skip">Omitir por ahora</button>
+          <button class="ob-btn-primary" id="svc-save">Guardar y continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2: Horario -->
+    <div class="ob-step ob-hidden" id="os-2">
+      <div class="ob-card ob-card-wide">
+        <div class="ob-step-hd">
+          <div class="ob-snum">2</div>
+          <div>
+            <h2 class="ob-h2">Horario de apertura</h2>
+            <p class="ob-sub">¿Cuándo está abierto tu negocio? Marca los días y pon la hora de apertura y cierre.</p>
+          </div>
+        </div>
+        <div id="sch-grid" class="ob-sch-grid"></div>
+        <div class="ob-row-actions">
+          <button class="ob-btn-text" id="sch-skip">Omitir por ahora</button>
+          <button class="ob-btn-primary" id="sch-save">Guardar y continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3: Canales -->
+    <div class="ob-step ob-hidden" id="os-3">
+      <div class="ob-card ob-card-center">
+        <div class="ob-step-hd ob-step-hd-center">
+          <div class="ob-snum">3</div>
+          <div>
+            <h2 class="ob-h2">Canales de contacto</h2>
+            <p class="ob-sub">Así te contactarán tus clientes. Puedes conectarlos ahora o más tarde desde el panel.</p>
+          </div>
+        </div>
+        <div class="ob-ch-list">
+          <div class="ob-ch-row">
+            <span class="ob-ch-icon">📱</span>
+            <div class="ob-ch-info">
+              <strong>WhatsApp</strong>
+              <span id="wa-lbl" class="ob-ch-lbl"></span>
+            </div>
+            <span id="wa-badge" class="ob-badge"></span>
+          </div>
+          <div class="ob-ch-row" id="tg-row" style="display:none">
+            <span class="ob-ch-icon">✈️</span>
+            <div class="ob-ch-info">
+              <strong>Telegram</strong>
+              <span class="ob-ch-lbl">Bot activo</span>
+            </div>
+            <span class="ob-badge ob-badge-ok">✓ Listo</span>
+          </div>
+        </div>
+        <div class="ob-row-actions ob-single">
+          <button class="ob-btn-primary" id="ch-next">Continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4: Tema -->
+    <div class="ob-step ob-hidden" id="os-4">
+      <div class="ob-card ob-card-center">
+        <div class="ob-step-hd ob-step-hd-center">
+          <div class="ob-snum">4</div>
+          <div>
+            <h2 class="ob-h2">Estilo del panel</h2>
+            <p class="ob-sub">¿Cómo prefieres ver el panel? Puedes cambiarlo en cualquier momento.</p>
+          </div>
+        </div>
+        <div class="ob-theme-row">
+          <button class="ob-theme-btn ob-t-selected" data-t="light" id="tb-light">
+            <div class="ob-thumb ob-thumb-light">
+              <div class="ob-thumb-sb"></div>
+              <div class="ob-thumb-bdy">
+                <div class="ob-thumb-topbar"></div>
+                <div class="ob-thumb-content">
+                  <div class="ob-thumb-card"></div>
+                  <div class="ob-thumb-card"></div>
+                  <div class="ob-thumb-card"></div>
+                  <div class="ob-thumb-card"></div>
+                </div>
+              </div>
+            </div>
+            <span>☀️ Claro</span>
+          </button>
+          <button class="ob-theme-btn" data-t="dark" id="tb-dark">
+            <div class="ob-thumb ob-thumb-dark">
+              <div class="ob-thumb-sb"></div>
+              <div class="ob-thumb-bdy">
+                <div class="ob-thumb-topbar"></div>
+                <div class="ob-thumb-content">
+                  <div class="ob-thumb-card"></div>
+                  <div class="ob-thumb-card"></div>
+                  <div class="ob-thumb-card"></div>
+                  <div class="ob-thumb-card"></div>
+                </div>
+              </div>
+            </div>
+            <span>🌙 Oscuro</span>
+          </button>
+        </div>
+        <div class="ob-row-actions ob-single">
+          <button class="ob-btn-primary" id="th-next">Continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5: Listo -->
+    <div class="ob-step ob-hidden" id="os-5">
+      <div class="ob-card ob-card-center">
+        <div class="ob-check-circle">✓</div>
+        <h2 class="ob-h2">¡Todo listo!</h2>
+        <p class="ob-sub">Tu panel está configurado. Edita cualquier ajuste en cualquier momento desde <strong>Configuración</strong> en el menú lateral.</p>
+        <div class="ob-fin-list" id="fin-list"></div>
+        <a href={`/cliente/${clientId}`} class="ob-btn-primary ob-btn-lg">Ir al panel →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style is:global>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.ob-light {
+  --ob-bg: #F5F5F7;
+  --ob-surface: #FFFFFF;
+  --ob-text: #1d1d1f;
+  --ob-muted: #6e6e73;
+  --ob-accent: #2a9d97;
+  --ob-accent-lt: rgba(42,157,151,0.1);
+  --ob-line: rgba(0,0,0,0.09);
+  --ob-input-bg: rgba(0,0,0,0.04);
+  --ob-input-border: rgba(0,0,0,0.14);
+  --ob-snum-bg: rgba(42,157,151,0.1);
+  --ob-snum-text: #1a7a76;
+  --ob-hdr-bg: rgba(245,245,247,0.92);
+  --ob-prog-track: rgba(0,0,0,0.1);
+  --ob-shadow: 0 2px 20px rgba(0,0,0,0.07);
+}
+.ob-dark {
+  --ob-bg: #0A0A0F;
+  --ob-surface: #12121A;
+  --ob-text: #F2F2EC;
+  --ob-muted: rgba(242,242,236,0.5);
+  --ob-accent: #4ECDC4;
+  --ob-accent-lt: rgba(78,205,196,0.12);
+  --ob-line: rgba(242,242,236,0.08);
+  --ob-input-bg: rgba(255,255,255,0.06);
+  --ob-input-border: rgba(242,242,236,0.15);
+  --ob-snum-bg: rgba(78,205,196,0.12);
+  --ob-snum-text: #4ECDC4;
+  --ob-hdr-bg: rgba(10,10,15,0.92);
+  --ob-prog-track: rgba(255,255,255,0.12);
+  --ob-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+#ob {
+  position: fixed; inset: 0; z-index: 999;
+  background: var(--ob-bg); color: var(--ob-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── Header ───────────────────────────────────────── */
+.ob-hdr {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--ob-hdr-bg);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--ob-line);
+  flex-shrink: 0;
+}
+.ob-logo { font-size: 1rem; font-weight: 400; color: var(--ob-text); letter-spacing: -0.02em; }
+.ob-logo strong { color: var(--ob-accent); font-weight: 700; }
+.ob-prog-wrap { flex: 1; display: flex; align-items: center; gap: 0.75rem; }
+.ob-prog-track { flex: 1; height: 4px; background: var(--ob-prog-track); border-radius: 2px; overflow: hidden; }
+.ob-prog-fill { height: 100%; background: var(--ob-accent); border-radius: 2px; transition: width 0.45s cubic-bezier(0.4,0,0.2,1); }
+.ob-prog-lbl { font-size: 0.73rem; color: var(--ob-muted); white-space: nowrap; }
+.ob-skip-all { font-size: 0.8rem; color: var(--ob-muted); text-decoration: none; transition: color 0.15s; }
+.ob-skip-all:hover { color: var(--ob-accent); }
+
+/* ── Stage ────────────────────────────────────────── */
+.ob-stage {
+  flex: 1; overflow-y: auto;
+  display: flex; justify-content: center;
+  padding: 2.5rem 1rem 5rem;
+}
+
+/* ── Steps ────────────────────────────────────────── */
+.ob-step { width: 100%; display: flex; justify-content: center; align-items: flex-start; }
+.ob-hidden { display: none !important; }
+
+/* ── Cards ────────────────────────────────────────── */
+.ob-card {
+  background: var(--ob-surface);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  box-shadow: var(--ob-shadow);
+}
+.ob-card-center {
+  max-width: 460px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem;
+}
+.ob-card-wide {
+  max-width: 660px;
+  display: flex; flex-direction: column; gap: 0;
+}
+
+/* ── Typography ───────────────────────────────────── */
+.ob-h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.035em; line-height: 1.15; }
+.ob-h2 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.025em; }
+.ob-acc { color: var(--ob-accent); }
+.ob-sub { font-size: 0.88rem; color: var(--ob-muted); line-height: 1.55; }
+.ob-big-emoji { font-size: 3.5rem; line-height: 1; }
+
+/* Plan pill */
+.ob-plan-pill {
+  padding: 0.28rem 0.9rem; border-radius: 99px;
+  font-size: 0.72rem; font-weight: 600;
+}
+.ob-pill-starter { background: rgba(90,90,90,0.12); color: var(--ob-muted); }
+.ob-pill-pro     { background: var(--ob-accent-lt); color: var(--ob-accent); }
+.ob-pill-total   { background: rgba(255,179,0,0.12); color: #c98a00; }
+
+/* ── Buttons ──────────────────────────────────────── */
+.ob-btn-primary {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.78rem 1.8rem; border-radius: 12px;
+  background: var(--ob-accent); color: #fff;
+  font-size: 0.9rem; font-weight: 600;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.ob-btn-primary:hover { opacity: 0.88; }
+.ob-btn-primary:active { transform: scale(0.98); }
+.ob-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.ob-btn-lg { padding: 0.9rem 2.5rem; font-size: 1rem; }
+.ob-btn-ghost {
+  display: inline-flex; align-items: center;
+  padding: 0.6rem 1rem; border-radius: 10px;
+  border: 1.5px dashed var(--ob-line);
+  background: transparent; color: var(--ob-accent);
+  font-size: 0.85rem; font-weight: 500; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  margin-bottom: 1.25rem;
+}
+.ob-btn-ghost:hover { border-color: var(--ob-accent); background: var(--ob-accent-lt); }
+.ob-btn-text {
+  background: none; border: none; cursor: pointer;
+  color: var(--ob-muted); font-size: 0.85rem;
+  text-decoration: underline; padding: 0.4rem 0;
+}
+.ob-btn-text:hover { color: var(--ob-text); }
+.ob-link-sm { font-size: 0.8rem; color: var(--ob-muted); text-decoration: none; }
+.ob-link-sm:hover { color: var(--ob-accent); }
+
+/* Row actions */
+.ob-row-actions {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 1rem;
+  margin-top: 1.5rem;
+}
+.ob-single { justify-content: flex-end; }
+
+/* ── Step header ──────────────────────────────────── */
+.ob-step-hd {
+  display: flex; align-items: flex-start; gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.ob-step-hd-center { align-items: center; text-align: center; flex-direction: column; }
+.ob-snum {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: var(--ob-snum-bg); color: var(--ob-snum-text);
+  font-size: 0.88rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Services ─────────────────────────────────────── */
+.ob-svc-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; min-height: 40px; }
+.ob-svc-empty { font-size: 0.85rem; color: var(--ob-muted); padding: 0.5rem 0; }
+.ob-svc-header {
+  display: grid; grid-template-columns: 1fr 76px 88px 36px;
+  gap: 0.5rem; padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ob-line); margin-bottom: 0.25rem;
+}
+.ob-svc-header span {
+  font-size: 0.7rem; color: var(--ob-muted);
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.ob-svc-row {
+  display: grid; grid-template-columns: 1fr 76px 88px 36px;
+  gap: 0.5rem; align-items: center;
+}
+.ob-svc-row input {
+  padding: 0.52rem 0.7rem; border-radius: 8px;
+  border: 1.5px solid var(--ob-input-border);
+  background: var(--ob-input-bg); color: var(--ob-text);
+  font-size: 0.84rem; width: 100%;
+}
+.ob-svc-row input:focus { outline: none; border-color: var(--ob-accent); }
+.ob-svc-del {
+  width: 36px; height: 36px; border-radius: 8px; border: none;
+  background: rgba(255,59,48,0.1); color: #ff3b30;
+  cursor: pointer; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.ob-svc-del:hover { background: rgba(255,59,48,0.2); }
+
+/* ── Schedule ─────────────────────────────────────── */
+.ob-sch-grid { display: flex; flex-direction: column; }
+.ob-sch-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.65rem 0; border-bottom: 1px solid var(--ob-line);
+}
+.ob-sch-row:last-child { border-bottom: none; }
+.ob-day-toggle {
+  display: flex; align-items: center; gap: 0.45rem;
+  cursor: pointer; user-select: none;
+  min-width: 116px; flex-shrink: 0;
+}
+.ob-day-toggle input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--ob-accent); cursor: pointer; }
+.ob-day-name { font-size: 0.84rem; font-weight: 500; }
+.ob-day-times { display: flex; gap: 0.75rem; flex: 1; align-items: center; }
+.ob-day-times.ob-closed { opacity: 0.28; pointer-events: none; }
+.ob-time-pair { display: flex; align-items: center; gap: 0.4rem; }
+.ob-time-pair label { font-size: 0.7rem; color: var(--ob-muted); white-space: nowrap; }
+.ob-time-pair input[type=time] {
+  padding: 0.38rem 0.5rem; border-radius: 7px;
+  border: 1.5px solid var(--ob-input-border);
+  background: var(--ob-input-bg); color: var(--ob-text);
+  font-size: 0.82rem;
+}
+.ob-time-pair input[type=time]:focus { outline: none; border-color: var(--ob-accent); }
+
+/* ── Channels ─────────────────────────────────────── */
+.ob-ch-list { display: flex; flex-direction: column; gap: 0.65rem; width: 100%; margin: 0.5rem 0; }
+.ob-ch-row {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.9rem 1.1rem; border-radius: 12px;
+  border: 1.5px solid var(--ob-line);
+  background: var(--ob-input-bg);
+}
+.ob-ch-icon { font-size: 1.4rem; }
+.ob-ch-info { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
+.ob-ch-info strong { font-size: 0.88rem; }
+.ob-ch-lbl { font-size: 0.76rem; color: var(--ob-muted); }
+.ob-badge { padding: 0.27rem 0.7rem; border-radius: 99px; font-size: 0.73rem; font-weight: 600; }
+.ob-badge-ok   { background: rgba(52,199,89,0.12); color: #28a745; }
+.ob-badge-warn { background: rgba(255,149,0,0.12); color: #c97400; }
+
+/* ── Theme picker ─────────────────────────────────── */
+.ob-theme-row { display: flex; gap: 1rem; width: 100%; margin: 0.5rem 0; }
+.ob-theme-btn {
+  flex: 1; border: 2px solid var(--ob-line); border-radius: 16px;
+  background: var(--ob-input-bg); cursor: pointer;
+  padding: 1rem 1rem 0.85rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+  color: var(--ob-text); font-size: 0.85rem; font-weight: 500;
+  transition: border-color 0.2s, background 0.2s;
+}
+.ob-theme-btn:hover { border-color: var(--ob-accent); }
+.ob-t-selected { border-color: var(--ob-accent) !important; background: var(--ob-accent-lt) !important; }
+
+/* Theme thumbnails — CSS art */
+.ob-thumb { width: 100%; aspect-ratio: 16/10; border-radius: 8px; display: flex; overflow: hidden; }
+.ob-thumb-light { background: #F5F5F7; }
+.ob-thumb-dark  { background: #0A0A0F; }
+.ob-thumb-sb { width: 30%; }
+.ob-thumb-light .ob-thumb-sb { background: #E8E8ED; }
+.ob-thumb-dark  .ob-thumb-sb { background: #0d0d14; }
+.ob-thumb-bdy { flex: 1; display: flex; flex-direction: column; }
+.ob-thumb-topbar { height: 22%; }
+.ob-thumb-light .ob-thumb-topbar { background: #FFFFFF; }
+.ob-thumb-dark  .ob-thumb-topbar { background: #12121A; }
+.ob-thumb-content { flex: 1; padding: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.ob-thumb-card { border-radius: 3px; }
+.ob-thumb-light .ob-thumb-card { background: #FFFFFF; }
+.ob-thumb-dark  .ob-thumb-card { background: #1a1a24; }
+
+/* ── Finish ───────────────────────────────────────── */
+.ob-check-circle {
+  width: 68px; height: 68px; border-radius: 50%;
+  background: rgba(52,199,89,0.12); color: #28a745;
+  font-size: 1.9rem; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.25rem;
+}
+.ob-fin-list { display: flex; flex-direction: column; gap: 0.45rem; width: 100%; margin: 0.5rem 0; }
+.ob-fin-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6rem 1rem; border-radius: 10px;
+  background: var(--ob-input-bg); font-size: 0.84rem;
+}
+.ob-fin-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ob-accent); flex-shrink: 0; }
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 660px) {
+  .ob-stage { padding: 1.5rem 0.75rem 4rem; }
+  .ob-card { padding: 2rem 1.25rem; }
+  .ob-h1 { font-size: 1.5rem; }
+  .ob-svc-row, .ob-svc-header { grid-template-columns: 1fr 68px 80px 36px; }
+  .ob-sch-row { flex-wrap: wrap; gap: 0.5rem; }
+  .ob-day-toggle { min-width: 100px; }
+  .ob-day-times { flex-wrap: wrap; }
+  .ob-theme-row { gap: 0.6rem; }
+  .ob-theme-btn { padding: 0.75rem 0.6rem 0.65rem; font-size: 0.78rem; }
+}
+</style>
+
+<script define:vars={{
+  clientId,
+  waConnected: data.channels.whatsapp.connected,
+  tgEnabled: data.channels.telegram.enabled,
+  servicesJson: JSON.stringify(data.services ?? []),
+  scheduleJson: JSON.stringify(data.schedule ?? {})
+}}>
+(function () {
+
+  var DAYS   = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
+  var LABELS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  var DEFAULT_SCH = {
+    lunes:     { open:'09:00', close:'19:00' },
+    martes:    { open:'09:00', close:'19:00' },
+    miercoles: { open:'09:00', close:'19:00' },
+    jueves:    { open:'09:00', close:'19:00' },
+    viernes:   { open:'09:00', close:'19:00' },
+    sabado:    { open:'09:00', close:'14:00' },
+    domingo:   null
+  };
+
+  var ob          = document.getElementById('ob');
+  var fill        = document.getElementById('ob-fill');
+  var lblEl       = document.getElementById('ob-lbl');
+  var currentStep = 0;
+  var TOTAL       = 5;
+  var finishItems = [];
+  var chosenTheme = localStorage.getItem('crm-theme') || 'light';
+
+  /* ── Theme ────────────────────────────────────────── */
+  function applyTheme(t) {
+    ob.className = t === 'dark' ? 'ob-dark' : 'ob-light';
+    chosenTheme  = t;
+  }
+  applyTheme(chosenTheme);
+  if (chosenTheme === 'dark') {
+    var tbL = document.getElementById('tb-light');
+    var tbD = document.getElementById('tb-dark');
+    if (tbL) tbL.classList.remove('ob-t-selected');
+    if (tbD) tbD.classList.add('ob-t-selected');
+  }
+
+  /* ── Progress ─────────────────────────────────────── */
+  function setProgress(n) {
+    var pct = n === 0 ? 0 : Math.round((n / TOTAL) * 100);
+    fill.style.width = pct + '%';
+    lblEl.textContent = n === 0 ? 'Comenzando…' : 'Paso ' + n + ' de ' + TOTAL;
+  }
+
+  /* ── Step nav ─────────────────────────────────────── */
+  function showStep(n) {
+    document.querySelectorAll('.ob-step').forEach(function (s) { s.classList.add('ob-hidden'); });
+    var el = document.getElementById('os-' + n);
+    if (el) el.classList.remove('ob-hidden');
+    currentStep = n;
+    setProgress(n);
+    document.querySelector('.ob-stage').scrollTop = 0;
+  }
+
+  function goNext() { showStep(currentStep + 1); }
+
+  /* ── API save ─────────────────────────────────────── */
+  function saveConfig(config, cb) {
+    fetch('/portal-api/update-config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: clientId, config: config })
+    }).then(function (r) { cb(r.ok); }).catch(function () { cb(false); });
+  }
+
+  /* ── Utils ────────────────────────────────────────── */
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ════════════════════════════════════════════════════
+     STEP 0 — Bienvenida
+  ════════════════════════════════════════════════════ */
+  document.getElementById('btn-start').addEventListener('click', function () { showStep(1); });
+
+  /* ════════════════════════════════════════════════════
+     STEP 1 — Servicios
+  ════════════════════════════════════════════════════ */
+  var services = JSON.parse(servicesJson);
+  if (!Array.isArray(services)) services = [];
+
+  function renderSvcs() {
+    var list = document.getElementById('svc-list');
+    if (!services.length) {
+      list.innerHTML = '<p class="ob-svc-empty">Aún no hay servicios. Pulsa "Añadir servicio".</p>';
+      return;
+    }
+    var h = '<div class="ob-svc-header">' +
+      '<span>Servicio</span><span>Min.</span><span>Precio</span><span></span></div>';
+    var rows = services.map(function (s, i) {
+      return '<div class="ob-svc-row">' +
+        '<input type="text" value="' + esc(s.name || '') + '" placeholder="Ej: Corte de pelo" data-i="' + i + '" data-f="name">' +
+        '<input type="number" value="' + (s.duration || 30) + '" min="5" max="480" placeholder="30" data-i="' + i + '" data-f="duration">' +
+        '<input type="number" value="' + (s.price || '') + '" min="0" step="0.01" placeholder="12.00" data-i="' + i + '" data-f="price">' +
+        '<button class="ob-svc-del" data-i="' + i + '">×</button>' +
+        '</div>';
+    }).join('');
+    list.innerHTML = h + rows;
+    list.querySelectorAll('input').forEach(function (inp) {
+      inp.addEventListener('input', function () {
+        var idx = parseInt(this.dataset.i), f = this.dataset.f;
+        if (f === 'name') services[idx].name = this.value;
+        else services[idx][f] = parseFloat(this.value) || 0;
+      });
+    });
+    list.querySelectorAll('.ob-svc-del').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        services.splice(parseInt(this.dataset.i), 1);
+        renderSvcs();
+      });
+    });
+  }
+  renderSvcs();
+
+  document.getElementById('svc-add').addEventListener('click', function () {
+    services.push({ name: '', duration: 30, price: 0 });
+    renderSvcs();
+  });
+
+  document.getElementById('svc-skip').addEventListener('click', goNext);
+
+  document.getElementById('svc-save').addEventListener('click', function () {
+    var btn = this;
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    saveConfig({ services: services }, function (ok) {
+      btn.disabled = false; btn.textContent = 'Guardar y continuar';
+      if (ok && services.length) finishItems.push(services.length + ' servicio' + (services.length === 1 ? '' : 's') + ' configurado' + (services.length === 1 ? '' : 's'));
+      goNext();
+    });
+  });
+
+  /* ════════════════════════════════════════════════════
+     STEP 2 — Horario
+  ════════════════════════════════════════════════════ */
+  var existSch = JSON.parse(scheduleJson) || {};
+
+  function renderSch() {
+    var grid = document.getElementById('sch-grid');
+    grid.innerHTML = DAYS.map(function (day, i) {
+      var ex   = existSch[day];
+      var def  = DEFAULT_SCH[day];
+      var open = ex !== undefined ? ex !== null : def !== null;
+      var ov   = (ex && ex.open)  || (def && def.open)  || '09:00';
+      var cv   = (ex && ex.close) || (def && def.close) || '19:00';
+      return '<div class="ob-sch-row">' +
+        '<label class="ob-day-toggle">' +
+          '<input type="checkbox" id="chk-' + day + '"' + (open ? ' checked' : '') + '>' +
+          '<span class="ob-day-name">' + LABELS[i] + '</span>' +
+        '</label>' +
+        '<div class="ob-day-times' + (open ? '' : ' ob-closed') + '" id="times-' + day + '">' +
+          '<div class="ob-time-pair"><label>Apertura</label><input type="time" id="op-' + day + '" value="' + ov + '"></div>' +
+          '<div class="ob-time-pair"><label>Cierre</label><input type="time" id="cl-' + day + '" value="' + cv + '"></div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+
+    DAYS.forEach(function (day) {
+      document.getElementById('chk-' + day).addEventListener('change', function () {
+        var t = document.getElementById('times-' + day);
+        if (this.checked) t.classList.remove('ob-closed');
+        else t.classList.add('ob-closed');
+      });
+    });
+  }
+  renderSch();
+
+  document.getElementById('sch-skip').addEventListener('click', goNext);
+
+  document.getElementById('sch-save').addEventListener('click', function () {
+    var schedule = {};
+    DAYS.forEach(function (day) {
+      var chk = document.getElementById('chk-' + day);
+      if (!chk.checked) { schedule[day] = null; return; }
+      schedule[day] = {
+        open:  document.getElementById('op-' + day).value || '09:00',
+        close: document.getElementById('cl-' + day).value || '19:00'
+      };
+    });
+    var btn = this;
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    saveConfig({ schedule: schedule }, function (ok) {
+      btn.disabled = false; btn.textContent = 'Guardar y continuar';
+      if (ok) {
+        var openCount = Object.values(schedule).filter(function (v) { return v !== null; }).length;
+        finishItems.push('Horario: ' + openCount + ' día' + (openCount === 1 ? '' : 's') + ' configurado' + (openCount === 1 ? '' : 's'));
+      }
+      goNext();
+    });
+  });
+
+  /* ════════════════════════════════════════════════════
+     STEP 3 — Canales
+  ════════════════════════════════════════════════════ */
+  (function () {
+    var waLbl   = document.getElementById('wa-lbl');
+    var waBadge = document.getElementById('wa-badge');
+    if (waConnected) {
+      waLbl.textContent   = 'Tu bot está activo y recibiendo mensajes';
+      waBadge.textContent = '✓ Conectado';
+      waBadge.className   = 'ob-badge ob-badge-ok';
+    } else {
+      waLbl.textContent   = 'Conéctalo desde el panel → Canales';
+      waBadge.textContent = '⚡ Pendiente';
+      waBadge.className   = 'ob-badge ob-badge-warn';
+    }
+    if (tgEnabled) {
+      document.getElementById('tg-row').style.display = 'flex';
+    }
+  })();
+
+  document.getElementById('ch-next').addEventListener('click', goNext);
+
+  /* ════════════════════════════════════════════════════
+     STEP 4 — Tema
+  ════════════════════════════════════════════════════ */
+  document.querySelectorAll('.ob-theme-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.ob-theme-btn').forEach(function (b) { b.classList.remove('ob-t-selected'); });
+      this.classList.add('ob-t-selected');
+      applyTheme(this.dataset.t);
+    });
+  });
+
+  document.getElementById('th-next').addEventListener('click', function () {
+    localStorage.setItem('crm-theme', chosenTheme);
+    finishItems.push('Estilo ' + (chosenTheme === 'dark' ? 'oscuro 🌙' : 'claro ☀️') + ' seleccionado');
+    renderFinish();
+    goNext();
+  });
+
+  /* ════════════════════════════════════════════════════
+     STEP 5 — Listo
+  ════════════════════════════════════════════════════ */
+  function renderFinish() {
+    var list = document.getElementById('fin-list');
+    if (!finishItems.length) {
+      list.innerHTML = '<p style="font-size:0.84rem;color:var(--ob-muted)">Puedes configurar todo desde el panel cuando quieras.</p>';
+      return;
+    }
+    list.innerHTML = finishItems.map(function (txt) {
+      return '<div class="ob-fin-item"><div class="ob-fin-dot"></div><span>' + esc(txt) + '</span></div>';
+    }).join('');
+  }
+
+  /* ── Init ─────────────────────────────────────────── */
+  setProgress(0);
+
+})();
+</script>
+
+</Layout>
