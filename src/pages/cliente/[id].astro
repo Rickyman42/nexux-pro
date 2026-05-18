@@ -265,6 +265,7 @@ function renderAppointmentDate(item: Appointment) {
         <form id="schedule-form" class="portal-config-form">
           {weekdayLabels.map(([key, label]) => {
             const slot = data.schedule[key];
+            const hasLunch = !!(slot as any)?.lunch_close;
             return (
               <div class="portal-schedule-row">
                 <div class="portal-schedule-day">{label}</div>
@@ -272,8 +273,16 @@ function renderAppointmentDate(item: Appointment) {
                   <input type="checkbox" name={`${key}_closed`} checked={!slot} />
                   <span>Cerrado</span>
                 </label>
-                <input type="time" name={`${key}_open`} value={slot?.open ?? '09:00'} disabled={!slot} />
-                <input type="time" name={`${key}_close`} value={slot?.close ?? '19:00'} disabled={!slot} />
+                <div class="portal-schedule-times">
+                  <input type="time" name={`${key}_open`} value={slot?.open ?? '09:00'} disabled={!slot} />
+                  <input type="time" name={`${key}_lunch_close`} value={(slot as any)?.lunch_close ?? '14:00'} disabled={!slot || !hasLunch} data-lunch />
+                  <input type="time" name={`${key}_lunch_open`} value={(slot as any)?.lunch_open ?? '16:00'} disabled={!slot || !hasLunch} data-lunch />
+                  <input type="time" name={`${key}_close`} value={slot?.close ?? '19:00'} disabled={!slot} />
+                </div>
+                <label class="portal-switch">
+                  <input type="checkbox" name={`${key}_lunch`} checked={hasLunch} disabled={!slot} />
+                  <span>Comer</span>
+                </label>
               </div>
             );
           })}
@@ -394,15 +403,23 @@ function renderAppointmentDate(item: Appointment) {
       const payload = {};
       ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(day => {
         const closed = form.elements.namedItem(`${day}_closed`);
-        const open = form.elements.namedItem(`${day}_open`);
-        const close = form.elements.namedItem(`${day}_close`);
         if (closed instanceof HTMLInputElement && closed.checked) {
           payload[day] = null;
           return;
         }
+        const open = form.elements.namedItem(`${day}_open`);
+        const close = form.elements.namedItem(`${day}_close`);
+        const lunchCheck = form.elements.namedItem(`${day}_lunch`);
+        const lunchClose = form.elements.namedItem(`${day}_lunch_close`);
+        const lunchOpen = form.elements.namedItem(`${day}_lunch_open`);
+        const hasLunch = lunchCheck instanceof HTMLInputElement && lunchCheck.checked;
         payload[day] = {
           open: open instanceof HTMLInputElement ? open.value : '09:00',
           close: close instanceof HTMLInputElement ? close.value : '19:00',
+          ...(hasLunch ? {
+            lunch_close: lunchClose instanceof HTMLInputElement ? lunchClose.value : '14:00',
+            lunch_open:  lunchOpen  instanceof HTMLInputElement ? lunchOpen.value  : '16:00',
+          } : {}),
         };
       });
       return payload;
@@ -430,11 +447,30 @@ function renderAppointmentDate(item: Appointment) {
       input.addEventListener('change', event => {
         const target = event.currentTarget;
         if (!(target instanceof HTMLInputElement)) return;
-        const day = target.name.replace('_closed', '');
-        const open = scheduleForm.elements.namedItem(`${day}_open`);
-        const close = scheduleForm.elements.namedItem(`${day}_close`);
-        if (open instanceof HTMLInputElement) open.disabled = target.checked;
-        if (close instanceof HTMLInputElement) close.disabled = target.checked;
+        if (target.name.endsWith('_closed')) {
+          const day = target.name.replace('_closed', '');
+          const isClosed = target.checked;
+          ['open','close','lunch_close','lunch_open'].forEach(f => {
+            const el = scheduleForm.elements.namedItem(`${day}_${f}`);
+            if (el instanceof HTMLInputElement) el.disabled = isClosed;
+          });
+          const lunchCheck = scheduleForm.elements.namedItem(`${day}_lunch`);
+          if (lunchCheck instanceof HTMLInputElement) {
+            lunchCheck.disabled = isClosed;
+            if (!isClosed) {
+              ['lunch_close','lunch_open'].forEach(f => {
+                const el = scheduleForm.elements.namedItem(`${day}_${f}`);
+                if (el instanceof HTMLInputElement) el.disabled = !lunchCheck.checked;
+              });
+            }
+          }
+        } else if (target.name.endsWith('_lunch')) {
+          const day = target.name.replace('_lunch', '');
+          ['lunch_close','lunch_open'].forEach(f => {
+            const el = scheduleForm.elements.namedItem(`${day}_${f}`);
+            if (el instanceof HTMLInputElement) el.disabled = !target.checked;
+          });
+        }
       });
     });
 
@@ -1131,9 +1167,31 @@ function renderAppointmentDate(item: Appointment) {
 
     .portal-schedule-row {
       display: grid;
-      grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 140px) minmax(120px, 140px);
+      grid-template-columns: minmax(90px, 130px) auto 1fr auto;
       gap: 0.75rem;
       align-items: center;
+    }
+
+    .portal-schedule-times {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .portal-schedule-times input[type='time'] {
+      flex: 1;
+      min-width: 86px;
+    }
+
+    .portal-schedule-times input[data-lunch] {
+      border-style: dashed;
+      opacity: 0.45;
+    }
+
+    .portal-schedule-times input[data-lunch]:not(:disabled) {
+      opacity: 1;
+      border-style: solid;
     }
 
     .portal-schedule-day {
@@ -1150,7 +1208,6 @@ function renderAppointmentDate(item: Appointment) {
     }
 
     .portal-config-form input[type='time'] {
-      width: 100%;
       padding: 0.8rem 0.9rem;
       border-radius: 14px;
       border: 1px solid var(--nx-line);
