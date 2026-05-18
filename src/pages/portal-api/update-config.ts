@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { updateClientConfig } from '../../../lib/portal-client';
+import { updateClientConfig } from '../../lib/portal-client';
 
 export const prerender = false;
 

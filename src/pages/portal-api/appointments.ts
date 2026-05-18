@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { fetchAllAppointments, cancelAppointmentById, createAppointmentManual } from "../../../lib/portal-client";
+import { fetchAllAppointments, cancelAppointmentById, createAppointmentManual } from "../../lib/portal-client";
 
 export const prerender = false;
 

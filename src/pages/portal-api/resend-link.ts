@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { resendPortalLink } from '../../../lib/portal-client';
+import { resendPortalLink } from '../../lib/portal-client';
 
 export const prerender = false;
 
