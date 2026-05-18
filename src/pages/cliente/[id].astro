@@ -16,16 +16,8 @@ if (!data) {
   return Astro.redirect('/acceso-denegado');
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-ES', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'long',
-});
-
-const timeFormatter = new Intl.DateTimeFormat('es-ES', {
-  hour: '2-digit',
-  minute: '2-digit',
-});
+const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long' });
+const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' });
 
 const todayKey = new Date().toDateString();
 const todayAppointments = data.nextAppointments.filter(item => new Date(item.datetime).toDateString() === todayKey).length;
@@ -34,30 +26,20 @@ const limitedProgress = data.metrics.conversationLimit
   : 100;
 const planLabel = data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
 const qrImageSrc = data.qrPngBase64
-  ? data.qrPngBase64.startsWith('data:image')
-    ? data.qrPngBase64
-    : `data:image/png;base64,${data.qrPngBase64}`
+  ? data.qrPngBase64.startsWith('data:image') ? data.qrPngBase64 : `data:image/png;base64,${data.qrPngBase64}`
   : null;
 const ownerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=${data.clientId}`;
 const customerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=c_${data.clientId}`;
 const showWhatsApp = !!data.channels.whatsapp?.provider;
 
 const weekdayLabels: [string, string][] = [
-  ['monday', 'Lunes'],
-  ['tuesday', 'Martes'],
-  ['wednesday', 'Miercoles'],
-  ['thursday', 'Jueves'],
-  ['friday', 'Viernes'],
-  ['saturday', 'Sabado'],
-  ['sunday', 'Domingo'],
+  ['monday','Lunes'],['tuesday','Martes'],['wednesday','Miercoles'],
+  ['thursday','Jueves'],['friday','Viernes'],['saturday','Sabado'],['sunday','Domingo'],
 ];
 
 function renderAppointmentDate(item: Appointment) {
   const date = new Date(item.datetime);
-  return {
-    date: dateFormatter.format(date),
-    time: timeFormatter.format(date),
-  };
+  return { date: dateFormatter.format(date), time: timeFormatter.format(date) };
 }
 ---
 <Layout
@@ -69,291 +51,342 @@ function renderAppointmentDate(item: Appointment) {
     <meta name="robots" content="noindex,nofollow" />
   </Fragment>
 
-  <section class="portal-page">
-    <div class="container-nx">
-      <header class="portal-header">
-        <div>
-          <p class="eyebrow">Portal cliente</p>
-          <h1>Tu bot - {data.name}</h1>
-        </div>
-        <div class="portal-badges">
-          <span class="portal-badge portal-badge-plan">Plan {planLabel}</span>
-          <span class={`portal-badge ${data.active ? 'portal-badge-live' : 'portal-badge-off'}`}>
+  <div id="crm" class="crm-light">
+
+    <!-- SIDEBAR -->
+    <aside class="crm-sidebar" id="crm-sidebar">
+      <div class="crm-logo">
+        <span class="crm-logo-mark">N</span>
+        <div class="crm-logo-words">nexux<em>pro</em></div>
+      </div>
+
+      <nav class="crm-nav">
+        <button class="crm-nav-btn active" data-view="dashboard">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </button>
+        <button class="crm-nav-btn" data-view="citas">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Citas
+        </button>
+        <button class="crm-nav-btn" data-view="clientes">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </button>
+        <button class="crm-nav-btn" data-view="canales">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Canales
+        </button>
+        <button class="crm-nav-btn" data-view="config">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+          Configuración
+        </button>
+      </nav>
+
+      <div class="crm-sidebar-foot">
+        <span class="crm-plan-chip">{planLabel}</span>
+        <a href="https://t.me/nexux_soporte_bot" target="_blank" rel="noopener" class="crm-support-link">Soporte</a>
+      </div>
+    </aside>
+
+    <div class="crm-overlay" id="crm-overlay"></div>
+
+    <!-- BODY -->
+    <div class="crm-body">
+      <header class="crm-topbar">
+        <button class="crm-burger" id="crm-burger" aria-label="Menu">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="crm-topbar-info">
+          <span class="crm-topbar-name">{data.name}</span>
+          <span class={`crm-topbar-badge ${data.active ? 'badge-live' : 'badge-off'}`}>
+            <span class="crm-dot"></span>
             {data.active ? 'Activo' : 'Inactivo'}
           </span>
         </div>
+        <button class="crm-theme-btn" id="crm-theme-btn" title="Cambiar tema">
+          <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
       </header>
 
-      <section class="portal-grid">
-        <article class="portal-card">
-          <div class="portal-card-head">
-            <h2>Estado del bot</h2>
+      <main class="crm-main">
+
+        <!-- ── DASHBOARD ──────────────────────────────────── -->
+        <section class="crm-view" id="v-dashboard">
+          <div class="crm-view-hdr">
+            <h1 class="crm-view-title">Dashboard</h1>
           </div>
-          <div class="portal-status-grid">
-            {showWhatsApp && (
-            <div class="portal-status-item">
-              <strong>WhatsApp</strong>
-              <span class="portal-status-val">
-                <span class={`portal-status-dot ${data.channels.whatsapp.connected ? 'dot-green' : data.botStatus === 'pending_qr' ? 'dot-yellow' : 'dot-red'}`}></span>
-                {data.channels.whatsapp.connected
-                  ? `Conectado (${data.channels.whatsapp.provider})`
-                  : data.botStatus === 'pending_qr'
-                    ? 'Pendiente de QR'
-                    : 'Desconectado'}
-              </span>
+
+          <div class="crm-kpi-grid">
+            <div class="crm-kpi">
+              <span class="crm-kpi-lbl">Citas hoy</span>
+              <strong class="crm-kpi-val">{todayAppointments}</strong>
             </div>
-            )}
-            <div class="portal-status-item">
-              <strong>Telegram</strong>
-              <span class="portal-status-val">
-                <span class={`portal-status-dot ${data.channels.telegram.ownerLinked ? 'dot-green' : 'dot-yellow'}`}></span>
-                {data.channels.telegram.ownerLinked ? 'Vinculado' : 'Pendiente de vincular'}
-              </span>
+            <div class="crm-kpi">
+              <span class="crm-kpi-lbl">Total reservadas</span>
+              <strong class="crm-kpi-val">{data.metrics.appointmentsBooked}</strong>
+            </div>
+            <div class="crm-kpi">
+              <span class="crm-kpi-lbl">Conversaciones</span>
+              <strong class="crm-kpi-val">{data.metrics.conversationCount}{data.metrics.conversationLimit ? `/${data.metrics.conversationLimit}` : ''}</strong>
+              {data.plan === 'starter' && data.metrics.conversationLimit && (
+                <div class="crm-progress"><div class="crm-progress-bar" style={`width:${limitedProgress}%`}></div></div>
+              )}
+            </div>
+            <div class="crm-kpi">
+              <span class="crm-kpi-lbl">Cancelaciones</span>
+              <strong class="crm-kpi-val">{data.metrics.appointmentsCancelled}</strong>
             </div>
           </div>
 
-          {showWhatsApp && data.botStatus === 'pending_qr' && (
-            <div class="portal-qr-block">
-              <p>
-                WhatsApp esta pendiente de vinculacion. {data.qrPngBase64 ? 'Escanea el QR desde tu movil.' : 'Te enviaremos un QR valido en breve desde soporte.'}
-              </p>
-              {qrImageSrc && (
-                <img
-                  src={qrImageSrc}
-                  alt="QR para vincular WhatsApp"
-                  class="portal-qr-image"
-                />
+          <div class="crm-dash-row">
+            <div class="crm-card crm-status-card">
+              <h2 class="crm-card-title">Estado</h2>
+              <div class="crm-status-list">
+                {showWhatsApp && (
+                  <div class="crm-status-item">
+                    <span class="crm-status-lbl">WhatsApp</span>
+                    <span class="crm-status-val">
+                      <span class={`crm-dot ${data.channels.whatsapp.connected ? 'dot-green' : data.botStatus === 'pending_qr' ? 'dot-yellow' : 'dot-red'}`}></span>
+                      {data.channels.whatsapp.connected ? `Conectado` : data.botStatus === 'pending_qr' ? 'Pendiente QR' : 'Desconectado'}
+                    </span>
+                  </div>
+                )}
+                <div class="crm-status-item">
+                  <span class="crm-status-lbl">Telegram</span>
+                  <span class="crm-status-val">
+                    <span class={`crm-dot ${data.channels.telegram.ownerLinked ? 'dot-green' : 'dot-yellow'}`}></span>
+                    {data.channels.telegram.ownerLinked ? 'Vinculado' : 'Pendiente'}
+                  </span>
+                </div>
+                <div class="crm-status-item">
+                  <span class="crm-status-lbl">Bot</span>
+                  <span class="crm-status-val">
+                    <span class={`crm-dot ${data.active ? 'dot-green' : 'dot-red'}`}></span>
+                    {data.active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="crm-card crm-apts-card">
+              <div class="crm-card-head">
+                <h2 class="crm-card-title">Próximas citas</h2>
+                <span class="crm-chip chip-accent">{todayAppointments} hoy</span>
+              </div>
+              {data.nextAppointments.length ? (
+                <div class="crm-table-wrap">
+                  <table class="crm-table">
+                    <thead><tr><th>Fecha</th><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Estado</th></tr></thead>
+                    <tbody>
+                      {data.nextAppointments.slice(0, 6).map(item => {
+                        const row = renderAppointmentDate(item);
+                        return (
+                          <tr>
+                            <td>{row.date}</td>
+                            <td>{row.time}</td>
+                            <td>{item.clientName || item.clientPhone}</td>
+                            <td>{item.service}</td>
+                            <td><span class={`crm-chip ${item.status === 'confirmed' ? 'chip-green' : 'chip-red'}`}>{item.status === 'confirmed' ? 'Confirmada' : 'Cancelada'}</span></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p class="crm-empty">Las citas reservadas por tu bot aparecerán aquí.</p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <!-- ── CITAS ──────────────────────────────────────── -->
+        <section class="crm-view crm-hidden" id="v-citas">
+          <div class="crm-view-hdr">
+            <h1 class="crm-view-title">Citas</h1>
+            <button class="crm-btn-primary" id="open-apt-modal">+ Nueva cita</button>
+          </div>
+          <div class="crm-card">
+            <div class="crm-cal-nav">
+              <button id="cal-prev" class="crm-btn-ghost">← Anterior</button>
+              <span id="cal-week-label" class="crm-cal-label"></span>
+              <button id="cal-next" class="crm-btn-ghost">Siguiente →</button>
+            </div>
+            <div class="crm-cal-grid" id="cal-grid">
+              <p class="crm-empty">Cargando...</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── CLIENTES ───────────────────────────────────── -->
+        <section class="crm-view crm-hidden" id="v-clientes">
+          <div class="crm-view-hdr">
+            <h1 class="crm-view-title">Clientes</h1>
+          </div>
+          {data.plan === 'starter' ? (
+            <div class="crm-lock-card">
+              <div class="crm-lock-icon">🔒</div>
+              <h2>Función del Plan Pro</h2>
+              <p>La sección de Clientes incluye historial completo, notas y preferencias de cada cliente que haya reservado con tu bot.</p>
+              <a href="https://nexux.pro/planes" class="crm-btn-primary" target="_blank" rel="noopener">Actualizar a Pro →</a>
+            </div>
+          ) : (
+            <div class="crm-card">
+              <p class="crm-empty">Los clientes que reserven citas a través de tu bot aparecerán aquí.</p>
+            </div>
+          )}
+        </section>
+
+        <!-- ── CANALES ────────────────────────────────────── -->
+        <section class="crm-view crm-hidden" id="v-canales">
+          <div class="crm-view-hdr">
+            <h1 class="crm-view-title">Canales</h1>
+          </div>
+
+          {showWhatsApp && (
+            <div class="crm-card crm-mb">
+              <div class="crm-card-head">
+                <h2 class="crm-card-title">WhatsApp</h2>
+                <span class={`crm-chip ${data.channels.whatsapp.connected ? 'chip-green' : data.botStatus === 'pending_qr' ? 'chip-yellow' : 'chip-red'}`}>
+                  {data.channels.whatsapp.connected ? 'Conectado' : data.botStatus === 'pending_qr' ? 'Pendiente QR' : 'Desconectado'}
+                </span>
+              </div>
+              {data.botStatus === 'pending_qr' && (
+                <div class="crm-qr-block">
+                  <p>{data.qrPngBase64 ? 'Escanea el QR desde tu móvil.' : 'Te enviaremos un QR válido en breve desde soporte.'}</p>
+                  {qrImageSrc && <img src={qrImageSrc} alt="QR WhatsApp" class="crm-qr-img" />}
+                </div>
+              )}
+              {data.plan !== 'starter' && (
+                <div class="crm-provider-wrap">
+                  <h3 class="crm-section-lbl">Proveedor</h3>
+                  <div class="crm-provider-opts">
+                    <label class="crm-provider-opt">
+                      <input type="radio" name="whatsapp_provider" value="baileys" checked={data.channels.whatsapp.provider === 'baileys'} />
+                      <span><strong>Baileys</strong><small>Tu número actual — Gratis</small></span>
+                    </label>
+                    <label class="crm-provider-opt">
+                      <input type="radio" name="whatsapp_provider" value="twilio" checked={data.channels.whatsapp.provider === 'twilio'} />
+                      <span><strong>Twilio Business</strong><small>Número dedicado — +10€/mes</small></span>
+                    </label>
+                  </div>
+                  <button id="provider-trigger" type="button" class="crm-btn-ghost">Cambiar proveedor →</button>
+                </div>
               )}
             </div>
           )}
-        </article>
 
-        <article class="portal-card">
-          <div class="portal-card-head">
-            <h2>Proximas citas</h2>
-            <span class="portal-mini-badge">{todayAppointments} hoy</span>
-          </div>
-
-          {data.nextAppointments.length ? (
-            <div class="portal-table-wrap">
-              <table class="portal-table">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Clienta</th>
-                    <th>Servicio</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.nextAppointments.slice(0, 10).map(item => {
-                    const row = renderAppointmentDate(item);
-                    return (
-                      <tr>
-                        <td>{row.date}</td>
-                        <td>{row.time}</td>
-                        <td>{item.clientName || item.clientPhone}</td>
-                        <td>{item.service}</td>
-                        <td>
-                          <span class={`portal-status-chip ${item.status === 'confirmed' ? 'portal-status-confirmed' : 'portal-status-cancelled'}`}>
-                            {item.status === 'confirmed' ? 'Confirmada' : 'Cancelada'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          <div class="crm-card">
+            <div class="crm-card-head">
+              <h2 class="crm-card-title">Telegram</h2>
+              <span class={`crm-chip ${data.channels.telegram.ownerLinked ? 'chip-green' : 'chip-yellow'}`}>
+                {data.channels.telegram.ownerLinked ? 'Vinculado' : 'No vinculado'}
+              </span>
             </div>
-          ) : (
-            <p class="portal-empty">Aun no hay citas registradas. Las citas reservadas por tu bot apareceran aqui.</p>
-          )}
-        </article>
-      </section>
-
-      <section class="portal-metrics">
-        <article class="portal-metric-card">
-          <span>Conversaciones</span>
-          <strong>
-            {data.metrics.conversationCount}{data.metrics.conversationLimit ? `/${data.metrics.conversationLimit}` : ''}
-          </strong>
-          {data.plan === 'starter' && data.metrics.conversationLimit && (
-            <div class="portal-progress">
-              <div class="portal-progress-bar" style={`width:${limitedProgress}%`}></div>
-            </div>
-          )}
-        </article>
-        <article class="portal-metric-card">
-          <span>Citas reservadas</span>
-          <strong>{data.metrics.appointmentsBooked}</strong>
-        </article>
-        <article class="portal-metric-card">
-          <span>Cancelaciones</span>
-          <strong>{data.metrics.appointmentsCancelled}</strong>
-        </article>
-      </section>
-
-      <section class="portal-card portal-calendar-card">
-        <div class="portal-card-head">
-          <h2>Calendario de citas</h2>
-          <button class="btn-primary btn-sm" id="open-apt-modal">+ Nueva cita</button>
-        </div>
-        <div class="portal-calendar-nav">
-          <button id="cal-prev" class="btn-ghost">← Semana anterior</button>
-          <span id="cal-week-label"></span>
-          <button id="cal-next" class="btn-ghost">Semana siguiente →</button>
-        </div>
-        <div class="portal-calendar-grid" id="cal-grid">
-          <p class="portal-cal-empty">Cargando...</p>
-        </div>
-      </section>
-
-      <section class="portal-card portal-telegram-card">
-        <div class="portal-card-head">
-          <h2>Telegram</h2>
-          <span class={`portal-status-chip ${data.channels.telegram.ownerLinked ? 'portal-status-confirmed' : 'portal-status-warning'}`}>
-            {data.channels.telegram.ownerLinked ? 'Vinculado' : 'No vinculado'}
-          </span>
-        </div>
-
-        {!data.channels.telegram.ownerLinked && (
-          <div class="portal-telegram-owner">
-            <p>Vincula tu Telegram para recibir avisos de citas y actividad de Lara.</p>
-            <a href={ownerTelegramUrl} class="btn-primary" target="_blank" rel="noopener">Vincular mi Telegram -></a>
-          </div>
-        )}
-
-        <div class="portal-telegram-customer">
-          <div>
-            <strong>Enlace para tus clientas</strong>
-            <p>Compártelo para que puedan iniciar conversacion con tu bot en Telegram.</p>
-          </div>
-          <div class="portal-copy-row">
-            <input id="telegram-customer-link" type="text" value={customerTelegramUrl} readonly />
-            <button id="telegram-copy" type="button" class="btn-ghost">Copiar enlace</button>
-          </div>
-        </div>
-      </section>
-
-      <details class="portal-card portal-config-card portal-services-card">
-        <summary>
-          <span>Mis servicios</span>
-          <span class="portal-summary-hint">Servicios del salón</span>
-        </summary>
-
-        <div id="services-list-wrap" class="portal-services-table-wrap"></div>
-
-        <div class="portal-services-form">
-          <div class="portal-services-add-row">
-            <input type="text" id="svc-name" placeholder="Nombre del servicio" />
-            <input type="number" id="svc-duration" placeholder="Duración (min)" min="1" />
-            <input type="number" id="svc-price" placeholder="Precio (€)" min="0" step="0.01" />
-            <button type="button" id="svc-add" class="btn-ghost">+ Añadir</button>
-          </div>
-        </div>
-
-        <button type="button" id="svc-save" class="btn-primary">Guardar cambios</button>
-      </details>
-
-      <details class="portal-card portal-config-card">
-        <summary>
-          <span>Configuracion rapida</span>
-          <span class="portal-summary-hint">Horario y disponibilidad</span>
-        </summary>
-
-        <form id="schedule-form" class="portal-config-form">
-          {weekdayLabels.map(([key, label]) => {
-            const slot = data.schedule[key];
-            const hasLunch = !!(slot as any)?.lunch_close;
-            return (
-              <div class="portal-schedule-row">
-                <div class="portal-schedule-day">{label}</div>
-                <label class="portal-switch">
-                  <input type="checkbox" name={`${key}_closed`} checked={!slot} />
-                  <span>Cerrado</span>
-                </label>
-                <div class="portal-schedule-times">
-                  <input type="time" name={`${key}_open`} value={slot?.open ?? '09:00'} disabled={!slot} />
-                  <input type="time" name={`${key}_lunch_close`} value={(slot as any)?.lunch_close ?? '14:00'} disabled={!slot || !hasLunch} data-lunch />
-                  <input type="time" name={`${key}_lunch_open`} value={(slot as any)?.lunch_open ?? '16:00'} disabled={!slot || !hasLunch} data-lunch />
-                  <input type="time" name={`${key}_close`} value={slot?.close ?? '19:00'} disabled={!slot} />
-                </div>
-                <label class="portal-switch">
-                  <input type="checkbox" name={`${key}_lunch`} checked={hasLunch} disabled={!slot} />
-                  <span>Comer</span>
-                </label>
+            {!data.channels.telegram.ownerLinked && (
+              <div class="crm-tg-owner">
+                <p>Vincula tu Telegram para recibir avisos de citas y actividad del bot.</p>
+                <a href={ownerTelegramUrl} class="crm-btn-primary" target="_blank" rel="noopener">Vincular mi Telegram →</a>
               </div>
-            );
-          })}
-          <button type="submit" class="btn-primary">Guardar horario</button>
-        </form>
-      </details>
-
-      {data.plan !== 'starter' && (
-        <section class="portal-card portal-provider-card">
-          <div class="portal-card-head">
-            <h2>Proveedor WhatsApp</h2>
+            )}
+            <div class="crm-tg-customer">
+              <strong class="crm-section-lbl">Enlace para tus clientes</strong>
+              <p class="crm-muted-p">Compártelo para que reserven en Telegram.</p>
+              <div class="crm-copy-row">
+                <input id="telegram-customer-link" type="text" value={customerTelegramUrl} readonly class="crm-input" />
+                <button id="telegram-copy" type="button" class="crm-btn-ghost">Copiar</button>
+              </div>
+            </div>
           </div>
-          <div class="portal-provider-options">
-            <label class="portal-provider-option">
-              <input type="radio" name="whatsapp_provider" value="baileys" checked={data.channels.whatsapp.provider === 'baileys'} />
-              <span>
-                <strong>Baileys</strong>
-                <small>Tu numero actual - Gratis</small>
-              </span>
-            </label>
-            <label class="portal-provider-option">
-              <input type="radio" name="whatsapp_provider" value="twilio" checked={data.channels.whatsapp.provider === 'twilio'} />
-              <span>
-                <strong>Twilio WhatsApp Business</strong>
-                <small>Numero dedicado - +10EUR/mes</small>
-              </span>
-            </label>
-          </div>
-          <button id="provider-trigger" type="button" class="btn-ghost">Cambiar proveedor -></button>
         </section>
-      )}
 
-      <footer class="portal-footer">
-        Necesitas ayuda? Contacta a Ricardo:
-        <a href="https://t.me/nexux_soporte_bot" target="_blank" rel="noopener">t.me/nexux_soporte_bot</a>
-      </footer>
+        <!-- ── CONFIGURACIÓN ──────────────────────────────── -->
+        <section class="crm-view crm-hidden" id="v-config">
+          <div class="crm-view-hdr">
+            <h1 class="crm-view-title">Configuración</h1>
+          </div>
+
+          <div class="crm-card crm-mb">
+            <h2 class="crm-card-title">Mis servicios</h2>
+            <div id="services-list-wrap"></div>
+            <div class="crm-svc-add-row">
+              <input type="text" id="svc-name" placeholder="Nombre del servicio" class="crm-input" />
+              <input type="number" id="svc-duration" placeholder="Duración (min)" min="1" class="crm-input" />
+              <input type="number" id="svc-price" placeholder="Precio (€)" min="0" step="0.01" class="crm-input" />
+              <button type="button" id="svc-add" class="crm-btn-ghost">+ Añadir</button>
+            </div>
+            <button type="button" id="svc-save" class="crm-btn-primary">Guardar servicios</button>
+          </div>
+
+          <div class="crm-card">
+            <h2 class="crm-card-title">Horario</h2>
+            <form id="schedule-form" class="crm-schedule-form">
+              {weekdayLabels.map(([key, label]) => {
+                const slot = data.schedule[key];
+                const hasLunch = !!(slot as any)?.lunch_close;
+                return (
+                  <div class="crm-schedule-row">
+                    <div class="crm-schedule-day">{label}</div>
+                    <label class="crm-toggle-lbl">
+                      <input type="checkbox" name={`${key}_closed`} checked={!slot} />
+                      <span>Cerrado</span>
+                    </label>
+                    <div class="crm-schedule-times">
+                      <input type="time" name={`${key}_open`} value={slot?.open ?? '09:00'} disabled={!slot} class="crm-input-time" />
+                      <input type="time" name={`${key}_lunch_close`} value={(slot as any)?.lunch_close ?? '14:00'} disabled={!slot || !hasLunch} data-lunch class="crm-input-time" />
+                      <input type="time" name={`${key}_lunch_open`} value={(slot as any)?.lunch_open ?? '16:00'} disabled={!slot || !hasLunch} data-lunch class="crm-input-time" />
+                      <input type="time" name={`${key}_close`} value={slot?.close ?? '19:00'} disabled={!slot} class="crm-input-time" />
+                    </div>
+                    <label class="crm-toggle-lbl">
+                      <input type="checkbox" name={`${key}_lunch`} checked={hasLunch} disabled={!slot} />
+                      <span>Comer</span>
+                    </label>
+                  </div>
+                );
+              })}
+              <button type="submit" class="crm-btn-primary">Guardar horario</button>
+            </form>
+          </div>
+        </section>
+
+      </main>
     </div>
-  </section>
+  </div>
 
-  <div id="portal-toast" class="portal-toast" hidden>Guardado OK</div>
+  <div id="portal-toast" class="crm-toast" hidden></div>
 
   {data.plan !== 'starter' && (
-    <dialog id="provider-dialog" class="portal-dialog">
-      <div class="portal-dialog-card">
+    <dialog id="provider-dialog" class="crm-dialog">
+      <div class="crm-dialog-card">
         <h3>Cambiar a Twilio WhatsApp Business</h3>
         <ul>
-          <li>Tu numero actual de WhatsApp dejara de recibir mensajes del bot.</li>
-          <li>Recibiras un numero nuevo de Twilio en 24-48h.</li>
-          <li>El coste adicional se aplicara en la proxima factura.</li>
+          <li>Tu número actual dejará de recibir mensajes del bot.</li>
+          <li>Recibirás un número de Twilio en 24-48h.</li>
+          <li>El coste adicional se aplicará en la próxima factura.</li>
         </ul>
-        <div class="portal-dialog-actions">
-          <button type="button" id="provider-confirm" class="btn-primary">Confirmar cambio</button>
-          <button type="button" id="provider-cancel" class="btn-ghost">Cancelar</button>
+        <div class="crm-dialog-actions">
+          <button type="button" id="provider-confirm" class="crm-btn-primary">Confirmar cambio</button>
+          <button type="button" id="provider-cancel" class="crm-btn-ghost">Cancelar</button>
         </div>
       </div>
     </dialog>
   )}
 
-  <dialog id="new-apt-modal" class="portal-dialog">
-    <form id="new-apt-form" class="portal-modal-form">
+  <dialog id="new-apt-modal" class="crm-dialog">
+    <form id="new-apt-form" class="crm-modal-form">
       <h3>Nueva cita</h3>
-      <label>
+      <label class="crm-form-lbl">
         Nombre cliente
-        <input type="text" name="client_name" required placeholder="Nombre del cliente" />
+        <input type="text" name="client_name" required placeholder="Nombre del cliente" class="crm-input" />
       </label>
-      <label>
+      <label class="crm-form-lbl">
         Servicio
-        <input type="text" name="service" required placeholder="Corte, tinte…" />
+        <input type="text" name="service" required placeholder="Corte, tinte…" class="crm-input" />
       </label>
-      <div class="apt-field-group">
-        <span class="apt-field-label">Fecha</span>
+      <div class="crm-field-grp">
+        <span class="crm-field-lbl">Fecha</span>
         <div class="apt-date-picker">
           <div class="apt-dp-nav">
             <button type="button" id="apt-dp-prev">←</button>
@@ -366,1203 +399,1288 @@ function renderAppointmentDate(item: Appointment) {
         <span class="apt-date-display" id="apt-date-display">Selecciona una fecha</span>
         <input type="hidden" name="date" id="apt-date-val" />
       </div>
-      <div class="apt-field-group">
-        <span class="apt-field-label">Hora</span>
+      <div class="crm-field-grp">
+        <span class="crm-field-lbl">Hora</span>
         <div class="apt-time-picker" id="apt-time-grid"></div>
         <input type="hidden" name="time" id="apt-time-val" />
       </div>
-      <label>
+      <label class="crm-form-lbl">
         Duración (min)
-        <input type="number" name="duration_min" value="60" min="15" step="15" />
+        <input type="number" name="duration_min" value="60" min="15" step="15" class="crm-input" />
       </label>
-      <div class="portal-modal-actions">
-        <button type="submit" class="btn-primary">Reservar cita</button>
-        <button type="button" id="close-apt-modal" class="btn-ghost">Cancelar</button>
+      <div class="crm-modal-actions">
+        <button type="submit" class="crm-btn-primary">Reservar cita</button>
+        <button type="button" id="close-apt-modal" class="crm-btn-ghost">Cancelar</button>
       </div>
     </form>
   </dialog>
 
   <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []) }}>
-    const toast = document.getElementById('portal-toast');
-    const scheduleForm = document.getElementById('schedule-form');
-    const telegramCopy = document.getElementById('telegram-copy');
-    const telegramCustomerLink = document.getElementById('telegram-customer-link');
+  (function () {
 
-    function showToast(message) {
-      if (!toast) return;
-      toast.textContent = message;
-      toast.hidden = false;
-      toast.classList.add('portal-toast-show');
-      setTimeout(() => {
-        toast.classList.remove('portal-toast-show');
-        toast.hidden = true;
-      }, 2200);
+    // ── Theme ─────────────────────────────────────────────────────────
+    const crm = document.getElementById('crm');
+    const themeBtn = document.getElementById('crm-theme-btn');
+
+    function applyTheme(t) {
+      crm.className = t === 'dark' ? 'crm-dark' : 'crm-light';
+      localStorage.setItem('crm-theme', t);
+    }
+    applyTheme(localStorage.getItem('crm-theme') || 'light');
+
+    themeBtn && themeBtn.addEventListener('click', function () {
+      applyTheme(crm.classList.contains('crm-dark') ? 'light' : 'dark');
+    });
+
+    // ── Navigation ────────────────────────────────────────────────────
+    const burger = document.getElementById('crm-burger');
+    const overlay = document.getElementById('crm-overlay');
+    const navBtns = document.querySelectorAll('.crm-nav-btn');
+    const views = document.querySelectorAll('.crm-view');
+
+    burger && burger.addEventListener('click', function () { crm.classList.toggle('sidebar-open'); });
+    overlay && overlay.addEventListener('click', function () { crm.classList.remove('sidebar-open'); });
+
+    function showView(viewId) {
+      views.forEach(function (v) { v.classList.add('crm-hidden'); });
+      navBtns.forEach(function (b) { b.classList.remove('active'); });
+      var el = document.getElementById('v-' + viewId);
+      if (el) el.classList.remove('crm-hidden');
+      var nb = document.querySelector('.crm-nav-btn[data-view="' + viewId + '"]');
+      if (nb) nb.classList.add('active');
+      localStorage.setItem('crm-view', viewId);
+      crm.classList.remove('sidebar-open');
     }
 
+    navBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () { showView(btn.dataset.view); });
+    });
+
+    showView(localStorage.getItem('crm-view') || 'dashboard');
+
+    // ── Toast ─────────────────────────────────────────────────────────
+    var toast = document.getElementById('portal-toast');
+    function showToast(msg) {
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.hidden = false;
+      toast.classList.add('crm-toast-show');
+      setTimeout(function () { toast.classList.remove('crm-toast-show'); toast.hidden = true; }, 2200);
+    }
+
+    // ── Schedule ──────────────────────────────────────────────────────
+    var scheduleForm = document.getElementById('schedule-form');
+
     function buildSchedulePayload(form) {
-      const payload = {};
-      ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(day => {
-        const closed = form.elements.namedItem(`${day}_closed`);
-        if (closed instanceof HTMLInputElement && closed.checked) {
-          payload[day] = null;
-          return;
-        }
-        const open = form.elements.namedItem(`${day}_open`);
-        const close = form.elements.namedItem(`${day}_close`);
-        const lunchCheck = form.elements.namedItem(`${day}_lunch`);
-        const lunchClose = form.elements.namedItem(`${day}_lunch_close`);
-        const lunchOpen = form.elements.namedItem(`${day}_lunch_open`);
-        const hasLunch = lunchCheck instanceof HTMLInputElement && lunchCheck.checked;
+      var payload = {};
+      ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function (day) {
+        var closed = form.elements.namedItem(day + '_closed');
+        if (closed instanceof HTMLInputElement && closed.checked) { payload[day] = null; return; }
+        var open = form.elements.namedItem(day + '_open');
+        var close = form.elements.namedItem(day + '_close');
+        var lunchCheck = form.elements.namedItem(day + '_lunch');
+        var lunchClose = form.elements.namedItem(day + '_lunch_close');
+        var lunchOpen = form.elements.namedItem(day + '_lunch_open');
+        var hasLunch = lunchCheck instanceof HTMLInputElement && lunchCheck.checked;
         payload[day] = {
           open: open instanceof HTMLInputElement ? open.value : '09:00',
           close: close instanceof HTMLInputElement ? close.value : '19:00',
-          ...(hasLunch ? {
-            lunch_close: lunchClose instanceof HTMLInputElement ? lunchClose.value : '14:00',
-            lunch_open:  lunchOpen  instanceof HTMLInputElement ? lunchOpen.value  : '16:00',
-          } : {}),
         };
+        if (hasLunch) {
+          payload[day].lunch_close = lunchClose instanceof HTMLInputElement ? lunchClose.value : '14:00';
+          payload[day].lunch_open = lunchOpen instanceof HTMLInputElement ? lunchOpen.value : '16:00';
+        }
       });
       return payload;
     }
 
-    async function copyTelegramLink(url) {
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast('¡Copiado!');
-      } catch {
-        if (telegramCustomerLink instanceof HTMLInputElement) {
-          telegramCustomerLink.focus();
-          telegramCustomerLink.select();
-          document.execCommand('copy');
-          showToast('¡Copiado!');
-        }
-      }
+    if (scheduleForm) {
+      scheduleForm.querySelectorAll('input[type="checkbox"]').forEach(function (input) {
+        input.addEventListener('change', function (event) {
+          var target = event.currentTarget;
+          if (!(target instanceof HTMLInputElement)) return;
+          if (target.name.endsWith('_closed')) {
+            var day = target.name.replace('_closed', '');
+            var isClosed = target.checked;
+            ['open','close','lunch_close','lunch_open'].forEach(function (f) {
+              var el = scheduleForm.elements.namedItem(day + '_' + f);
+              if (el instanceof HTMLInputElement) el.disabled = isClosed;
+            });
+            var lunchCheck = scheduleForm.elements.namedItem(day + '_lunch');
+            if (lunchCheck instanceof HTMLInputElement) {
+              lunchCheck.disabled = isClosed;
+              if (!isClosed) {
+                ['lunch_close','lunch_open'].forEach(function (f) {
+                  var el = scheduleForm.elements.namedItem(day + '_' + f);
+                  if (el instanceof HTMLInputElement) el.disabled = !lunchCheck.checked;
+                });
+              }
+            }
+          } else if (target.name.endsWith('_lunch')) {
+            var day2 = target.name.replace('_lunch', '');
+            ['lunch_close','lunch_open'].forEach(function (f) {
+              var el = scheduleForm.elements.namedItem(day2 + '_' + f);
+              if (el instanceof HTMLInputElement) el.disabled = !target.checked;
+            });
+          }
+        });
+      });
+
+      scheduleForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        if (!(scheduleForm instanceof HTMLFormElement)) return;
+        var response = await fetch('/portal-api/update-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, config: { schedule: buildSchedulePayload(scheduleForm) } }),
+        }).catch(function () { return null; });
+        showToast(response && response.ok ? 'Guardado OK' : 'No se pudo guardar');
+      });
     }
 
-    telegramCopy?.addEventListener('click', () => {
-      copyTelegramLink(customerTelegramUrl);
-    });
+    // ── Services ──────────────────────────────────────────────────────
+    var services = JSON.parse(servicesJson || '[]');
 
-    scheduleForm?.querySelectorAll('input[type="checkbox"]').forEach(input => {
-      input.addEventListener('change', event => {
-        const target = event.currentTarget;
-        if (!(target instanceof HTMLInputElement)) return;
-        if (target.name.endsWith('_closed')) {
-          const day = target.name.replace('_closed', '');
-          const isClosed = target.checked;
-          ['open','close','lunch_close','lunch_open'].forEach(f => {
-            const el = scheduleForm.elements.namedItem(`${day}_${f}`);
-            if (el instanceof HTMLInputElement) el.disabled = isClosed;
-          });
-          const lunchCheck = scheduleForm.elements.namedItem(`${day}_lunch`);
-          if (lunchCheck instanceof HTMLInputElement) {
-            lunchCheck.disabled = isClosed;
-            if (!isClosed) {
-              ['lunch_close','lunch_open'].forEach(f => {
-                const el = scheduleForm.elements.namedItem(`${day}_${f}`);
-                if (el instanceof HTMLInputElement) el.disabled = !lunchCheck.checked;
-              });
-            }
-          }
-        } else if (target.name.endsWith('_lunch')) {
-          const day = target.name.replace('_lunch', '');
-          ['lunch_close','lunch_open'].forEach(f => {
-            const el = scheduleForm.elements.namedItem(`${day}_${f}`);
-            if (el instanceof HTMLInputElement) el.disabled = !target.checked;
-          });
-        }
-      });
-    });
+    function esc(s) { var d = document.createElement('div'); d.textContent = String(s != null ? s : ''); return d.innerHTML; }
 
-    scheduleForm?.addEventListener('submit', async event => {
-      event.preventDefault();
-      if (!(scheduleForm instanceof HTMLFormElement)) return;
-
-      const response = await fetch('/portal-api/update-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clientId,
-          config: { schedule: buildSchedulePayload(scheduleForm) },
-        }),
-      }).catch(() => null);
-
-      showToast(response?.ok ? 'Guardado OK' : 'No se pudo guardar');
-    });
-
-    // ── Services ───────────────────────────────────────
-    let services = JSON.parse(servicesJson || '[]');
-
-    function esc(s) { const d = document.createElement('div'); d.textContent = String(s ?? ''); return d.innerHTML; }
     function renderServices() {
-      const wrap = document.getElementById('services-list-wrap');
+      var wrap = document.getElementById('services-list-wrap');
       if (!wrap) return;
       if (services.length === 0) {
-        wrap.innerHTML = '<p class="portal-empty portal-services-empty">Sin servicios configurados. Añade el primero.</p>';
+        wrap.innerHTML = '<p class="crm-empty">Sin servicios. Añade el primero.</p>';
         return;
       }
-      wrap.innerHTML = `
-        <div class="portal-table-wrap">
-          <table class="portal-table">
-            <thead><tr><th>Servicio</th><th>Duración</th><th>Precio</th><th></th></tr></thead>
-            <tbody>${services.map((s, i) => `
-              <tr>
-                <td>${esc(s.name)}</td>
-                <td>${esc(s.duration)} min</td>
-                <td>${esc(s.price)} €</td>
-                <td><button type="button" class="btn-del-svc" data-i="${i}" title="Eliminar">🗑</button></td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>`;
-      wrap.querySelectorAll('.btn-del-svc').forEach(btn => {
-        btn.addEventListener('click', () => {
-          services.splice(parseInt(btn.dataset.i), 1);
-          renderServices();
-        });
+      wrap.innerHTML = '<div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Servicio</th><th>Duración</th><th>Precio</th><th></th></tr></thead><tbody>' +
+        services.map(function (s, i) {
+          return '<tr><td>' + esc(s.name) + '</td><td>' + esc(s.duration) + ' min</td><td>' + esc(s.price) + ' €</td><td><button type="button" class="crm-btn-del" data-i="' + i + '">🗑</button></td></tr>';
+        }).join('') + '</tbody></table></div>';
+      wrap.querySelectorAll('.crm-btn-del').forEach(function (btn) {
+        btn.addEventListener('click', function () { services.splice(parseInt(btn.dataset.i), 1); renderServices(); });
       });
     }
     renderServices();
 
-    document.getElementById('svc-add')?.addEventListener('click', () => {
-      const nameInput = document.getElementById('svc-name');
-      const durInput  = document.getElementById('svc-duration');
-      const priceInput = document.getElementById('svc-price');
-      const name     = nameInput?.value.trim();
-      const duration = parseInt(durInput?.value);
-      const price    = parseFloat(priceInput?.value);
-      if (!name)                        { showToast('Nombre obligatorio'); return; }
-      if (!duration || duration <= 0)   { showToast('Duración inválida'); return; }
-      if (isNaN(price) || price < 0)   { showToast('Precio inválido'); return; }
-      services.push({ name, duration, price });
-      renderServices();
-      nameInput.value = '';
-      durInput.value  = '';
-      priceInput.value = '';
-    });
-
-    document.getElementById('svc-save')?.addEventListener('click', async () => {
-      const response = await fetch('/portal-api/update-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientId, config: { services } }),
-      }).catch(() => null);
-      showToast(response?.ok ? 'Guardado ✅' : 'No se pudo guardar');
-    });
-    // ── /Services ──────────────────────────────────────
-
-    if (!isStarter) {
-      const providerTrigger = document.getElementById('provider-trigger');
-      const providerDialog = document.getElementById('provider-dialog');
-      const providerCancel = document.getElementById('provider-cancel');
-      const providerConfirm = document.getElementById('provider-confirm');
-
-      providerTrigger?.addEventListener('click', () => {
-        const selected = document.querySelector('input[name="whatsapp_provider"]:checked');
-        if (!(selected instanceof HTMLInputElement)) return;
-        if (selected.value === currentProvider) {
-          showToast('No hay cambios pendientes');
-          return;
-        }
-        if (providerDialog instanceof HTMLDialogElement) {
-          providerDialog.showModal();
-        }
-      });
-
-      providerCancel?.addEventListener('click', () => {
-        if (providerDialog instanceof HTMLDialogElement) providerDialog.close();
-      });
-
-      providerConfirm?.addEventListener('click', async () => {
-        const selected = document.querySelector('input[name="whatsapp_provider"]:checked');
-        if (!(selected instanceof HTMLInputElement)) return;
-
-        const response = await fetch('/portal-api/update-config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            clientId,
-            config: { channels: { whatsapp: { provider: selected.value } } },
-          }),
-        }).catch(() => null);
-
-        if (providerDialog instanceof HTMLDialogElement) providerDialog.close();
-        showToast(response?.ok ? 'Cambio solicitado OK' : 'No se pudo solicitar el cambio');
+    var svcAdd = document.getElementById('svc-add');
+    if (svcAdd) {
+      svcAdd.addEventListener('click', function () {
+        var nameInput = document.getElementById('svc-name');
+        var durInput = document.getElementById('svc-duration');
+        var priceInput = document.getElementById('svc-price');
+        var name = nameInput ? nameInput.value.trim() : '';
+        var duration = parseInt(durInput ? durInput.value : '');
+        var price = parseFloat(priceInput ? priceInput.value : '');
+        if (!name) { showToast('Nombre obligatorio'); return; }
+        if (!duration || duration <= 0) { showToast('Duración inválida'); return; }
+        if (isNaN(price) || price < 0) { showToast('Precio inválido'); return; }
+        services.push({ name: name, duration: duration, price: price });
+        renderServices();
+        if (nameInput) nameInput.value = '';
+        if (durInput) durInput.value = '';
+        if (priceInput) priceInput.value = '';
       });
     }
 
-    // ── Calendar ───────────────────────────────────────────────────────────
-    (function () {
-      let currentWeekOffset = 0;
+    var svcSave = document.getElementById('svc-save');
+    if (svcSave) {
+      svcSave.addEventListener('click', async function () {
+        var response = await fetch('/portal-api/update-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, config: { services: services } }),
+        }).catch(function () { return null; });
+        showToast(response && response.ok ? 'Guardado ✅' : 'No se pudo guardar');
+      });
+    }
 
-      const DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-      // Indices 3-6 (Thu-Sun) hidden on mobile — show Mon/Tue/Wed
-      const HIDE_ON_MOBILE = [3, 4, 5, 6];
+    // ── Telegram copy ─────────────────────────────────────────────────
+    var telegramCopy = document.getElementById('telegram-copy');
+    var telegramCustomerLink = document.getElementById('telegram-customer-link');
+
+    if (telegramCopy) {
+      telegramCopy.addEventListener('click', async function () {
+        try {
+          await navigator.clipboard.writeText(customerTelegramUrl);
+          showToast('¡Copiado!');
+        } catch (_) {
+          if (telegramCustomerLink instanceof HTMLInputElement) {
+            telegramCustomerLink.focus(); telegramCustomerLink.select();
+            document.execCommand('copy');
+            showToast('¡Copiado!');
+          }
+        }
+      });
+    }
+
+    // ── Provider dialog ───────────────────────────────────────────────
+    if (!isStarter) {
+      var providerTrigger = document.getElementById('provider-trigger');
+      var providerDialog = document.getElementById('provider-dialog');
+      var providerCancel = document.getElementById('provider-cancel');
+      var providerConfirm = document.getElementById('provider-confirm');
+
+      if (providerTrigger) {
+        providerTrigger.addEventListener('click', function () {
+          var selected = document.querySelector('input[name="whatsapp_provider"]:checked');
+          if (!(selected instanceof HTMLInputElement)) return;
+          if (selected.value === currentProvider) { showToast('No hay cambios pendientes'); return; }
+          if (providerDialog instanceof HTMLDialogElement) providerDialog.showModal();
+        });
+      }
+      if (providerCancel) {
+        providerCancel.addEventListener('click', function () {
+          if (providerDialog instanceof HTMLDialogElement) providerDialog.close();
+        });
+      }
+      if (providerConfirm) {
+        providerConfirm.addEventListener('click', async function () {
+          var selected = document.querySelector('input[name="whatsapp_provider"]:checked');
+          if (!(selected instanceof HTMLInputElement)) return;
+          var response = await fetch('/portal-api/update-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId, config: { channels: { whatsapp: { provider: selected.value } } } }),
+          }).catch(function () { return null; });
+          if (providerDialog instanceof HTMLDialogElement) providerDialog.close();
+          showToast(response && response.ok ? 'Cambio solicitado OK' : 'No se pudo solicitar el cambio');
+        });
+      }
+    }
+
+    // ── Calendar ──────────────────────────────────────────────────────
+    (function () {
+      var currentWeekOffset = 0;
+      var DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      var HIDE_ON_MOBILE = [3, 4, 5, 6];
 
       function getMondayOfWeek(offset) {
-        const now = new Date();
-        const day = now.getDay(); // 0=Sun
-        const diffToMon = (day === 0 ? -6 : 1 - day);
-        const mon = new Date(now);
+        var now = new Date();
+        var day = now.getDay();
+        var diffToMon = (day === 0 ? -6 : 1 - day);
+        var mon = new Date(now);
         mon.setDate(now.getDate() + diffToMon + offset * 7);
         mon.setHours(0, 0, 0, 0);
         return mon;
       }
 
       function pad(n) { return String(n).padStart(2, '0'); }
-
-      function fmtDate(d) {
-        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-      }
-
-      function fmtTime(iso) {
-        if (!iso) return '';
-        const d = new Date(iso);
-        return pad(d.getHours()) + ':' + pad(d.getMinutes());
-      }
-
-      function isToday(d) {
-        const t = new Date();
-        return (
-          d.getFullYear() === t.getFullYear() &&
-          d.getMonth() === t.getMonth() &&
-          d.getDate() === t.getDate()
-        );
-      }
+      function fmtDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+      function fmtTime(iso) { if (!iso) return ''; var d = new Date(iso); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+      function isToday(d) { var t = new Date(); return d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth() && d.getDate() === t.getDate(); }
 
       async function loadCalendar() {
-        const grid = document.getElementById('cal-grid');
-        const label = document.getElementById('cal-week-label');
+        var grid = document.getElementById('cal-grid');
+        var label = document.getElementById('cal-week-label');
         if (!grid) return;
-        grid.innerHTML = '<p class="portal-cal-empty">Cargando…</p>';
-
-        let apts = [];
+        grid.innerHTML = '<p class="crm-empty">Cargando…</p>';
+        var apts = [];
         try {
-          const res = await fetch('/portal-api/appointments?clientId=' + clientId);
+          var res = await fetch('/portal-api/appointments?clientId=' + clientId);
           if (res.ok) apts = await res.json();
         } catch (e) {
-          grid.innerHTML = '<p class="portal-cal-empty">Error al cargar citas</p>';
+          grid.innerHTML = '<p class="crm-empty">Error al cargar citas</p>';
           return;
         }
-
-        const monday = getMondayOfWeek(currentWeekOffset);
-
-        const mStr = (monday.getMonth() + 1);
-        const sunday = new Date(monday);
+        var monday = getMondayOfWeek(currentWeekOffset);
+        var mStr = (monday.getMonth() + 1);
+        var sunday = new Date(monday);
         sunday.setDate(monday.getDate() + 6);
-        label.textContent =
-          monday.getDate() + '/' + mStr + ' – ' +
-          sunday.getDate() + '/' + (sunday.getMonth() + 1) + '/' + sunday.getFullYear();
-
+        if (label) label.textContent = monday.getDate() + '/' + mStr + ' – ' + sunday.getDate() + '/' + (sunday.getMonth() + 1) + '/' + sunday.getFullYear();
         grid.innerHTML = '';
-
-        for (let i = 0; i < 7; i++) {
-          const day = new Date(monday);
+        for (var i = 0; i < 7; i++) {
+          var day = new Date(monday);
           day.setDate(monday.getDate() + i);
-          const dayStr = fmtDate(day);
-
-          const dayApts = apts
-            .filter(a => {
-              const d = new Date(a.datetime);
-              return fmtDate(d) === dayStr;
-            })
-            .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-
-          const col = document.createElement('div');
-          col.className = 'portal-cal-day' + (HIDE_ON_MOBILE.includes(i) ? ' hide-mobile' : '');
-
-          const hdr = document.createElement('div');
-          hdr.className = 'portal-cal-day-header' + (isToday(day) ? ' today' : '');
-          hdr.innerHTML = DAY_NAMES[i] + '<span class="cal-date">' + day.getDate() + '</span>';
+          var dayStr = fmtDate(day);
+          var dayApts = apts.filter(function (a) { return fmtDate(new Date(a.datetime)) === dayStr; }).sort(function (a, b) { return new Date(a.datetime) - new Date(b.datetime); });
+          var col = document.createElement('div');
+          col.className = 'crm-cal-day' + (HIDE_ON_MOBILE.indexOf(i) !== -1 ? ' hide-mobile' : '');
+          var hdr = document.createElement('div');
+          hdr.className = 'crm-cal-day-hdr' + (isToday(day) ? ' today' : '');
+          hdr.innerHTML = DAY_NAMES[i] + '<span class="crm-cal-date">' + day.getDate() + '</span>';
           col.appendChild(hdr);
-
           if (dayApts.length === 0) {
-            const empty = document.createElement('p');
-            empty.className = 'portal-cal-empty';
+            var empty = document.createElement('p');
+            empty.className = 'crm-cal-empty-cell';
             empty.textContent = '–';
             col.appendChild(empty);
           } else {
-            dayApts.forEach(apt => {
-              const card = document.createElement('div');
-              const st = (apt.status || 'confirmed').toLowerCase();
-              card.className = 'portal-cal-apt ' + st;
-
-              const tSpan = document.createElement('span');
-              tSpan.className = 'portal-cal-apt-time';
-              tSpan.textContent = fmtTime(apt.datetime);
-              const nSpan = document.createElement('span');
-              nSpan.className = 'portal-cal-apt-name';
-              nSpan.textContent = apt.clientName || apt.client_name || '';
-              const sSpan = document.createElement('span');
-              sSpan.className = 'portal-cal-apt-name';
-              sSpan.style.fontSize = '0.7rem';
-              sSpan.textContent = apt.service || '';
-              card.appendChild(tSpan);
-              card.appendChild(nSpan);
-              card.appendChild(sSpan);
-
+            dayApts.forEach(function (apt) {
+              var card = document.createElement('div');
+              var st = (apt.status || 'confirmed').toLowerCase();
+              card.className = 'crm-cal-apt ' + st;
+              var tSpan = document.createElement('span'); tSpan.className = 'crm-cal-apt-time'; tSpan.textContent = fmtTime(apt.datetime);
+              var nSpan = document.createElement('span'); nSpan.className = 'crm-cal-apt-name'; nSpan.textContent = apt.clientName || apt.client_name || '';
+              var sSpan = document.createElement('span'); sSpan.className = 'crm-cal-apt-svc'; sSpan.textContent = apt.service || '';
+              card.appendChild(tSpan); card.appendChild(nSpan); card.appendChild(sSpan);
               if (st !== 'cancelled') {
-                const btn = document.createElement('button');
-                btn.className = 'portal-cal-apt-cancel';
+                var btn = document.createElement('button');
+                btn.className = 'crm-cal-apt-cancel';
                 btn.textContent = 'Cancelar';
-                btn.addEventListener('click', async () => {
+                btn.addEventListener('click', async function () {
                   btn.disabled = true;
-                  try {
-                    await fetch('/portal-api/appointments', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ clientId, action: 'cancel', aptId: apt.id })
-                    });
-                  } catch (_) {}
+                  try { await fetch('/portal-api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, action: 'cancel', aptId: apt.id }) }); } catch (_) {}
                   await loadCalendar();
                 });
                 card.appendChild(btn);
               }
-
               col.appendChild(card);
             });
           }
-
           grid.appendChild(col);
         }
       }
 
-      // Week navigation
-      document.getElementById('cal-prev')?.addEventListener('click', () => {
-        currentWeekOffset--;
-        loadCalendar();
-      });
-      document.getElementById('cal-next')?.addEventListener('click', () => {
-        currentWeekOffset++;
-        loadCalendar();
-      });
+      var calPrev = document.getElementById('cal-prev');
+      var calNext = document.getElementById('cal-next');
+      if (calPrev) calPrev.addEventListener('click', function () { currentWeekOffset--; loadCalendar(); });
+      if (calNext) calNext.addEventListener('click', function () { currentWeekOffset++; loadCalendar(); });
 
-      // Modal
-      const aptModal = document.getElementById('new-apt-modal');
-      document.getElementById('open-apt-modal')?.addEventListener('click', () => {
-        aptModal?.showModal();
-      });
-      document.getElementById('close-apt-modal')?.addEventListener('click', () => {
-        aptModal?.close();
-      });
+      var aptModal = document.getElementById('new-apt-modal');
+      var openBtn = document.getElementById('open-apt-modal');
+      var closeBtn = document.getElementById('close-apt-modal');
+      if (openBtn) {
+        openBtn.addEventListener('click', function () {
+          dpYear = new Date().getFullYear(); dpMonth = new Date().getMonth();
+          dpSelected = null; tpSelected = null;
+          var dh = document.getElementById('apt-date-val'); if (dh) dh.value = '';
+          var th = document.getElementById('apt-time-val'); if (th) th.value = '';
+          var dd = document.getElementById('apt-date-display'); if (dd) dd.textContent = 'Selecciona una fecha';
+          renderDatePicker(); renderTimePicker();
+          if (aptModal instanceof HTMLDialogElement) aptModal.showModal();
+        });
+      }
+      if (closeBtn) closeBtn.addEventListener('click', function () { if (aptModal instanceof HTMLDialogElement) aptModal.close(); });
 
-      // New appointment submit
-      document.getElementById('new-apt-form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        const date = fd.get('date');
-        const time = fd.get('time');
-        if (!date || !time) { showToast('Selecciona fecha y hora'); return; }
-        const body = {
-          clientId,
-          client_name:  fd.get('client_name'),
-          service:      fd.get('service'),
-          datetime:     date + 'T' + time + ':00',
-          duration_min: parseInt(fd.get('duration_min'), 10) || 60
-        };
-        try {
-          const r = await fetch('/portal-api/appointments', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-          });
-          if (!r.ok) throw new Error('api error');
-          aptModal?.close();
-          e.target.reset();
-        } catch (_) {}
-        await loadCalendar();
-      });
-
-      // ── Date + Time Pickers ────────────────────────────────────────────────
-      const DP_MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-      let dpYear = new Date().getFullYear();
-      let dpMonth = new Date().getMonth();
-      let dpSelected = null;
-      let tpSelected = null;
-
-      function renderDatePicker() {
-        const dpGrid = document.getElementById('apt-dp-grid');
-        const dpLabel = document.getElementById('apt-dp-month-label');
-        const dpDisplay = document.getElementById('apt-date-display');
-        const dpHidden = document.getElementById('apt-date-val');
-        if (!dpGrid || !dpLabel) return;
-        const pad2 = n => String(n).padStart(2,'0');
-        dpLabel.textContent = DP_MONTHS[dpMonth] + ' ' + dpYear;
-        const firstDay = new Date(dpYear, dpMonth, 1).getDay();
-        const offset = (firstDay === 0 ? 6 : firstDay - 1);
-        const daysInMonth = new Date(dpYear, dpMonth + 1, 0).getDate();
-        const today = new Date(); today.setHours(0,0,0,0);
-        dpGrid.innerHTML = '';
-        for (let i = 0; i < offset; i++) {
-          const empty = document.createElement('span');
-          empty.className = 'apt-dp-cell empty';
-          dpGrid.appendChild(empty);
-        }
-        for (let d = 1; d <= daysInMonth; d++) {
-          const cellDate = new Date(dpYear, dpMonth, d);
-          const isPast = cellDate < today;
-          const isTodayCell = cellDate.getTime() === today.getTime();
-          const dateStr = dpYear + '-' + pad2(dpMonth+1) + '-' + pad2(d);
-          const isSelected = dpSelected === dateStr;
-          const cell = document.createElement('button');
-          cell.type = 'button';
-          cell.textContent = String(d);
-          cell.className = 'apt-dp-cell' + (isPast ? ' past' : '') + (isTodayCell ? ' today' : '') + (isSelected ? ' selected' : '');
-          cell.disabled = isPast;
-          if (!isPast) {
-            cell.addEventListener('click', () => {
-              dpSelected = dateStr;
-              if (dpHidden) dpHidden.value = dateStr;
-              if (dpDisplay) dpDisplay.textContent = d + ' de ' + DP_MONTHS[dpMonth] + ' ' + dpYear;
-              renderDatePicker();
+      var aptForm = document.getElementById('new-apt-form');
+      if (aptForm) {
+        aptForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var fd = new FormData(e.target);
+          var date = fd.get('date'); var time = fd.get('time');
+          if (!date || !time) { showToast('Selecciona fecha y hora'); return; }
+          try {
+            var r = await fetch('/portal-api/appointments', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ clientId, client_name: fd.get('client_name'), service: fd.get('service'), datetime: date + 'T' + time + ':00', duration_min: parseInt(fd.get('duration_min'), 10) || 60 })
             });
-          }
-          dpGrid.appendChild(cell);
-        }
+            if (!r.ok) throw new Error('api error');
+            if (aptModal instanceof HTMLDialogElement) aptModal.close();
+            e.target.reset();
+          } catch (_) {}
+          await loadCalendar();
+        });
       }
 
-      function renderTimePicker() {
-        const tpGrid = document.getElementById('apt-time-grid');
-        const tpHidden = document.getElementById('apt-time-val');
-        if (!tpGrid) return;
-        tpGrid.innerHTML = '';
-        const pad2 = n => String(n).padStart(2,'0');
-        for (let h = 8; h <= 20; h++) {
-          for (const m of [0, 30]) {
-            if (h === 20 && m === 30) continue;
-            const slot = pad2(h) + ':' + pad2(m);
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.textContent = slot;
-            btn.className = 'apt-time-slot' + (tpSelected === slot ? ' selected' : '');
-            btn.addEventListener('click', () => {
-              tpSelected = slot;
-              if (tpHidden) tpHidden.value = slot;
-              renderTimePicker();
-            });
-            tpGrid.appendChild(btn);
-          }
-        }
-      }
-
-      document.getElementById('apt-dp-prev')?.addEventListener('click', () => {
-        dpMonth--; if (dpMonth < 0) { dpMonth = 11; dpYear--; }
-        renderDatePicker();
-      });
-      document.getElementById('apt-dp-next')?.addEventListener('click', () => {
-        dpMonth++; if (dpMonth > 11) { dpMonth = 0; dpYear++; }
-        renderDatePicker();
-      });
-      document.getElementById('open-apt-modal')?.addEventListener('click', () => {
-        dpYear = new Date().getFullYear(); dpMonth = new Date().getMonth();
-        dpSelected = null; tpSelected = null;
-        const dh = document.getElementById('apt-date-val');
-        const th = document.getElementById('apt-time-val');
-        const dd = document.getElementById('apt-date-display');
-        if (dh) dh.value = ''; if (th) th.value = '';
-        if (dd) dd.textContent = 'Selecciona una fecha';
-        renderDatePicker();
-        renderTimePicker();
-      });
-
-      // Boot
       loadCalendar();
     })();
+
+    // ── Date + Time Pickers ───────────────────────────────────────────
+    var DP_MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    var dpYear = new Date().getFullYear();
+    var dpMonth = new Date().getMonth();
+    var dpSelected = null;
+    var tpSelected = null;
+
+    function renderDatePicker() {
+      var dpGrid = document.getElementById('apt-dp-grid');
+      var dpLabel = document.getElementById('apt-dp-month-label');
+      var dpDisplay = document.getElementById('apt-date-display');
+      var dpHidden = document.getElementById('apt-date-val');
+      if (!dpGrid || !dpLabel) return;
+      var pad2 = function (n) { return String(n).padStart(2, '0'); };
+      dpLabel.textContent = DP_MONTHS[dpMonth] + ' ' + dpYear;
+      var firstDay = new Date(dpYear, dpMonth, 1).getDay();
+      var offset = (firstDay === 0 ? 6 : firstDay - 1);
+      var daysInMonth = new Date(dpYear, dpMonth + 1, 0).getDate();
+      var today = new Date(); today.setHours(0, 0, 0, 0);
+      dpGrid.innerHTML = '';
+      for (var i = 0; i < offset; i++) {
+        var empty = document.createElement('span'); empty.className = 'apt-dp-cell empty'; dpGrid.appendChild(empty);
+      }
+      for (var d = 1; d <= daysInMonth; d++) {
+        var cellDate = new Date(dpYear, dpMonth, d);
+        var isPast = cellDate < today;
+        var isTodayCell = cellDate.getTime() === today.getTime();
+        var dateStr = dpYear + '-' + pad2(dpMonth + 1) + '-' + pad2(d);
+        var isSelected = dpSelected === dateStr;
+        var cell = document.createElement('button');
+        cell.type = 'button';
+        cell.textContent = String(d);
+        cell.className = 'apt-dp-cell' + (isPast ? ' past' : '') + (isTodayCell ? ' today' : '') + (isSelected ? ' selected' : '');
+        cell.disabled = isPast;
+        if (!isPast) {
+          (function (dd, ds) {
+            cell.addEventListener('click', function () {
+              dpSelected = ds;
+              if (dpHidden) dpHidden.value = ds;
+              if (dpDisplay) dpDisplay.textContent = dd + ' de ' + DP_MONTHS[dpMonth] + ' ' + dpYear;
+              renderDatePicker();
+            });
+          })(d, dateStr);
+        }
+        dpGrid.appendChild(cell);
+      }
+    }
+
+    function renderTimePicker() {
+      var tpGrid = document.getElementById('apt-time-grid');
+      var tpHidden = document.getElementById('apt-time-val');
+      if (!tpGrid) return;
+      tpGrid.innerHTML = '';
+      var pad2 = function (n) { return String(n).padStart(2, '0'); };
+      for (var h = 8; h <= 20; h++) {
+        for (var mi = 0; mi < 2; mi++) {
+          var m = mi * 30;
+          if (h === 20 && m === 30) continue;
+          var slot = pad2(h) + ':' + pad2(m);
+          (function (sl) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = sl;
+            btn.className = 'apt-time-slot' + (tpSelected === sl ? ' selected' : '');
+            btn.addEventListener('click', function () { tpSelected = sl; if (tpHidden) tpHidden.value = sl; renderTimePicker(); });
+            tpGrid.appendChild(btn);
+          })(slot);
+        }
+      }
+    }
+
+    var dpPrev = document.getElementById('apt-dp-prev');
+    var dpNext = document.getElementById('apt-dp-next');
+    if (dpPrev) dpPrev.addEventListener('click', function () { dpMonth--; if (dpMonth < 0) { dpMonth = 11; dpYear--; } renderDatePicker(); });
+    if (dpNext) dpNext.addEventListener('click', function () { dpMonth++; if (dpMonth > 11) { dpMonth = 0; dpYear++; } renderDatePicker(); });
+
+  })();
   </script>
 
   <style>
-    .portal-page {
-      padding: 4.5rem 0 5rem;
-    }
-
-    .portal-header {
+    /* ── CRM Reset & Layout ─────────────────────────────────────────── */
+    #crm {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
       display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 1.5rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--nx-line);
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .portal-header h1 {
-      margin-top: 0.8rem;
-      font-family: var(--nx-font-serif);
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-style: italic;
-      font-weight: 400;
-      line-height: 1;
-      letter-spacing: -0.03em;
+    /* ── Theme tokens ───────────────────────────────────────────────── */
+    .crm-light {
+      --crm-bg: #F5F5F7;
+      --crm-surface: #FFFFFF;
+      --crm-sidebar-bg: #FFFFFF;
+      --crm-topbar-bg: rgba(255,255,255,0.88);
+      --crm-text: #1d1d1f;
+      --crm-muted: #6e6e73;
+      --crm-accent: #2a9d97;
+      --crm-accent-hi: #4ECDC4;
+      --crm-line: rgba(0,0,0,0.09);
+      --crm-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      --crm-shadow-card: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+      --crm-nav-hover: rgba(0,0,0,0.05);
+      --crm-nav-active-bg: rgba(42,157,151,0.1);
+      --crm-nav-active-text: #1a7a76;
+      --crm-input-bg: rgba(0,0,0,0.04);
+      --crm-input-border: rgba(0,0,0,0.14);
+      --crm-input-text: #1d1d1f;
+      --crm-dp-text: rgba(29,29,31,0.9);
+      --crm-dp-past: rgba(29,29,31,0.25);
+      --crm-dp-bg: rgba(0,0,0,0.03);
+      --crm-slot-bg: rgba(0,0,0,0.04);
+      --crm-slot-border: rgba(0,0,0,0.12);
     }
 
-    .portal-badges {
+    .crm-dark {
+      --crm-bg: #0A0A0F;
+      --crm-surface: #12121A;
+      --crm-sidebar-bg: #0d0d14;
+      --crm-topbar-bg: rgba(10,10,15,0.88);
+      --crm-text: #F2F2EC;
+      --crm-muted: rgba(242,242,236,0.5);
+      --crm-accent: #4ECDC4;
+      --crm-accent-hi: #4ECDC4;
+      --crm-line: rgba(242,242,236,0.08);
+      --crm-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+      --crm-shadow-card: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.15);
+      --crm-nav-hover: rgba(242,242,236,0.05);
+      --crm-nav-active-bg: rgba(78,205,196,0.12);
+      --crm-nav-active-text: #4ECDC4;
+      --crm-input-bg: rgba(11,13,18,0.6);
+      --crm-input-border: rgba(242,242,236,0.12);
+      --crm-input-text: #F2F2EC;
+      --crm-dp-text: rgba(242,242,236,0.9);
+      --crm-dp-past: rgba(242,242,236,0.22);
+      --crm-dp-bg: rgba(11,13,18,0.55);
+      --crm-slot-bg: rgba(242,242,236,0.05);
+      --crm-slot-border: rgba(242,242,236,0.15);
+    }
+
+    #crm { background: var(--crm-bg); color: var(--crm-text); }
+
+    /* ── Sidebar ────────────────────────────────────────────────────── */
+    .crm-sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--crm-sidebar-bg);
+      border-right: 1px solid var(--crm-line);
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
+      flex-direction: column;
+      padding: 1.25rem 0.75rem;
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+      z-index: 20;
+      gap: 0.5rem;
     }
 
-    .portal-badge {
-      display: inline-flex;
+    .crm-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0 0.5rem 1rem;
+      border-bottom: 1px solid var(--crm-line);
+      margin-bottom: 0.5rem;
+    }
+
+    .crm-logo-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--crm-accent);
+      color: #fff;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0.55rem 0.95rem;
-      border-radius: 999px;
-      border: 1px solid var(--nx-line);
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
     }
 
-    .portal-badge-plan {
-      color: var(--nx-magnet);
-      border-color: rgba(78, 205, 196, 0.25);
-      background: rgba(78, 205, 196, 0.08);
-    }
-
-    .portal-badge-live {
-      color: var(--nx-ink);
-    }
-
-    .portal-badge-off {
-      color: var(--nx-ink-muted);
-    }
-
-    .portal-grid {
-      display: grid;
-      gap: 1.25rem;
-      grid-template-columns: 1fr;
-      margin-top: 2rem;
-    }
-
-    .portal-card,
-    .portal-metric-card {
-      background: var(--nx-deep);
-      border: 1px solid var(--nx-line);
-      border-radius: 24px;
-      padding: 1.5rem;
-    }
-
-    .portal-card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .portal-card-head h2 {
-      font-size: 1.05rem;
+    .crm-logo-words {
+      font-size: 15px;
       font-weight: 600;
+      color: var(--crm-text);
+      letter-spacing: -0.02em;
     }
 
-    .portal-mini-badge {
-      color: var(--nx-magnet);
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
+    .crm-logo-words em { color: var(--crm-accent); font-style: normal; }
 
-    .portal-status-grid {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .portal-status-item strong,
-    .portal-provider-option strong {
-      display: block;
-      color: var(--nx-ink);
-      font-size: 0.95rem;
-    }
-
-    .portal-status-item span,
-    .portal-empty,
-    .portal-provider-option small,
-    .portal-footer {
-      color: var(--nx-ink-muted);
-      line-height: 1.7;
-    }
-
-    .portal-qr-block {
-      margin-top: 1rem;
-      padding: 1rem;
-      border-radius: 18px;
-      background: rgba(78, 205, 196, 0.06);
-      border: 1px solid rgba(78, 205, 196, 0.16);
-    }
-
-    .portal-qr-image {
-      margin-top: 1rem;
-      width: min(100%, 220px);
-      border-radius: 14px;
-      background: #fff;
-      padding: 0.75rem;
-    }
-
-    .portal-table-wrap {
-      overflow-x: auto;
-    }
-
-    .portal-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 620px;
-    }
-
-    .portal-table th,
-    .portal-table td {
-      text-align: left;
-      padding: 0.9rem 0.75rem;
-      border-bottom: 1px solid var(--nx-line);
-      font-size: 0.9rem;
-    }
-
-    .portal-table th {
-      color: var(--nx-ink);
-      font-weight: 600;
-    }
-
-    .portal-table td {
-      color: var(--nx-ink-muted);
-    }
-
-    .portal-status-chip {
-      display: inline-flex;
-      padding: 0.35rem 0.65rem;
-      border-radius: 999px;
-      font-size: 0.76rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .portal-status-confirmed {
-      background: rgba(78, 205, 196, 0.1);
-      color: var(--nx-magnet);
-    }
-
-    .portal-status-cancelled {
-      background: rgba(255, 107, 107, 0.1);
-      color: #ff9a9a;
-    }
-
-    .portal-status-warning {
-      background: rgba(255, 204, 102, 0.1);
-      color: #ffd98a;
-    }
-
-    .portal-metrics {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      margin-top: 1.25rem;
-    }
-
-    .portal-metric-card span {
-      color: var(--nx-ink-muted);
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .portal-metric-card strong {
-      display: block;
-      margin-top: 0.75rem;
-      font-family: var(--nx-font-serif);
-      font-size: 2.4rem;
-      line-height: 1;
-      color: var(--nx-ink);
-    }
-
-    .portal-progress {
-      margin-top: 1rem;
-      height: 0.5rem;
-      border-radius: 999px;
-      background: rgba(242, 242, 236, 0.08);
-      overflow: hidden;
-    }
-
-    .portal-progress-bar {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--nx-magnet), var(--nx-magnet-glow));
-    }
-
-    .portal-config-card {
-      margin-top: 1.25rem;
-    }
-
-    .portal-telegram-card {
-      display: grid;
-      gap: 1.25rem;
-      margin-top: 1.25rem;
-    }
-
-    .portal-telegram-owner,
-    .portal-telegram-customer {
-      display: grid;
-      gap: 1rem;
-      padding: 1rem;
-      border-radius: 18px;
-      background: rgba(11, 13, 18, 0.45);
-      border: 1px solid var(--nx-line);
-    }
-
-    .portal-telegram-owner {
-      align-items: center;
-      grid-template-columns: 1fr auto;
-    }
-
-    .portal-telegram-owner p,
-    .portal-telegram-customer p {
-      color: var(--nx-ink-muted);
-      line-height: 1.7;
-    }
-
-    .portal-telegram-customer strong {
-      color: var(--nx-ink);
-      font-size: 0.95rem;
-    }
-
-    .portal-copy-row {
-      display: grid;
-      gap: 0.75rem;
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-
-    .portal-copy-row input {
-      width: 100%;
-      min-width: 0;
-      padding: 0.9rem 1rem;
-      border-radius: 14px;
-      border: 1px solid var(--nx-line);
-      background: rgba(11, 13, 18, 0.55);
-      color: var(--nx-ink-muted);
-      font: inherit;
-    }
-
-    .portal-config-card summary {
-      list-style: none;
+    .crm-nav {
       display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      cursor: pointer;
-      color: var(--nx-ink);
-      font-weight: 600;
-    }
-
-    .portal-config-card summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .portal-summary-hint {
-      color: var(--nx-ink-muted);
-      font-size: 0.88rem;
-      font-weight: 400;
-    }
-
-    .portal-config-form {
-      display: grid;
-      gap: 0.9rem;
-      margin-top: 1.5rem;
-    }
-
-    .portal-schedule-row {
-      display: grid;
-      grid-template-columns: minmax(90px, 130px) auto 1fr auto;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
-    .portal-schedule-times {
-      display: flex;
-      gap: 0.4rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .portal-schedule-times input[type='time'] {
+      flex-direction: column;
+      gap: 2px;
       flex: 1;
-      min-width: 86px;
     }
 
-    .portal-schedule-times input[data-lunch] {
-      border-style: dashed;
-      opacity: 0.45;
-    }
-
-    .portal-schedule-times input[data-lunch]:not(:disabled) {
-      opacity: 1;
-      border-style: solid;
-    }
-
-    .portal-schedule-day {
-      color: var(--nx-ink);
-      font-weight: 500;
-    }
-
-    .portal-switch {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--nx-ink-muted);
-      font-size: 0.88rem;
-    }
-
-    .portal-config-form input[type='time'] {
-      padding: 0.8rem 0.9rem;
-      border-radius: 14px;
-      border: 1px solid var(--nx-line);
-      background: rgba(11, 13, 18, 0.55);
-      color: var(--nx-ink);
-      font: inherit;
-    }
-
-    .portal-provider-card {
-      margin-top: 1.25rem;
-    }
-
-    .portal-provider-options {
-      display: grid;
-      gap: 0.9rem;
-      margin-bottom: 1rem;
-    }
-
-    .portal-provider-option {
+    .crm-nav-btn {
       display: flex;
-      gap: 0.75rem;
-      align-items: start;
-      padding: 1rem;
-      border-radius: 18px;
-      background: rgba(11, 13, 18, 0.45);
-      border: 1px solid var(--nx-line);
-    }
-
-    .portal-footer {
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    .portal-footer a {
-      color: var(--nx-magnet);
-    }
-
-    .portal-toast {
-      position: fixed;
-      right: 1.5rem;
-      bottom: 1.5rem;
-      padding: 0.9rem 1.1rem;
-      border-radius: 16px;
-      background: rgba(78, 205, 196, 0.14);
-      border: 1px solid rgba(78, 205, 196, 0.22);
-      color: var(--nx-ink);
-      z-index: 150;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.2s var(--nx-ease), transform 0.2s var(--nx-ease);
-    }
-
-    .portal-toast-show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .portal-dialog {
-      margin: auto;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 10px;
       border: none;
-      background: transparent;
-      padding: 1rem;
-    }
-
-    .portal-dialog::backdrop {
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(6px);
-    }
-
-    .portal-dialog-card {
-      max-width: 520px;
-      padding: 1.5rem;
-      border-radius: 24px;
-      background: var(--nx-deep);
-      border: 1px solid var(--nx-line);
-    }
-
-    .portal-dialog-card h3 {
-      font-size: 1.15rem;
-      margin-bottom: 1rem;
-    }
-
-    .portal-dialog-card ul {
-      padding-left: 1.2rem;
-      color: var(--nx-ink-muted);
-      line-height: 1.7;
-    }
-
-    .portal-dialog-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-    }
-
-    .portal-services-table-wrap {
-      margin-top: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .portal-services-empty {
-      margin-top: 0;
-      margin-bottom: 1rem;
-    }
-
-    .portal-services-form {
-      margin-bottom: 1rem;
-    }
-
-    .portal-services-add-row {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
-    .portal-services-add-row input {
+      background: none;
+      color: var(--crm-muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.14s, color 0.14s;
       width: 100%;
-      padding: 0.8rem 0.9rem;
-      border-radius: 14px;
-      border: 1px solid var(--nx-line);
-      background: rgba(11, 13, 18, 0.55);
-      color: var(--nx-ink);
-      font: inherit;
     }
 
-    .btn-del-svc {
+    .crm-nav-btn:hover { background: var(--crm-nav-hover); color: var(--crm-text); }
+    .crm-nav-btn.active { background: var(--crm-nav-active-bg); color: var(--crm-nav-active-text); font-weight: 600; }
+    .crm-nav-btn svg { flex-shrink: 0; opacity: 0.75; }
+    .crm-nav-btn.active svg { opacity: 1; }
+
+    .crm-sidebar-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--crm-line);
+      margin-top: 0.5rem;
+    }
+
+    .crm-plan-chip {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--crm-accent);
+      background: var(--crm-nav-active-bg);
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .crm-support-link {
+      font-size: 12px;
+      color: var(--crm-muted);
+      text-decoration: none;
+    }
+
+    .crm-support-link:hover { color: var(--crm-accent); }
+
+    /* ── Mobile overlay + burger ────────────────────────────────────── */
+    .crm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 15;
+      backdrop-filter: blur(2px);
+    }
+
+    .crm-burger {
+      display: none;
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 1rem;
-      padding: 0.2rem 0.4rem;
-      opacity: 0.6;
-      transition: opacity 0.15s;
+      color: var(--crm-text);
+      padding: 0.25rem;
+      flex-shrink: 0;
     }
 
-    .btn-del-svc:hover { opacity: 1; }
-
-    @media (max-width: 900px) {
-      .portal-header {
-        align-items: start;
-        flex-direction: column;
+    @media (max-width: 768px) {
+      .crm-burger { display: flex; }
+      .crm-sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.15);
       }
-
-      .portal-schedule-row {
-        grid-template-columns: 1fr;
-      }
-
-      .portal-services-add-row {
-        grid-template-columns: 1fr;
-      }
-
-      .portal-telegram-owner,
-      .portal-copy-row {
-        grid-template-columns: 1fr;
-      }
+      #crm.sidebar-open .crm-sidebar { transform: translateX(0); }
+      #crm.sidebar-open .crm-overlay { display: block; }
     }
 
-    /* ── Calendar card ─────────────────────────────────────────────────── */
-    .portal-calendar-card {
-      grid-column: 1 / -1;
-      margin-top: 1.25rem;
+    /* ── Body + Topbar ──────────────────────────────────────────────── */
+    .crm-body {
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      overflow: hidden;
     }
 
-    .portal-calendar-nav {
+    .crm-topbar {
+      height: 54px;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
+      padding: 0 1.25rem;
+      background: var(--crm-topbar-bg);
+      border-bottom: 1px solid var(--crm-line);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      flex-shrink: 0;
     }
 
-    #cal-week-label {
+    .crm-topbar-info { flex: 1; display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+
+    .crm-topbar-name {
+      font-weight: 600;
+      font-size: 14.5px;
+      color: var(--crm-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .crm-topbar-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 11.5px;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .badge-live { background: rgba(34,197,94,0.12); color: #16a34a; }
+    .crm-dark .badge-live { color: #4ade80; }
+    .badge-off { background: rgba(107,114,128,0.1); color: var(--crm-muted); }
+
+    .crm-theme-btn {
+      background: none;
+      border: 1px solid var(--crm-line);
+      border-radius: 8px;
+      padding: 0.35rem 0.45rem;
+      cursor: pointer;
+      color: var(--crm-muted);
+      display: flex;
+      align-items: center;
+      transition: color 0.14s, border-color 0.14s;
+      flex-shrink: 0;
+    }
+
+    .crm-theme-btn:hover { color: var(--crm-text); border-color: var(--crm-accent); }
+
+    .crm-light .icon-moon { display: none; }
+    .crm-dark .icon-sun { display: none; }
+    .crm-dark .icon-moon { display: block; }
+
+    /* ── Main scroll area ───────────────────────────────────────────── */
+    .crm-main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .crm-view { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+    .crm-hidden { display: none !important; }
+
+    .crm-view-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .crm-view-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--crm-text);
+      margin: 0;
+    }
+
+    /* ── Cards ──────────────────────────────────────────────────────── */
+    .crm-card {
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: var(--crm-shadow-card);
+    }
+
+    .crm-mb { margin-bottom: 0; }
+
+    .crm-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .crm-card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--crm-text);
+      margin: 0 0 1rem;
+    }
+
+    .crm-card-head .crm-card-title { margin-bottom: 0; }
+
+    /* ── KPI grid ───────────────────────────────────────────────────── */
+    .crm-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+
+    .crm-kpi {
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: var(--crm-shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .crm-kpi-lbl {
+      font-size: 11.5px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--crm-muted);
+    }
+
+    .crm-kpi-val {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--crm-text);
+      line-height: 1.1;
+    }
+
+    .crm-progress {
+      margin-top: 0.5rem;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--crm-line);
+      overflow: hidden;
+    }
+
+    .crm-progress-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--crm-accent);
+    }
+
+    /* ── Dashboard row ──────────────────────────────────────────────── */
+    .crm-dash-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0.75rem;
+    }
+
+    .crm-status-card { display: flex; flex-direction: column; }
+    .crm-apts-card { min-width: 0; }
+
+    .crm-status-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .crm-status-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .crm-status-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--crm-muted); font-weight: 500; }
+
+    .crm-status-val {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 13px;
+      color: var(--crm-text);
+    }
+
+    .crm-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--crm-muted);
+    }
+
+    .dot-green { background: #22c55e; box-shadow: 0 0 5px rgba(34,197,94,0.5); }
+    .dot-yellow { background: #f59e0b; box-shadow: 0 0 5px rgba(245,158,11,0.45); }
+    .dot-red { background: #ef4444; box-shadow: 0 0 5px rgba(239,68,68,0.45); }
+
+    /* topbar badge dot */
+    .crm-topbar-badge .crm-dot { width: 6px; height: 6px; background: currentColor; box-shadow: none; }
+    .badge-live .crm-dot { background: #22c55e; box-shadow: 0 0 4px rgba(34,197,94,0.5); }
+    .badge-off .crm-dot { background: var(--crm-muted); }
+
+    /* ── Tables ─────────────────────────────────────────────────────── */
+    .crm-table-wrap { overflow-x: auto; margin-top: 0; }
+
+    .crm-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+
+    .crm-table th, .crm-table td {
+      text-align: left;
+      padding: 0.7rem 0.75rem;
+      border-bottom: 1px solid var(--crm-line);
+      font-size: 13px;
+    }
+
+    .crm-table th { color: var(--crm-muted); font-weight: 500; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .crm-table td { color: var(--crm-text); }
+    .crm-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Chips ──────────────────────────────────────────────────────── */
+    .crm-chip {
+      display: inline-flex;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .chip-green { background: rgba(34,197,94,0.12); color: #16a34a; }
+    .crm-dark .chip-green { color: #4ade80; }
+    .chip-red { background: rgba(239,68,68,0.1); color: #dc2626; }
+    .crm-dark .chip-red { color: #f87171; }
+    .chip-yellow { background: rgba(245,158,11,0.12); color: #d97706; }
+    .crm-dark .chip-yellow { color: #fbbf24; }
+    .chip-accent { background: var(--crm-nav-active-bg); color: var(--crm-nav-active-text); }
+
+    /* ── Buttons ────────────────────────────────────────────────────── */
+    .crm-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: 10px;
+      border: none;
+      background: var(--crm-accent);
+      color: #fff;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.14s, transform 0.1s;
+    }
+
+    .crm-btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .crm-btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--crm-line);
+      background: transparent;
+      color: var(--crm-text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.14s, border-color 0.14s;
+    }
+
+    .crm-btn-ghost:hover { background: var(--crm-nav-hover); border-color: var(--crm-accent); }
+
+    .crm-btn-del {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0.15rem 0.3rem;
+      opacity: 0.55;
+      transition: opacity 0.14s;
+    }
+
+    .crm-btn-del:hover { opacity: 1; }
+
+    /* ── Inputs ─────────────────────────────────────────────────────── */
+    .crm-input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--crm-input-border);
+      background: var(--crm-input-bg);
+      color: var(--crm-input-text);
+      font-size: 13.5px;
+      font-family: inherit;
+      transition: border-color 0.14s;
+      box-sizing: border-box;
+    }
+
+    .crm-input:focus { outline: none; border-color: var(--crm-accent); }
+
+    .crm-input-time {
+      padding: 0.55rem 0.7rem;
+      border-radius: 9px;
+      border: 1px solid var(--crm-input-border);
+      background: var(--crm-input-bg);
+      color: var(--crm-input-text);
+      font-size: 13px;
+      font-family: inherit;
+      flex: 1;
+      min-width: 82px;
+    }
+
+    .crm-input-time:focus { outline: none; border-color: var(--crm-accent); }
+    .crm-input-time:disabled { opacity: 0.35; }
+    .crm-input-time[data-lunch] { border-style: dashed; }
+    .crm-input-time[data-lunch]:not(:disabled) { border-style: solid; opacity: 1; }
+
+    /* ── Empty state ────────────────────────────────────────────────── */
+    .crm-empty {
+      color: var(--crm-muted);
+      font-size: 13.5px;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      margin: 0;
+    }
+
+    .crm-muted-p { color: var(--crm-muted); font-size: 13px; margin: 0.25rem 0; line-height: 1.6; }
+
+    /* ── Calendar (Citas view) ──────────────────────────────────────── */
+    .crm-cal-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .crm-cal-label {
       flex: 1;
       text-align: center;
-      font-size: 0.875rem;
-      color: var(--nx-ink-muted);
+      font-size: 13px;
+      color: var(--crm-muted);
     }
 
-    .portal-calendar-grid {
+    .crm-cal-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 0.5rem;
       overflow-x: auto;
     }
 
-    .portal-cal-day {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      min-width: 0;
-    }
+    .crm-cal-day { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
 
-    .portal-cal-day-header {
+    .crm-cal-day-hdr {
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 11px;
       font-weight: 600;
-      color: var(--nx-ink-muted);
-      padding: 0.35rem 0.25rem;
-      border-bottom: 1px solid var(--nx-line);
+      color: var(--crm-muted);
+      padding: 0.3rem 0.2rem;
+      border-bottom: 1px solid var(--crm-line);
     }
 
-    .portal-cal-day-header .cal-date {
+    .crm-cal-date {
       display: block;
-      font-size: 1rem;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--nx-ink);
-      margin-top: 0.1rem;
+      color: var(--crm-text);
+      margin-top: 0.15rem;
     }
 
-    .portal-cal-day-header.today .cal-date {
-      color: var(--nx-accent);
-    }
+    .crm-cal-day-hdr.today .crm-cal-date { color: var(--crm-accent); }
 
-    .portal-cal-apt {
-      border-radius: 10px;
-      padding: 0.5rem 0.6rem;
-      font-size: 0.75rem;
-      background: rgba(242, 242, 236, 0.04);
-      border: 1px solid var(--nx-line);
+    .crm-cal-apt {
+      border-radius: 9px;
+      padding: 0.45rem 0.55rem;
+      font-size: 11.5px;
+      background: var(--crm-nav-hover);
+      border: 1px solid var(--crm-line);
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.2rem;
     }
 
-    .portal-cal-apt.confirmed {
-      background: rgba(0, 200, 120, 0.08);
-      border-color: var(--nx-green);
-    }
+    .crm-cal-apt.confirmed { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.25); }
+    .crm-cal-apt.cancelled { opacity: 0.4; text-decoration: line-through; }
 
-    .portal-cal-apt.cancelled {
-      opacity: 0.45;
-      text-decoration: line-through;
-    }
+    .crm-cal-apt-time { font-weight: 700; color: var(--crm-text); }
+    .crm-cal-apt-name { color: var(--crm-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .crm-cal-apt-svc { color: var(--crm-muted); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .portal-cal-apt-time {
-      font-weight: 600;
-      color: var(--nx-ink);
-    }
-
-    .portal-cal-apt-name {
-      color: var(--nx-ink-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .portal-cal-apt-cancel {
+    .crm-cal-apt-cancel {
       align-self: flex-start;
-      font-size: 0.7rem;
-      color: var(--nx-ink-muted);
+      font-size: 10.5px;
+      color: var(--crm-muted);
       background: transparent;
-      border: 1px solid var(--nx-line);
-      border-radius: 6px;
-      padding: 0.15rem 0.4rem;
+      border: 1px solid var(--crm-line);
+      border-radius: 5px;
+      padding: 0.1rem 0.35rem;
       cursor: pointer;
-      margin-top: 0.25rem;
+      margin-top: 0.2rem;
     }
 
-    .portal-cal-apt-cancel:hover {
-      border-color: #ee0055;
-      color: #ee0055;
-    }
+    .crm-cal-apt-cancel:hover { border-color: #ef4444; color: #ef4444; }
 
-    .portal-cal-empty {
-      font-size: 0.75rem;
-      color: var(--nx-ink-muted);
+    .crm-cal-empty-cell {
+      font-size: 11.5px;
+      color: var(--crm-muted);
       text-align: center;
-      padding: 0.5rem 0;
-    }
-
-    .portal-modal-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      min-width: 320px;
-    }
-
-    .portal-modal-form h3 {
+      padding: 0.3rem 0;
       margin: 0;
-      font-size: 1.1rem;
-      color: var(--nx-ink);
     }
 
-    .portal-modal-form label {
+    /* ── Lock card (Clientes) ───────────────────────────────────────── */
+    .crm-lock-card {
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
-      font-size: 0.8rem;
-      color: var(--nx-ink-muted);
-    }
-
-    .portal-modal-form input {
-      padding: 0.5rem 0.75rem;
-      border-radius: 10px;
-      border: 1px solid var(--nx-line);
-      background: rgba(11, 13, 18, 0.55);
-      color: var(--nx-ink);
-      font-size: 0.875rem;
-    }
-
-    .portal-modal-actions {
-      display: flex;
+      align-items: center;
       gap: 0.75rem;
-      justify-content: flex-end;
-      padding-top: 0.5rem;
+      box-shadow: var(--crm-shadow-card);
+      max-width: 420px;
+      margin: 2rem auto;
     }
 
-    @media (max-width: 768px) {
-      .portal-calendar-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+    .crm-lock-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .crm-lock-card h2 { font-size: 18px; font-weight: 700; margin: 0; color: var(--crm-text); }
+    .crm-lock-card p { color: var(--crm-muted); font-size: 13.5px; line-height: 1.6; margin: 0; }
 
-      .portal-cal-day.hide-mobile {
-        display: none;
-      }
+    /* ── Canales ─────────────────────────────────────────────────────── */
+    .crm-qr-block {
+      margin-top: 0.75rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: var(--crm-nav-active-bg);
+      border: 1px solid var(--crm-line);
     }
 
-    /* ── Status dots ───────────────────────────────────────────────────── */
-    .portal-status-val {
+    .crm-qr-block p { color: var(--crm-muted); font-size: 13px; margin: 0 0 0.75rem; }
+
+    .crm-qr-img {
+      width: min(100%, 200px);
+      border-radius: 10px;
+      background: #fff;
+      padding: 0.5rem;
+      display: block;
+    }
+
+    .crm-provider-wrap { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--crm-line); }
+
+    .crm-section-lbl {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--crm-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .crm-provider-opts { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+
+    .crm-provider-opt {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      background: var(--crm-input-bg);
+      border: 1px solid var(--crm-input-border);
+      cursor: pointer;
+    }
+
+    .crm-provider-opt strong { display: block; font-size: 13px; color: var(--crm-text); }
+    .crm-provider-opt small { font-size: 11.5px; color: var(--crm-muted); }
+
+    .crm-tg-owner {
+      padding: 1rem;
+      border-radius: 12px;
+      background: var(--crm-input-bg);
+      border: 1px solid var(--crm-input-border);
       display: flex;
       align-items: center;
-      gap: 0.45rem;
-      color: var(--nx-ink-muted);
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
 
-    .portal-status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
+    .crm-tg-owner p { color: var(--crm-muted); font-size: 13px; margin: 0; flex: 1; line-height: 1.5; }
+
+    .crm-tg-customer { margin-top: 1rem; }
+
+    .crm-copy-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
     }
 
-    .dot-green  { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
-    .dot-yellow { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.4); }
-    .dot-red    { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+    /* ── Config: Services ───────────────────────────────────────────── */
+    .crm-svc-add-row {
+      display: grid;
+      grid-template-columns: minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+      align-items: center;
+    }
 
-    /* ── Appointment pickers ───────────────────────────────────────────── */
-    .apt-field-group {
+    /* ── Config: Schedule ───────────────────────────────────────────── */
+    .crm-schedule-form { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .crm-schedule-row {
+      display: grid;
+      grid-template-columns: 100px auto 1fr auto;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .crm-schedule-day { font-weight: 500; font-size: 13px; color: var(--crm-text); }
+
+    .crm-schedule-times {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .crm-toggle-lbl {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 12.5px;
+      color: var(--crm-muted);
+      cursor: pointer;
+    }
+
+    /* ── Dialog ─────────────────────────────────────────────────────── */
+    .crm-dialog {
+      margin: auto;
+      border: none;
+      background: transparent;
+      padding: 1rem;
+    }
+
+    .crm-dialog::backdrop {
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+    }
+
+    .crm-dialog-card {
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      border-radius: 18px;
+      padding: 1.5rem;
+      max-width: 480px;
+      color: var(--crm-text);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+
+    .crm-dialog-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 1rem; }
+    .crm-dialog-card ul { padding-left: 1.1rem; color: var(--crm-muted); line-height: 1.7; font-size: 13.5px; }
+
+    .crm-dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+    }
+
+    /* ── Modal form ─────────────────────────────────────────────────── */
+    .crm-modal-form {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.85rem;
+      min-width: 300px;
+      max-width: 420px;
     }
 
-    .apt-field-label {
-      font-size: 0.8rem;
-      color: var(--nx-ink-muted);
+    .crm-modal-form h3 { font-size: 16px; font-weight: 700; margin: 0; color: var(--crm-text); }
+
+    .crm-form-lbl {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      font-size: 11.5px;
+      color: var(--crm-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
+    .crm-field-grp { display: flex; flex-direction: column; gap: 0.4rem; }
+    .crm-field-lbl { font-size: 11.5px; color: var(--crm-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .crm-modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+      padding-top: 0.25rem;
+    }
+
+    /* ── Date picker ─────────────────────────────────────────────────── */
     .apt-date-picker {
-      border: 1px solid var(--nx-line);
-      border-radius: 14px;
+      border: 1px solid var(--crm-input-border);
+      border-radius: 12px;
       padding: 0.75rem;
-      background: rgba(11,13,18,0.55);
+      background: var(--crm-dp-bg);
     }
 
     .apt-dp-nav {
@@ -1575,29 +1693,25 @@ function renderAppointmentDate(item: Appointment) {
     .apt-dp-nav button {
       background: none;
       border: none;
-      color: var(--nx-ink);
+      color: var(--crm-text);
       cursor: pointer;
-      font-size: 1rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 8px;
+      font-size: 14px;
+      padding: 0.2rem 0.4rem;
+      border-radius: 6px;
     }
 
-    .apt-dp-nav button:hover { background: rgba(242,242,236,0.08); }
+    .apt-dp-nav button:hover { background: var(--crm-nav-hover); }
 
-    #apt-dp-month-label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--nx-ink);
-    }
+    #apt-dp-month-label { font-size: 13px; font-weight: 600; color: var(--crm-text); }
 
     .apt-dp-weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       text-align: center;
-      font-size: 0.65rem;
-      color: var(--nx-ink-muted);
-      margin-bottom: 0.35rem;
-      letter-spacing: 0.04em;
+      font-size: 10.5px;
+      color: var(--crm-muted);
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.03em;
     }
 
     .apt-dp-grid {
@@ -1611,72 +1725,88 @@ function renderAppointmentDate(item: Appointment) {
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
+      border-radius: 7px;
       border: none;
       background: none;
-      color: rgba(242,242,236,0.85);
-      font-size: 0.82rem;
+      color: var(--crm-dp-text);
+      font-size: 12.5px;
       cursor: pointer;
-      transition: background 0.12s;
+      transition: background 0.1s;
     }
 
     .apt-dp-cell.empty { pointer-events: none; }
+    .apt-dp-cell.past { color: var(--crm-dp-past); cursor: default; }
+    .apt-dp-cell.today { border: 1px solid var(--crm-accent); color: var(--crm-accent); }
+    .apt-dp-cell.selected { background: var(--crm-accent); color: #fff; border: none; }
+    .apt-dp-cell:not(.past):not(.empty):not(.selected):hover { background: var(--crm-nav-active-bg); }
 
-    .apt-dp-cell.past {
-      color: rgba(242,242,236,0.25);
-      cursor: default;
-    }
+    .apt-date-display { font-size: 12px; color: var(--crm-accent); min-height: 1.2em; }
 
-    .apt-dp-cell.today {
-      border: 1px solid var(--nx-magnet);
-      color: var(--nx-magnet);
-    }
-
-    .apt-dp-cell.selected {
-      background: var(--nx-magnet);
-      color: #000;
-    }
-
-    .apt-dp-cell:not(.past):not(.empty):not(.selected):hover {
-      background: rgba(78,205,196,0.12);
-    }
-
-    .apt-date-display {
-      font-size: 0.78rem;
-      color: var(--nx-magnet);
-      min-height: 1.2em;
-    }
-
+    /* ── Time picker ─────────────────────────────────────────────────── */
     .apt-time-picker {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
-      max-height: 130px;
+      gap: 0.35rem;
+      max-height: 120px;
       overflow-y: auto;
-      padding: 0.25rem 0;
+      padding: 0.2rem 0;
     }
 
     .apt-time-slot {
-      padding: 0.3rem 0.55rem;
-      border-radius: 8px;
-      border: 1px solid rgba(242,242,236,0.18);
-      background: rgba(242,242,236,0.05);
-      color: var(--nx-ink);
-      font-size: 0.78rem;
+      padding: 0.28rem 0.5rem;
+      border-radius: 7px;
+      border: 1px solid var(--crm-slot-border);
+      background: var(--crm-slot-bg);
+      color: var(--crm-text);
+      font-size: 12px;
       cursor: pointer;
-      transition: background 0.12s, color 0.12s, border-color 0.12s;
+      transition: background 0.1s, border-color 0.1s;
     }
 
-    .apt-time-slot:hover {
-      background: rgba(78,205,196,0.1);
-      border-color: var(--nx-magnet);
-      color: var(--nx-ink);
+    .apt-time-slot:hover { background: var(--crm-nav-active-bg); border-color: var(--crm-accent); }
+    .apt-time-slot.selected { background: var(--crm-accent); border-color: var(--crm-accent); color: #fff; }
+
+    /* ── Toast ──────────────────────────────────────────────────────── */
+    .crm-toast {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      color: var(--crm-text);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 1100;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.18s, transform 0.18s;
+      font-size: 13.5px;
+      font-weight: 500;
     }
 
-    .apt-time-slot.selected {
-      background: var(--nx-magnet);
-      border-color: var(--nx-magnet);
-      color: #000;
+    .crm-toast-show { opacity: 1; transform: translateY(0); }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .crm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .crm-dash-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .crm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .crm-cal-grid { grid-template-columns: repeat(3, 1fr); }
+      .crm-cal-day.hide-mobile { display: none; }
+      .crm-schedule-row { grid-template-columns: 1fr; }
+      .crm-svc-add-row { grid-template-columns: 1fr; }
+      .crm-copy-row { grid-template-columns: 1fr; }
+      .crm-tg-owner { flex-direction: column; }
+      .crm-main { padding: 1rem; }
+    }
+
+    @media (max-width: 480px) {
+      .crm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .crm-kpi-val { font-size: 22px; }
     }
   </style>
 </Layout>
