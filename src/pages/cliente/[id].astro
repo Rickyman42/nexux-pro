@@ -74,7 +74,7 @@ function renderAppointmentDate(item: Appointment) {
       <header class="portal-header">
         <div>
           <p class="eyebrow">Portal cliente</p>
-          <h1>Lara - {data.name}</h1>
+          <h1>Tu bot - {data.name}</h1>
         </div>
         <div class="portal-badges">
           <span class="portal-badge portal-badge-plan">Plan {planLabel}</span>
@@ -93,7 +93,8 @@ function renderAppointmentDate(item: Appointment) {
             {showWhatsApp && (
             <div class="portal-status-item">
               <strong>WhatsApp</strong>
-              <span>
+              <span class="portal-status-val">
+                <span class={`portal-status-dot ${data.channels.whatsapp.connected ? 'dot-green' : data.botStatus === 'pending_qr' ? 'dot-yellow' : 'dot-red'}`}></span>
                 {data.channels.whatsapp.connected
                   ? `Conectado (${data.channels.whatsapp.provider})`
                   : data.botStatus === 'pending_qr'
@@ -104,7 +105,10 @@ function renderAppointmentDate(item: Appointment) {
             )}
             <div class="portal-status-item">
               <strong>Telegram</strong>
-              <span>{data.channels.telegram.ownerLinked ? 'Vinculado' : 'Pendiente de vincular'}</span>
+              <span class="portal-status-val">
+                <span class={`portal-status-dot ${data.channels.telegram.ownerLinked ? 'dot-green' : 'dot-yellow'}`}></span>
+                {data.channels.telegram.ownerLinked ? 'Vinculado' : 'Pendiente de vincular'}
+              </span>
             </div>
           </div>
 
@@ -163,7 +167,7 @@ function renderAppointmentDate(item: Appointment) {
               </table>
             </div>
           ) : (
-            <p class="portal-empty">Aun no hay citas registradas. Cuando Lara reserve las primeras, apareceran aqui.</p>
+            <p class="portal-empty">Aun no hay citas registradas. Las citas reservadas por tu bot apareceran aqui.</p>
           )}
         </article>
       </section>
@@ -223,7 +227,7 @@ function renderAppointmentDate(item: Appointment) {
         <div class="portal-telegram-customer">
           <div>
             <strong>Enlace para tus clientas</strong>
-            <p>Compártelo para que puedan iniciar conversacion con Lara en Telegram.</p>
+            <p>Compártelo para que puedan iniciar conversacion con tu bot en Telegram.</p>
           </div>
           <div class="portal-copy-row">
             <input id="telegram-customer-link" type="text" value={customerTelegramUrl} readonly />
@@ -316,7 +320,7 @@ function renderAppointmentDate(item: Appointment) {
       <div class="portal-dialog-card">
         <h3>Cambiar a Twilio WhatsApp Business</h3>
         <ul>
-          <li>Tu numero actual de WhatsApp dejara de recibir mensajes de Lara.</li>
+          <li>Tu numero actual de WhatsApp dejara de recibir mensajes del bot.</li>
           <li>Recibiras un numero nuevo de Twilio en 24-48h.</li>
           <li>El coste adicional se aplicara en la proxima factura.</li>
         </ul>
@@ -339,14 +343,25 @@ function renderAppointmentDate(item: Appointment) {
         Servicio
         <input type="text" name="service" required placeholder="Corte, tinte…" />
       </label>
-      <label>
-        Fecha
-        <input type="date" name="date" required />
-      </label>
-      <label>
-        Hora
-        <input type="time" name="time" required />
-      </label>
+      <div class="apt-field-group">
+        <span class="apt-field-label">Fecha</span>
+        <div class="apt-date-picker">
+          <div class="apt-dp-nav">
+            <button type="button" id="apt-dp-prev">←</button>
+            <span id="apt-dp-month-label"></span>
+            <button type="button" id="apt-dp-next">→</button>
+          </div>
+          <div class="apt-dp-weekdays">Lu Ma Mi Ju Vi Sá Do</div>
+          <div class="apt-dp-grid" id="apt-dp-grid"></div>
+        </div>
+        <span class="apt-date-display" id="apt-date-display">Selecciona una fecha</span>
+        <input type="hidden" name="date" id="apt-date-val" />
+      </div>
+      <div class="apt-field-group">
+        <span class="apt-field-label">Hora</span>
+        <div class="apt-time-picker" id="apt-time-grid"></div>
+        <input type="hidden" name="time" id="apt-time-val" />
+      </div>
       <label>
         Duración (min)
         <input type="number" name="duration_min" value="60" min="15" step="15" />
@@ -701,6 +716,7 @@ function renderAppointmentDate(item: Appointment) {
         const fd = new FormData(e.target);
         const date = fd.get('date');
         const time = fd.get('time');
+        if (!date || !time) { showToast('Selecciona fecha y hora'); return; }
         const body = {
           clientId,
           client_name:  fd.get('client_name'),
@@ -719,6 +735,98 @@ function renderAppointmentDate(item: Appointment) {
           e.target.reset();
         } catch (_) {}
         await loadCalendar();
+      });
+
+      // ── Date + Time Pickers ────────────────────────────────────────────────
+      const DP_MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      let dpYear = new Date().getFullYear();
+      let dpMonth = new Date().getMonth();
+      let dpSelected = null;
+      let tpSelected = null;
+
+      function renderDatePicker() {
+        const dpGrid = document.getElementById('apt-dp-grid');
+        const dpLabel = document.getElementById('apt-dp-month-label');
+        const dpDisplay = document.getElementById('apt-date-display');
+        const dpHidden = document.getElementById('apt-date-val');
+        if (!dpGrid || !dpLabel) return;
+        const pad2 = n => String(n).padStart(2,'0');
+        dpLabel.textContent = DP_MONTHS[dpMonth] + ' ' + dpYear;
+        const firstDay = new Date(dpYear, dpMonth, 1).getDay();
+        const offset = (firstDay === 0 ? 6 : firstDay - 1);
+        const daysInMonth = new Date(dpYear, dpMonth + 1, 0).getDate();
+        const today = new Date(); today.setHours(0,0,0,0);
+        dpGrid.innerHTML = '';
+        for (let i = 0; i < offset; i++) {
+          const empty = document.createElement('span');
+          empty.className = 'apt-dp-cell empty';
+          dpGrid.appendChild(empty);
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const cellDate = new Date(dpYear, dpMonth, d);
+          const isPast = cellDate < today;
+          const isTodayCell = cellDate.getTime() === today.getTime();
+          const dateStr = dpYear + '-' + pad2(dpMonth+1) + '-' + pad2(d);
+          const isSelected = dpSelected === dateStr;
+          const cell = document.createElement('button');
+          cell.type = 'button';
+          cell.textContent = String(d);
+          cell.className = 'apt-dp-cell' + (isPast ? ' past' : '') + (isTodayCell ? ' today' : '') + (isSelected ? ' selected' : '');
+          cell.disabled = isPast;
+          if (!isPast) {
+            cell.addEventListener('click', () => {
+              dpSelected = dateStr;
+              if (dpHidden) dpHidden.value = dateStr;
+              if (dpDisplay) dpDisplay.textContent = d + ' de ' + DP_MONTHS[dpMonth] + ' ' + dpYear;
+              renderDatePicker();
+            });
+          }
+          dpGrid.appendChild(cell);
+        }
+      }
+
+      function renderTimePicker() {
+        const tpGrid = document.getElementById('apt-time-grid');
+        const tpHidden = document.getElementById('apt-time-val');
+        if (!tpGrid) return;
+        tpGrid.innerHTML = '';
+        const pad2 = n => String(n).padStart(2,'0');
+        for (let h = 8; h <= 20; h++) {
+          for (const m of [0, 30]) {
+            if (h === 20 && m === 30) continue;
+            const slot = pad2(h) + ':' + pad2(m);
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = slot;
+            btn.className = 'apt-time-slot' + (tpSelected === slot ? ' selected' : '');
+            btn.addEventListener('click', () => {
+              tpSelected = slot;
+              if (tpHidden) tpHidden.value = slot;
+              renderTimePicker();
+            });
+            tpGrid.appendChild(btn);
+          }
+        }
+      }
+
+      document.getElementById('apt-dp-prev')?.addEventListener('click', () => {
+        dpMonth--; if (dpMonth < 0) { dpMonth = 11; dpYear--; }
+        renderDatePicker();
+      });
+      document.getElementById('apt-dp-next')?.addEventListener('click', () => {
+        dpMonth++; if (dpMonth > 11) { dpMonth = 0; dpYear++; }
+        renderDatePicker();
+      });
+      document.getElementById('open-apt-modal')?.addEventListener('click', () => {
+        dpYear = new Date().getFullYear(); dpMonth = new Date().getMonth();
+        dpSelected = null; tpSelected = null;
+        const dh = document.getElementById('apt-date-val');
+        const th = document.getElementById('apt-time-val');
+        const dd = document.getElementById('apt-date-display');
+        if (dh) dh.value = ''; if (th) th.value = '';
+        if (dd) dd.textContent = 'Selecciona una fecha';
+        renderDatePicker();
+        renderTimePicker();
       });
 
       // Boot
@@ -1360,6 +1468,159 @@ function renderAppointmentDate(item: Appointment) {
       .portal-cal-day.hide-mobile {
         display: none;
       }
+    }
+
+    /* ── Status dots ───────────────────────────────────────────────────── */
+    .portal-status-val {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--nx-ink-muted);
+    }
+
+    .portal-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-green  { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .dot-yellow { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+    .dot-red    { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+
+    /* ── Appointment pickers ───────────────────────────────────────────── */
+    .apt-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .apt-field-label {
+      font-size: 0.8rem;
+      color: var(--nx-ink-muted);
+    }
+
+    .apt-date-picker {
+      border: 1px solid var(--nx-line);
+      border-radius: 14px;
+      padding: 0.75rem;
+      background: rgba(11,13,18,0.55);
+    }
+
+    .apt-dp-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .apt-dp-nav button {
+      background: none;
+      border: none;
+      color: var(--nx-ink);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 8px;
+    }
+
+    .apt-dp-nav button:hover { background: rgba(242,242,236,0.08); }
+
+    #apt-dp-month-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--nx-ink);
+    }
+
+    .apt-dp-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--nx-ink-muted);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.04em;
+    }
+
+    .apt-dp-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .apt-dp-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      color: var(--nx-ink);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .apt-dp-cell.empty { pointer-events: none; }
+
+    .apt-dp-cell.past {
+      color: var(--nx-ink-muted);
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .apt-dp-cell.today {
+      border: 1px solid var(--nx-magnet);
+      color: var(--nx-magnet);
+    }
+
+    .apt-dp-cell.selected {
+      background: var(--nx-magnet);
+      color: #000;
+    }
+
+    .apt-dp-cell:not(.past):not(.empty):not(.selected):hover {
+      background: rgba(78,205,196,0.12);
+    }
+
+    .apt-date-display {
+      font-size: 0.78rem;
+      color: var(--nx-magnet);
+      min-height: 1.2em;
+    }
+
+    .apt-time-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      max-height: 130px;
+      overflow-y: auto;
+      padding: 0.25rem 0;
+    }
+
+    .apt-time-slot {
+      padding: 0.3rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid var(--nx-line);
+      background: rgba(11,13,18,0.55);
+      color: var(--nx-ink-muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+    }
+
+    .apt-time-slot:hover {
+      background: rgba(78,205,196,0.1);
+      border-color: var(--nx-magnet);
+      color: var(--nx-ink);
+    }
+
+    .apt-time-slot.selected {
+      background: var(--nx-magnet);
+      border-color: var(--nx-magnet);
+      color: #000;
     }
   </style>
 </Layout>
