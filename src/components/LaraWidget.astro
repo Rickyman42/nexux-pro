@@ -187,7 +187,7 @@
     const body = $('lara-body');
     const msg = document.createElement('div');
     msg.className = 'lara-msg lara-msg-' + who;
-    msg.textContent = text;
+    if (who === 'bot') { msg.innerHTML = text; } else { msg.textContent = text; }
     body.appendChild(msg);
     requestAnimationFrame(() => msg.classList.add('show'));
     body.scrollTop = body.scrollHeight;
