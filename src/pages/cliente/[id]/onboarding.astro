@@ -377,7 +377,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
 }
 .ob-day-toggle input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--ob-accent); cursor: pointer; }
 .ob-day-name { font-size: 0.84rem; font-weight: 500; }
-.ob-day-times { display: flex; gap: 0.75rem; flex: 1; align-items: center; }
+.ob-day-times { display: flex; gap: 0.75rem; flex: 1; align-items: center; flex-wrap: wrap; }
 .ob-day-times.ob-closed { opacity: 0.28; pointer-events: none; }
 .ob-time-pair { display: flex; align-items: center; gap: 0.4rem; }
 .ob-time-pair label { font-size: 0.7rem; color: var(--ob-muted); white-space: nowrap; }
@@ -388,6 +388,20 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
   font-size: 0.82rem;
 }
 .ob-time-pair input[type=time]:focus { outline: none; border-color: var(--ob-accent); }
+.ob-lunch-toggle {
+  display: flex; align-items: center; cursor: pointer; flex-shrink: 0;
+}
+.ob-lunch-toggle input[type=checkbox] { display: none; }
+.ob-lunch-lbl {
+  font-size: 1rem; opacity: 0.35; transition: opacity 0.15s;
+  padding: 0.28rem 0.4rem; border-radius: 6px;
+  border: 1.5px solid transparent;
+}
+.ob-lunch-toggle:has(input:checked) .ob-lunch-lbl {
+  opacity: 1; border-color: var(--ob-accent); background: var(--ob-accent-lt);
+}
+.ob-lunch-times { display: flex; gap: 0.75rem; align-items: center; }
+.ob-lunch-times.ob-hidden { display: none !important; }
 
 /* ── Channels ─────────────────────────────────────── */
 .ob-ch-list { display: flex; flex-direction: column; gap: 0.65rem; width: 100%; margin: 0.5rem 0; }
@@ -612,8 +626,11 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
       var ex   = existSch[day];
       var def  = DEFAULT_SCH[day];
       var open = ex !== undefined ? ex !== null : def !== null;
-      var ov   = (ex && ex.open)  || (def && def.open)  || '09:00';
-      var cv   = (ex && ex.close) || (def && def.close) || '19:00';
+      var ov   = (ex && ex.open)        || (def && def.open)  || '09:00';
+      var cv   = (ex && ex.close)       || (def && def.close) || '19:00';
+      var lcv  = (ex && ex.lunch_close) || '';
+      var lov  = (ex && ex.lunch_open)  || '';
+      var hasL = !!(ex && ex.lunch_close);
       return '<div class="ob-sch-row">' +
         '<label class="ob-day-toggle">' +
           '<input type="checkbox" id="chk-' + day + '"' + (open ? ' checked' : '') + '>' +
@@ -621,6 +638,14 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
         '</label>' +
         '<div class="ob-day-times' + (open ? '' : ' ob-closed') + '" id="times-' + day + '">' +
           '<div class="ob-time-pair"><label>Apertura</label><input type="time" id="op-' + day + '" value="' + ov + '"></div>' +
+          '<label class="ob-lunch-toggle" title="Pausa comida">' +
+            '<input type="checkbox" id="lnch-chk-' + day + '"' + (hasL ? ' checked' : '') + '>' +
+            '<span class="ob-lunch-lbl">🍽</span>' +
+          '</label>' +
+          '<div class="ob-lunch-times' + (hasL ? '' : ' ob-hidden') + '" id="lunch-' + day + '">' +
+            '<div class="ob-time-pair"><label>Cierra</label><input type="time" id="lc-' + day + '" value="' + lcv + '"></div>' +
+            '<div class="ob-time-pair"><label>Reabre</label><input type="time" id="lo-' + day + '" value="' + lov + '"></div>' +
+          '</div>' +
           '<div class="ob-time-pair"><label>Cierre</label><input type="time" id="cl-' + day + '" value="' + cv + '"></div>' +
         '</div>' +
         '</div>';
@@ -631,6 +656,11 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
         var t = document.getElementById('times-' + day);
         if (this.checked) t.classList.remove('ob-closed');
         else t.classList.add('ob-closed');
+      });
+      document.getElementById('lnch-chk-' + day).addEventListener('change', function () {
+        var lt = document.getElementById('lunch-' + day);
+        if (this.checked) lt.classList.remove('ob-hidden');
+        else lt.classList.add('ob-hidden');
       });
     });
   }
@@ -643,10 +673,18 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     DAYS.forEach(function (day) {
       var chk = document.getElementById('chk-' + day);
       if (!chk.checked) { schedule[day] = null; return; }
-      schedule[day] = {
+      var entry = {
         open:  document.getElementById('op-' + day).value || '09:00',
         close: document.getElementById('cl-' + day).value || '19:00'
       };
+      var lnchChk = document.getElementById('lnch-chk-' + day);
+      if (lnchChk && lnchChk.checked) {
+        var lcVal = document.getElementById('lc-' + day).value;
+        var loVal = document.getElementById('lo-' + day).value;
+        if (lcVal) entry.lunch_close = lcVal;
+        if (loVal) entry.lunch_open  = loVal;
+      }
+      schedule[day] = entry;
     });
     var btn = this;
     btn.disabled = true; btn.textContent = 'Guardando…';
