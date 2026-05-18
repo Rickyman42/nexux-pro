@@ -136,16 +136,37 @@
         const planKey = recomendar(data);
         data._plan = planKey;
         const p = PLANES[planKey];
-        return `Con lo que me has contado, el plan que mejor encaja para <strong>${data.salon}</strong> es:<br/><br/>` +
+        const alts = Object.entries(PLANES).filter(([k]) => k !== planKey);
+        return `Con lo que me has contado, el plan ideal para <strong>${data.salon}</strong> es:<br/><br/>` +
           `<div class="lara-plan-card">` +
+          `<div class="lara-plan-badge">⭐ Recomendado</div>` +
           `<div class="lara-plan-header">${p.emoji} <strong>Plan ${p.nombre}</strong> · <span class="lara-plan-price">${p.precio}</span></div>` +
           `<ul class="lara-plan-list">${p.puntos.map(pt => `<li>${pt}</li>`).join('')}</ul>` +
           `<div class="lara-plan-desc">${p.desc}</div>` +
-          `</div>`;
+          `</div>` +
+          `<div class="lara-plan-alts-label">También disponibles:</div>` +
+          alts.map(([k, alt]) =>
+            `<div class="lara-plan-alt">` +
+            `<div class="lara-plan-alt-header">${alt.emoji} <strong>Plan ${alt.nombre}</strong> · <span class="lara-plan-price">${alt.precio}</span></div>` +
+            `<div class="lara-plan-alt-desc">${alt.desc}</div>` +
+            `</div>`
+          ).join('') +
+          `<br/>¿Con cuál te quedas?`;
       },
-      field: null,
-      autoNext: true,
-      autoNextDelay: 1400,
+      field: 'plan_elegido',
+      validate: (v, data) => {
+        const lower = v.toLowerCase();
+        if (lower.includes('starter')) { data._plan = 'starter'; return true; }
+        if (lower.includes('pro')) { data._plan = 'pro'; return true; }
+        if (lower.includes('total')) { data._plan = 'total'; return true; }
+        return false;
+      },
+      suggestions: (data) => {
+        const rec = data._plan || 'pro';
+        return ['starter', 'pro', 'total'].map(k =>
+          k === rec ? `✓ Plan ${PLANES[k].nombre}` : `Plan ${PLANES[k].nombre}`
+        );
+      },
     },
     {
       id: 'telefono',
@@ -258,7 +279,8 @@
     const text = typeof step.bot === 'function' ? step.bot(state.data) : step.bot;
     addMsg(text, 'bot');
     if (step.suggestions) {
-      setTimeout(() => addSuggestions(step.suggestions), 200);
+      const suggs = typeof step.suggestions === 'function' ? step.suggestions(state.data) : step.suggestions;
+      setTimeout(() => addSuggestions(suggs), 200);
     }
     if (step.autoNext) {
       setTimeout(() => {
@@ -305,7 +327,7 @@
     if (!value) return;
     const step = flow[state.step];
     if (!step || !step.field) return;
-    if (!step.validate(value)) {
+    if (!step.validate(value, state.data)) {
       addMsg(value, 'user');
       addTyping();
       await new Promise(r => setTimeout(r, 700));
@@ -606,6 +628,35 @@
   }
 
   /* Plan recommendation card */
+  .lara-plan-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--nx-magnet);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.35rem;
+  }
+  .lara-plan-alts-label {
+    font-size: 0.75rem;
+    color: var(--nx-ink-muted);
+    margin: 0.6rem 0 0.2rem;
+  }
+  .lara-plan-alt {
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-line);
+    border-radius: 10px;
+    padding: 0.55rem 0.8rem;
+    margin-top: 0.35rem;
+  }
+  .lara-plan-alt-header {
+    font-size: 0.83rem;
+    color: var(--nx-ink);
+    margin-bottom: 0.15rem;
+  }
+  .lara-plan-alt-desc {
+    font-size: 0.73rem;
+    color: var(--nx-ink-muted);
+  }
   .lara-plan-card {
     background: var(--nx-void);
     border: 1px solid var(--nx-magnet);
