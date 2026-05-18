@@ -32,6 +32,17 @@ const ownerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=${data.clientI
 const customerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=c_${data.clientId}`;
 const showWhatsApp = !!data.channels.whatsapp?.provider;
 
+const booked = data.metrics.appointmentsBooked;
+const avgPrice = data.services?.length
+  ? data.services.reduce((s, sv) => s + (sv.price || 0), 0) / data.services.length
+  : 30;
+const roiRevenue = Math.round(booked * avgPrice);
+const roiTimeSaved = booked * 5;
+const nextApt = data.nextAppointments?.[0] ?? null;
+const nextAptFormatted = nextApt
+  ? { date: dateFormatter.format(new Date(nextApt.datetime)), time: timeFormatter.format(new Date(nextApt.datetime)) }
+  : null;
+
 const weekdayLabels: [string, string][] = [
   ['monday','Lunes'],['tuesday','Martes'],['wednesday','Miercoles'],
   ['thursday','Jueves'],['friday','Viernes'],['saturday','Sabado'],['sunday','Domingo'],
@@ -199,6 +210,42 @@ function renderAppointmentDate(item: Appointment) {
               ) : (
                 <p class="crm-empty">Las citas reservadas por tu bot aparecerán aquí.</p>
               )}
+            </div>
+          </div>
+
+          <!-- Próxima cita + ROI -->
+          <div class="crm-dash-row2">
+            <div class="crm-card crm-next-apt-card">
+              <h2 class="crm-card-title">Próxima cita</h2>
+              {nextAptFormatted && nextApt ? (
+                <div class="crm-next-apt-content">
+                  <div class="crm-next-apt-time">
+                    <span class="crm-next-apt-date">{nextAptFormatted.date}</span>
+                    <strong class="crm-next-apt-hour">{nextAptFormatted.time}</strong>
+                  </div>
+                  <div>
+                    <div style="font-size:14px;font-weight:600;color:var(--crm-text)">{nextApt.clientName || nextApt.clientPhone}</div>
+                    <div class="crm-muted-p">{nextApt.service}</div>
+                  </div>
+                </div>
+              ) : (
+                <p class="crm-empty">Sin citas próximas</p>
+              )}
+            </div>
+            <div class="crm-card crm-roi-card">
+              <h2 class="crm-card-title">ROI del bot</h2>
+              <div class="crm-roi-grid">
+                <div class="crm-roi-item">
+                  <span class="crm-kpi-lbl">Ingresos generados</span>
+                  <strong class="crm-roi-val crm-roi-green">~{roiRevenue}€</strong>
+                  <span class="crm-roi-sub">{booked} cita{booked !== 1 ? 's' : ''} × ~{Math.round(avgPrice)}€ ticket medio</span>
+                </div>
+                <div class="crm-roi-item">
+                  <span class="crm-kpi-lbl">Tiempo ahorrado</span>
+                  <strong class="crm-roi-val">{roiTimeSaved} min</strong>
+                  <span class="crm-roi-sub">~5 min de llamada por reserva</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -384,7 +431,8 @@ function renderAppointmentDate(item: Appointment) {
       </label>
       <label class="crm-form-lbl">
         Servicio
-        <input type="text" name="service" required placeholder="Corte, tinte…" class="crm-input" />
+        <input type="text" name="service" required placeholder="Corte, tinte…" class="crm-input" list="svc-suggest" autocomplete="off" />
+        <datalist id="svc-suggest"></datalist>
       </label>
       <div class="crm-field-grp">
         <span class="crm-field-lbl">Fecha</span>
@@ -416,7 +464,7 @@ function renderAppointmentDate(item: Appointment) {
     </form>
   </dialog>
 
-  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []) }}>
+  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []), scheduleJson: JSON.stringify(data.schedule ?? {}) }}>
   (function () {
 
     // ── Theme ─────────────────────────────────────────────────────────
@@ -686,48 +734,107 @@ function renderAppointmentDate(item: Appointment) {
         var sunday = new Date(monday);
         sunday.setDate(monday.getDate() + 6);
         if (label) label.textContent = monday.getDate() + '/' + mStr + ' – ' + sunday.getDate() + '/' + (sunday.getMonth() + 1) + '/' + sunday.getFullYear();
+
+        var schedObj = {};
+        try { schedObj = JSON.parse(scheduleJson || '{}'); } catch (_) {}
+        var dayKeyList = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        var minH = 9, maxH = 20;
+        dayKeyList.forEach(function(k) {
+          var s = schedObj[k];
+          if (!s) return;
+          var o = parseInt((s.open || '09:00').split(':')[0], 10);
+          var c = parseInt((s.close || '20:00').split(':')[0], 10);
+          if (o < minH) minH = o;
+          if (c > maxH) maxH = c;
+        });
+        var SLOT_H = 52;
+        var totalH = (maxH - minH) * SLOT_H;
+
         grid.innerHTML = '';
-        for (var i = 0; i < 7; i++) {
-          var day = new Date(monday);
-          day.setDate(monday.getDate() + i);
-          var dayStr = fmtDate(day);
-          var dayApts = apts.filter(function (a) { return fmtDate(new Date(a.datetime)) === dayStr; }).sort(function (a, b) { return new Date(a.datetime) - new Date(b.datetime); });
+        grid.className = 'crm-tac';
+
+        var hdrEl = document.createElement('div');
+        hdrEl.className = 'crm-tac-header';
+        var corner = document.createElement('div');
+        corner.className = 'crm-tac-corner';
+        hdrEl.appendChild(corner);
+        for (var di = 0; di < 7; di++) {
+          var dDay = new Date(monday);
+          dDay.setDate(monday.getDate() + di);
+          var dh2 = document.createElement('div');
+          dh2.className = 'crm-tac-day-hdr' + (isToday(dDay) ? ' today' : '');
+          dh2.innerHTML = '<span class="crm-tac-dn">' + DAY_NAMES[di] + '</span><span class="crm-tac-dd">' + dDay.getDate() + '</span>';
+          hdrEl.appendChild(dh2);
+        }
+        grid.appendChild(hdrEl);
+
+        var scrollEl = document.createElement('div');
+        scrollEl.className = 'crm-tac-scroll';
+
+        var innerEl = document.createElement('div');
+        innerEl.className = 'crm-tac-inner';
+        innerEl.style.height = totalH + 'px';
+
+        var timeColEl = document.createElement('div');
+        timeColEl.className = 'crm-tac-time-col';
+        for (var th3 = minH; th3 <= maxH; th3++) {
+          var tl = document.createElement('div');
+          tl.className = 'crm-tac-time-lbl';
+          tl.style.top = ((th3 - minH) * SLOT_H) + 'px';
+          tl.textContent = pad(th3) + ':00';
+          timeColEl.appendChild(tl);
+        }
+        innerEl.appendChild(timeColEl);
+
+        var colsEl = document.createElement('div');
+        colsEl.className = 'crm-tac-cols';
+
+        for (var ci = 0; ci < 7; ci++) {
+          var cDay = new Date(monday);
+          cDay.setDate(monday.getDate() + ci);
+          var cStr = fmtDate(cDay);
+          var cApts = apts.filter(function(a) { return fmtDate(new Date(a.datetime)) === cStr; });
+
           var col = document.createElement('div');
-          col.className = 'crm-cal-day' + (HIDE_ON_MOBILE.indexOf(i) !== -1 ? ' hide-mobile' : '');
-          var hdr = document.createElement('div');
-          hdr.className = 'crm-cal-day-hdr' + (isToday(day) ? ' today' : '');
-          hdr.innerHTML = DAY_NAMES[i] + '<span class="crm-cal-date">' + day.getDate() + '</span>';
-          col.appendChild(hdr);
-          if (dayApts.length === 0) {
-            var empty = document.createElement('p');
-            empty.className = 'crm-cal-empty-cell';
-            empty.textContent = '–';
-            col.appendChild(empty);
-          } else {
-            dayApts.forEach(function (apt) {
-              var card = document.createElement('div');
-              var st = (apt.status || 'confirmed').toLowerCase();
-              card.className = 'crm-cal-apt ' + st;
-              var tSpan = document.createElement('span'); tSpan.className = 'crm-cal-apt-time'; tSpan.textContent = fmtTime(apt.datetime);
-              var nSpan = document.createElement('span'); nSpan.className = 'crm-cal-apt-name'; nSpan.textContent = apt.clientName || apt.client_name || '';
-              var sSpan = document.createElement('span'); sSpan.className = 'crm-cal-apt-svc'; sSpan.textContent = apt.service || '';
-              card.appendChild(tSpan); card.appendChild(nSpan); card.appendChild(sSpan);
-              if (st !== 'cancelled') {
-                var btn = document.createElement('button');
-                btn.className = 'crm-cal-apt-cancel';
-                btn.textContent = 'Cancelar';
-                btn.addEventListener('click', async function () {
-                  btn.disabled = true;
-                  try { await fetch('/portal-api/appointments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, action: 'cancel', aptId: apt.id }) }); } catch (_) {}
+          col.className = 'crm-tac-col';
+
+          cApts.forEach(function(apt) {
+            var aptD2 = new Date(apt.datetime);
+            var fracH = aptD2.getHours() + aptD2.getMinutes() / 60;
+            var dur = (apt.duration_min || 60) / 60;
+            var top = (fracH - minH) * SLOT_H;
+            var height = Math.max(dur * SLOT_H, 26);
+            if (fracH < minH || fracH >= maxH) return;
+            var st2 = (apt.status || 'confirmed').toLowerCase();
+            var blk = document.createElement('div');
+            blk.className = 'crm-tac-apt ' + st2;
+            blk.style.top = top + 'px';
+            blk.style.height = height + 'px';
+            blk.innerHTML =
+              '<span class="crm-tac-apt-t">' + fmtTime(apt.datetime) + '</span>' +
+              '<span class="crm-tac-apt-n">' + esc(apt.clientName || apt.client_name || '') + '</span>' +
+              '<span class="crm-tac-apt-s">' + esc(apt.service || '') + '</span>';
+            if (st2 !== 'cancelled') {
+              var cb = document.createElement('button');
+              cb.className = 'crm-cal-apt-cancel';
+              cb.textContent = '×';
+              (function(aa, bb) {
+                bb.addEventListener('click', async function() {
+                  bb.disabled = true;
+                  try { await fetch('/portal-api/appointments', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({clientId, action:'cancel', aptId:aa.id}) }); } catch(_){}
                   await loadCalendar();
                 });
-                card.appendChild(btn);
-              }
-              col.appendChild(card);
-            });
-          }
-          grid.appendChild(col);
+              })(apt, cb);
+              blk.appendChild(cb);
+            }
+            col.appendChild(blk);
+          });
+          colsEl.appendChild(col);
         }
+
+        innerEl.appendChild(colsEl);
+        scrollEl.appendChild(innerEl);
+        grid.appendChild(scrollEl);
       }
 
       var calPrev = document.getElementById('cal-prev');
@@ -745,6 +852,8 @@ function renderAppointmentDate(item: Appointment) {
           var dh = document.getElementById('apt-date-val'); if (dh) dh.value = '';
           var th = document.getElementById('apt-time-val'); if (th) th.value = '';
           var dd = document.getElementById('apt-date-display'); if (dd) dd.textContent = 'Selecciona una fecha';
+          var svcList = document.getElementById('svc-suggest');
+          if (svcList) svcList.innerHTML = services.map(function(s) { return '<option value="' + esc(s.name) + '">'; }).join('');
           renderDatePicker(); renderTimePicker();
           if (aptModal instanceof HTMLDialogElement) aptModal.showModal();
         });
@@ -814,7 +923,10 @@ function renderAppointmentDate(item: Appointment) {
               dpSelected = ds;
               if (dpHidden) dpHidden.value = ds;
               if (dpDisplay) dpDisplay.textContent = dd + ' de ' + DP_MONTHS[dpMonth] + ' ' + dpYear;
+              tpSelected = null;
+              var th2 = document.getElementById('apt-time-val'); if (th2) th2.value = '';
               renderDatePicker();
+              renderTimePicker();
             });
           })(d, dateStr);
         }
@@ -828,11 +940,26 @@ function renderAppointmentDate(item: Appointment) {
       if (!tpGrid) return;
       tpGrid.innerHTML = '';
       var pad2 = function (n) { return String(n).padStart(2, '0'); };
-      for (var h = 8; h <= 20; h++) {
+      var dayStart = 8, dayEnd = 20, lunchClose = null, lunchOpen = null;
+      if (dpSelected) {
+        var sched2 = {};
+        try { sched2 = JSON.parse(scheduleJson || '{}'); } catch (_) {}
+        var dow = new Date(dpSelected + 'T12:00:00').getDay();
+        var dowKey = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][dow];
+        var ds = sched2[dowKey];
+        if (ds) {
+          dayStart = parseInt((ds.open || '08:00').split(':')[0], 10);
+          dayEnd = parseInt((ds.close || '20:00').split(':')[0], 10);
+          if (ds.lunch_close) lunchClose = ds.lunch_close;
+          if (ds.lunch_open) lunchOpen = ds.lunch_open;
+        }
+      }
+      for (var h = dayStart; h <= dayEnd; h++) {
         for (var mi = 0; mi < 2; mi++) {
           var m = mi * 30;
-          if (h === 20 && m === 30) continue;
+          if (h === dayEnd && m > 0) continue;
           var slot = pad2(h) + ':' + pad2(m);
+          if (lunchClose && lunchOpen && slot >= lunchClose && slot < lunchOpen) continue;
           (function (sl) {
             var btn = document.createElement('button');
             btn.type = 'button';
@@ -842,6 +969,9 @@ function renderAppointmentDate(item: Appointment) {
             tpGrid.appendChild(btn);
           })(slot);
         }
+      }
+      if (!tpGrid.children.length) {
+        tpGrid.innerHTML = '<span style="font-size:12px;color:var(--crm-muted)">Día cerrado o sin horario</span>';
       }
     }
 
@@ -1233,6 +1363,54 @@ function renderAppointmentDate(item: Appointment) {
       gap: 0.75rem;
     }
 
+    .crm-dash-row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .crm-next-apt-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .crm-next-apt-time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--crm-nav-active-bg);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      min-width: 72px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .crm-next-apt-date { font-size: 11px; color: var(--crm-muted); }
+    .crm-next-apt-hour { font-size: 24px; font-weight: 700; color: var(--crm-accent); line-height: 1.1; }
+
+    .crm-roi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .crm-roi-item { display: flex; flex-direction: column; gap: 0.2rem; }
+
+    .crm-roi-val {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--crm-text);
+      line-height: 1.1;
+    }
+
+    .crm-roi-green { color: #16a34a; }
+    .crm-dark .crm-roi-green { color: #4ade80; }
+    .crm-roi-sub { font-size: 11px; color: var(--crm-muted); }
+
     .crm-status-card { display: flex; flex-direction: column; }
     .crm-apts-card { min-width: 0; }
 
@@ -1423,6 +1601,95 @@ function renderAppointmentDate(item: Appointment) {
       gap: 0.5rem;
       overflow-x: auto;
     }
+
+    /* ── Time-axis calendar ─────────────────────────────────────────── */
+    .crm-tac { overflow-x: auto; min-width: 0; }
+
+    .crm-tac-header {
+      display: grid;
+      grid-template-columns: 52px repeat(7, 1fr);
+      border-bottom: 1px solid var(--crm-line);
+      position: sticky;
+      top: 0;
+      background: var(--crm-surface);
+      z-index: 1;
+    }
+
+    .crm-tac-corner { min-height: 54px; background: var(--crm-surface); }
+
+    .crm-tac-day-hdr {
+      text-align: center;
+      padding: 0.5rem 0.2rem;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--crm-muted);
+      border-left: 1px solid var(--crm-line);
+    }
+
+    .crm-tac-day-hdr.today .crm-tac-dd { color: var(--crm-accent); }
+    .crm-tac-dn { display: block; }
+    .crm-tac-dd { display: block; font-size: 15px; font-weight: 700; color: var(--crm-text); margin-top: 2px; }
+
+    .crm-tac-scroll { overflow-y: auto; max-height: 520px; }
+
+    .crm-tac-inner {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+    }
+
+    .crm-tac-time-col {
+      position: relative;
+      border-right: 1px solid var(--crm-line);
+    }
+
+    .crm-tac-time-lbl {
+      position: absolute;
+      right: 6px;
+      font-size: 9.5px;
+      color: var(--crm-muted);
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+
+    .crm-tac-cols {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent calc(52px - 1px),
+        var(--crm-line) calc(52px - 1px),
+        var(--crm-line) 52px
+      );
+    }
+
+    .crm-tac-col {
+      position: relative;
+      border-left: 1px solid var(--crm-line);
+    }
+
+    .crm-tac-apt {
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      border-radius: 6px;
+      padding: 2px 5px;
+      font-size: 10.5px;
+      overflow: hidden;
+      background: var(--crm-nav-hover);
+      border: 1px solid var(--crm-line);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      z-index: 1;
+      cursor: default;
+    }
+
+    .crm-tac-apt.confirmed { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); }
+    .crm-tac-apt.cancelled { opacity: 0.4; }
+    .crm-tac-apt-t { font-weight: 700; font-size: 10px; color: var(--crm-text); }
+    .crm-tac-apt-n { font-size: 10px; color: var(--crm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .crm-tac-apt-s { font-size: 9.5px; color: var(--crm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .crm-cal-day { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
 
@@ -1651,6 +1918,14 @@ function renderAppointmentDate(item: Appointment) {
       gap: 0.85rem;
       min-width: 300px;
       max-width: 420px;
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      border-radius: 18px;
+      padding: 1.5rem;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      color: var(--crm-text);
     }
 
     .crm-modal-form h3 { font-size: 16px; font-weight: 700; margin: 0; color: var(--crm-text); }
@@ -1792,6 +2067,7 @@ function renderAppointmentDate(item: Appointment) {
     @media (max-width: 1024px) {
       .crm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .crm-dash-row { grid-template-columns: 1fr; }
+      .crm-dash-row2 { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 768px) {
