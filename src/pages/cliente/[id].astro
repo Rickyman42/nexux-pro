@@ -351,7 +351,7 @@ function renderAppointmentDate(item: Appointment) {
             <span id="apt-dp-month-label"></span>
             <button type="button" id="apt-dp-next">→</button>
           </div>
-          <div class="apt-dp-weekdays">Lu Ma Mi Ju Vi Sá Do</div>
+          <div class="apt-dp-weekdays"><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span><span>Do</span></div>
           <div class="apt-dp-grid" id="apt-dp-grid"></div>
         </div>
         <span class="apt-date-display" id="apt-date-display">Selecciona una fecha</span>
@@ -1557,8 +1557,8 @@ function renderAppointmentDate(item: Appointment) {
       border-radius: 8px;
       border: none;
       background: none;
-      color: var(--nx-ink);
-      font-size: 0.8rem;
+      color: rgba(242,242,236,0.85);
+      font-size: 0.82rem;
       cursor: pointer;
       transition: background 0.12s;
     }
@@ -1566,8 +1566,7 @@ function renderAppointmentDate(item: Appointment) {
     .apt-dp-cell.empty { pointer-events: none; }
 
     .apt-dp-cell.past {
-      color: var(--nx-ink-muted);
-      opacity: 0.3;
+      color: rgba(242,242,236,0.25);
       cursor: default;
     }
 
@@ -1603,9 +1602,9 @@ function renderAppointmentDate(item: Appointment) {
     .apt-time-slot {
       padding: 0.3rem 0.55rem;
       border-radius: 8px;
-      border: 1px solid var(--nx-line);
-      background: rgba(11,13,18,0.55);
-      color: var(--nx-ink-muted);
+      border: 1px solid rgba(242,242,236,0.18);
+      background: rgba(242,242,236,0.05);
+      color: var(--nx-ink);
       font-size: 0.78rem;
       cursor: pointer;
       transition: background 0.12s, color 0.12s, border-color 0.12s;
