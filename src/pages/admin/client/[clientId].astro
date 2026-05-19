@@ -1,0 +1,278 @@
+---
+export const prerender = false;
+
+import Layout from '../../../layouts/Layout.astro';
+
+const ADMIN_SECRET     = import.meta.env.ADMIN_SECRET     || 'nexux-admin-2026';
+const PI_URL           = import.meta.env.NEXUX_CLIENTS_URL || 'https://pi.nexux.pro';
+const PROVISION_SECRET = import.meta.env.PROVISION_SECRET  || '9eb46b31794b43332c8a2358497b18df68174b6111cbdbea7b226ad254f311e0';
+
+const cookieSecret = Astro.cookies.get('nexux_admin')?.value;
+const urlSecret    = Astro.url.searchParams.get('s');
+const authed       = urlSecret === ADMIN_SECRET || cookieSecret === ADMIN_SECRET;
+
+if (!authed) {
+  return new Response('Unauthorized — go to /admin?s=YOUR_SECRET first', { status: 401 });
+}
+
+const { clientId } = Astro.params;
+
+// ── Fetch data from Pi ─────────────────────────────────────────────────────
+const headers = { 'x-provision-secret': PROVISION_SECRET };
+
+let client: any = null;
+let appointments: any[] = [];
+let invoices: any[] = [];
+let error = '';
+
+try {
+  // Admin stats to find this client
+  const statsRes = await fetch(`${PI_URL}/admin/stats`, { headers });
+  if (statsRes.ok) {
+    const stats = await statsRes.json();
+    client = stats.clients?.find((c: any) => c.clientId === clientId) || null;
+  }
+} catch (e: any) { error = e.message; }
+
+// Appointments — use provision secret as Bearer (admin bypass)
+try {
+  const aptRes = await fetch(`${PI_URL}/client/${clientId}/appointments`, {
+    headers: { Authorization: `Bearer ${PROVISION_SECRET}` },
+  });
+  if (aptRes.ok) appointments = await aptRes.json().then((r: any) => r.appointments || r);
+} catch { /* silent */ }
+
+// Invoices
+try {
+  const invRes = await fetch(`${PI_URL}/client/${clientId}/invoices`, {
+    headers: { Authorization: `Bearer ${PROVISION_SECRET}` },
+  });
+  if (invRes.ok) invoices = await invRes.json().then((r: any) => r.invoices || r);
+} catch { /* silent */ }
+
+if (!client) error = error || `Cliente "${clientId}" no encontrado`;
+
+const PLAN_LABEL: Record<string, string> = { starter: 'Starter 249€', pro: 'Pro 449€', total: 'Total 749€' };
+const fmt = (d: string | null) => d ? new Date(d).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+const fmtDt = (d: string) => new Date(d).toLocaleString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const upcoming  = appointments.filter((a: any) => a.status === 'confirmed' && new Date(a.datetime) >= new Date());
+const past      = appointments.filter((a: any) => a.status !== 'confirmed' || new Date(a.datetime) < new Date()).slice(0, 20);
+---
+
+<Layout title={`Admin — ${client?.name || clientId}`}>
+  <style>
+    body { background: #0a0a0a; color: #e5e5e5; font-family: system-ui, sans-serif; margin: 0; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 32px 16px; }
+    a.back { color: #888; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; }
+    a.back:hover { color: #fff; }
+    h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+    .sub { color: #666; font-size: 13px; margin-bottom: 32px; font-family: monospace; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .card { background: #111; border: 1px solid #222; border-radius: 10px; padding: 16px 20px; }
+    .card-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .card-value { font-size: 18px; font-weight: 600; }
+    .chip { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .chip-green { background: #052f1f; color: #22c55e; }
+    .chip-red   { background: #2f0505; color: #ef4444; }
+    .chip-blue  { background: #051a2f; color: #60a5fa; }
+    .chip-yellow{ background: #2f2005; color: #facc15; }
+    section { margin-bottom: 32px; }
+    h2 { font-size: 15px; font-weight: 600; color: #aaa; margin: 0 0 12px; text-transform: uppercase; letter-spacing: .05em; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: #555; font-weight: 500; padding: 6px 10px; border-bottom: 1px solid #1a1a1a; }
+    td { padding: 8px 10px; border-bottom: 1px solid #141414; vertical-align: top; }
+    tr:hover td { background: #111; }
+    .status-confirmed { color: #22c55e; }
+    .status-cancelled { color: #ef4444; }
+    .status-past      { color: #555; }
+    .empty { color: #444; font-size: 13px; padding: 16px 0; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-row { display: flex; flex-direction: column; gap: 2px; }
+    .info-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: .05em; }
+    .info-val { font-size: 14px; }
+    .portal-link { color: #60a5fa; text-decoration: none; font-size: 12px; }
+    .portal-link:hover { text-decoration: underline; }
+    .error { background: #1a0505; border: 1px solid #3a0a0a; border-radius: 8px; padding: 16px; color: #ef4444; }
+    .inv-status { font-size: 11px; padding: 2px 8px; border-radius: 12px; }
+    .inv-paid   { background: #052f1f; color: #22c55e; }
+    .inv-open   { background: #2f2005; color: #facc15; }
+  </style>
+
+  <div class="wrap">
+    <a class="back" href="/admin">← Volver al panel</a>
+
+    {error && !client ? (
+      <div class="error">⚠️ {error}</div>
+    ) : (
+      <>
+        <h1>{client.name || clientId}</h1>
+        <div class="sub">{clientId}</div>
+
+        <!-- KPI cards -->
+        <div class="grid">
+          <div class="card">
+            <div class="card-label">Plan</div>
+            <div class="card-value">
+              <span class={`chip ${client.active ? 'chip-blue' : 'chip-red'}`}>
+                {PLAN_LABEL[client.plan] || client.plan}
+              </span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-label">Estado</div>
+            <div class="card-value">
+              <span class={`chip ${client.active ? 'chip-green' : 'chip-red'}`}>
+                {client.active ? 'Activo' : 'Inactivo'}
+              </span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-label">MRR</div>
+            <div class="card-value">{client.mrr}€/mes</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Citas totales</div>
+            <div class="card-value">{client.appointmentsTotal}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Próximas confirmadas</div>
+            <div class="card-value">{upcoming.length}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Alta</div>
+            <div class="card-value" style="font-size:15px">{fmt(client.createdAt)}</div>
+          </div>
+        </div>
+
+        <!-- Client info -->
+        <section>
+          <h2>Información del cliente</h2>
+          <div class="card">
+            <div class="info-grid">
+              <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-val">{client.email || '—'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Teléfono</span>
+                <span class="info-val">{client.phone || '—'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Ciudad</span>
+                <span class="info-val">{client.city || '—'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Stripe Customer ID</span>
+                <span class="info-val" style="font-size:12px;font-family:monospace">
+                  {client.stripeCustomerId
+                    ? <a class="portal-link" href={`https://dashboard.stripe.com/customers/${client.stripeCustomerId}`} target="_blank">{client.stripeCustomerId} ↗</a>
+                    : '—'}
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Caduca</span>
+                <span class="info-val">{fmt(client.expiresAt)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Portal cliente</span>
+                <span class="info-val">
+                  <a class="portal-link" href={`/cliente/${clientId}`} target="_blank">nexux.pro/cliente/{clientId} ↗</a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Upcoming appointments -->
+        <section>
+          <h2>Próximas citas ({upcoming.length})</h2>
+          {upcoming.length === 0
+            ? <p class="empty">Sin citas próximas confirmadas.</p>
+            : (
+              <table>
+                <thead>
+                  <tr><th>Fecha</th><th>Cliente</th><th>Servicio</th><th>Teléfono</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                  {upcoming.map((a: any) => (
+                    <tr>
+                      <td>{fmtDt(a.datetime)}</td>
+                      <td>{a.client_name || '—'}</td>
+                      <td>{a.service}</td>
+                      <td>{a.client_phone || '—'}</td>
+                      <td><span class="status-confirmed">✓ Confirmada</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          }
+        </section>
+
+        <!-- Past / cancelled appointments -->
+        <section>
+          <h2>Historial de citas (últimas {past.length})</h2>
+          {past.length === 0
+            ? <p class="empty">Sin historial.</p>
+            : (
+              <table>
+                <thead>
+                  <tr><th>Fecha</th><th>Cliente</th><th>Servicio</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                  {past.map((a: any) => (
+                    <tr>
+                      <td style="color:#666">{fmtDt(a.datetime)}</td>
+                      <td>{a.client_name || '—'}</td>
+                      <td>{a.service}</td>
+                      <td>
+                        {a.status === 'cancelled'
+                          ? <span class="status-cancelled">✗ Cancelada</span>
+                          : <span class="status-past">Pasada</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          }
+        </section>
+
+        <!-- Invoices -->
+        <section>
+          <h2>Facturas ({invoices.length})</h2>
+          {invoices.length === 0
+            ? <p class="empty">Sin facturas en Stripe.</p>
+            : (
+              <table>
+                <thead>
+                  <tr><th>Fecha</th><th>Importe</th><th>Estado</th><th>PDF</th></tr>
+                </thead>
+                <tbody>
+                  {invoices.map((inv: any) => (
+                    <tr>
+                      <td>{new Date(inv.date * 1000).toLocaleDateString('es-ES')}</td>
+                      <td>{(inv.amount / 100).toFixed(2)} {inv.currency?.toUpperCase()}</td>
+                      <td>
+                        <span class={`inv-status ${inv.status === 'paid' ? 'inv-paid' : 'inv-open'}`}>
+                          {inv.status === 'paid' ? 'Pagada' : inv.status}
+                        </span>
+                      </td>
+                      <td>
+                        {inv.pdf
+                          ? <a class="portal-link" href={inv.pdf} target="_blank">Descargar ↗</a>
+                          : inv.hosted_url
+                            ? <a class="portal-link" href={inv.hosted_url} target="_blank">Ver ↗</a>
+                            : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          }
+        </section>
+      </>
+    )}
+  </div>
+</Layout>
