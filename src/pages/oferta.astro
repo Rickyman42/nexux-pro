@@ -1,0 +1,200 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+import CheckoutModal from '../components/CheckoutModal.astro';
+
+const salon = Astro.url.searchParams.get('salon') || '';
+const ciudad = Astro.url.searchParams.get('ciudad') || '';
+const headline = salon
+  ? `${salon}: 30 días para probar Lara sin coste`
+  : 'Tu peluquería: 30 días para probar Lara sin coste';
+---
+<Layout title="Oferta Especial — Nexux Pro" description="Prueba Lara 30 días sin coste. Si no recuperas citas, te devolvemos el dinero.">
+<style>
+  .oferta-hero {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 60px 24px 40px;
+    text-align: center;
+  }
+  .badge {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .headline {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: #111;
+  }
+  .subheadline {
+    font-size: 1.1rem;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  .roi-box {
+    background: #f8f8f8;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 24px;
+    margin: 0 auto 32px;
+    max-width: 500px;
+    text-align: left;
+  }
+  .roi-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: #111; }
+  .roi-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.95rem; color: #333; }
+  .roi-item:last-child { border: none; font-weight: 700; color: #111; }
+  .roi-green { color: #16a34a; font-weight: 700; }
+  .cta-primary {
+    display: inline-block;
+    background: #111;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 16px 36px;
+    border-radius: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    margin-bottom: 12px;
+    transition: background 0.2s;
+  }
+  .cta-primary:hover { background: #333; }
+  .guarantee {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 8px;
+  }
+  .features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin: 32px 0;
+  }
+  .feat {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: #333;
+    max-width: 200px;
+    text-align: left;
+  }
+  .feat strong { display: block; color: #111; margin-bottom: 4px; }
+  .urgency {
+    background: #fff9e6;
+    border: 1px solid #f59e0b;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 24px auto;
+    max-width: 500px;
+    font-size: 0.95rem;
+    color: #92400e;
+  }
+  .divider { border: none; border-top: 1px solid #eee; margin: 40px 0; }
+  .testimonio {
+    max-width: 500px;
+    margin: 0 auto 32px;
+    background: #f8f8f8;
+    border-radius: 12px;
+    padding: 20px 24px;
+    text-align: left;
+  }
+  .testimonio p { font-size: 1rem; line-height: 1.6; color: #333; margin-bottom: 10px; }
+  .testimonio cite { font-size: 0.85rem; color: #888; font-style: normal; }
+</style>
+
+<div class="oferta-hero">
+  <span class="badge">✉️ Email exclusivo</span>
+  <h1 class="headline">{headline}</h1>
+  <p class="subheadline">
+    Lara gestiona todas las citas de tu salón por Telegram, 24 horas al día.
+    Sin cambiar cómo trabajas. Sin aplicaciones nuevas para tus clientas.
+  </p>
+
+  <div class="roi-box">
+    <h3>📊 Cálculo rápido para tu salón</h3>
+    <div class="roi-item">
+      <span>Citas perdidas por semana (media sector)</span>
+      <span>5-7 citas</span>
+    </div>
+    <div class="roi-item">
+      <span>Ticket medio por servicio</span>
+      <span>35-50 €</span>
+    </div>
+    <div class="roi-item">
+      <span>Pérdida mensual estimada</span>
+      <span style="color:#dc2626">-600 a -800 €/mes</span>
+    </div>
+    <div class="roi-item">
+      <span>Coste de Lara (Starter)</span>
+      <span>249 €/mes</span>
+    </div>
+    <div class="roi-item">
+      <span>Retorno neto estimado</span>
+      <span class="roi-green">+350 a +550 €/mes</span>
+    </div>
+  </div>
+
+  <div class="urgency">
+    ⏰ <strong>Oferta hasta el 26 de mayo:</strong> Si contratas antes del lunes, la configuración inicial (valorada en 150€) es gratuita y te ayudamos a activar Lara ese mismo día.
+  </div>
+
+  <button class="cta-primary" data-checkout-plan="starter">
+    Empezar — 30 días sin riesgo
+  </button>
+  <p class="guarantee">
+    ✓ 30 días de garantía de devolución · Sin permanencia · Cancela cuando quieras
+  </p>
+
+  <div class="features">
+    <div class="feat">
+      <strong>💬 Telegram 24h</strong>
+      Lara responde y reserva citas automáticamente, incluso a medianoche.
+    </div>
+    <div class="feat">
+      <strong>⏰ 0 no-shows</strong>
+      Recordatorios automáticos 24h y 1h antes de cada cita.
+    </div>
+    <div class="feat">
+      <strong>📅 Agenda integrada</strong>
+      Las citas van a tu Google Calendar. Tú solo apareces y trabajas.
+    </div>
+    <div class="feat">
+      <strong>⚡ En 20 minutos</strong>
+      Te guiamos paso a paso. Lara empieza a funcionar el mismo día.
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="testimonio">
+    <p>"Antes perdía 3-4 citas por semana porque estaba cortando y no podía coger el teléfono. Desde que usamos Lara, las clientas reservan solas y yo no me entero hasta que llega el resumen del día."</p>
+    <cite>— Carmen R., peluquería en Madrid (usuaria beta)</cite>
+  </div>
+
+  <button class="cta-primary" data-checkout-plan="starter">
+    Activar Lara — 249 €/mes
+  </button>
+  <p class="guarantee">
+    ✓ 30 días de garantía · Sin permanencia · Sin contratos
+  </p>
+</div>
+
+<CheckoutModal />
+<script>
+  import '../scripts/checkout.ts';
+</script>
+</Layout>
