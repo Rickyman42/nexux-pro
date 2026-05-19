@@ -411,7 +411,7 @@ function renderAppointmentDate(item: Appointment) {
             <div class="billing-plan-row">
               <div class="billing-plan-badge">
                 <span class="billing-plan-name">{planLabel}</span>
-                <span class="billing-plan-sub">{data.plan === 'starter' ? '39€/mes' : data.plan === 'pro' ? '79€/mes' : '129€/mes'}</span>
+                <span class="billing-plan-sub">{data.plan === 'starter' ? '249€/mes' : data.plan === 'pro' ? '449€/mes' : '749€/mes'}</span>
               </div>
               <button id="btn-billing-portal" class="crm-btn-primary">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -427,7 +427,7 @@ function renderAppointmentDate(item: Appointment) {
               <div class={`billing-plan-card ${data.plan === 'starter' ? 'current' : ''}`}>
                 <div class="bpc-header">
                   <span class="bpc-name">Starter</span>
-                  <span class="bpc-price">39€<small>/mes</small></span>
+                  <span class="bpc-price">249€<small>/mes</small></span>
                 </div>
                 <ul class="bpc-features">
                   <li>✅ Bot WhatsApp IA</li>
@@ -440,7 +440,7 @@ function renderAppointmentDate(item: Appointment) {
               <div class={`billing-plan-card ${data.plan === 'pro' ? 'current' : ''}`}>
                 <div class="bpc-header">
                   <span class="bpc-name">Pro</span>
-                  <span class="bpc-price">79€<small>/mes</small></span>
+                  <span class="bpc-price">449€<small>/mes</small></span>
                 </div>
                 <ul class="bpc-features">
                   <li>✅ Todo lo de Starter</li>
@@ -453,7 +453,7 @@ function renderAppointmentDate(item: Appointment) {
               <div class={`billing-plan-card ${data.plan === 'total' ? 'current' : ''}`}>
                 <div class="bpc-header">
                   <span class="bpc-name">Total</span>
-                  <span class="bpc-price">129€<small>/mes</small></span>
+                  <span class="bpc-price">749€<small>/mes</small></span>
                 </div>
                 <ul class="bpc-features">
                   <li>✅ Todo lo de Pro</li>
@@ -1120,10 +1120,10 @@ function renderAppointmentDate(item: Appointment) {
           d.invoices.forEach(function(inv) {
             var date = new Date(inv.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
             var amount = inv.amount.toFixed(2) + ' ' + inv.currency;
-            var statusLabel = inv.status === 'paid' ? '<span class=inv-status paid>Pagada</span>' :
-              inv.status === 'open' ? '<span class=inv-status open>Pendiente</span>' :
-              '<span class=inv-status other>' + inv.status + '</span>';
-            var downloadBtn = inv.pdf ? '<a href=' + inv.pdf + ' target=_blank class=inv-dl-btn>PDF</a>' : '';
+            var statusLabel = inv.status === 'paid' ? '<span class="inv-status paid">Pagada</span>' :
+              inv.status === 'open' ? '<span class="inv-status open">Pendiente</span>' :
+              '<span class="inv-status other">' + inv.status + '</span>';
+            var downloadBtn = inv.pdf ? '<a href="' + inv.pdf + '" target="_blank" class="inv-dl-btn">PDF</a>' : '';
             var tr = document.createElement('tr');
             tr.innerHTML = '<td>' + date + '</td><td>' + (inv.description || 'Suscripción Nexux') + '</td><td>' + amount + '</td><td>' + statusLabel + '</td><td>' + downloadBtn + '</td>';
             tbody.appendChild(tr);
@@ -1775,6 +1775,89 @@ function renderAppointmentDate(item: Appointment) {
       overflow-x: auto;
     }
 
+
+    /* ── Billing section ─────────────────────────────────────────── */
+    .billing-plan-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .billing-plan-badge {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .billing-plan-name {
+      font-size: 20px; font-weight: 700; color: var(--crm-text);
+    }
+    .billing-plan-sub {
+      font-size: 13px; color: var(--crm-muted);
+    }
+    .billing-hint {
+      margin: 0; font-size: 12px; color: var(--crm-muted); line-height: 1.5;
+    }
+    .billing-plans-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+    }
+    .billing-plan-card {
+      position: relative;
+      border: 1px solid var(--crm-border); border-radius: 12px;
+      padding: 16px; background: var(--crm-surface);
+      transition: border-color 0.2s;
+    }
+    .billing-plan-card.current {
+      border-color: var(--crm-accent);
+      background: rgba(78,205,196,0.05);
+    }
+    .bpc-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .bpc-name { font-weight: 700; color: var(--crm-text); font-size: 15px; }
+    .bpc-price { font-size: 17px; font-weight: 700; color: var(--crm-accent); }
+    .bpc-price small { font-size: 11px; font-weight: 400; color: var(--crm-muted); }
+    .bpc-features {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .bpc-features li { font-size: 12px; color: var(--crm-muted); }
+    .bpc-current-tag {
+      display: inline-block; margin-top: 12px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--crm-accent); background: rgba(78,205,196,0.1);
+      padding: 3px 8px; border-radius: 999px;
+    }
+    /* ── Invoice table ─────────────────────────────────────────────── */
+    .invoices-loading, .invoices-empty {
+      font-size: 13px; color: var(--crm-text-muted); padding: 12px 0;
+    }
+    .invoices-table {
+      width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px;
+    }
+    .invoices-table th {
+      text-align: left; padding: 8px 10px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--crm-text-muted); border-bottom: 1px solid var(--crm-border);
+    }
+    .invoices-table td {
+      padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--crm-text);
+    }
+    .invoices-table tr:last-child td { border-bottom: none; }
+    .inv-status {
+      display: inline-block; padding: 2px 8px; border-radius: 999px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .inv-status.paid { background: rgba(78,205,196,0.12); color: #4ecdc4; }
+    .inv-status.open { background: rgba(255,200,60,0.12); color: #ffc83c; }
+    .inv-status.other { background: rgba(255,255,255,0.06); color: var(--crm-text-muted); }
+    .inv-dl-btn {
+      font-size: 11px; font-weight: 600; color: var(--crm-accent);
+      text-decoration: none; padding: 3px 10px;
+      border: 1px solid rgba(78,205,196,0.3); border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .inv-dl-btn:hover { background: rgba(78,205,196,0.1); }
+  </style>
+
+<style is:global>
     /* ── Time-axis calendar ─────────────────────────────────────────── */
     .crm-tac { overflow-x: auto; min-width: 0; }
 
@@ -2277,84 +2360,12 @@ function renderAppointmentDate(item: Appointment) {
       .crm-kpi-val { font-size: 22px; }
     }
 
-    /* ── Billing section ─────────────────────────────────────────── */
-    .billing-plan-row {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; flex-wrap: wrap; margin-bottom: 12px;
-    }
-    .billing-plan-badge {
-      display: flex; flex-direction: column; gap: 2px;
-    }
-    .billing-plan-name {
-      font-size: 20px; font-weight: 700; color: var(--crm-text);
-    }
-    .billing-plan-sub {
-      font-size: 13px; color: var(--crm-muted);
-    }
-    .billing-hint {
-      margin: 0; font-size: 12px; color: var(--crm-muted); line-height: 1.5;
-    }
-    .billing-plans-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
-    }
-    .billing-plan-card {
-      position: relative;
-      border: 1px solid var(--crm-border); border-radius: 12px;
-      padding: 16px; background: var(--crm-surface);
-      transition: border-color 0.2s;
-    }
-    .billing-plan-card.current {
-      border-color: var(--crm-accent);
-      background: rgba(78,205,196,0.05);
-    }
-    .bpc-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 12px;
-    }
-    .bpc-name { font-weight: 700; color: var(--crm-text); font-size: 15px; }
-    .bpc-price { font-size: 17px; font-weight: 700; color: var(--crm-accent); }
-    .bpc-price small { font-size: 11px; font-weight: 400; color: var(--crm-muted); }
-    .bpc-features {
-      list-style: none; margin: 0; padding: 0;
-      display: flex; flex-direction: column; gap: 6px;
-    }
-    .bpc-features li { font-size: 12px; color: var(--crm-muted); }
-    .bpc-current-tag {
-      display: inline-block; margin-top: 12px;
-      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--crm-accent); background: rgba(78,205,196,0.1);
-      padding: 3px 8px; border-radius: 999px;
-    }
-    /* ── Invoice table ─────────────────────────────────────────────── */
-    .invoices-loading, .invoices-empty {
-      font-size: 13px; color: var(--crm-text-muted); padding: 12px 0;
-    }
-    .invoices-table {
-      width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px;
-    }
-    .invoices-table th {
-      text-align: left; padding: 8px 10px;
-      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--crm-text-muted); border-bottom: 1px solid var(--crm-border);
-    }
-    .invoices-table td {
-      padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.04);
-      color: var(--crm-text);
-    }
-    .invoices-table tr:last-child td { border-bottom: none; }
-    .inv-status {
-      display: inline-block; padding: 2px 8px; border-radius: 999px;
-      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
-    }
-    .inv-status.paid { background: rgba(78,205,196,0.12); color: #4ecdc4; }
-    .inv-status.open { background: rgba(255,200,60,0.12); color: #ffc83c; }
-    .inv-status.other { background: rgba(255,255,255,0.06); color: var(--crm-text-muted); }
-    .inv-dl-btn {
-      font-size: 11px; font-weight: 600; color: var(--crm-accent);
-      text-decoration: none; padding: 3px 10px;
-      border: 1px solid rgba(78,205,196,0.3); border-radius: 6px;
-      transition: background 0.2s;
-    }
-    .inv-dl-btn:hover { background: rgba(78,205,196,0.1); }
-  </style>
+
+  /* ── Dynamic invoice elements (JS-created) ── */
+  .inv-status { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .inv-status.paid { background: rgba(78,205,196,0.12); color: #4ecdc4; }
+  .inv-status.open { background: rgba(255,200,60,0.12); color: #ffc83c; }
+  .inv-status.other { background: rgba(255,255,255,0.06); color: #6e6e73; }
+  .inv-dl-btn { font-size: 11px; font-weight: 600; color: #2a9d97; text-decoration: none; padding: 3px 10px; border: 1px solid rgba(42,157,151,0.3); border-radius: 6px; }
+</style>
 </Layout>
