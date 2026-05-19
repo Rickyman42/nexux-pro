@@ -118,7 +118,7 @@ const headline = salon
 
 <div class="oferta-hero">
   <span class="badge">✉️ Email exclusivo</span>
-  <h1 class="headline">{headline}</h1>
+  <h1 class="headline" id="oferta-headline">Tu peluquería: 30 días para probar Lara sin coste</h1>
   <p class="subheadline">
     Lara gestiona todas las citas de tu salón por Telegram, 24 horas al día.
     Sin cambiar cómo trabajas. Sin aplicaciones nuevas para tus clientas.
@@ -196,5 +196,16 @@ const headline = salon
 <CheckoutModal />
 <script>
   import '../scripts/checkout.ts';
+</script>
+
+<script>
+  (function() {
+    const p = new URLSearchParams(location.search);
+    const salon = p.get('salon') || '';
+    if (salon) {
+      const el = document.getElementById('oferta-headline');
+      if (el) el.textContent = salon + ': 30 días para probar Lara sin coste';
+    }
+  })();
 </script>
 </Layout>
