@@ -91,6 +91,27 @@ export async function getPublicClientData(clientId: string): Promise<PublicClien
   } catch { return null; }
 }
 
+export interface Invoice {
+  id: string;
+  date: number;
+  amount: number;
+  currency: string;
+  status: string;
+  pdf: string | null;
+  hosted_url: string | null;
+  description: string | null;
+}
+
+export async function getClientInvoices(clientId: string, token: string): Promise<Invoice[]> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/invoices`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return [];
+    return (await response.json()) as Invoice[];
+  } catch { return []; }
+}
+
 export async function getBillingPortalUrl(clientId: string, token: string): Promise<string | null> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/billing-portal`, {

@@ -466,6 +466,24 @@ function renderAppointmentDate(item: Appointment) {
             </div>
             <p class="billing-hint" style="margin-top:16px">Para cambiar de plan usa el botón “Gestionar suscripción” arriba — Stripe te mostrará las opciones disponibles.</p>
           </div>
+
+          <div class="crm-section">
+            <span class="crm-section-lbl">Historial de facturas</span>
+            <div id="invoices-loading" class="invoices-loading">Cargando facturas…</div>
+            <div id="invoices-empty" class="invoices-empty crm-hidden">Sin facturas todavía.</div>
+            <table id="invoices-table" class="invoices-table crm-hidden">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Importe</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="invoices-tbody"></tbody>
+            </table>
+          </div>
         </section>
 
       </main>
@@ -1082,6 +1100,57 @@ function renderAppointmentDate(item: Appointment) {
           billingBtn.textContent = 'Gestionar suscripción';
         }
       });
+    }
+
+    // ── Invoices loader ────────────────────────────────────────────────
+    function loadInvoices() {
+      var loading = document.getElementById('invoices-loading');
+      var empty = document.getElementById('invoices-empty');
+      var table = document.getElementById('invoices-table');
+      var tbody = document.getElementById('invoices-tbody');
+      if (!loading || !tbody) return;
+      fetch('/portal-api/invoices?clientId=' + encodeURIComponent(clientId))
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          loading.classList.add('crm-hidden');
+          if (!d.ok || !d.invoices || d.invoices.length === 0) {
+            empty.classList.remove('crm-hidden');
+            return;
+          }
+          d.invoices.forEach(function(inv) {
+            var date = new Date(inv.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+            var amount = inv.amount.toFixed(2) + ' ' + inv.currency;
+            var statusLabel = inv.status === 'paid' ? '<span class=inv-status paid>Pagada</span>' :
+              inv.status === 'open' ? '<span class=inv-status open>Pendiente</span>' :
+              '<span class=inv-status other>' + inv.status + '</span>';
+            var downloadBtn = inv.pdf ? '<a href=' + inv.pdf + ' target=_blank class=inv-dl-btn>PDF</a>' : '';
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + date + '</td><td>' + (inv.description || 'Suscripción Nexux') + '</td><td>' + amount + '</td><td>' + statusLabel + '</td><td>' + downloadBtn + '</td>';
+            tbody.appendChild(tr);
+          });
+          table.classList.remove('crm-hidden');
+        })
+        .catch(function() {
+          loading.classList.add('crm-hidden');
+          empty.classList.remove('crm-hidden');
+        });
+    }
+
+    // Load invoices when billing nav button is clicked
+    var billingNavBtn = document.querySelector('.crm-nav-btn[data-view=billing]');
+    if (billingNavBtn) {
+      billingNavBtn.addEventListener('click', function() {
+        var table = document.getElementById('invoices-table');
+        if (table && !table.classList.contains('inv-loaded')) {
+          table.classList.add('inv-loaded');
+          loadInvoices();
+        }
+      });
+    }
+    // Also load if billing is the initial view
+    if ((localStorage.getItem('crm-view') || 'dashboard') === 'billing') {
+      var table = document.getElementById('invoices-table');
+      if (table) { table.classList.add('inv-loaded'); loadInvoices(); }
     }
 
   })();
@@ -2256,5 +2325,36 @@ function renderAppointmentDate(item: Appointment) {
       color: var(--crm-accent); background: rgba(78,205,196,0.1);
       padding: 3px 8px; border-radius: 999px;
     }
+    /* ── Invoice table ─────────────────────────────────────────────── */
+    .invoices-loading, .invoices-empty {
+      font-size: 13px; color: var(--crm-text-muted); padding: 12px 0;
+    }
+    .invoices-table {
+      width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px;
+    }
+    .invoices-table th {
+      text-align: left; padding: 8px 10px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--crm-text-muted); border-bottom: 1px solid var(--crm-border);
+    }
+    .invoices-table td {
+      padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--crm-text);
+    }
+    .invoices-table tr:last-child td { border-bottom: none; }
+    .inv-status {
+      display: inline-block; padding: 2px 8px; border-radius: 999px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .inv-status.paid { background: rgba(78,205,196,0.12); color: #4ecdc4; }
+    .inv-status.open { background: rgba(255,200,60,0.12); color: #ffc83c; }
+    .inv-status.other { background: rgba(255,255,255,0.06); color: var(--crm-text-muted); }
+    .inv-dl-btn {
+      font-size: 11px; font-weight: 600; color: var(--crm-accent);
+      text-decoration: none; padding: 3px 10px;
+      border: 1px solid rgba(78,205,196,0.3); border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .inv-dl-btn:hover { background: rgba(78,205,196,0.1); }
   </style>
 </Layout>

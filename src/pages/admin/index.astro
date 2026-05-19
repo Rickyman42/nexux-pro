@@ -1,0 +1,192 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+
+const ADMIN_SECRET = import.meta.env.ADMIN_SECRET;
+const PI_URL = import.meta.env.NEXUX_CLIENTS_URL || 'https://pi.nexux.pro';
+const PROVISION_SECRET = import.meta.env.PROVISION_SECRET;
+
+// Auth check via query param or cookie
+const urlSecret = Astro.url.searchParams.get('s');
+const cookieSecret = Astro.cookies.get('nexux_admin')?.value;
+
+if (!ADMIN_SECRET || (urlSecret !== ADMIN_SECRET && cookieSecret !== ADMIN_SECRET)) {
+  // Show login form
+  if (urlSecret && urlSecret !== ADMIN_SECRET) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+}
+
+const authed = urlSecret === ADMIN_SECRET || cookieSecret === ADMIN_SECRET;
+
+// Set cookie if authenticated via URL param
+if (urlSecret === ADMIN_SECRET && cookieSecret !== ADMIN_SECRET) {
+  Astro.cookies.set('nexux_admin', ADMIN_SECRET, {
+    httpOnly: true, secure: true, sameSite: 'strict',
+    maxAge: 86400 * 7,
+    path: '/admin',
+  });
+}
+
+interface ClientStat {
+  clientId: string;
+  name: string;
+  plan: string;
+  active: boolean;
+  email: string;
+  phone: string;
+  city: string;
+  createdAt: string;
+  stripeCustomerId: string | null;
+  expiresAt: string | null;
+  mrr: number;
+  appointmentsTotal: number;
+  appointmentsUpcoming: number;
+}
+
+interface AdminStats {
+  mrr: number;
+  clientCount: number;
+  activeCount: number;
+  clients: ClientStat[];
+}
+
+let stats: AdminStats | null = null;
+let fetchError = '';
+
+if (authed && PROVISION_SECRET) {
+  try {
+    const resp = await fetch(`${PI_URL}/admin/stats`, {
+      headers: { 'x-provision-secret': PROVISION_SECRET },
+    });
+    if (resp.ok) stats = await resp.json() as AdminStats;
+    else fetchError = `Pi respondió ${resp.status}`;
+  } catch (e: unknown) {
+    fetchError = e instanceof Error ? e.message : 'Error desconocido';
+  }
+}
+
+const planColor: Record<string, string> = {
+  starter: '#4ECDC4',
+  pro: '#6366f1',
+  total: '#f59e0b',
+  demo: '#6b7280',
+};
+---
+<Layout title="Admin — Nexux Pro">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex,nofollow" />
+    <style>
+      body { background: #0a0a0f; color: #e8e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .adm { max-width: 1100px; margin: 0 auto; padding: 32px 16px 64px; }
+      .adm-header { margin-bottom: 32px; }
+      .adm-title { font-size: 22px; font-weight: 800; color: #4ECDC4; margin: 0 0 4px; }
+      .adm-sub { font-size: 13px; color: #6b6b8a; margin: 0; }
+      .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 32px; }
+      .kpi { background: #12121a; border: 1px solid #1e1e2e; border-radius: 14px; padding: 20px; }
+      .kpi-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #6b6b8a; margin: 0 0 6px; }
+      .kpi-val { font-size: 28px; font-weight: 800; color: #e8e8f0; margin: 0; }
+      .kpi-val.green { color: #4ECDC4; }
+      table { width: 100%; border-collapse: collapse; background: #12121a; border: 1px solid #1e1e2e; border-radius: 14px; overflow: hidden; }
+      th { background: #0d0d14; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b6b8a; padding: 12px 14px; text-align: left; border-bottom: 1px solid #1e1e2e; }
+      td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #13131d; vertical-align: middle; }
+      tr:last-child td { border-bottom: none; }
+      tr:hover td { background: rgba(255,255,255,0.02); }
+      .plan-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+      .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+      .active-dot { background: #22c55e; }
+      .inactive-dot { background: #ef4444; }
+      .adm-login { max-width: 380px; margin: 80px auto; background: #12121a; border: 1px solid #1e1e2e; border-radius: 20px; padding: 32px; text-align: center; }
+      .adm-login h1 { font-size: 20px; font-weight: 800; margin: 0 0 24px; }
+      .adm-login input { width: 100%; box-sizing: border-box; background: #0a0a0f; border: 1px solid #2a2a3e; border-radius: 10px; color: #e8e8f0; font-size: 15px; padding: 11px 14px; outline: none; margin-bottom: 14px; }
+      .adm-login button { background: #4ECDC4; color: #0a0a0f; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; padding: 12px 24px; cursor: pointer; width: 100%; }
+      .err { color: #f87171; font-size: 13px; margin: 16px 0 0; }
+      a.portal-link { color: #4ECDC4; text-decoration: none; font-size: 12px; }
+      a.portal-link:hover { text-decoration: underline; }
+    </style>
+  </Fragment>
+
+  {!authed ? (
+    <div class="adm-login">
+      <h1>🔐 Admin Nexux</h1>
+      <form method="get">
+        <input type="password" name="s" placeholder="Contraseña de admin" autofocus />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+  ) : stats ? (
+    <div class="adm">
+      <div class="adm-header">
+        <h1 class="adm-title">nexux.pro — Panel Admin</h1>
+        <p class="adm-sub">Actualizado: {new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })}</p>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <p class="kpi-lbl">MRR</p>
+          <p class="kpi-val green">{stats.mrr}€</p>
+        </div>
+        <div class="kpi">
+          <p class="kpi-lbl">Clientes activos</p>
+          <p class="kpi-val">{stats.activeCount}</p>
+        </div>
+        <div class="kpi">
+          <p class="kpi-lbl">Total clientes</p>
+          <p class="kpi-val">{stats.clientCount}</p>
+        </div>
+        <div class="kpi">
+          <p class="kpi-lbl">ARR estimado</p>
+          <p class="kpi-val green">{stats.mrr * 12}€</p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Estado</th>
+            <th>Salón</th>
+            <th>Plan</th>
+            <th>MRR</th>
+            <th>Email</th>
+            <th>Ciudad</th>
+            <th>Citas</th>
+            <th>Alta</th>
+            <th>Portal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {stats.clients.map(c => (
+            <tr>
+              <td>
+                <span class={`status-dot ${c.active ? 'active-dot' : 'inactive-dot'}`}></span>
+                {c.active ? 'Activo' : 'Inactivo'}
+              </td>
+              <td><strong>{c.name || c.clientId}</strong>{c.phone ? <><br /><span style="color:#6b6b8a;font-size:11px">{c.phone}</span></> : null}</td>
+              <td>
+                <span class="plan-chip" style={`background:${planColor[c.plan] || '#4ECDC4'}22;color:${planColor[c.plan] || '#4ECDC4'}`}>
+                  {c.plan}
+                </span>
+                {c.expiresAt && new Date(c.expiresAt) < new Date() ? <span style="color:#f87171;font-size:10px;display:block">Expirado</span> : null}
+              </td>
+              <td style="color:#4ECDC4;font-weight:700">{c.active ? `${c.mrr}€` : '—'}</td>
+              <td style="font-size:12px">{c.email || '—'}</td>
+              <td style="font-size:12px">{c.city || '—'}</td>
+              <td style="text-align:center">
+                <span style="color:#e8e8f0">{c.appointmentsUpcoming}</span>
+                <span style="color:#3a3a5a"> / {c.appointmentsTotal}</span>
+              </td>
+              <td style="font-size:11px;color:#6b6b8a">{c.createdAt ? new Date(c.createdAt).toLocaleDateString('es-ES') : '—'}</td>
+              <td><a class="portal-link" href={`/admin/client/${c.clientId}`}>ver</a></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <div class="adm">
+      <h1 style="color:#f87171">Error cargando datos</h1>
+      <p>{fetchError}</p>
+    </div>
+  )}
+</Layout>
