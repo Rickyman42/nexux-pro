@@ -92,6 +92,10 @@ function renderAppointmentDate(item: Appointment) {
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
           Configuración
         </button>
+        <button class="crm-nav-btn" data-view="billing">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Facturación
+        </button>
       </nav>
 
       <div class="crm-sidebar-foot">
@@ -396,6 +400,71 @@ function renderAppointmentDate(item: Appointment) {
               })}
               <button type="submit" class="crm-btn-primary">Guardar horario</button>
             </form>
+          </div>
+        </section>
+
+        <!-- ── BILLING ──────────────────────────────────────────────────────────────── -->
+        <section class="crm-view crm-hidden" id="v-billing">
+          <h1 class="crm-view-title">Facturación</h1>
+          <div class="crm-section">
+            <span class="crm-section-lbl">Plan activo</span>
+            <div class="billing-plan-row">
+              <div class="billing-plan-badge">
+                <span class="billing-plan-name">{planLabel}</span>
+                <span class="billing-plan-sub">{data.plan === 'starter' ? '39€/mes' : data.plan === 'pro' ? '79€/mes' : '129€/mes'}</span>
+              </div>
+              <button id="btn-billing-portal" class="crm-btn-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Gestionar suscripción
+              </button>
+            </div>
+            <p class="billing-hint">Cambia de plan, actualiza tu método de pago o cancela desde el portal de Stripe.</p>
+          </div>
+
+          <div class="crm-section">
+            <span class="crm-section-lbl">Planes disponibles</span>
+            <div class="billing-plans-grid">
+              <div class={`billing-plan-card ${data.plan === 'starter' ? 'current' : ''}`}>
+                <div class="bpc-header">
+                  <span class="bpc-name">Starter</span>
+                  <span class="bpc-price">39€<small>/mes</small></span>
+                </div>
+                <ul class="bpc-features">
+                  <li>✅ Bot WhatsApp IA</li>
+                  <li>✅ Hasta 200 conversaciones/mes</li>
+                  <li>✅ Portal de gestión</li>
+                  <li>✅ Citas automáticas</li>
+                </ul>
+                {data.plan === 'starter' && <span class="bpc-current-tag">Plan actual</span>}
+              </div>
+              <div class={`billing-plan-card ${data.plan === 'pro' ? 'current' : ''}`}>
+                <div class="bpc-header">
+                  <span class="bpc-name">Pro</span>
+                  <span class="bpc-price">79€<small>/mes</small></span>
+                </div>
+                <ul class="bpc-features">
+                  <li>✅ Todo lo de Starter</li>
+                  <li>✅ Hasta 600 conversaciones/mes</li>
+                  <li>✅ Recordatorios automáticos</li>
+                  <li>✅ Soporte prioritario</li>
+                </ul>
+                {data.plan === 'pro' && <span class="bpc-current-tag">Plan actual</span>}
+              </div>
+              <div class={`billing-plan-card ${data.plan === 'total' ? 'current' : ''}`}>
+                <div class="bpc-header">
+                  <span class="bpc-name">Total</span>
+                  <span class="bpc-price">129€<small>/mes</small></span>
+                </div>
+                <ul class="bpc-features">
+                  <li>✅ Todo lo de Pro</li>
+                  <li>✅ Conversaciones ilimitadas</li>
+                  <li>✅ Bot Telegram incluido</li>
+                  <li>✅ Onboarding dedicado</li>
+                </ul>
+                {data.plan === 'total' && <span class="bpc-current-tag">Plan actual</span>}
+              </div>
+            </div>
+            <p class="billing-hint" style="margin-top:16px">Para cambiar de plan usa el botón “Gestionar suscripción” arriba — Stripe te mostrará las opciones disponibles.</p>
           </div>
         </section>
 
@@ -990,6 +1059,30 @@ function renderAppointmentDate(item: Appointment) {
     var dpNext = document.getElementById('apt-dp-next');
     if (dpPrev) dpPrev.addEventListener('click', function () { dpMonth--; if (dpMonth < 0) { dpMonth = 11; dpYear--; } renderDatePicker(); });
     if (dpNext) dpNext.addEventListener('click', function () { dpMonth++; if (dpMonth > 11) { dpMonth = 0; dpYear++; } renderDatePicker(); });
+
+    // ── Billing portal button ──────────────────────────────────────────
+    var billingBtn = document.getElementById('btn-billing-portal');
+    if (billingBtn) {
+      billingBtn.addEventListener('click', async function () {
+        billingBtn.disabled = true;
+        billingBtn.textContent = 'Cargando...';
+        try {
+          var r = await fetch('/portal-api/billing?clientId=' + encodeURIComponent(clientId));
+          var d = await r.json();
+          if (d.url) {
+            window.location.href = d.url;
+          } else {
+            showToast('Error al abrir el portal de facturación');
+            billingBtn.disabled = false;
+            billingBtn.textContent = 'Gestionar suscripción';
+          }
+        } catch (_) {
+          showToast('Error de conexión');
+          billingBtn.disabled = false;
+          billingBtn.textContent = 'Gestionar suscripción';
+        }
+      });
+    }
 
   })();
   </script>
@@ -2113,6 +2206,55 @@ function renderAppointmentDate(item: Appointment) {
     @media (max-width: 480px) {
       .crm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .crm-kpi-val { font-size: 22px; }
+    }
+
+    /* ── Billing section ─────────────────────────────────────────── */
+    .billing-plan-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .billing-plan-badge {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .billing-plan-name {
+      font-size: 20px; font-weight: 700; color: var(--crm-text);
+    }
+    .billing-plan-sub {
+      font-size: 13px; color: var(--crm-muted);
+    }
+    .billing-hint {
+      margin: 0; font-size: 12px; color: var(--crm-muted); line-height: 1.5;
+    }
+    .billing-plans-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+    }
+    .billing-plan-card {
+      position: relative;
+      border: 1px solid var(--crm-border); border-radius: 12px;
+      padding: 16px; background: var(--crm-surface);
+      transition: border-color 0.2s;
+    }
+    .billing-plan-card.current {
+      border-color: var(--crm-accent);
+      background: rgba(78,205,196,0.05);
+    }
+    .bpc-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .bpc-name { font-weight: 700; color: var(--crm-text); font-size: 15px; }
+    .bpc-price { font-size: 17px; font-weight: 700; color: var(--crm-accent); }
+    .bpc-price small { font-size: 11px; font-weight: 400; color: var(--crm-muted); }
+    .bpc-features {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .bpc-features li { font-size: 12px; color: var(--crm-muted); }
+    .bpc-current-tag {
+      display: inline-block; margin-top: 12px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--crm-accent); background: rgba(78,205,196,0.1);
+      padding: 3px 8px; border-radius: 999px;
     }
   </style>
 </Layout>

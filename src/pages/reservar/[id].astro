@@ -1,0 +1,233 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { getPublicClientData } from '../../lib/portal-client';
+
+const { id: clientId } = Astro.params;
+if (!clientId) return Astro.redirect('/');
+
+const data = await getPublicClientData(clientId);
+if (!data) return Astro.redirect('/');
+
+const salonName = data.salon_name || data.name || 'Tu salón';
+const services: { name: string; duration: number; price: number }[] = data.services || [];
+---
+<Layout title={`Reservar cita — ${salonName}`}>
+  <div class="bk-root">
+    <header class="bk-header">
+      <h1 class="bk-salon-name">{salonName}</h1>
+      <p class="bk-tagline">Reserva tu cita en segundos</p>
+    </header>
+
+    <form id="bk-form" class="bk-form">
+      <input type="hidden" id="bk-client-id" value={clientId} />
+
+      <div class="bk-field">
+        <label class="bk-label" for="bk-name">Tu nombre</label>
+        <input id="bk-name" class="bk-input" type="text" placeholder="Ana García" required />
+      </div>
+
+      <div class="bk-field">
+        <label class="bk-label" for="bk-phone">Teléfono (WhatsApp)</label>
+        <input id="bk-phone" class="bk-input" type="tel" placeholder="+34 600 000 000" required />
+      </div>
+
+      <div class="bk-field">
+        <label class="bk-label" for="bk-service">Servicio</label>
+        <select id="bk-service" class="bk-input" required>
+          <option value="">Selecciona un servicio</option>
+          {services.length > 0
+            ? services.map(s => (
+                <option value={s.name} data-duration={s.duration}>
+                  {s.name}{s.price > 0 ? ` — ${s.price}€` : ''}
+                </option>
+              ))
+            : <option value="Consulta">Consulta</option>
+          }
+        </select>
+      </div>
+
+      <div class="bk-field">
+        <label class="bk-label" for="bk-date">Fecha</label>
+        <input id="bk-date" class="bk-input" type="date" required />
+      </div>
+
+      <div class="bk-field">
+        <label class="bk-label" for="bk-time">Hora</label>
+        <input id="bk-time" class="bk-input" type="time" step="1800" required />
+      </div>
+
+      <button type="submit" id="bk-submit" class="bk-btn">Reservar cita</button>
+
+      <div id="bk-success" class="bk-success" hidden>
+        <span class="bk-success-icon">✅</span>
+        <p>¡Cita reservada! Nos vemos pronto.</p>
+      </div>
+      <div id="bk-error" class="bk-error" hidden>
+        <p>No se pudo confirmar la cita. Inténtalo de nuevo o llámanos.</p>
+      </div>
+    </form>
+
+    <footer class="bk-footer">
+      <p>Powered by <a href="https://nexux.pro" target="_blank" rel="noopener">nexux.pro</a></p>
+    </footer>
+  </div>
+</Layout>
+
+<script>
+  (function () {
+    var dateInput = document.getElementById('bk-date') as HTMLInputElement;
+    if (dateInput) {
+      var today = new Date();
+      dateInput.min = today.toISOString().split('T')[0];
+      dateInput.value = today.toISOString().split('T')[0];
+    }
+
+    var form = document.getElementById('bk-form') as HTMLFormElement;
+    if (!form) return;
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var btn = document.getElementById('bk-submit') as HTMLButtonElement;
+      var clientId = (document.getElementById('bk-client-id') as HTMLInputElement).value;
+      var name = (document.getElementById('bk-name') as HTMLInputElement).value.trim();
+      var phone = (document.getElementById('bk-phone') as HTMLInputElement).value.trim();
+      var service = (document.getElementById('bk-service') as HTMLSelectElement).value;
+      var date = (document.getElementById('bk-date') as HTMLInputElement).value;
+      var time = (document.getElementById('bk-time') as HTMLInputElement).value;
+
+      if (!name || !phone || !service || !date || !time) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      var datetime = date + 'T' + time + ':00';
+      var serviceEl = document.getElementById('bk-service') as HTMLSelectElement;
+      var duration = serviceEl.selectedOptions[0]?.dataset.duration ? Number(serviceEl.selectedOptions[0].dataset.duration) : 60;
+
+      try {
+        var r = await fetch('/api/book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, client_name: name, client_phone: phone, service, datetime, duration_min: duration }),
+        });
+        var d = await r.json();
+        if (r.ok && d.ok) {
+          form.style.display = 'none';
+          var successEl = document.getElementById('bk-success');
+          if (successEl) successEl.hidden = false;
+        } else {
+          throw new Error('api error');
+        }
+      } catch {
+        var errorEl = document.getElementById('bk-error');
+        if (errorEl) errorEl.hidden = false;
+        btn.disabled = false;
+        btn.textContent = 'Reservar cita';
+      }
+    });
+  })();
+</script>
+
+<style>
+  .bk-root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #0a0a0f;
+    color: #e8e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 32px 16px 64px;
+  }
+  .bk-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .bk-salon-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #4ECDC4;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+  }
+  .bk-tagline {
+    margin: 0;
+    font-size: 14px;
+    color: #6b6b8a;
+  }
+  .bk-form {
+    width: 100%;
+    max-width: 440px;
+    background: #12121a;
+    border: 1px solid #1e1e2e;
+    border-radius: 20px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .bk-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .bk-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6b6b8a;
+  }
+  .bk-input {
+    background: #0a0a0f;
+    border: 1px solid #2a2a3e;
+    border-radius: 10px;
+    color: #e8e8f0;
+    font-size: 15px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+    color-scheme: dark;
+  }
+  .bk-input:focus { border-color: #4ECDC4; }
+  .bk-btn {
+    background: #4ECDC4;
+    color: #0a0a0f;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+  .bk-btn:hover { opacity: 0.9; }
+  .bk-btn:disabled { opacity: 0.5; cursor: default; }
+  .bk-success {
+    text-align: center;
+    padding: 24px 0;
+  }
+  .bk-success-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+  .bk-success p { font-size: 16px; font-weight: 600; color: #4ECDC4; margin: 0; }
+  .bk-error {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    color: #f87171;
+    text-align: center;
+  }
+  .bk-error p { margin: 0; }
+  .bk-footer {
+    margin-top: 32px;
+    font-size: 12px;
+    color: #3a3a5a;
+  }
+  .bk-footer a { color: #4ECDC4; text-decoration: none; }
+</style>

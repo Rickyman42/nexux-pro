@@ -76,6 +76,32 @@ export async function updateClientConfig(clientId: string, token: string, config
   }
 }
 
+export interface PublicClientInfo {
+  clientId: string;
+  salon_name: string;
+  services: { name: string; duration: number; price: number }[];
+  schedule: Record<string, unknown>;
+}
+
+export async function getPublicClientData(clientId: string): Promise<PublicClientInfo | null> {
+  try {
+    const response = await fetch(`${BASE_URL}/public/${clientId}`);
+    if (!response.ok) return null;
+    return (await response.json()) as PublicClientInfo;
+  } catch { return null; }
+}
+
+export async function getBillingPortalUrl(clientId: string, token: string): Promise<string | null> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/billing-portal`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return null;
+    const data = await response.json() as { url?: string };
+    return data.url || null;
+  } catch { return null; }
+}
+
 export async function resendPortalLink(clientId: string, email: string): Promise<void> {
   const url = new URL(`${BASE_URL}/client/${clientId}/resend-link`);
   url.searchParams.set('email', email);
