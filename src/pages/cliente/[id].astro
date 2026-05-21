@@ -252,6 +252,34 @@ function renderAppointmentDate(item: Appointment) {
               </div>
             </div>
           </div>
+
+          <!-- ── Herramientas rápidas ─────────────────────────────── -->
+          <div class="crm-dash-row" style="margin-top:1.5rem">
+            <div class="crm-card" style="flex:1">
+              <h2 class="crm-card-title">⚡ Herramientas rápidas</h2>
+              <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.75rem">
+
+                <!-- Llamada perdida -->
+                <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
+                  <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">📞 <strong style="color:#e2e8f0">Llamada perdida</strong> — Lara contacta al cliente automáticamente</p>
+                  <div style="display:flex;gap:0.5rem">
+                    <input id="missed-call-phone" type="tel" placeholder="Teléfono (ej: 666123456)" style="flex:1;background:#0b0d12;border:1px solid #2d3148;border-radius:6px;padding:0.4rem 0.75rem;color:#e2e8f0;font-size:0.85rem" />
+                    <button id="btn-missed-call" style="background:#4ECDC4;color:#0b0d12;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Enviar</button>
+                  </div>
+                </div>
+
+                <!-- Mini-web -->
+                <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
+                  <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">🌐 <strong style="color:#e2e8f0">Mini-web</strong> — Página con tus servicios y horarios optimizada para Google</p>
+                  <div style="display:flex;gap:0.5rem;align-items:center">
+                    <span id="web-url-display" style="flex:1;font-size:0.82rem;color:#64748b;font-style:italic">No generada aún</span>
+                    <button id="btn-regen-web" style="background:#2d3148;color:#e2e8f0;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Generar web</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- ── CITAS ──────────────────────────────────────── -->
@@ -1077,6 +1105,51 @@ function renderAppointmentDate(item: Appointment) {
     var dpNext = document.getElementById('apt-dp-next');
     if (dpPrev) dpPrev.addEventListener('click', function () { dpMonth--; if (dpMonth < 0) { dpMonth = 11; dpYear--; } renderDatePicker(); });
     if (dpNext) dpNext.addEventListener('click', function () { dpMonth++; if (dpMonth > 11) { dpMonth = 0; dpYear++; } renderDatePicker(); });
+
+
+    // ── Missed call ────────────────────────────────────────────────────
+    var missedBtn = document.getElementById('btn-missed-call');
+    if (missedBtn) {
+      missedBtn.addEventListener('click', async function () {
+        var phone = document.getElementById('missed-call-phone').value.trim().replace(/\s/g, '');
+        if (!phone) { showToast('Introduce el teléfono'); return; }
+        missedBtn.disabled = true; missedBtn.textContent = 'Enviando...';
+        try {
+          var r = await fetch('/portal-api/missed-call', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: clientId, phone: phone }),
+          });
+          var d = await r.json();
+          if (d.ok) {
+            showToast(d.channel === 'whatsapp' ? '✅ Lara le ha escrito por WhatsApp' : '✅ Propietario notificado por Telegram');
+            document.getElementById('missed-call-phone').value = '';
+          } else { showToast('Error: ' + (d.error || 'no disponible')); }
+        } catch (_) { showToast('Error de conexión'); }
+        missedBtn.disabled = false; missedBtn.textContent = 'Enviar';
+      });
+    }
+
+    // ── Regenerate web ─────────────────────────────────────────────────
+    var regenBtn = document.getElementById('btn-regen-web');
+    if (regenBtn) {
+      regenBtn.addEventListener('click', async function () {
+        regenBtn.disabled = true; regenBtn.textContent = 'Generando...';
+        try {
+          var r = await fetch('/portal-api/regenerate-web', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: clientId }),
+          });
+          var d = await r.json();
+          if (d.ok && d.url) {
+            document.getElementById('web-url-display').innerHTML = '<a href="' + d.url + '" target="_blank" style="color:#4ECDC4">' + d.url + '</a>';
+            showToast('✅ Mini-web generada');
+          } else { showToast('Error generando la web: ' + (d.error || '')); }
+        } catch (_) { showToast('Error de conexión'); }
+        regenBtn.disabled = false; regenBtn.textContent = 'Generar web';
+      });
+    }
 
     // ── Billing portal button ──────────────────────────────────────────
     var billingBtn = document.getElementById('btn-billing-portal');
