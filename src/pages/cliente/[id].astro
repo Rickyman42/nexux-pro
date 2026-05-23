@@ -16,8 +16,8 @@ if (!data) {
   return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long' });
-const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' });
+const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' });
+const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });
 
 const todayKey = new Date().toDateString();
 const todayAppointments = data.nextAppointments.filter(item => new Date(item.datetime).toDateString() === todayKey).length;
@@ -310,23 +310,43 @@ function renderAppointmentDate(item: Appointment) {
               <h2 class="crm-card-title">⚡ Herramientas rápidas</h2>
               <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.75rem">
 
-                <!-- Llamada perdida -->
-                <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
-                  <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">📞 <strong style="color:#e2e8f0">Llamada perdida</strong> — Lara contacta al cliente automáticamente</p>
-                  <div style="display:flex;gap:0.5rem">
-                    <input id="missed-call-phone" type="tel" placeholder="Teléfono (ej: 666123456)" style="flex:1;background:#0b0d12;border:1px solid #2d3148;border-radius:6px;padding:0.4rem 0.75rem;color:#e2e8f0;font-size:0.85rem" />
-                    <button id="btn-missed-call" style="background:#4ECDC4;color:#0b0d12;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Enviar</button>
-                  </div>
-                </div>
+                {data.plan === 'starter' ? (
+                  <>
+                    <!-- Llamada perdida — bloqueado en Starter -->
+                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem;opacity:0.6;position:relative">
+                      <div style="position:absolute;top:0.6rem;right:0.75rem;font-size:0.75rem;background:#2d3148;color:#94a3b8;padding:0.2rem 0.5rem;border-radius:99px">Plan Pro</div>
+                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">📞 <strong style="color:#e2e8f0">Llamada perdida</strong> — Lara contacta al cliente automáticamente</p>
+                      <a href="https://nexux.pro/planes" target="_blank" rel="noopener" style="display:inline-block;font-size:0.8rem;color:#4ECDC4;font-weight:600;text-decoration:none;margin-top:0.25rem">Actualizar a Pro para activar →</a>
+                    </div>
 
-                <!-- Mini-web -->
-                <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
-                  <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">🌐 <strong style="color:#e2e8f0">Mini-web</strong> — Página con tus servicios y horarios optimizada para Google</p>
-                  <div style="display:flex;gap:0.5rem;align-items:center">
-                    <span id="web-url-display" style="flex:1;font-size:0.82rem;color:#64748b;font-style:italic">No generada aún</span>
-                    <button id="btn-regen-web" style="background:#2d3148;color:#e2e8f0;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Generar web</button>
-                  </div>
-                </div>
+                    <!-- Mini-web — bloqueado en Starter -->
+                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem;opacity:0.6;position:relative">
+                      <div style="position:absolute;top:0.6rem;right:0.75rem;font-size:0.75rem;background:#2d3148;color:#94a3b8;padding:0.2rem 0.5rem;border-radius:99px">Plan Pro</div>
+                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">🌐 <strong style="color:#e2e8f0">Mini-web</strong> — Página con tus servicios y horarios optimizada para Google</p>
+                      <a href="https://nexux.pro/planes" target="_blank" rel="noopener" style="display:inline-block;font-size:0.8rem;color:#4ECDC4;font-weight:600;text-decoration:none;margin-top:0.25rem">Actualizar a Pro para activar →</a>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <!-- Llamada perdida — activo en Pro/Total -->
+                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
+                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">📞 <strong style="color:#e2e8f0">Llamada perdida</strong> — Lara contacta al cliente automáticamente</p>
+                      <div style="display:flex;gap:0.5rem">
+                        <input id="missed-call-phone" type="tel" placeholder="Teléfono (ej: 666123456)" style="flex:1;background:#0b0d12;border:1px solid #2d3148;border-radius:6px;padding:0.4rem 0.75rem;color:#e2e8f0;font-size:0.85rem" />
+                        <button id="btn-missed-call" style="background:#4ECDC4;color:#0b0d12;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Enviar</button>
+                      </div>
+                    </div>
+
+                    <!-- Mini-web — activo en Pro/Total -->
+                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
+                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">🌐 <strong style="color:#e2e8f0">Mini-web</strong> — Página con tus servicios y horarios optimizada para Google</p>
+                      <div style="display:flex;gap:0.5rem;align-items:center">
+                        <span id="web-url-display" style="flex:1;font-size:0.82rem;color:#64748b;font-style:italic">No generada aún</span>
+                        <button id="btn-regen-web" style="background:#2d3148;color:#e2e8f0;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Generar web</button>
+                      </div>
+                    </div>
+                  </>
+                )}
 
               </div>
             </div>
