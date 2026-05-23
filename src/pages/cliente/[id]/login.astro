@@ -4,6 +4,8 @@ export const prerender = false;
 import Layout from '../../../layouts/Layout.astro';
 
 const { id } = Astro.params;
+const reason = Astro.url.searchParams.get('reason');
+const isExpiredSession = reason === 'session' || reason === 'expired';
 ---
 <Layout
   title="Acceso al portal | Nexux Pro"
@@ -18,10 +20,13 @@ const { id } = Astro.params;
     <div class="container-nx">
       <div class="portal-auth-card">
         <p class="eyebrow">Portal cliente</p>
-        <h1>Sesion caducada o <em>enlace invalido</em></h1>
+        <h1>{isExpiredSession ? 'Vuelve a entrar a tu' : 'Acceso al'} <em>portal</em></h1>
         <p class="portal-auth-copy">
-          Introduce tu email para recibir un nuevo enlace de acceso al portal de tu salon.
+          {isExpiredSession
+            ? 'Por seguridad, te enviamos un enlace nuevo para abrir el panel de tu salon en este dispositivo.'
+            : 'Introduce tu email para recibir un nuevo enlace de acceso al portal de tu salon.'}
         </p>
+        <p class="portal-auth-hint">Solo tienes que hacerlo cuando el enlace anterior haya caducado.</p>
 
         <form id="portal-login-form" class="portal-auth-form">
           <label class="portal-field">
@@ -41,12 +46,20 @@ const { id } = Astro.params;
   <script define:vars={{ clientId: id }}>
     const form = document.getElementById('portal-login-form');
     const message = document.getElementById('portal-login-message');
+    const emailInput = document.getElementById('portal-email');
+    const emailStorageKey = 'portal-email:' + clientId;
+
+    if (emailInput instanceof HTMLInputElement) {
+      emailInput.value = localStorage.getItem(emailStorageKey) || localStorage.getItem('portal-email') || '';
+    }
 
     form?.addEventListener('submit', async event => {
       event.preventDefault();
-      const emailInput = document.getElementById('portal-email');
       const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : '';
       if (!email) return;
+      localStorage.setItem(emailStorageKey, email);
+      localStorage.setItem('portal-email', email);
+      localStorage.setItem('crm-last-client', clientId);
 
       await fetch('/portal-api/resend-link', {
         method: 'POST',
@@ -56,9 +69,6 @@ const { id } = Astro.params;
 
       if (message) {
         message.hidden = false;
-      }
-      if (form instanceof HTMLFormElement) {
-        form.reset();
       }
     });
   </script>
@@ -101,6 +111,13 @@ const { id } = Astro.params;
       margin-top: 1rem;
       color: var(--nx-ink-muted);
       line-height: 1.8;
+    }
+
+    .portal-auth-hint {
+      margin-top: 0.75rem;
+      color: var(--nx-ink-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
     }
 
     .portal-auth-form {

@@ -165,27 +165,6 @@ export async function createAppointmentManual(clientId: string, token: string, d
 
 export async function reportMissedCall(clientId: string, token: string, phone: string): Promise<{ ok: boolean; channel?: string }> {
   try {
-    const response = await fetch(, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization:  },
-      body: JSON.stringify({ phone }),
-    });
-    return await response.json();
-  } catch { return { ok: false }; }
-}
-
-export async function regenerateWeb(clientId: string, token: string): Promise<{ ok: boolean; url?: string }> {
-  try {
-    const response = await fetch(, {
-      method: 'POST',
-      headers: { Authorization:  },
-    });
-    return await response.json();
-  } catch { return { ok: false }; }
-}
-
-export async function reportMissedCall(clientId: string, token: string, phone: string): Promise<{ ok: boolean; channel?: string }> {
-  try {
     const response = await fetch(BASE_URL + '/client/' + clientId + '/missed-call', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },

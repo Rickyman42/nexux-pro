@@ -8,12 +8,12 @@ const { id: clientId } = Astro.params;
 const token = Astro.cookies.get('nexux_token')?.value;
 
 if (!clientId || !token) {
-  return Astro.redirect(`/cliente/${clientId ?? ''}/login`);
+  return Astro.redirect(`/cliente/${clientId ?? ''}/login?reason=session`);
 }
 
 const data = await getClientData(clientId, token);
 if (!data) {
-  return Astro.redirect('/acceso-denegado');
+  return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
 }
 
 const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long' });
@@ -42,6 +42,39 @@ const nextApt = data.nextAppointments?.[0] ?? null;
 const nextAptFormatted = nextApt
   ? { date: dateFormatter.format(new Date(nextApt.datetime)), time: timeFormatter.format(new Date(nextApt.datetime)) }
   : null;
+
+const todayIndex = new Date().getDay();
+const todayScheduleKey = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][todayIndex];
+const todaySchedule = data.schedule?.[todayScheduleKey] ?? null;
+const confirmedTodayAppointments = data.nextAppointments.filter(item => {
+  const itemDate = new Date(item.datetime);
+  return item.status !== 'cancelled' && itemDate.toDateString() === todayKey;
+});
+const defaultServiceDuration = data.services?.length
+  ? Math.round(data.services.reduce((sum, service) => sum + (service.duration || 60), 0) / data.services.length)
+  : 60;
+
+function minutesFromTime(value?: string) {
+  if (!value) return 0;
+  const [hours, minutes] = value.split(':').map(Number);
+  return (hours || 0) * 60 + (minutes || 0);
+}
+
+function estimateOpenMinutes(schedule: typeof todaySchedule) {
+  if (!schedule) return 0;
+  const open = minutesFromTime(schedule.open);
+  const close = minutesFromTime(schedule.close);
+  return Math.max(0, close - open);
+}
+
+const todayOpenMinutes = estimateOpenMinutes(todaySchedule);
+const bookedTodayMinutes = confirmedTodayAppointments.reduce((sum, item) => sum + ((item as any).duration_min || defaultServiceDuration), 0);
+const freeSlotsToday = todayOpenMinutes > 0
+  ? Math.max(0, Math.floor((todayOpenMinutes - bookedTodayMinutes) / Math.max(defaultServiceDuration, 30)))
+  : 0;
+const manualReviewCount = data.active && (data.channels.whatsapp.connected || data.channels.telegram.ownerLinked) ? 0 : 1;
+const manualReviewLabel = manualReviewCount === 0 ? 'Sin intervencion pendiente' : 'Revisar canales';
+const freeSlotsLabel = todayOpenMinutes > 0 ? `${freeSlotsToday} hueco${freeSlotsToday === 1 ? '' : 's'}` : 'Cerrado hoy';
 
 const weekdayLabels: [string, string][] = [
   ['monday','Lunes'],['tuesday','Martes'],['wednesday','Miercoles'],
@@ -127,6 +160,24 @@ function renderAppointmentDate(item: Appointment) {
       </header>
 
       <main class="crm-main">
+
+        <section class="crm-ops-strip" aria-label="Resumen operativo de hoy">
+          <div class="crm-ops-item">
+            <span class="crm-ops-label">Citas hoy</span>
+            <strong class="crm-ops-value">{todayAppointments}</strong>
+            <span class="crm-ops-note">{nextAptFormatted ? `Proxima ${nextAptFormatted.time}` : 'Sin proximas citas'}</span>
+          </div>
+          <div class="crm-ops-item">
+            <span class="crm-ops-label">Mensajes a revisar</span>
+            <strong class="crm-ops-value">{manualReviewCount}</strong>
+            <span class="crm-ops-note">{manualReviewLabel}</span>
+          </div>
+          <div class="crm-ops-item">
+            <span class="crm-ops-label">Huecos libres</span>
+            <strong class="crm-ops-value">{freeSlotsLabel}</strong>
+            <span class="crm-ops-note">Estimado segun horario y duracion media</span>
+          </div>
+        </section>
 
         <!-- ── DASHBOARD ──────────────────────────────────── -->
         <section class="crm-view" id="v-dashboard">
@@ -601,6 +652,8 @@ function renderAppointmentDate(item: Appointment) {
     const overlay = document.getElementById('crm-overlay');
     const navBtns = document.querySelectorAll('.crm-nav-btn');
     const views = document.querySelectorAll('.crm-view');
+    const viewStorageKey = 'crm-view:' + clientId;
+    localStorage.setItem('crm-last-client', clientId);
 
     burger && burger.addEventListener('click', function () { crm.classList.toggle('sidebar-open'); });
     overlay && overlay.addEventListener('click', function () { crm.classList.remove('sidebar-open'); });
@@ -612,7 +665,7 @@ function renderAppointmentDate(item: Appointment) {
       if (el) el.classList.remove('crm-hidden');
       var nb = document.querySelector('.crm-nav-btn[data-view="' + viewId + '"]');
       if (nb) nb.classList.add('active');
-      localStorage.setItem('crm-view', viewId);
+      localStorage.setItem(viewStorageKey, viewId);
       crm.classList.remove('sidebar-open');
     }
 
@@ -620,7 +673,7 @@ function renderAppointmentDate(item: Appointment) {
       btn.addEventListener('click', function () { showView(btn.dataset.view); });
     });
 
-    showView(localStorage.getItem('crm-view') || 'dashboard');
+    showView(localStorage.getItem(viewStorageKey) || localStorage.getItem('crm-view') || 'dashboard');
 
     // ── Toast ─────────────────────────────────────────────────────────
     var toast = document.getElementById('portal-toast');
@@ -1509,6 +1562,48 @@ function renderAppointmentDate(item: Appointment) {
 
     .crm-view { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
     .crm-hidden { display: none !important; }
+
+    .crm-ops-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .crm-ops-item {
+      min-width: 0;
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      border-radius: 14px;
+      padding: 0.95rem 1.1rem;
+      box-shadow: var(--crm-shadow-card);
+      display: grid;
+      gap: 0.2rem;
+    }
+
+    .crm-ops-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--crm-muted);
+    }
+
+    .crm-ops-value {
+      color: var(--crm-text);
+      font-size: 22px;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .crm-ops-note {
+      color: var(--crm-muted);
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .crm-view-hdr {
       display: flex;
@@ -2412,6 +2507,7 @@ function renderAppointmentDate(item: Appointment) {
 
     /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 1024px) {
+      .crm-ops-strip { grid-template-columns: 1fr; }
       .crm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .crm-dash-row { grid-template-columns: 1fr; }
       .crm-dash-row2 { grid-template-columns: 1fr; }
@@ -2429,6 +2525,8 @@ function renderAppointmentDate(item: Appointment) {
     }
 
     @media (max-width: 480px) {
+      .crm-ops-item { padding: 0.85rem 0.95rem; }
+      .crm-ops-value { font-size: 20px; }
       .crm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .crm-kpi-val { font-size: 22px; }
     }
