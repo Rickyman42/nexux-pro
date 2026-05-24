@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     : 'https://nexux.pro';
 
   const params = new URLSearchParams();
-  params.append('ui_mode', 'embedded');
+  params.append('ui_mode', 'embedded_page');
   params.append('mode', 'subscription');
   params.append('return_url', `${origin}/gracias?plan=${plan}`);
   params.append('metadata[plan]', plan);
