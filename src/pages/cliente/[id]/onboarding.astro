@@ -22,7 +22,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
       <div class="ob-prog-track"><div class="ob-prog-fill" id="ob-fill" style="width:0%"></div></div>
       <span class="ob-prog-lbl" id="ob-lbl">Comenzando…</span>
     </div>
-    <a href={`/cliente/${clientId}`} class="ob-skip-all">Saltar</a>
+    <a href={`/cliente/${clientId}`} class="ob-skip-all" id="ob-skip">Saltar</a>
   </header>
 
   <div class="ob-stage">
@@ -35,7 +35,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
         <p class="ob-sub">Configura tu negocio en 5 pasos. Tardas menos de 3 minutos y puedes modificar todo después desde el panel.</p>
         <span class={"ob-plan-pill ob-pill-" + data.plan}>{planLabel}</span>
         <button class="ob-btn-primary" id="btn-start">Empezar configuración →</button>
-        <a href={`/cliente/${clientId}`} class="ob-link-sm">Ya lo tengo configurado, ir al panel</a>
+        <a href={`/cliente/${clientId}`} class="ob-link-sm ob-mark-done">Ya lo tengo configurado, ir al panel</a>
       </div>
     </div>
 
@@ -78,34 +78,41 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
 
     <!-- 3: Canales -->
     <div class="ob-step ob-hidden" id="os-3">
-      <div class="ob-card ob-card-center">
-        <div class="ob-step-hd ob-step-hd-center">
+      <div class="ob-card ob-card-wide">
+        <div class="ob-step-hd">
           <div class="ob-snum">3</div>
           <div>
-            <h2 class="ob-h2">Canales de contacto</h2>
-            <p class="ob-sub">Así te contactarán tus clientes. Puedes conectarlos ahora o más tarde desde el panel.</p>
+            <h2 class="ob-h2">¿Cómo llegan tus clientas?</h2>
+            <p class="ob-sub">Elige el canal principal. Puedes añadir más desde el panel en cualquier momento.</p>
           </div>
         </div>
-        <div class="ob-ch-list">
-          <div class="ob-ch-row">
-            <span class="ob-ch-icon">📱</span>
-            <div class="ob-ch-info">
-              <strong>WhatsApp</strong>
-              <span id="wa-lbl" class="ob-ch-lbl"></span>
-            </div>
-            <span id="wa-badge" class="ob-badge"></span>
-          </div>
-          <div class="ob-ch-row" id="tg-row" style="display:none">
-            <span class="ob-ch-icon">✈️</span>
-            <div class="ob-ch-info">
-              <strong>Telegram</strong>
-              <span class="ob-ch-lbl">Bot activo</span>
-            </div>
-            <span class="ob-badge ob-badge-ok">✓ Listo</span>
-          </div>
+        <div class="ob-canal-grid" id="canal-grid">
+          <button class="ob-canal-opt" data-canal="whatsapp">
+            <span class="ob-canal-icon">📱</span>
+            <strong>WhatsApp</strong>
+            <span class="ob-canal-desc">Mis clientas ya me escriben por WhatsApp</span>
+          </button>
+          <button class="ob-canal-opt" data-canal="tg_group">
+            <span class="ob-canal-icon">💬</span>
+            <strong>Telegram — grupo existente</strong>
+            <span class="ob-canal-desc">Tengo un grupo de Telegram con mis clientas</span>
+          </button>
+          <button class="ob-canal-opt" data-canal="tg_new">
+            <span class="ob-canal-icon">✈️</span>
+            <strong>Telegram — empezamos</strong>
+            <span class="ob-canal-desc">Quiero usar Telegram, empezamos desde cero</span>
+          </button>
+          <button class="ob-canal-opt" data-canal="web">
+            <span class="ob-canal-icon">🌐</span>
+            <strong>Widget web</strong>
+            <span class="ob-canal-desc">Las clientas reservan desde la web del salón</span>
+          </button>
+        </div>
+        <div class="ob-canal-guide ob-hidden" id="canal-guide">
+          <div class="ob-canal-guide-inner" id="canal-guide-inner"></div>
         </div>
         <div class="ob-row-actions ob-single">
-          <button class="ob-btn-primary" id="ch-next">Continuar</button>
+          <button class="ob-btn-primary" id="ch-next" disabled style="opacity:0.45;cursor:not-allowed">Continuar</button>
         </div>
       </div>
     </div>
@@ -165,7 +172,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
         <h2 class="ob-h2">¡Todo listo!</h2>
         <p class="ob-sub">Tu panel está configurado. Edita cualquier ajuste en cualquier momento desde <strong>Configuración</strong> en el menú lateral.</p>
         <div class="ob-fin-list" id="fin-list"></div>
-        <a href={`/cliente/${clientId}`} class="ob-btn-primary ob-btn-lg">Ir al panel →</a>
+        <a href={`/cliente/${clientId}`} class="ob-btn-primary ob-btn-lg" id="ob-finish">Ir al panel →</a>
       </div>
     </div>
 
@@ -475,6 +482,47 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
   .ob-theme-row { gap: 0.6rem; }
   .ob-theme-btn { padding: 0.75rem 0.6rem 0.65rem; font-size: 0.78rem; }
 }
+
+    /* ── Canal selector ────────────────────────────────── */
+    .ob-canal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+    .ob-canal-opt {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem;
+      padding: 1rem 1.1rem;
+      background: var(--ob-input-bg);
+      border: 1.5px solid var(--ob-line);
+      border-radius: 14px;
+      cursor: pointer; text-align: left;
+      color: var(--ob-text);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .ob-canal-opt:hover { border-color: var(--ob-accent); background: var(--ob-accent-lt); }
+    .ob-canal-opt.ob-canal-selected { border-color: var(--ob-accent); background: var(--ob-accent-lt); }
+    .ob-canal-icon { font-size: 1.4rem; }
+    .ob-canal-opt strong { font-size: 0.88rem; }
+    .ob-canal-desc { font-size: 0.77rem; color: var(--ob-muted); line-height: 1.4; }
+    .ob-canal-guide {
+      margin-top: 1rem;
+      padding: 1rem 1.15rem;
+      background: var(--ob-accent-lt);
+      border: 1px solid rgba(42,157,151,0.2);
+      border-radius: 12px;
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--ob-text);
+    }
+    .ob-canal-guide strong { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .ob-canal-guide p { margin: 0.4rem 0; }
+    .ob-canal-guide code { background: rgba(0,0,0,0.08); border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em; }
+    .ob-guide-tip { font-size: 0.78rem !important; color: var(--ob-muted) !important; font-style: italic; margin-top: 0.5rem !important; }
+    .ob-guide-link { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
+    .ob-guide-link a { font-size: 0.8rem; color: var(--ob-accent); word-break: break-all; }
+    .ob-copy-btn { font-size: 0.75rem; padding: 0.2rem 0.6rem; border: 1px solid var(--ob-accent); background: none; color: var(--ob-accent); border-radius: 6px; cursor: pointer; }
+    @media (max-width: 540px) { .ob-canal-grid { grid-template-columns: 1fr; } }
 </style>
 
 <script define:vars={{
@@ -699,26 +747,46 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
   });
 
   /* ════════════════════════════════════════════════════
-     STEP 3 — Canales
+     STEP 3 — Canal selection
   ════════════════════════════════════════════════════ */
   (function () {
-    var waLbl   = document.getElementById('wa-lbl');
-    var waBadge = document.getElementById('wa-badge');
-    if (waConnected) {
-      waLbl.textContent   = 'Tu bot está activo y recibiendo mensajes';
-      waBadge.textContent = '✓ Conectado';
-      waBadge.className   = 'ob-badge ob-badge-ok';
-    } else {
-      waLbl.textContent   = 'Conéctalo desde el panel → Canales';
-      waBadge.textContent = '⚡ Pendiente';
-      waBadge.className   = 'ob-badge ob-badge-warn';
-    }
-    if (tgEnabled) {
-      document.getElementById('tg-row').style.display = 'flex';
-    }
-  })();
+    var tgDeepLink = 'https://t.me/NexuxProAssistantBot?start=c_' + clientId;
 
-  document.getElementById('ch-next').addEventListener('click', goNext);
+    var GUIDES = {
+      whatsapp: '<strong>📱 WhatsApp</strong><p>Te enviaremos los pasos para conectar tu número existente al bot Lara. Sin cambiar el número que ya tienen guardado tus clientas.</p><p class="ob-guide-tip">Desde el panel → <em>Canales</em> podrás escanear el QR cuando estés lista.</p>',
+      tg_group: '<strong>💬 Telegram — grupo existente</strong><p>Añade a <code>@NexuxProAssistantBot</code> como administrador de tu grupo de Telegram. Lara empezará a responder automáticamente a las clientas del grupo.</p><p class="ob-guide-tip">Pasos: Grupo → Miembros → Añadir admin → Busca @NexuxProAssistantBot</p>',
+      tg_new:   '<strong>✈️ Telegram — empezamos desde cero</strong><p>Comparte este enlace con tus clientas. Las que lo abran podrán chatear directamente con Lara para pedir cita.</p><div class="ob-guide-link"><a href="' + tgDeepLink + '" target="_blank">' + tgDeepLink + '</a><button onclick="navigator.clipboard.writeText('' + tgDeepLink + '')" class="ob-copy-btn">Copiar</button></div><p class="ob-guide-tip">Ponlo en tu bio de Instagram, en tu estado de WhatsApp o imprímelo como QR para el mostrador.</p>',
+      web:      '<strong>🌐 Widget web</strong><p>Añade el widget de citas de Nexux a tu página web. Tus clientas podrán reservar directamente desde la web sin necesidad de ninguna app.</p><p class="ob-guide-tip">Desde el panel → <em>Canales</em> encontrarás el código de instalación listo para copiar y pegar.</p>',
+    };
+
+    var LABELS = {
+      whatsapp: 'WhatsApp', tg_group: 'Telegram (grupo)', tg_new: 'Telegram (deeplink)', web: 'Widget web',
+    };
+
+    var chNext  = document.getElementById('ch-next');
+    var guide   = document.getElementById('canal-guide');
+    var guideIn = document.getElementById('canal-guide-inner');
+    var chosen  = null;
+
+    document.querySelectorAll('.ob-canal-opt').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.ob-canal-opt').forEach(function (b) { b.classList.remove('ob-canal-selected'); });
+        this.classList.add('ob-canal-selected');
+        chosen = this.dataset.canal;
+        guideIn.innerHTML = GUIDES[chosen] || '';
+        guide.classList.remove('ob-hidden');
+        chNext.disabled = false;
+        chNext.style.opacity = '';
+        chNext.style.cursor  = '';
+      });
+    });
+
+    chNext.addEventListener('click', function () {
+      if (!chosen) return;
+      finishItems.push('Canal: ' + LABELS[chosen]);
+      goNext();
+    });
+  })();
 
   /* ════════════════════════════════════════════════════
      STEP 4 — Tema
@@ -754,6 +822,17 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
 
   /* ── Init ─────────────────────────────────────────── */
   setProgress(0);
+
+  /* ── Marcar onboarding como visto ─────────────────── */
+  function markDone() {
+    try { localStorage.setItem('nx_ob_' + clientId, '1'); } catch(e) {}
+  }
+  var skipEl   = document.getElementById('ob-skip');
+  var finishEl = document.getElementById('ob-finish');
+  var doneEls  = document.querySelectorAll('.ob-mark-done');
+  if (skipEl)   skipEl.addEventListener('click', markDone);
+  if (finishEl) finishEl.addEventListener('click', markDone);
+  doneEls.forEach(function(el){ el.addEventListener('click', markDone); });
 
 })();
 </script>
