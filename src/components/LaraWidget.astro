@@ -1,7 +1,8 @@
 ---
+const { trial = false } = Astro.props;
 ---
 <!-- Floating launcher button -->
-<button id="lara-launcher" class="lara-launcher" aria-label="Habla con Lara" data-track="lara_open">
+<button id="lara-launcher" class="lara-launcher" aria-label="Habla con Lara" data-track="lara_open" data-trial={trial ? "1" : "0"}>
   <div class="lara-launcher-inner">
     <div class="lara-avatar-mini">L</div>
     <div class="lara-launch-text">
@@ -89,7 +90,7 @@
     return 'starter';
   }
 
-  const flow = [
+  const FLOW_STANDARD = [
     {
       id: 'welcome',
       bot: '¡Hola! 👋 Soy Lara, la asistente IA que gestiona peluquerías mientras las dueñas trabajan.<br/><br/>¿Cómo te llamas?',
@@ -188,6 +189,47 @@
       showCTA: true,
     },
   ];
+
+
+  // ── TRIAL FLOW (prueba gratis) ─────────────────────────────────────────
+  const FLOW_TRIAL = [
+    {
+      id: 'welcome',
+      bot: '¡Hola! 👋 Soy Lara.<br/><br/>Voy a activarte la prueba gratis en menos de 24h. Es muy rápido. ¿Cómo te llamas?',
+      field: 'nombre',
+      validate: v => v.length >= 2,
+    },
+    {
+      id: 'salon',
+      bot: (data) => `Encantada, ${data.nombre} 🌸. ¿Cómo se llama tu salón?`,
+      field: 'salon',
+      validate: v => v.length >= 2,
+    },
+    {
+      id: 'canal',
+      bot: '¿Por dónde te contactan más tus clientas?',
+      field: 'canal',
+      validate: v => v.length >= 2,
+      suggestions: ['WhatsApp', 'Instagram', 'Teléfono', 'Por todos lados'],
+    },
+    {
+      id: 'telefono',
+      bot: (data) => `Perfecto. Para activar Lara en <strong>${data.salon}</strong> solo necesito tu número de WhatsApp.<br/><br/>Te confirmo la activación en menos de 24h — gratis, sin tarjeta.`,
+      field: 'telefono',
+      validate: v => /^[+\d\s\-()]{9,}$/.test(v),
+    },
+    {
+      id: 'final',
+      bot: (data) => `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu prueba gratuita para <strong>${data.salon}</strong>. En menos de 24h recibirás un mensaje en el ${data.telefono} para activar Lara.<br/><br/><em>Sin tarjeta · Sin compromisos · 7 días para probarlo todo</em>`,
+      field: null,
+      final: true,
+      showCTA: false,
+    },
+  ];
+
+  // Detect trial mode from launcher data attribute
+  const IS_TRIAL = document.getElementById('lara-launcher')?.dataset?.trial === '1';
+  const flow = IS_TRIAL ? FLOW_TRIAL : FLOW_STANDARD;
 
   const state = {
     step: 0,

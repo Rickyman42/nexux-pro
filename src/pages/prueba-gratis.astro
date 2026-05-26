@@ -1,0 +1,189 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import LaraWidget from '../components/LaraWidget.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout
+  title="7 días gratis con Lara — Nexux Pro"
+  description="Prueba Lara gratis 7 días. Tu asistente IA responde WhatsApp y gestiona citas 24h. Sin tarjeta, sin permanencia."
+  canonical="https://nexux.pro/prueba-gratis"
+>
+  <Nav />
+
+  <main class="prueba-wrap">
+    <section class="prueba-hero">
+      <div class="container-nx">
+        <div class="prueba-badge">🎯 Oferta limitada · Sin tarjeta</div>
+        <h1 class="prueba-title">
+          7 días con Lara<br/>
+          <span class="prueba-accent">completamente gratis</span>
+        </h1>
+        <p class="prueba-sub">
+          Lara responde a tus clientas por WhatsApp 24h, agenda citas y manda recordatorios.<br/>
+          Lo configuro en menos de una hora. Si no te convence, se apaga y no pagas nada.
+        </p>
+
+        <div class="prueba-features">
+          <div class="prueba-feat">
+            <div class="prueba-feat-icon">💬</div>
+            <div>
+              <strong>WhatsApp 24h sin app nueva</strong>
+              <span>Lara responde desde tu número actual</span>
+            </div>
+          </div>
+          <div class="prueba-feat">
+            <div class="prueba-feat-icon">📅</div>
+            <div>
+              <strong>Agenda citas automáticamente</strong>
+              <span>Sin errores, sin dobles reservas</span>
+            </div>
+          </div>
+          <div class="prueba-feat">
+            <div class="prueba-feat-icon">🔔</div>
+            <div>
+              <strong>Recordatorios automáticos</strong>
+              <span>Cero no-shows sin llamar a nadie</span>
+            </div>
+          </div>
+          <div class="prueba-feat">
+            <div class="prueba-feat-icon">📊</div>
+            <div>
+              <strong>Resumen diario al cierre</strong>
+              <span>Todo lo que pasó en tu salón</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="prueba-cta" id="prueba-open-lara">
+          Quiero mis 7 días gratis →
+        </button>
+
+        <p class="prueba-disclaimer">
+          Sin tarjeta · Sin permanencia · Cancela cuando quieras
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <LaraWidget trial={true} />
+  <Footer />
+</Layout>
+
+<script is:inline>
+  // Auto-open Lara after 1.5s if came from email
+  (function() {
+    const params = new URLSearchParams(location.search);
+    const fromEmail = params.get('ref') === 'email';
+
+    document.getElementById('prueba-open-lara').addEventListener('click', function() {
+      const launcher = document.getElementById('lara-launcher');
+      if (launcher) launcher.click();
+    });
+
+    if (fromEmail) {
+      setTimeout(function() {
+        const launcher = document.getElementById('lara-launcher');
+        if (launcher) launcher.click();
+      }, 1500);
+    }
+  })();
+</script>
+
+<style>
+  .prueba-wrap {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5rem 0 4rem;
+  }
+  .prueba-hero { padding: 0; }
+  .prueba-badge {
+    display: inline-block;
+    background: var(--nx-magnet-halo);
+    color: var(--nx-magnet);
+    border: 1px solid rgba(78,205,196,0.3);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-bottom: 1.5rem;
+  }
+  .prueba-title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--nx-ink);
+    margin: 0 0 1.25rem;
+  }
+  .prueba-accent { color: var(--nx-magnet); }
+  .prueba-sub {
+    font-size: 1.1rem;
+    color: var(--nx-ink-muted);
+    line-height: 1.7;
+    max-width: 560px;
+    margin: 0 0 2.5rem;
+  }
+  .prueba-features {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    max-width: 520px;
+  }
+  .prueba-feat {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-line);
+    border-radius: 12px;
+    padding: 0.875rem 1.1rem;
+  }
+  .prueba-feat-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+  }
+  .prueba-feat strong {
+    display: block;
+    font-size: 0.92rem;
+    color: var(--nx-ink);
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+  }
+  .prueba-feat span {
+    font-size: 0.8rem;
+    color: var(--nx-ink-muted);
+  }
+  .prueba-cta {
+    background: linear-gradient(135deg, var(--nx-magnet), var(--nx-magnet-deep));
+    color: var(--nx-void);
+    border: none;
+    border-radius: 14px;
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--nx-font-sans);
+    transition: all 0.25s;
+    box-shadow: 0 12px 30px -8px rgba(78,205,196,0.4);
+    display: block;
+    margin-bottom: 0.875rem;
+  }
+  .prueba-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -10px rgba(78,205,196,0.5);
+  }
+  .prueba-disclaimer {
+    font-size: 0.78rem;
+    color: var(--nx-ink-faint);
+    margin: 0;
+  }
+  @media (max-width: 640px) {
+    .prueba-wrap { padding: 4rem 0 3rem; }
+  }
+</style>
