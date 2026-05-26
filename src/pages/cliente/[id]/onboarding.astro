@@ -755,7 +755,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     var GUIDES = {
       whatsapp: '<strong>📱 WhatsApp</strong><p>Te enviaremos los pasos para conectar tu número existente al bot Lara. Sin cambiar el número que ya tienen guardado tus clientas.</p><p class="ob-guide-tip">Desde el panel → <em>Canales</em> podrás escanear el QR cuando estés lista.</p>',
       tg_group: '<strong>💬 Telegram — grupo existente</strong><p>Añade a <code>@NexuxProAssistantBot</code> como administrador de tu grupo de Telegram. Lara empezará a responder automáticamente a las clientas del grupo.</p><p class="ob-guide-tip">Pasos: Grupo → Miembros → Añadir admin → Busca @NexuxProAssistantBot</p>',
-      tg_new:   '<strong>✈️ Telegram — empezamos desde cero</strong><p>Comparte este enlace con tus clientas. Las que lo abran podrán chatear directamente con Lara para pedir cita.</p><div class="ob-guide-link"><a href="' + tgDeepLink + '" target="_blank">' + tgDeepLink + '</a><button onclick="navigator.clipboard.writeText('' + tgDeepLink + '')" class="ob-copy-btn">Copiar</button></div><p class="ob-guide-tip">Ponlo en tu bio de Instagram, en tu estado de WhatsApp o imprímelo como QR para el mostrador.</p>',
+      tg_new:   '<strong>✈️ Telegram — empezamos desde cero</strong><p>Comparte este enlace con tus clientas. Las que lo abran podrán chatear directamente con Lara para pedir cita.</p><div class="ob-guide-link"><a href="' + tgDeepLink + '" target="_blank">' + tgDeepLink + '</a><button data-copy="' + tgDeepLink + '" class="ob-copy-btn">Copiar</button></div><p class="ob-guide-tip">Ponlo en tu bio de Instagram, en tu estado de WhatsApp o imprímelo como QR para el mostrador.</p>',
       web:      '<strong>🌐 Widget web</strong><p>Añade el widget de citas de Nexux a tu página web. Tus clientas podrán reservar directamente desde la web sin necesidad de ninguna app.</p><p class="ob-guide-tip">Desde el panel → <em>Canales</em> encontrarás el código de instalación listo para copiar y pegar.</p>',
     };
 
@@ -785,6 +785,14 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
       if (!chosen) return;
       finishItems.push('Canal: ' + LABELS[chosen]);
       goNext();
+    });
+    document.addEventListener('click', function(e) {
+      var btn = e.target;
+      if (btn && btn.classList.contains('ob-copy-btn') && btn.dataset.copy) {
+        navigator.clipboard.writeText(btn.dataset.copy).catch(function(){});
+        btn.textContent = '\u00a1Copiado!';
+        setTimeout(function(){ btn.textContent = 'Copiar'; }, 1500);
+      }
     });
   })();
 
