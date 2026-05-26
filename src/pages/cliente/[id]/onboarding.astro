@@ -68,6 +68,31 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
         </div>
         <div id="svc-list" class="ob-svc-list"></div>
         <button class="ob-btn-ghost" id="svc-add">+ Añadir servicio</button>
+
+        <!-- Contexto adicional del negocio (opcional) -->
+        <details class="ob-ctx-details">
+          <summary class="ob-ctx-summary">ℹ️ Información adicional para Lara <span class="ob-ctx-badge">Opcional</span></summary>
+          <div class="ob-ctx-body">
+            <p class="ob-sub ob-ctx-hint">Cuanto más sepa Lara sobre tu negocio, mejor atenderá a tus clientas.</p>
+            <div class="ob-ctx-row">
+              <label class="ob-ctx-label">Ciudad / Barrio</label>
+              <input type="text" id="ctx-city" class="ob-input" placeholder="Ej: Madrid, barrio de Malasaña" maxlength="80" />
+            </div>
+            <div class="ob-ctx-row">
+              <label class="ob-ctx-label">Dirección del salón</label>
+              <input type="text" id="ctx-address" class="ob-input" placeholder="Ej: Calle Fuencarral 12" maxlength="120" />
+            </div>
+            <div class="ob-ctx-row">
+              <label class="ob-ctx-label">Brève descripción del negocio</label>
+              <textarea id="ctx-bio" class="ob-textarea" rows="2" placeholder="Ej: Salón especializado en coloración y cortes modernos desde 2015" maxlength="300"></textarea>
+            </div>
+            <div class="ob-ctx-row">
+              <label class="ob-ctx-label">Política de cancelación</label>
+              <input type="text" id="ctx-cancel" class="ob-input" placeholder="Ej: Se ruega avisar con 24h de antelación" maxlength="200" />
+            </div>
+          </div>
+        </details>
+
         <div class="ob-row-actions">
           <button class="ob-btn-text" id="svc-skip">Omitir por ahora</button>
           <button class="ob-btn-primary" id="svc-save">Guardar y continuar</button>
@@ -707,6 +732,59 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     .ob-tg-qr-actions { margin-top: 0.4rem; }
     .ob-tg-qr-actions a { font-size: 0.78rem; color: var(--ob-accent); text-decoration: none; }
     .ob-tg-qr-actions a:hover { text-decoration: underline; }
+    /* ── Business context optional section ─────────────── */
+    .ob-ctx-details {
+      margin: 1rem 0 0.5rem;
+      border: 1px solid var(--ob-line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .ob-ctx-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ob-muted);
+      list-style: none;
+      user-select: none;
+      background: var(--ob-input-bg);
+    }
+    .ob-ctx-summary::-webkit-details-marker { display: none; }
+    .ob-ctx-summary:hover { color: var(--ob-text); }
+    .ob-ctx-badge {
+      font-size: 0.68rem;
+      background: var(--ob-accent-lt);
+      color: var(--ob-accent);
+      border-radius: 20px;
+      padding: 0.1rem 0.5rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .ob-ctx-body {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .ob-ctx-hint { margin: 0 0 0.25rem; font-size: 0.8rem; }
+    .ob-ctx-row { display: flex; flex-direction: column; gap: 0.3rem; }
+    .ob-ctx-label { font-size: 0.78rem; font-weight: 600; color: var(--ob-muted); }
+    .ob-textarea {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--ob-line);
+      border-radius: 8px;
+      background: var(--ob-input-bg);
+      color: var(--ob-text);
+      font-size: 0.88rem;
+      resize: vertical;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .ob-textarea:focus { outline: none; border-color: var(--ob-accent); }
 </style>
 
 <script define:vars={{
@@ -851,7 +929,16 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
   document.getElementById('svc-save').addEventListener('click', function () {
     var btn = this;
     btn.disabled = true; btn.textContent = 'Guardando…';
-    saveConfig({ services: services }, function (ok) {
+    var ctxPayload = { services: services };
+    var ctxCity   = (document.getElementById('ctx-city')   || {}).value || '';
+    var ctxAddr   = (document.getElementById('ctx-address') || {}).value || '';
+    var ctxBio    = (document.getElementById('ctx-bio')     || {}).value || '';
+    var ctxCancel = (document.getElementById('ctx-cancel')  || {}).value || '';
+    if (ctxCity)   ctxPayload.city                = ctxCity.trim();
+    if (ctxAddr)   ctxPayload.address             = ctxAddr.trim();
+    if (ctxBio)    ctxPayload.bio                 = ctxBio.trim();
+    if (ctxCancel) ctxPayload.cancellation_policy = ctxCancel.trim();
+    saveConfig(ctxPayload, function (ok) {
       btn.disabled = false; btn.textContent = 'Guardar y continuar';
       if (ok && services.length) finishItems.push(services.length + ' servicio' + (services.length === 1 ? '' : 's') + ' configurado' + (services.length === 1 ? '' : 's'));
       trackOb('ob_svc_saved', { count: services.length, ok: ok });
