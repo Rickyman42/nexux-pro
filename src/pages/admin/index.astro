@@ -43,12 +43,16 @@ interface ClientStat {
   mrr: number;
   appointmentsTotal: number;
   appointmentsUpcoming: number;
+  canal: string;
+  obDone: boolean;
+  obStarted: boolean;
 }
 
 interface AdminStats {
   mrr: number;
   clientCount: number;
   activeCount: number;
+  obDoneCount: number;
   clients: ClientStat[];
 }
 
@@ -139,6 +143,10 @@ const planColor: Record<string, string> = {
           <p class="kpi-lbl">ARR estimado</p>
           <p class="kpi-val green">{stats.mrr * 12}€</p>
         </div>
+        <div class="kpi">
+          <p class="kpi-lbl">Onboarding completado</p>
+          <p class="kpi-val">{stats.obDoneCount ?? 0}<span style="font-size:14px;color:#6b6b8a"> / {stats.clientCount}</span></p>
+        </div>
       </div>
 
       <table>
@@ -147,6 +155,8 @@ const planColor: Record<string, string> = {
             <th>Estado</th>
             <th>Salón</th>
             <th>Plan</th>
+            <th>Canal</th>
+            <th>Onboarding</th>
             <th>MRR</th>
             <th>Email</th>
             <th>Ciudad</th>
@@ -168,6 +178,17 @@ const planColor: Record<string, string> = {
                   {c.plan}
                 </span>
                 {c.expiresAt && new Date(c.expiresAt) < new Date() ? <span style="color:#f87171;font-size:10px;display:block">Expirado</span> : null}
+              </td>
+              <td style="font-size:12px">
+                {c.canal === 'whatsapp' ? '📱 WhatsApp' :
+                 c.canal === 'telegram' ? '✈️ Telegram' :
+                 c.canal === 'whatsapp_pending' ? <span style="color:#f59e0b">📱 WA pendiente</span> :
+                 <span style="color:#6b6b8a">—</span>}
+              </td>
+              <td style="font-size:12px;text-align:center">
+                {c.obDone ? <span style="color:#22c55e">✓ Hecho</span> :
+                 c.obStarted ? <span style="color:#f59e0b">En curso</span> :
+                 <span style="color:#6b6b8a">Pendiente</span>}
               </td>
               <td style="color:#4ECDC4;font-weight:700">{c.active ? `${c.mrr}€` : '—'}</td>
               <td style="font-size:12px">{c.email || '—'}</td>
