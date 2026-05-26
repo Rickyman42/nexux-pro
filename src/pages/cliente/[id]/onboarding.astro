@@ -779,6 +779,17 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     }).then(function (r) { cb(r.ok); }).catch(function () { cb(false); });
   }
 
+  /* ── Analytics ──────────────────────────────────────── */
+  function trackOb(event, data) {
+    try {
+      fetch('/api/analytics/ob', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: event, clientId: clientId, data: data || {} }),
+      }).catch(function () {});
+    } catch(e) {}
+  }
+
   /* ── Utils ────────────────────────────────────────── */
   function esc(s) {
     return String(s)
@@ -789,7 +800,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
   /* ════════════════════════════════════════════════════
      STEP 0 — Bienvenida
   ════════════════════════════════════════════════════ */
-  document.getElementById('btn-start').addEventListener('click', function () { showStep(1); });
+  document.getElementById('btn-start').addEventListener('click', function () { trackOb('ob_step', { step: 1, name: 'servicios' }); showStep(1); });
 
   /* ════════════════════════════════════════════════════
      STEP 1 — Servicios
@@ -835,7 +846,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     renderSvcs();
   });
 
-  document.getElementById('svc-skip').addEventListener('click', goNext);
+  document.getElementById('svc-skip').addEventListener('click', function() { trackOb('ob_svc_skipped', {}); goNext(); });
 
   document.getElementById('svc-save').addEventListener('click', function () {
     var btn = this;
@@ -843,6 +854,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     saveConfig({ services: services }, function (ok) {
       btn.disabled = false; btn.textContent = 'Guardar y continuar';
       if (ok && services.length) finishItems.push(services.length + ' servicio' + (services.length === 1 ? '' : 's') + ' configurado' + (services.length === 1 ? '' : 's'));
+      trackOb('ob_svc_saved', { count: services.length, ok: ok });
       goNext();
     });
   });
@@ -898,7 +910,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
   }
   renderSch();
 
-  document.getElementById('sch-skip').addEventListener('click', goNext);
+  document.getElementById('sch-skip').addEventListener('click', function() { trackOb('ob_sch_skipped', {}); goNext(); });
 
   document.getElementById('sch-save').addEventListener('click', function () {
     var schedule = {};
@@ -926,6 +938,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
         var openCount = Object.values(schedule).filter(function (v) { return v !== null; }).length;
         finishItems.push('Horario: ' + openCount + ' día' + (openCount === 1 ? '' : 's') + ' configurado' + (openCount === 1 ? '' : 's'));
       }
+      trackOb('ob_sch_saved', { ok: ok });
       goNext();
     });
   });
@@ -974,12 +987,14 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
         chNext.disabled = false;
         chNext.style.opacity = '';
         chNext.style.cursor  = '';
+        trackOb('ob_canal_selected', { canal: chosen });
       });
     });
 
     chNext.addEventListener('click', function () {
       if (!chosen) return;
       finishItems.push('Canal: ' + LABELS[chosen]);
+      trackOb('ob_canal_confirmed', { canal: chosen });
       goNext();
     });
     document.addEventListener('click', function(e) {
@@ -1006,6 +1021,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
   document.getElementById('th-next').addEventListener('click', function () {
     localStorage.setItem('crm-theme', chosenTheme);
     finishItems.push('Estilo ' + (chosenTheme === 'dark' ? 'oscuro 🌙' : 'claro ☀️') + ' seleccionado');
+    trackOb('ob_theme_set', { theme: chosenTheme });
     renderFinish();
     goNext();
   });
@@ -1026,16 +1042,18 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
 
   /* ── Init ─────────────────────────────────────────── */
   setProgress(0);
+  trackOb('ob_start', {});
 
   /* ── Marcar onboarding como visto ─────────────────── */
   function markDone() {
     try { localStorage.setItem('nx_ob_' + clientId, '1'); } catch(e) {}
+    trackOb('ob_mark_done', {});
   }
   var skipEl   = document.getElementById('ob-skip');
   var finishEl = document.getElementById('ob-finish');
   var doneEls  = document.querySelectorAll('.ob-mark-done');
-  if (skipEl)   skipEl.addEventListener('click', markDone);
-  if (finishEl) finishEl.addEventListener('click', markDone);
+  if (skipEl)   skipEl.addEventListener('click', function() { trackOb('ob_skipped', {}); markDone(); });
+  if (finishEl) finishEl.addEventListener('click', function() { trackOb('ob_complete', {}); markDone(); });
   doneEls.forEach(function(el){ el.addEventListener('click', markDone); });
 
 })();
