@@ -93,6 +93,7 @@ function renderAppointmentDate(item: Appointment) {
 >
   <Fragment slot="head">
     <meta name="robots" content="noindex,nofollow" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   </Fragment>
 
   <div id="crm" class="crm-light" data-clientid={clientId}>
@@ -415,10 +416,14 @@ function renderAppointmentDate(item: Appointment) {
                   {data.channels.whatsapp.connected ? 'Conectado' : data.botStatus === 'pending_qr' ? 'Pendiente QR' : 'Desconectado'}
                 </span>
               </div>
-              {data.botStatus === 'pending_qr' && (
-                <div class="crm-qr-block">
-                  <p>{data.qrPngBase64 ? 'Escanea el QR desde tu móvil.' : 'Te enviaremos un QR válido en breve desde soporte.'}</p>
-                  {qrImageSrc && <img src={qrImageSrc} alt="QR WhatsApp" class="crm-qr-img" />}
+              {!data.channels.whatsapp.connected && (
+                <div class="crm-qr-block" id="wa-qr-block">
+                  <p class="crm-qr-hint">Escanea este QR desde WhatsApp en tu móvil.<br/><small>WhatsApp → Dispositivos vinculados → Vincular dispositivo</small></p>
+                  <div id="wa-qr-wrap">
+                    <div class="crm-qr-spinner" id="wa-qr-spinner">Cargando QR...</div>
+                    <img id="wa-qr-img" src="" alt="QR WhatsApp" class="crm-qr-img" style="display:none" />
+                    <p id="wa-qr-connected" class="crm-qr-ok" style="display:none">✅ WhatsApp conectado</p>
+                  </div>
                 </div>
               )}
               {data.plan !== 'starter' && (
@@ -459,6 +464,13 @@ function renderAppointmentDate(item: Appointment) {
               <div class="crm-copy-row">
                 <input id="telegram-customer-link" type="text" value={customerTelegramUrl} readonly class="crm-input" />
                 <button id="telegram-copy" type="button" class="crm-btn-ghost">Copiar</button>
+              </div>
+              <div class="crm-tg-qr-wrap">
+                <p class="crm-muted-p" style="margin-top:1rem;margin-bottom:0.5rem">O escanea el QR para compartirlo fácilmente:</p>
+                <canvas id="tg-qr-canvas" width="180" height="180"></canvas>
+                <div class="crm-tg-qr-actions">
+                  <a id="tg-qr-download" download="lara-telegram.png" class="crm-btn-ghost" style="font-size:0.8rem">⬇️ Descargar QR</a>
+                </div>
               </div>
             </div>
           </div>
@@ -841,7 +853,65 @@ function renderAppointmentDate(item: Appointment) {
     }
 
     // ── Telegram copy ─────────────────────────────────────────────────
-    var telegramCopy = document.getElementById('telegram-copy');
+    // ── Telegram QR ───────────────────────────────────────────────────────────
+    (function () {
+      var canvas = document.getElementById('tg-qr-canvas');
+      var dlLink = document.getElementById('tg-qr-download');
+      if (!canvas || !customerTelegramUrl) return;
+      function renderTgQr() {
+        if (typeof QRCode === 'undefined') { setTimeout(renderTgQr, 300); return; }
+        QRCode.toCanvas(canvas, customerTelegramUrl, { width: 180, margin: 1, color: { dark: '#0a0a0f', light: '#ffffff' } }, function (err) {
+          if (!err && dlLink) { dlLink.href = canvas.toDataURL('image/png'); }
+        });
+      }
+      renderTgQr();
+    })();
+
+    // ── WhatsApp live QR ──────────────────────────────────────────────────────
+    (function () {
+      var qrBlock = document.getElementById('wa-qr-block');
+      if (!qrBlock) return;
+      var qrSpinner = document.getElementById('wa-qr-spinner');
+      var qrImg    = document.getElementById('wa-qr-img');
+      var qrOk     = document.getElementById('wa-qr-connected');
+      var pollTimer = null;
+      var pollInterval = 5000;
+
+      function pollWaQr() {
+        fetch('/portal-api/wa-qr?clientId=' + encodeURIComponent(clientId))
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d.status === 'connected') {
+              if (qrSpinner) qrSpinner.style.display = 'none';
+              if (qrImg)     qrImg.style.display = 'none';
+              if (qrOk)      qrOk.style.display = '';
+              var waChip = document.querySelector('#v-canales .crm-card-head .chip-yellow, #v-canales .crm-card-head .chip-red');
+              if (waChip) { waChip.textContent = 'Conectado'; waChip.className = waChip.className.replace(/chip-yellow|chip-red/g, 'chip-green'); }
+              return;
+            }
+            if (d.status === 'qr' && d.qr) {
+              if (qrSpinner) qrSpinner.style.display = 'none';
+              if (qrImg) { qrImg.src = 'data:image/png;base64,' + d.qr; qrImg.style.display = ''; }
+            } else {
+              if (qrSpinner) qrSpinner.style.display = '';
+              if (qrImg) qrImg.style.display = 'none';
+            }
+            pollTimer = setTimeout(pollWaQr, d.status === 'qr' ? 30000 : pollInterval);
+          })
+          .catch(function () { pollTimer = setTimeout(pollWaQr, pollInterval); });
+      }
+
+      var canalSection = document.getElementById('v-canales');
+      var observer = new MutationObserver(function () {
+        var visible = canalSection && !canalSection.classList.contains('crm-hidden');
+        if (visible && !pollTimer) { pollWaQr(); }
+        if (!visible && pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+      });
+      if (canalSection) observer.observe(canalSection, { attributes: true, attributeFilter: ['class'] });
+      if (canalSection && !canalSection.classList.contains('crm-hidden')) pollWaQr();
+    })();
+
+        var telegramCopy = document.getElementById('telegram-copy');
     var telegramCustomerLink = document.getElementById('telegram-customer-link');
 
     if (telegramCopy) {
@@ -2263,6 +2333,23 @@ function renderAppointmentDate(item: Appointment) {
       padding: 0.5rem;
       display: block;
     }
+    .crm-qr-spinner {
+      color: var(--crm-muted);
+      font-size: 13px;
+      padding: 1rem 0;
+      animation: crm-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes crm-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .crm-qr-hint { color: var(--crm-muted); font-size: 13px; margin: 0 0 0.75rem; }
+    .crm-qr-hint small { font-size: 11px; opacity: 0.75; }
+    .crm-qr-ok { color: #4caf50; font-size: 14px; font-weight: 600; margin: 0.5rem 0 0; }
+    .crm-tg-qr-wrap { margin-top: 1rem; }
+    .crm-tg-qr-wrap canvas { border-radius: 10px; border: 4px solid #fff; display: block; }
+    .crm-tg-qr-actions { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+    .crm-tg-qr-actions a { font-size: 0.78rem !important; }
 
     .crm-provider-wrap { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--crm-line); }
 

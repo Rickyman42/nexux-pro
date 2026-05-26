@@ -13,6 +13,7 @@ require('dotenv').config({ path: process.env.HOME + '/.env' });
 
 const PORT = process.env.LEADS_PORT || 4326;
 const LEADS_FILE = path.join(__dirname, 'leads.jsonl');
+const EMAIL_ASSETS_DIR = path.join(__dirname, 'email-assets');
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TG_CHAT_ID = process.env.TELEGRAM_CHAT_ID || process.env.TG_CHAT_ID;
 
@@ -98,6 +99,36 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && parsed.pathname === '/health') {
     return send(res, 200, { ok: true, service: 'nexux-pro-leads' }, cors);
+  }
+
+  if (req.method === 'GET' && parsed.pathname.startsWith('/email-assets/')) {
+    const filename = path.basename(decodeURIComponent(parsed.pathname));
+    if (!/^[a-z0-9._-]+\.(png|jpg|jpeg|gif|webp|mp3)$/i.test(filename)) {
+      return send(res, 404, { error: 'not_found' }, cors);
+    }
+
+    const filePath = path.join(EMAIL_ASSETS_DIR, filename);
+    if (!fs.existsSync(filePath)) {
+      return send(res, 404, { error: 'not_found' }, cors);
+    }
+
+    const ext = path.extname(filename).toLowerCase();
+    const types = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.mp3': 'audio/mpeg',
+    };
+
+    res.writeHead(200, {
+      'Content-Type': types[ext] || 'application/octet-stream',
+      'Cache-Control': 'public, max-age=604800, immutable',
+      ...cors,
+    });
+    fs.createReadStream(filePath).pipe(res);
+    return;
   }
 
   if (req.method === 'POST' && parsed.pathname === '/leads/pro') {

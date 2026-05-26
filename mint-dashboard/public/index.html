@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nexux Pro — Mint Dashboard</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="bg"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <div class="title">Mint Dashboard</div>
+          <div class="subtitle">Nexux Pro · control en tiempo real</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div id="statusPill" class="pill">Cargando…</div>
+        <button id="refreshBtn" class="btn">Refrescar</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card span-6">
+        <div class="cardHead">
+          <h2>Embudo</h2>
+          <div class="muted" id="funnelHint">Leads → enviados → abiertos → respondidos → trial</div>
+        </div>
+        <div class="funnel">
+          <div class="fStep"><div class="k">Leads</div><div class="v" id="kLeads">—</div></div>
+          <div class="arrow">→</div>
+          <div class="fStep"><div class="k">Enviados</div><div class="v" id="kSent">—</div></div>
+          <div class="arrow">→</div>
+          <div class="fStep">
+            <div class="k">Abiertos</div>
+            <div class="v"><span id="kOpened">—</span><span class="pct" id="kOpenedPct">—</span></div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="fStep">
+            <div class="k">Respondidos</div>
+            <div class="v"><span id="kResp">—</span><span class="pct" id="kRespPct">—</span></div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="fStep">
+            <div class="k">Trial</div>
+            <div class="v"><span id="kTrial">—</span><span class="pct" id="kTrialPct">—</span></div>
+          </div>
+        </div>
+        <div class="note">Nota: “Trial” solo aparece si existe `trial_active` en conversaciones.</div>
+      </section>
+
+      <section class="card span-6">
+        <div class="cardHead">
+          <h2>Histórico</h2>
+          <div class="seg">
+            <button class="segBtn isOn" data-days="7">7d</button>
+            <button class="segBtn" data-days="30">30d</button>
+            <button class="segBtn" data-days="365">Todo</button>
+          </div>
+        </div>
+        <canvas id="historyChart" height="110"></canvas>
+      </section>
+
+      <section class="card span-4">
+        <div class="cardHead">
+          <h2>WhatsApp riesgo</h2>
+          <div class="muted">hoy</div>
+        </div>
+        <div class="big" id="waTotal">—</div>
+        <div class="bar">
+          <div class="barFill" id="waBar"></div>
+        </div>
+        <div class="row3">
+          <div><div class="k">OK</div><div class="v" id="waOk">—</div></div>
+          <div><div class="k">Error</div><div class="v" id="waErr">—</div></div>
+          <div><div class="k">Sin WA</div><div class="v" id="waNo">—</div></div>
+        </div>
+        <div class="note" id="waNote">—</div>
+      </section>
+
+      <section class="card span-4">
+        <div class="cardHead">
+          <h2>Scheduler</h2>
+          <div class="muted">PM2</div>
+        </div>
+        <div class="pillRow">
+          <div id="schedPill" class="pill">—</div>
+        </div>
+        <div class="kv">
+          <div class="k">Uptime</div>
+          <div class="v" id="schedUp">—</div>
+          <div class="k">Restarts</div>
+          <div class="v" id="schedRestarts">—</div>
+        </div>
+        <div class="note">Si sale “unknown”, revisa SSH Pi→Mint y PM2.</div>
+      </section>
+
+      <section class="card span-4">
+        <div class="cardHead">
+          <h2>Hot leads</h2>
+          <div class="muted">usuario escribió último</div>
+        </div>
+        <div id="hotList" class="list"></div>
+      </section>
+
+      <section class="card span-7">
+        <div class="cardHead">
+          <h2>Buscador</h2>
+          <div class="muted">CSV scraper</div>
+        </div>
+        <div class="searchRow">
+          <input id="qInput" class="input" placeholder="Buscar por nombre, ciudad, teléfono, web…" />
+          <input id="cityInput" class="input" placeholder="Filtrar ciudad (opcional)" />
+          <button id="searchBtn" class="btn">Buscar</button>
+        </div>
+        <div id="leadsTable" class="table"></div>
+      </section>
+
+      <section class="card span-5">
+        <div class="cardHead">
+          <h2>Journey</h2>
+          <div class="muted">timeline por lead</div>
+        </div>
+        <div class="note">Haz clic en un hot lead (o pega `id` en el chat) para ver detalles.</div>
+        <div id="journey" class="journey"></div>
+      </section>
+
+      <section class="card span-12">
+        <div class="cardHead">
+          <h2>Chat (Qwen)</h2>
+          <div class="muted">preguntas al sistema</div>
+        </div>
+        <div class="chat">
+          <div id="chatLog" class="chatLog"></div>
+          <div class="chatRow">
+            <input id="chatInput" class="input" placeholder='Ej: "¿Cuántos leads contactamos hoy?" o "¿Qué respondió el 34611553535?"' />
+            <button id="chatSend" class="btn">Enviar</button>
+          </div>
+          <div class="note">Si Ollama no responde, verifica `OLLAMA_URL` y que el nodo Mint esté online.</div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
+
