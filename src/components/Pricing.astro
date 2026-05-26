@@ -62,6 +62,41 @@ const plans = [
       </p>
     </div>
 
+    <div class="roi-block">
+      <div class="roi-main">
+        <div class="roi-item">
+          <div class="roi-icon">📵</div>
+          <div>
+            <strong>Citas que se pierden</strong>
+            <p>Estás peinando y suena el teléfono. No puedes coger. La clienta llama al salón de enfrente. Con Lara, cada llamada perdida se convierte en un WhatsApp automático en 3 segundos — y la cita se salva.</p>
+          </div>
+        </div>
+        <div class="roi-item">
+          <div class="roi-icon">🔍</div>
+          <div>
+            <strong>Clientas nuevas que no te encuentran</strong>
+            <p>El 60% de las reservas online se hacen fuera de tu horario laboral. Lara responde a las 23:00, cierra la cita y la clienta aparece el lunes. Sin que tú hagas nada.</p>
+          </div>
+        </div>
+        <div class="roi-item">
+          <div class="roi-icon">💛</div>
+          <div>
+            <strong>Clientas que no vuelven</strong>
+            <p>Una clienta sin recordatorio se olvida, pospone y prueba otro salón. Lara les avisa 24h antes, les felicita el cumpleaños y les envía su próxima cita antes de que piensen en buscar alternativas.</p>
+          </div>
+        </div>
+      </div>
+      <div class="roi-math">
+        <span class="roi-math-line"><span class="roi-math-loss">3 citas perdidas/semana × 35€</span> = <strong>420€/mes que se van</strong></span>
+        <span class="roi-math-line"><span class="roi-math-loss">2 reservas online que no cierras</span> = <strong>280€/mes que no entran</strong></span>
+        <span class="roi-math-cta">Lara Starter cuesta <strong>249€/mes</strong>. Se paga sola en la primera semana.</span>
+      </div>
+      <div class="roi-total-note">
+        <span class="roi-total-badge">Plan Total</span>
+        ¿Tienes recepcionista o piensas contratar una? Media jornada cuesta <strong>~1.100€/mes</strong> con Seguridad Social. Lara hace lo mismo 24h al día, sin bajas ni vacaciones, por <strong>749€/mes</strong>.
+      </div>
+    </div>
+
     <div class="plans">
       {plans.map(plan => (
         <div class={`plan ${plan.highlight ? 'plan-highlight' : ''}`}>
@@ -127,6 +162,101 @@ const plans = [
     line-height: 1.7;
     max-width: 580px;
     margin: 1.25rem auto 0;
+  }
+
+  /* ROI block */
+  .roi-block {
+    max-width: 860px;
+    margin: 0 auto 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .roi-main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 720px) {
+    .roi-main { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .roi-item {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    padding: 1.25rem 1.5rem;
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 16px;
+  }
+  .roi-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .roi-item strong {
+    display: block;
+    color: var(--nx-ink);
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+  }
+  .roi-item p {
+    color: var(--nx-ink-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .roi-math {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem 2rem;
+    background: rgba(78,205,196,0.06);
+    border: 1px solid rgba(78,205,196,0.25);
+    border-radius: 16px;
+    text-align: center;
+  }
+  .roi-math-line {
+    color: var(--nx-ink-muted);
+    font-size: 0.93rem;
+  }
+  .roi-math-loss {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .roi-math-line strong { color: var(--nx-ink); }
+  .roi-math-cta {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: var(--nx-ink-muted);
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(78,205,196,0.2);
+  }
+  .roi-math-cta strong { color: var(--nx-magnet); font-size: 1.1rem; }
+
+  .roi-total-note {
+    padding: 1rem 1.5rem;
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 12px;
+    color: var(--nx-ink-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+  .roi-total-note strong { color: var(--nx-ink); }
+  .roi-total-badge {
+    display: inline-block;
+    background: rgba(78,205,196,0.12);
+    color: var(--nx-magnet);
+    border: 1px solid rgba(78,205,196,0.3);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.65rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
   }
 
   .plans {
