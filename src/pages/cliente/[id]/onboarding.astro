@@ -27,15 +27,32 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
 
   <div class="ob-stage">
 
-    <!-- 0: Bienvenida -->
+    <!-- 0: Bienvenida — Premium -->
     <div class="ob-step" id="os-0">
-      <div class="ob-card ob-card-center">
-        <div class="ob-big-emoji">👋</div>
-        <h1 class="ob-h1">Hola, <span class="ob-acc">{data.name}</span></h1>
-        <p class="ob-sub">Configura tu negocio en 5 pasos. Tardas menos de 3 minutos y puedes modificar todo después desde el panel.</p>
-        <span class={"ob-plan-pill ob-pill-" + data.plan}>{planLabel}</span>
-        <button class="ob-btn-primary" id="btn-start">Empezar configuración →</button>
-        <a href={`/cliente/${clientId}`} class="ob-link-sm ob-mark-done">Ya lo tengo configurado, ir al panel</a>
+      <div class="ob-card ob-card-center ob-card-welcome">
+        <div class="ob-w-glow ob-w-glow-tr"></div>
+        <div class="ob-w-glow ob-w-glow-bl"></div>
+        <div class="ob-w-badge">
+          <span class="ob-w-emoji">👋</span>
+        </div>
+        <p class="ob-w-eyebrow">Bienvenida a <span class="ob-w-brand">nexux<strong>pro</strong></span></p>
+        <h1 class="ob-w-name">{data.name}</h1>
+        <p class="ob-sub ob-w-sub">Lara ya está activa para tu negocio.<br/>Solo unos minutos para terminar la configuración.</p>
+        <div class="ob-w-steps-row">
+          <div class="ob-w-step-chip"><span>📋</span><span>Servicios</span></div>
+          <div class="ob-w-sep">·</div>
+          <div class="ob-w-step-chip"><span>🕐</span><span>Horario</span></div>
+          <div class="ob-w-sep">·</div>
+          <div class="ob-w-step-chip"><span>📡</span><span>Canal</span></div>
+          <div class="ob-w-sep">·</div>
+          <div class="ob-w-step-chip"><span>🎨</span><span>Tema</span></div>
+        </div>
+        <span class={"ob-plan-pill ob-pill-" + data.plan + " ob-w-pill"}>{planLabel}</span>
+        <button class="ob-btn-primary ob-w-cta" id="btn-start">
+          <span>Empezar configuración</span>
+          <svg class="ob-w-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+        <a href={`/cliente/${clientId}`} class="ob-link-sm ob-mark-done ob-w-skip">Ya lo tengo configurado, ir al panel</a>
       </div>
     </div>
 
@@ -102,11 +119,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
             <strong>Telegram — empezamos</strong>
             <span class="ob-canal-desc">Quiero usar Telegram, empezamos desde cero</span>
           </button>
-          <button class="ob-canal-opt" data-canal="web">
-            <span class="ob-canal-icon">🌐</span>
-            <strong>Widget web</strong>
-            <span class="ob-canal-desc">Las clientas reservan desde la web del salón</span>
-          </button>
+
         </div>
         <div class="ob-canal-guide ob-hidden" id="canal-guide">
           <div class="ob-canal-guide-inner" id="canal-guide-inner"></div>
@@ -523,6 +536,171 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     .ob-guide-link a { font-size: 0.8rem; color: var(--ob-accent); word-break: break-all; }
     .ob-copy-btn { font-size: 0.75rem; padding: 0.2rem 0.6rem; border: 1px solid var(--ob-accent); background: none; color: var(--ob-accent); border-radius: 6px; cursor: pointer; }
     @media (max-width: 540px) { .ob-canal-grid { grid-template-columns: 1fr; } }
+
+    /* ── Premium Welcome Step 0 ────────────────────────── */
+    @keyframes ob-float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33%  { transform: translateY(-6px) rotate(-3deg); }
+      66%  { transform: translateY(-10px) rotate(3deg); }
+    }
+    @keyframes ob-fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes ob-glow-pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50%       { opacity: 0.7; transform: scale(1.15); }
+    }
+    @keyframes ob-shimmer-btn {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes ob-arrow-bounce {
+      0%, 100% { transform: translateX(0); }
+      50%       { transform: translateX(5px); }
+    }
+
+    .ob-card-welcome {
+      position: relative;
+      overflow: hidden;
+      padding: 2.5rem 2rem 2rem;
+      gap: 0;
+    }
+    .ob-w-glow {
+      position: absolute;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: ob-glow-pulse 4s ease-in-out infinite;
+    }
+    .ob-w-glow-tr {
+      top: -80px; right: -80px;
+      background: radial-gradient(circle, rgba(42,157,151,0.18) 0%, transparent 65%);
+      animation-delay: 0s;
+    }
+    .ob-w-glow-bl {
+      bottom: -70px; left: -70px;
+      background: radial-gradient(circle, rgba(42,157,151,0.12) 0%, transparent 65%);
+      animation-delay: 2s;
+    }
+    .ob-w-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px; height: 80px;
+      background: var(--ob-accent-lt);
+      border-radius: 24px;
+      margin: 0 auto 1.25rem;
+      animation: ob-fade-up 0.5s ease both;
+      animation-delay: 0.05s;
+      opacity: 0;
+    }
+    .ob-w-emoji {
+      font-size: 2.6rem;
+      animation: ob-float 3.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .ob-w-eyebrow {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ob-muted);
+      margin: 0 0 0.4rem;
+      animation: ob-fade-up 0.5s ease both;
+      animation-delay: 0.12s;
+      opacity: 0;
+    }
+    .ob-w-brand { font-size: 0.72rem; font-weight: 400; color: var(--ob-muted); }
+    .ob-w-brand strong { color: var(--ob-accent); font-weight: 700; }
+    .ob-w-name {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      color: var(--ob-text);
+      margin: 0 0 0.75rem;
+      animation: ob-fade-up 0.5s ease both;
+      animation-delay: 0.2s;
+      opacity: 0;
+    }
+    .ob-w-sub {
+      margin: 0 0 1.25rem;
+      line-height: 1.6;
+      animation: ob-fade-up 0.5s ease both;
+      animation-delay: 0.28s;
+      opacity: 0;
+    }
+    .ob-w-steps-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      animation: ob-fade-up 0.5s ease both;
+      animation-delay: 0.36s;
+      opacity: 0;
+    }
+    .ob-w-step-chip {
+      display: flex; align-items: center; gap: 0.3rem;
+      font-size: 0.72rem;
+      color: var(--ob-muted);
+      padding: 0.25rem 0.65rem;
+      background: var(--ob-input-bg);
+      border: 1px solid var(--ob-line);
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .ob-w-sep { font-size: 0.6rem; color: var(--ob-line); }
+    .ob-w-pill {
+      margin-bottom: 1.5rem;
+      animation: ob-fade-up 0.5s ease both;
+      animation-delay: 0.44s;
+      opacity: 0;
+    }
+    .ob-w-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+      padding: 0.95rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, var(--ob-accent) 0%, #1a8a85 50%, var(--ob-accent) 100%);
+      background-size: 200% auto;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(42,157,151,0.3), 0 1px 3px rgba(0,0,0,0.1);
+      animation: ob-fade-up 0.5s ease both, ob-shimmer-btn 3s linear 1.2s infinite;
+      animation-delay: 0.52s;
+      opacity: 0;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      margin-bottom: 0.85rem;
+    }
+    .ob-w-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(42,157,151,0.42), 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .ob-w-arrow {
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .ob-w-cta:hover .ob-w-arrow {
+      animation: ob-arrow-bounce 0.6s ease infinite;
+    }
+    .ob-w-skip {
+      animation: ob-fade-up 0.5s ease both;
+      animation-delay: 0.6s;
+      opacity: 0;
+    }
+    /* Canal guide ordered list */
+    .ob-guide-ol {
+      margin: 0.4rem 0 0.4rem 1.2rem;
+      padding: 0;
+      font-size: 0.84rem;
+      line-height: 1.8;
+    }
+    .ob-guide-ol li { margin: 0; }
 </style>
 
 <script define:vars={{
@@ -753,10 +931,10 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
     var tgDeepLink = 'https://t.me/NexuxProAssistantBot?start=c_' + clientId;
 
     var GUIDES = {
-      whatsapp: '<strong>📱 WhatsApp</strong><p>Te enviaremos los pasos para conectar tu número existente al bot Lara. Sin cambiar el número que ya tienen guardado tus clientas.</p><p class="ob-guide-tip">Desde el panel → <em>Canales</em> podrás escanear el QR cuando estés lista.</p>',
-      tg_group: '<strong>💬 Telegram — grupo existente</strong><p>Añade a <code>@NexuxProAssistantBot</code> como administrador de tu grupo de Telegram. Lara empezará a responder automáticamente a las clientas del grupo.</p><p class="ob-guide-tip">Pasos: Grupo → Miembros → Añadir admin → Busca @NexuxProAssistantBot</p>',
+      whatsapp: '<strong>📱 WhatsApp</strong><p>Perfecto. Nuestro equipo se pondrá en contacto contigo en menos de 24h para conectar tu número — sin cambiar el que ya tienen guardado tus clientas, sin perder chats.</p><p class="ob-guide-tip">Solo necesitarás escanear un código QR desde tu teléfono cuando te lo indiquemos. Tardas 2 minutos.</p>',
+      tg_group: '<strong>💬 Telegram — grupo existente</strong><p>Añade a Lara como administradora de tu grupo y empezará a responder sola a tus clientas.</p><ol class="ob-guide-ol"><li>Abre tu grupo de Telegram</li><li>Miembros → Añadir administrador</li><li>Busca <code>@NexuxProAssistantBot</code></li></ol><p class="ob-guide-tip">Eso es todo. Lara activa al instante.</p>',
       tg_new:   '<strong>✈️ Telegram — empezamos desde cero</strong><p>Comparte este enlace con tus clientas. Las que lo abran podrán chatear directamente con Lara para pedir cita.</p><div class="ob-guide-link"><a href="' + tgDeepLink + '" target="_blank">' + tgDeepLink + '</a><button data-copy="' + tgDeepLink + '" class="ob-copy-btn">Copiar</button></div><p class="ob-guide-tip">Ponlo en tu bio de Instagram, en tu estado de WhatsApp o imprímelo como QR para el mostrador.</p>',
-      web:      '<strong>🌐 Widget web</strong><p>Añade el widget de citas de Nexux a tu página web. Tus clientas podrán reservar directamente desde la web sin necesidad de ninguna app.</p><p class="ob-guide-tip">Desde el panel → <em>Canales</em> encontrarás el código de instalación listo para copiar y pegar.</p>',
+
     };
 
     var LABELS = {
