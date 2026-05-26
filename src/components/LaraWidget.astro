@@ -341,10 +341,11 @@ const { trial = false } = Astro.props;
     }
   }
 
-  function sendLead() {
+  async function sendLead() {
     const payload = {
       ...state.data,
       source: 'nexux.pro',
+      _trial: IS_TRIAL ? '1' : '0',
       timestamp: new Date().toISOString(),
       utm: new URLSearchParams(location.search).toString(),
     };
@@ -355,11 +356,25 @@ const { trial = false } = Astro.props;
       console.warn('[lara] sessionStorage unavailable', e);
     }
 
-    fetch('/api/leads/pro', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }).catch(() => {});
+    try {
+      const res  = await fetch('/api/leads/pro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      // Trial: show Telegram deep-link button once provisioned
+      if (IS_TRIAL && data.telegramDeepLink) {
+        await new Promise(r => setTimeout(r, 1200));
+        const btn = `<a href="${data.telegramDeepLink}" target="_blank"
+          style="display:inline-block;margin-top:12px;background:#229ED9;color:#fff;
+          text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:700;
+          font-size:13px;">&#128172; Hablar con Lara en Telegram &rarr;</a>`;
+        addMsg(`Lara ya está lista para <strong>${state.data.salon}</strong>. ` +
+               `Haz clic para empezar la conversación:${btn}`, 'bot');
+      }
+    } catch { /* non-blocking */ }
   }
 
   async function handleSend() {
