@@ -173,7 +173,7 @@ const { trial = false } = Astro.props;
       id: 'telefono',
       bot: (data) => {
         const p = PLANES[data._plan || 'pro'];
-        return `Para activar el <strong>Plan ${p.nombre}</strong> solo necesito un dato más.<br/>¿Cuál es tu teléfono? Te confirmo la activación por WhatsApp en menos de 24h.`;
+        return `Para activar el <strong>Plan ${p.nombre}</strong> solo necesito un dato más.<br/>¿Cuál es tu teléfono? Te confirmo la activación por Telegram en menos de 24h.`;
       },
       field: 'telefono',
       validate: v => /^[+\d\s\-()]{9,}$/.test(v),
@@ -214,13 +214,13 @@ const { trial = false } = Astro.props;
     },
     {
       id: 'telefono',
-      bot: (data) => `Perfecto. Para activar Lara en <strong>${data.salon}</strong> solo necesito tu número de WhatsApp.<br/><br/>Te activo Lara en tu salón en minutos — gratis, sin tarjeta.`,
+      bot: (data) => `Perfecto. Para activar Lara en <strong>${data.salon}</strong> solo necesito tu número de Telegram o WhatsApp.<br/><br/>Te activo Lara en tu salón en minutos — gratis, sin tarjeta. Te contacto por Telegram.`,
       field: 'telefono',
       validate: v => /^[+\d\s\-()]{9,}$/.test(v),
     },
     {
       id: 'final',
-      bot: (data) => `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu prueba gratuita para <strong>${data.salon}</strong>. En pocos minutos recibirás un mensaje en el ${data.telefono} para activar Lara.<br/><br/><em>Sin tarjeta · Sin compromisos · 7 días para probarlo todo</em>`,
+      bot: (data) => `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu prueba gratuita para <strong>${data.salon}</strong>. En pocos minutos te escribo por Telegram al ${data.telefono} para activar Lara.<br/><br/><em>Sin tarjeta · Sin compromisos · 7 días para probarlo todo</em>`,
       field: null,
       final: true,
       showCTA: false,
