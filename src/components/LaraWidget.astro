@@ -214,13 +214,13 @@ const { trial = false } = Astro.props;
     },
     {
       id: 'telefono',
-      bot: (data) => `Perfecto. Para activar Lara en <strong>${data.salon}</strong> solo necesito tu número de WhatsApp.<br/><br/>Te confirmo la activación en menos de 24h — gratis, sin tarjeta.`,
+      bot: (data) => `Perfecto. Para activar Lara en <strong>${data.salon}</strong> solo necesito tu número de WhatsApp.<br/><br/>Te activo Lara en tu salón en minutos — gratis, sin tarjeta.`,
       field: 'telefono',
       validate: v => /^[+\d\s\-()]{9,}$/.test(v),
     },
     {
       id: 'final',
-      bot: (data) => `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu prueba gratuita para <strong>${data.salon}</strong>. En menos de 24h recibirás un mensaje en el ${data.telefono} para activar Lara.<br/><br/><em>Sin tarjeta · Sin compromisos · 7 días para probarlo todo</em>`,
+      bot: (data) => `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu prueba gratuita para <strong>${data.salon}</strong>. En pocos minutos recibirás un mensaje en el ${data.telefono} para activar Lara.<br/><br/><em>Sin tarjeta · Sin compromisos · 7 días para probarlo todo</em>`,
       field: null,
       final: true,
       showCTA: false,
