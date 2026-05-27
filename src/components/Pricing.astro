@@ -46,6 +46,7 @@ const plans = [
     ],
     cta: 'Hablar de Total',
     highlight: false,
+    premium: true,
   },
 ];
 ---
@@ -99,7 +100,7 @@ const plans = [
 
     <div class="plans">
       {plans.map(plan => (
-        <div class={`plan ${plan.highlight ? 'plan-highlight' : ''}`}>
+        <div class={`plan ${plan.highlight ? 'plan-highlight' : ''}${plan.premium ? ' plan-premium' : ''}`}>
           {plan.badge && <div class="plan-badge">{plan.badge}</div>}
           <div class="plan-head">
             <h3 class="plan-name">{plan.name}</h3>
@@ -291,6 +292,14 @@ const plans = [
     box-shadow: 0 30px 60px -20px rgba(78, 205, 196, 0.15);
   }
   .plan-highlight:hover { border-color: var(--nx-magnet); }
+  .plan-premium {
+    background:
+      radial-gradient(ellipse at top, rgba(212,175,55,0.09), transparent 60%),
+      var(--nx-deep);
+    border-color: rgba(212,175,55,0.3);
+    box-shadow: 0 30px 60px -20px rgba(212,175,55,0.12);
+  }
+  .plan-premium:hover { border-color: rgba(212,175,55,0.6); }
 
   .plan-badge {
     position: absolute;
