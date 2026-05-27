@@ -86,7 +86,7 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     color: '#4ECDC4',
     for: [
       'Salones con 1-3 empleadas',
-      'Peluquerías que reciben llamadas perdidas',
+      'Tu teléfono suena mientras atiendes — Lara lo gestiona',
       'Centros que quieren captar clientas nuevas online',
     ],
     features: [
@@ -98,8 +98,8 @@ export const PLANS: Record<PlanSlug, PlanData> = {
       },
       {
         icon: '📞',
-        title: 'Lara responde llamadas perdidas',
-        detail: 'Cuando no puedes coger el teléfono, Lara intercepta y le escribe por WhatsApp en segundos. La clienta no llama a otro salón.',
+        title: 'Llamada no contestada → WhatsApp en 3 segundos',
+        detail: 'Tu teléfono suena, estás con una clienta. Lara contesta en voz: "Te escribo por WhatsApp ahora mismo". Antes de que cuelguen, ya tienen la respuesta. Cero citas perdidas.',
       },
       {
         icon: '🌐',
@@ -125,7 +125,7 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     faqs: [
       {
         q: '¿Cómo funciona lo de las llamadas perdidas?',
-        a: 'Desvías las llamadas no contestadas a un número que te damos. Lara coge, da un mensaje de voz y le escribe por WhatsApp a quien llamó, todo en menos de 3 segundos.',
+        a: 'Desvías las llamadas no contestadas al número Twilio que te asignamos automáticamente. Lara responde en voz con Polly Conchita y en paralelo le escribe por WhatsApp antes de que cuelguen. Tu clienta nunca se va a la competencia.',
       },
       {
         q: '¿La mini-web sale en Google?',
