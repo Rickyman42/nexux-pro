@@ -57,28 +57,31 @@ if (heroVisual && heroWrap) {
 // ─── SCROLL REVEALS — STAGGERED BATCH ───────────────────────────────────────
 // Section headers
 ScrollTrigger.batch('.pain-header, .pricing-header, .how-header, .testimonials-header, .proof-left', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 36, duration: 0.85, ease: 'power3.out', stagger: 0.12
-  }),
-  start: 'top 88%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0 },
+    { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out', stagger: 0.12, clearProps: 'all' }
+  ),
+  start: 'top 92%',
   once: true,
 });
 
 // Pain cards
 ScrollTrigger.batch('.pain-card', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 48, duration: 0.75, ease: 'power3.out', stagger: 0.14
-  }),
-  start: 'top 88%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0 },
+    { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out', stagger: 0.14, clearProps: 'all' }
+  ),
+  start: 'top 92%',
   once: true,
 });
 
 // ROI items
 ScrollTrigger.batch('.roi-item', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 44, duration: 0.75, ease: 'power3.out', stagger: 0.14
-  }),
-  start: 'top 88%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0 },
+    { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out', stagger: 0.14, clearProps: 'all' }
+  ),
+  start: 'top 92%',
   once: true,
 });
 
@@ -94,46 +97,51 @@ ScrollTrigger.batch('.plan', {
 
 // Steps (how it works)
 ScrollTrigger.batch('.step', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, x: -40, duration: 0.8, ease: 'power3.out', stagger: 0.18
-  }),
-  start: 'top 88%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0, x: -40 },
+    { opacity: 1, y: 0, x: 0, duration: 0.8, ease: 'power3.out', stagger: 0.18, clearProps: 'all' }
+  ),
+  start: 'top 92%',
   once: true,
 });
 
 // Testimonials
 ScrollTrigger.batch('.testimonial-card', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 40, scale: 0.96, duration: 0.75, ease: 'power3.out', stagger: 0.12
-  }),
-  start: 'top 90%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0, scale: 0.96 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'power3.out', stagger: 0.12, clearProps: 'all' }
+  ),
+  start: 'top 93%',
   once: true,
 });
 
 // Metric cards
 ScrollTrigger.batch('.metric-card', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 36, duration: 0.7, ease: 'power3.out', stagger: 0.13
-  }),
-  start: 'top 88%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0 },
+    { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.13, clearProps: 'all' }
+  ),
+  start: 'top 92%',
   once: true,
 });
 
 // ROI math block
 ScrollTrigger.batch('.roi-math', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 30, scale: 0.98, duration: 0.8, ease: 'power3.out'
-  }),
-  start: 'top 88%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0, scale: 0.98 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out', clearProps: 'all' }
+  ),
+  start: 'top 92%',
   once: true,
 });
 
 // ─── EYEBROW LABELS ──────────────────────────────────────────────────────────
 ScrollTrigger.batch('.eyebrow', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 14, duration: 0.55, ease: 'power2.out', stagger: 0.08
-  }),
-  start: 'top 90%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 0 },
+    { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out', stagger: 0.08, clearProps: 'all' }
+  ),
+  start: 'top 93%',
   once: true,
 });
 
