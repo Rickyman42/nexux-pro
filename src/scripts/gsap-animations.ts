@@ -84,10 +84,11 @@ ScrollTrigger.batch('.roi-item', {
 
 // Pricing plans
 ScrollTrigger.batch('.plan', {
-  onEnter: (els) => gsap.from(els, {
-    opacity: 0, y: 50, scale: 0.97, duration: 0.8, ease: 'power3.out', stagger: 0.15
-  }),
-  start: 'top 88%',
+  onEnter: (els) => gsap.fromTo(els,
+    { opacity: 0, y: 50, scale: 0.97 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out', stagger: 0.15, clearProps: 'all' }
+  ),
+  start: 'top 92%',
   once: true,
 });
 
