@@ -328,7 +328,14 @@ const API = 'https://pi.nexux.pro';
 
   fetch(API + '/demo/appointments')
     .then(function(r){ return r.json(); })
-    .then(function(d){ apts = d; renderAll(); })
+    .then(function(d){
+      apts = d;
+      if (apts.length > 0) {
+        var earliest = apts.slice().sort(function(a,b){ return new Date(a.datetime) - new Date(b.datetime); })[0];
+        weekOffset = weekOffsetFor(new Date(earliest.datetime));
+      }
+      renderAll();
+    })
     .catch(function(){ renderAll(); });
 
   // ── Helpers ──────────────────────────────────────────
