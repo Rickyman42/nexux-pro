@@ -176,13 +176,13 @@ const API = 'https://pi.nexux.pro';
     .cta-sub { font-size: 11px; color: var(--muted); white-space: nowrap; }
 
     /* ── DESKTOP ──────────────────────────────────────── */
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
       .crm-panel { display: flex; }
       .tab-bar { display: none !important; }
       .crm-mobile { display: none !important; }
     }
     /* ── MOBILE ───────────────────────────────────────── */
-    @media (max-width: 767px) {
+    @media (max-width: 1023px) {
       .tab-bar { display: flex; }
       .crm-panel { display: none !important; }
       .msg { max-width: 86%; }
@@ -248,7 +248,7 @@ const API = 'https://pi.nexux.pro';
     </div>
 
     <div class="crm-mobile" id="crmMobile">
-      <div class="crm-mobile-scroll"><div id="mCalRows"></div></div>
+      <div class="crm-mobile-scroll"><div id="mCalRows"></div><p style="font-size:11px;color:var(--muted);text-align:center;padding:10px 0 4px;border-top:1px solid var(--border);margin-top:8px">Vista CRM completa disponible en tablet y escritorio</p></div>
       <div class="crm-mobile-cta">
         <a href="/prueba-gratis" class="cta-btn" style="display:block;text-align:center">Quiero esto para mi negocio</a>
         <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">7 dias gratis &middot; Activo en segundos</p>
