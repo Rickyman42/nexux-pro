@@ -104,7 +104,9 @@ const API = 'https://pi.nexux.pro';
     .sug:hover { background: var(--nx); color: #fff; border-color: var(--nx); }
 
     /* MOBILE CRM SHEET */
-    .crm-mobile { display: none; flex-direction: column; flex: 1; overflow-y: auto; background: var(--bg); padding: 12px; gap: 10px; }
+    .crm-mobile { display: none; flex-direction: column; flex: 1; min-height: 0; background: var(--bg); }
+    .crm-mobile-scroll { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .crm-mobile-cta { padding: 10px 12px; border-top: 1px solid var(--border); background: #fff; flex-shrink: 0; }
 
     /* INPUT */
     .input-bar { padding: 8px 10px; display: flex; gap: 7px; align-items: flex-end; flex-shrink: 0; }
@@ -142,6 +144,9 @@ const API = 'https://pi.nexux.pro';
 
     /* CALENDAR WEEK VIEW */
     .cal-container { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .cal-scroll-x { overflow-x: auto; display: flex; flex-direction: column; flex: 1; }
+    .cal-head { min-width: 520px; }
+    .cal-body { overflow-y: auto; overflow-x: auto; min-width: 520px; }
     .cal-head { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; background: #fff; }
     .cal-head-time { width: 50px; flex-shrink: 0; }
     .cal-head-day { flex: 1; text-align: center; padding: 8px 2px; border-left: 1px solid var(--border); }
@@ -165,7 +170,8 @@ const API = 'https://pi.nexux.pro';
 
     /* CRM FOOTER */
     .crm-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: #fff; flex-shrink: 0; display: flex; align-items: center; gap: 14px; }
-    .cta-btn { flex: 1; background: var(--nx-dark); color: #fff; text-align: center; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; transition: background .2s; white-space: nowrap; }
+    .crm-footer .cta-btn { flex: 1; }
+    .cta-btn { background: var(--nx-dark); color: #fff; text-align: center; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; transition: background .2s; white-space: nowrap; }
     .cta-btn:hover { background: #1a7a6e; }
     .cta-sub { font-size: 11px; color: var(--muted); white-space: nowrap; }
 
@@ -242,9 +248,11 @@ const API = 'https://pi.nexux.pro';
     </div>
 
     <div class="crm-mobile" id="crmMobile">
-      <div id="mCalRows"></div>
-      <a href="/prueba-gratis" class="cta-btn" style="margin-top:auto;display:block;text-align:center">Quiero esto para mi negocio</a>
-      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">7 dias gratis &middot; Activo en segundos</p>
+      <div class="crm-mobile-scroll"><div id="mCalRows"></div></div>
+      <div class="crm-mobile-cta">
+        <a href="/prueba-gratis" class="cta-btn" style="display:block;text-align:center">Quiero esto para mi negocio</a>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">7 dias gratis &middot; Activo en segundos</p>
+      </div>
     </div>
 
     <div class="input-bar" id="inputBar">
@@ -290,10 +298,10 @@ const API = 'https://pi.nexux.pro';
 
     <!-- CALENDAR WEEK VIEW -->
     <div class="cal-container">
-      <!-- Day headers -->
-      <div class="cal-head" id="calHead"></div>
-      <!-- Body -->
-      <div class="cal-body" id="calBody"></div>
+      <div class="cal-scroll-x">
+        <div class="cal-head" id="calHead"></div>
+        <div class="cal-body" id="calBody"></div>
+      </div>
     </div>
 
     <!-- FOOTER CTA -->
