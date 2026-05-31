@@ -1,0 +1,585 @@
+---
+// demo.astro — Demostración en vivo de Lara · Salón Élite
+const API = 'https://pi.nexux.pro';
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo en vivo — Lara, tu asistente IA | Nexux.pro</title>
+  <meta name="description" content="Habla con Lara, la asistente IA de Nexux. Ve en tiempo real cómo gestiona citas y atiende clientes por WhatsApp." />
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --wa-green: #25D366;
+      --wa-dark: #128C7E;
+      --wa-header: #075E54;
+      --wa-bg: #ECE5DD;
+      --wa-bubble-in: #ffffff;
+      --wa-bubble-out: #DCF8C6;
+      --crm-bg: #f8fafc;
+      --crm-border: #e2e8f0;
+      --nexux: #4ECDC4;
+      --nexux-dark: #2a9d8f;
+      --text: #1a1a2e;
+      --muted: #64748b;
+    }
+
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; }
+
+    /* TOP BAR */
+    .top-bar {
+      background: var(--nexux-dark);
+      color: #fff;
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .top-bar a {
+      background: #fff;
+      color: var(--nexux-dark);
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    /* MAIN LAYOUT */
+    .demo-wrap {
+      display: flex;
+      height: calc(100dvh - 44px);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* CHAT PANEL */
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      background: var(--wa-bg);
+    }
+    .chat-header {
+      background: var(--wa-header);
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .avatar {
+      width: 40px; height: 40px;
+      background: var(--wa-green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .chat-header .info { flex: 1; }
+    .chat-header .name { font-weight: 700; font-size: 15px; }
+    .chat-header .status { font-size: 12px; opacity: .8; display: flex; align-items: center; gap: 4px; }
+    .status-dot { width: 7px; height: 7px; background: #4ade80; border-radius: 50%; display: inline-block; }
+    .badge-demo {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    /* MOBILE TABS */
+    .mobile-tab-bar {
+      display: none;
+      background: var(--wa-header);
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,.7);
+      padding: 10px 0;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .tab-btn.active { color: #fff; border-bottom: 2px solid var(--wa-green); }
+
+    /* MESSAGES */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .msg { display: flex; flex-direction: column; max-width: 72%; }
+    .msg.out { align-self: flex-end; align-items: flex-end; }
+    .msg.in  { align-self: flex-start; }
+    .bubble {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.45;
+      position: relative;
+      word-break: break-word;
+      box-shadow: 0 1px 2px rgba(0,0,0,.12);
+    }
+    .msg.out .bubble { background: var(--wa-bubble-out); border-bottom-right-radius: 2px; }
+    .msg.in  .bubble { background: var(--wa-bubble-in);  border-bottom-left-radius: 2px; }
+    .bubble .ts { font-size: 11px; color: var(--muted); margin-top: 3px; display: block; text-align: right; }
+
+    .typing-indicator {
+      display: flex; gap: 4px; padding: 10px 14px;
+      background: #fff; border-radius: 8px; border-bottom-left-radius: 2px;
+      width: fit-content; box-shadow: 0 1px 2px rgba(0,0,0,.12);
+    }
+    .dot { width: 8px; height: 8px; background: #999; border-radius: 50%; animation: bounce 1.2s infinite; }
+    .dot:nth-child(2) { animation-delay: .2s; }
+    .dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+    /* INPUT BAR */
+    .input-bar {
+      background: #f0f2f5;
+      padding: 10px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    #msg-input {
+      flex: 1;
+      border: none;
+      background: #fff;
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-size: 14px;
+      outline: none;
+      resize: none;
+      max-height: 100px;
+      line-height: 1.4;
+      font-family: inherit;
+    }
+    .send-btn {
+      width: 44px; height: 44px;
+      background: var(--wa-green);
+      border: none; border-radius: 50%;
+      color: #fff; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background .2s;
+    }
+    .send-btn:hover { background: var(--wa-dark); }
+    .send-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* SUGGESTIONS */
+    .suggestions {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      padding: 8px 12px 0;
+    }
+    .sug-btn {
+      background: #fff; border: 1px solid #ddd; border-radius: 16px;
+      padding: 6px 12px; font-size: 12px; cursor: pointer; color: var(--text);
+      transition: all .15s;
+    }
+    .sug-btn:hover { background: var(--nexux); color: #fff; border-color: var(--nexux); }
+
+    /* CRM PANEL (desktop) */
+    .crm-panel {
+      display: none;
+      flex-direction: column;
+      width: 420px; min-width: 340px;
+      background: var(--crm-bg);
+      border-left: 1px solid var(--crm-border);
+      flex-shrink: 0;
+    }
+    .crm-header {
+      background: #fff;
+      border-bottom: 1px solid var(--crm-border);
+      padding: 16px 20px;
+      flex-shrink: 0;
+    }
+    .crm-header h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+    .crm-stats { display: flex; gap: 10px; }
+    .stat-card {
+      flex: 1; background: #f8fafc;
+      border: 1px solid var(--crm-border); border-radius: 8px;
+      padding: 10px; text-align: center;
+    }
+    .stat-card .num { font-size: 22px; font-weight: 800; color: var(--nexux-dark); }
+    .stat-card .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .crm-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .crm-date-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+
+    .apt-card {
+      background: #fff; border: 1px solid var(--crm-border);
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; gap: 12px; align-items: center;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .apt-card.new-apt {
+      border-color: var(--nexux);
+      animation: aptIn .5s ease;
+    }
+    @keyframes aptIn {
+      from { opacity: 0; transform: translateY(-10px); box-shadow: 0 0 0 3px rgba(78,205,196,.3); }
+      to   { opacity: 1; transform: translateY(0);     box-shadow: 0 0 0 0 transparent; }
+    }
+    .apt-time { text-align: center; min-width: 46px; }
+    .apt-time .h { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
+    .apt-time .d { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .apt-info { flex: 1; }
+    .apt-name { font-weight: 700; font-size: 14px; color: var(--text); }
+    .apt-svc  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .apt-badge {
+      font-size: 11px; padding: 3px 8px; border-radius: 12px;
+      font-weight: 600; white-space: nowrap;
+    }
+    .badge-confirmed { background: #dcfce7; color: #166534; }
+    .badge-pending   { background: #fef9c3; color: #854d0e; }
+    .badge-new       { background: #cffafe; color: #164e63; }
+
+    .crm-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--crm-border);
+      background: #fff; flex-shrink: 0;
+    }
+    .cta-btn {
+      display: block; width: 100%;
+      background: var(--nexux-dark); color: #fff;
+      text-align: center; padding: 14px; border-radius: 10px;
+      font-weight: 700; font-size: 15px; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .cta-btn:hover { background: #1a7a6e; transform: translateY(-1px); }
+    .cta-sub { font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px; }
+
+    /* MOBILE CRM SHEET */
+    .crm-mobile-sheet {
+      display: none;
+      flex-direction: column;
+      flex: 1; overflow-y: auto;
+      background: var(--crm-bg);
+      padding: 16px; gap: 10px;
+    }
+
+    /* DESKTOP */
+    @media (min-width: 768px) {
+      .crm-panel { display: flex; }
+      .chat-panel { width: auto; flex: 1; }
+      .mobile-tab-bar { display: none !important; }
+      .crm-mobile-sheet { display: none !important; }
+    }
+
+    /* MOBILE */
+    @media (max-width: 767px) {
+      .mobile-tab-bar { display: flex; }
+      .crm-panel { display: none !important; }
+      .top-bar strong { display: none; }
+      .msg { max-width: 85%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <strong>Demo en vivo — Salón Élite (simulado)</strong>
+  <span>¿Lo quieres para tu negocio?</span>
+  <a href="/prueba-gratis">Prueba gratis 14 días</a>
+</div>
+
+<div class="demo-wrap">
+
+  <!-- CHAT PANEL -->
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+      <div class="avatar">&#x1F487;</div>
+      <div class="info">
+        <div class="name">Salon Elite &middot; Lara</div>
+        <div class="status"><span class="status-dot"></span> En linea &middot; Asistente IA</div>
+      </div>
+      <span class="badge-demo">DEMO</span>
+    </div>
+
+    <div class="mobile-tab-bar">
+      <button class="tab-btn active" id="tab-chat" onclick="showTab('chat')">&#x1F4AC; Chat</button>
+      <button class="tab-btn" id="tab-crm" onclick="showTab('crm')">&#x1F4CB; Panel del salon</button>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="msg in">
+        <div class="bubble">
+          Hola! Soy Lara, la asistente del Salon Elite &#x1F487;&#x200D;&#x2640;&#xFE0F;<br><br>
+          Puedo ayudarte a reservar cita, informarte de precios y horarios, o gestionar tu reserva. En que puedo ayudarte hoy?
+          <span class="ts" id="init-ts"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="suggestions" id="suggestions">
+      <button class="sug-btn" onclick="useSuggestion(this)">Que servicios teneis?</button>
+      <button class="sug-btn" onclick="useSuggestion(this)">Quiero reservar cita</button>
+      <button class="sug-btn" onclick="useSuggestion(this)">Cuanto cuesta un tinte?</button>
+      <button class="sug-btn" onclick="useSuggestion(this)">Teneis hueco manana?</button>
+    </div>
+
+    <div class="crm-mobile-sheet" id="crmMobile">
+      <div class="crm-date-label" id="mDateLabel">Citas de hoy</div>
+      <div id="mAptList"></div>
+      <a href="/prueba-gratis" class="cta-btn" style="margin-top:auto">Quiero esto para mi negocio</a>
+      <p class="cta-sub">14 dias gratis &middot; Sin tarjeta</p>
+    </div>
+
+    <div class="input-bar" id="inputBar">
+      <textarea id="msg-input" rows="1" placeholder="Escribe un mensaje..." maxlength="500"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">&#x27A4;</button>
+    </div>
+  </div>
+
+  <!-- CRM PANEL (desktop) -->
+  <div class="crm-panel">
+    <div class="crm-header">
+      <h2>Panel del negocio &mdash; Vista del dueno</h2>
+      <div class="crm-stats">
+        <div class="stat-card">
+          <div class="num" id="stat-total">3</div>
+          <div class="lbl">Citas hoy</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="stat-conf">2</div>
+          <div class="lbl">Confirmadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="stat-pend">1</div>
+          <div class="lbl">Pendientes</div>
+        </div>
+      </div>
+    </div>
+    <div class="crm-body" id="aptList">
+      <div class="crm-date-label" id="dateLabel"></div>
+    </div>
+    <div class="crm-footer">
+      <a href="/prueba-gratis" class="cta-btn">Quiero esto para mi negocio &rarr;</a>
+      <p class="cta-sub">14 dias gratis &middot; Sin tarjeta de credito</p>
+    </div>
+  </div>
+
+</div>
+
+<script define:vars={{ API }}>
+  var history = [];
+  var sending = false;
+  var apts = [];
+
+  document.getElementById('init-ts').textContent = fmtTime(new Date());
+
+  fetch(API + '/demo/appointments')
+    .then(function(r){ return r.json(); })
+    .then(function(data){ apts = data; renderApts(); })
+    .catch(function(){ apts = []; renderApts(); });
+
+  function fmtTime(d) {
+    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtAptTime(iso) {
+    return new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtAptDate(iso) {
+    return new Date(iso).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+  function todayLabel() {
+    return new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  function renderApts(newId) {
+    var confirmed = apts.filter(function(a){ return a.status === 'confirmed'; }).length;
+    var pending   = apts.filter(function(a){ return a.status === 'pending' || a.status === 'new'; }).length;
+    var totalEl = document.getElementById('stat-total');
+    var confEl  = document.getElementById('stat-conf');
+    var pendEl  = document.getElementById('stat-pend');
+    if (totalEl) totalEl.textContent = apts.length;
+    if (confEl)  confEl.textContent  = confirmed;
+    if (pendEl)  pendEl.textContent  = pending;
+
+    var cards = apts.map(function(a){ return aptCard(a, a.id === newId); }).join('');
+    var label = todayLabel();
+
+    var aptList = document.getElementById('aptList');
+    var mAptList = document.getElementById('mAptList');
+    var dateLabel = document.getElementById('dateLabel');
+    var mDateLabel = document.getElementById('mDateLabel');
+
+    if (dateLabel) dateLabel.textContent = label;
+    if (mDateLabel) mDateLabel.textContent = 'Citas de hoy';
+    if (aptList) aptList.innerHTML = '<div class="crm-date-label">' + label + '</div>' + cards;
+    if (mAptList) mAptList.innerHTML = cards;
+  }
+
+  function aptCard(a, isNew) {
+    var badgeClass = isNew ? 'badge-new' : (a.status === 'confirmed' ? 'badge-confirmed' : 'badge-pending');
+    var badgeText  = isNew ? 'Nueva!' : (a.status === 'confirmed' ? 'Confirmada' : 'Pendiente');
+    return '<div class="apt-card ' + (isNew ? 'new-apt' : '') + '">'
+      + '<div class="apt-time"><div class="h">' + fmtAptTime(a.datetime) + '</div>'
+      + '<div class="d">' + fmtAptDate(a.datetime) + '</div></div>'
+      + '<div class="apt-info"><div class="apt-name">' + a.client_name + '</div>'
+      + '<div class="apt-svc">' + a.service + '</div></div>'
+      + '<span class="apt-badge ' + badgeClass + '">' + badgeText + '</span>'
+      + '</div>';
+  }
+
+  function appendMsg(text, role) {
+    var msgs = document.getElementById('messages');
+    var div = document.createElement('div');
+    div.className = 'msg ' + (role === 'user' ? 'out' : 'in');
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = text.replace(/\n/g, '<br>') + '<span class="ts">' + fmtTime(new Date()) + '</span>';
+    div.appendChild(bubble);
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping() {
+    var msgs = document.getElementById('messages');
+    var div = document.createElement('div');
+    div.className = 'msg in';
+    div.id = 'typing';
+    div.innerHTML = '<div class="typing-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function hideTyping() {
+    var t = document.getElementById('typing');
+    if (t) t.remove();
+  }
+
+  function sendMessage() {
+    if (sending) return;
+    var input = document.getElementById('msg-input');
+    var text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('suggestions').style.display = 'none';
+    document.getElementById('send-btn').disabled = true;
+    sending = true;
+
+    appendMsg(text, 'user');
+    history.push({ role: 'user', content: text });
+    showTyping();
+
+    fetch(API + '/demo/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history: history.slice(-8) })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      hideTyping();
+      if (data.error) {
+        appendMsg('Lo siento, hubo un problema. Intentalo de nuevo.', 'assistant');
+      } else {
+        appendMsg(data.reply, 'assistant');
+        history.push({ role: 'assistant', content: data.reply });
+
+        if (data.appointmentBooked) {
+          var apt = data.appointmentBooked;
+          var parts = (apt.time || '10:00').split(':');
+          var hh = parseInt(parts[0]) || 10;
+          var mm = parseInt(parts[1]) || 0;
+          var dt = new Date();
+          dt.setHours(hh, mm, 0, 0);
+          var newApt = {
+            id: 'new-' + Date.now(),
+            client_name: apt.name || 'Cliente',
+            service: apt.service || 'Servicio',
+            datetime: dt.toISOString(),
+            status: 'new'
+          };
+          apts = apts.concat([newApt]);
+          renderApts(newApt.id);
+
+          var crmTab = document.getElementById('tab-crm');
+          if (crmTab) {
+            crmTab.style.color = '#4ade80';
+            crmTab.textContent = 'Nueva cita!';
+            setTimeout(function() {
+              crmTab.style.color = '';
+              crmTab.textContent = 'Panel del salon';
+            }, 3000);
+          }
+        }
+      }
+      sending = false;
+      document.getElementById('send-btn').disabled = false;
+      input.focus();
+    })
+    .catch(function() {
+      hideTyping();
+      appendMsg('Error de conexion. Recarga la pagina.', 'assistant');
+      sending = false;
+      document.getElementById('send-btn').disabled = false;
+    });
+  }
+
+  function useSuggestion(btn) {
+    var input = document.getElementById('msg-input');
+    input.value = btn.textContent;
+    sendMessage();
+  }
+
+  document.getElementById('msg-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  document.getElementById('msg-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+
+  function showTab(tab) {
+    var messages  = document.getElementById('messages');
+    var sugs      = document.getElementById('suggestions');
+    var inputBar  = document.getElementById('inputBar');
+    var crmSheet  = document.getElementById('crmMobile');
+    var tabChat   = document.getElementById('tab-chat');
+    var tabCrm    = document.getElementById('tab-crm');
+
+    if (tab === 'chat') {
+      messages.style.display = '';
+      sugs.style.display     = '';
+      inputBar.style.display = '';
+      crmSheet.style.display = 'none';
+      tabChat.classList.add('active');
+      tabCrm.classList.remove('active');
+    } else {
+      messages.style.display = 'none';
+      sugs.style.display     = 'none';
+      inputBar.style.display = 'none';
+      crmSheet.style.display = 'flex';
+      tabCrm.classList.add('active');
+      tabChat.classList.remove('active');
+      renderApts();
+    }
+  }
+</script>
+</body>
+</html>
