@@ -564,7 +564,7 @@ const API = 'https://pi.nexux.pro';
     fetch(API + '/demo/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history: history.slice(-8) })
+      body: JSON.stringify({ message: text, history: history.slice(-8), booked: apts.map(function(a){ return a.datetime; }) })
     })
     .then(function(r){ return r.json(); })
     .then(function(data) {
