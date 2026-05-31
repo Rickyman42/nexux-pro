@@ -343,6 +343,16 @@ const API = 'https://pi.nexux.pro';
     return d;
   }
 
+  function weekOffsetFor(date) {
+    var curMon = getWeekStart(0);
+    var d = new Date(date);
+    var day = d.getDay();
+    var diff = (day === 0 ? -6 : 1 - day);
+    d.setDate(d.getDate() + diff);
+    d.setHours(0, 0, 0, 0);
+    return Math.round((d - curMon) / (7 * 24 * 3600 * 1000));
+  }
+
   function sameDay(a, b) {
     return a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
   }
@@ -430,22 +440,29 @@ const API = 'https://pi.nexux.pro';
   function renderMobile(newId) {
     var el = document.getElementById('mCalRows');
     if (!el) return;
-    var hours = [9,10,11,12,13,14,15,16,17,18,19];
+    var sorted = apts.slice().sort(function(a,b){ return new Date(a.datetime) - new Date(b.datetime); });
+    if (sorted.length === 0) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Sin citas programadas</div>'; return; }
     var today = new Date();
-    var html = '<div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px">Agenda de hoy &mdash; ' + today.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'short'}) + '</div>';
-    hours.forEach(function(h) {
-      var slotApts = apts.filter(function(a){ var ad=new Date(a.datetime); return sameDay(ad,today) && ad.getHours()===h; });
-      if (slotApts.length === 0) return;
-      slotApts.forEach(function(a) {
-        var isNew = a.id === newId;
-        var cls = isNew ? 'new-apt' : (a.status==='confirmed' ? 'confirmed' : 'pending');
-        html += '<div class="wcal-apt ' + cls + '" style="margin-bottom:6px;padding:8px 10px">'
-          + '<div class="apt-name">' + h + ':00 &mdash; ' + a.client_name + '</div>'
-          + '<div class="apt-svc">' + a.service + '</div>'
-          + '</div>';
-      });
+    var html = '';
+    var lastDay = '';
+    sorted.forEach(function(a) {
+      var ad = new Date(a.datetime);
+      var dayKey = ad.toDateString();
+      if (dayKey !== lastDay) {
+        lastDay = dayKey;
+        var tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+        var label = sameDay(ad, today) ? 'Hoy' : (sameDay(ad, tomorrow) ? 'Manana' : ad.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'short'}));
+        html += '<div style="font-size:12px;font-weight:700;color:var(--nx-dark);margin:12px 0 6px;text-transform:capitalize">' + label + '</div>';
+      }
+      var isNew = a.id === newId;
+      var cls = isNew ? 'new-apt' : (a.status==='confirmed' ? 'confirmed' : 'pending');
+      var badge = isNew ? 'Nueva!' : (a.status==='confirmed' ? 'Confirmada' : 'Pendiente');
+      html += '<div class="wcal-apt ' + cls + '" style="margin-bottom:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between">'
+        + '<div><div class="apt-name">' + hhmm(ad) + ' &mdash; ' + a.client_name + '</div>'
+        + '<div class="apt-svc">' + a.service + '</div></div>'
+        + '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(0,0,0,.07)">' + badge + '</span>'
+        + '</div>';
     });
-    if (apts.length === 0) html += '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Sin citas programadas</div>';
     el.innerHTML = html;
   }
 
@@ -553,15 +570,16 @@ const API = 'https://pi.nexux.pro';
 
         if (data.appointmentBooked) {
           var apt = data.appointmentBooked;
-          var parts = (apt.time || '10:00').split(':');
-          var dt = new Date(); dt.setHours(parseInt(parts[0])||10, parseInt(parts[1])||0, 0, 0);
-          var newApt = { id: 'new-' + Date.now(), client_name: apt.name || 'Cliente', service: apt.service || 'Servicio', datetime: dt.toISOString(), status: 'new' };
-          apts = apts.concat([newApt]);
-          renderAll(newApt.id);
-          var scMsgs = document.getElementById('sc-msgs');
-          if (scMsgs) { scMsgs.textContent = parseInt(scMsgs.textContent||0) + 1; }
-          var tabCrm = document.getElementById('tab-crm');
-          if (tabCrm) { var o=tabCrm.textContent; tabCrm.style.color='#4ade80'; tabCrm.textContent='Nueva cita!'; setTimeout(function(){ tabCrm.style.color=''; tabCrm.textContent=o; }, 3000); }
+          var iso = apt.datetime || new Date().toISOString();
+          var dup = apts.some(function(a){ return a.client_name === apt.name && a.service === apt.service && a.datetime === iso; });
+          if (!dup) {
+            var newApt = { id: 'new-' + Date.now(), client_name: apt.name || 'Cliente', service: apt.service || 'Servicio', datetime: iso, status: 'new' };
+            apts = apts.concat([newApt]);
+            weekOffset = weekOffsetFor(new Date(iso));
+            renderAll(newApt.id);
+            var tabCrm = document.getElementById('tab-crm');
+            if (tabCrm) { var o=tabCrm.textContent; tabCrm.style.color='#4ade80'; tabCrm.textContent='Nueva cita!'; setTimeout(function(){ tabCrm.style.color=''; tabCrm.textContent=o; }, 3000); }
+          }
         }
       }
       sending = false;
