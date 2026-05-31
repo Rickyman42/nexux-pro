@@ -200,11 +200,11 @@ const API = 'https://pi.nexux.pro';
 
     <!-- CHANNEL TOGGLE -->
     <div class="channel-toggle">
-      <button class="ch-btn wa-btn active" id="btn-wa" onclick="setChannel('wa')">
+      <button class="ch-btn wa-btn active" id="btn-wa" id="btn-wa-inner">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.552 4.122 1.523 5.858L0 24l6.286-1.493C8.019 23.453 9.972 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.899 0-3.68-.496-5.22-1.366l-.374-.222-3.734.887.927-3.644-.243-.387C2.498 15.67 2 13.9 2 12 2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
         WhatsApp
       </button>
-      <button class="ch-btn tg-btn" id="btn-tg" onclick="setChannel('tg')">
+      <button class="ch-btn tg-btn" id="btn-tg" id="btn-tg-inner">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
         Telegram
       </button>
@@ -220,8 +220,8 @@ const API = 'https://pi.nexux.pro';
     </div>
 
     <div class="tab-bar" id="tabBar">
-      <button class="tab-btn active" id="tab-chat" onclick="showTab('chat')">&#x1F4AC; Chat</button>
-      <button class="tab-btn" id="tab-crm" onclick="showTab('crm')">&#x1F4C5; Agenda</button>
+      <button class="tab-btn active" id="tab-chat" >&#x1F4AC; Chat</button>
+      <button class="tab-btn" id="tab-crm" >&#x1F4C5; Agenda</button>
     </div>
 
     <div class="messages" id="messages">
@@ -235,10 +235,10 @@ const API = 'https://pi.nexux.pro';
     </div>
 
     <div class="suggestions" id="suggestions">
-      <button class="sug" onclick="useSug(this)">Que servicios teneis?</button>
-      <button class="sug" onclick="useSug(this)">Quiero reservar cita</button>
-      <button class="sug" onclick="useSug(this)">Cuanto cuesta un tinte?</button>
-      <button class="sug" onclick="useSug(this)">Teneis hueco manana?</button>
+      <button class="sug" >Que servicios teneis?</button>
+      <button class="sug" >Quiero reservar cita</button>
+      <button class="sug" >Cuanto cuesta un tinte?</button>
+      <button class="sug" >Teneis hueco manana?</button>
     </div>
 
     <div class="crm-mobile" id="crmMobile">
@@ -249,7 +249,7 @@ const API = 'https://pi.nexux.pro';
 
     <div class="input-bar" id="inputBar">
       <textarea id="msg-input" rows="1" placeholder="Escribe un mensaje..." maxlength="500"></textarea>
-      <button class="send-btn" id="send-btn" onclick="sendMsg()">&#x27A4;</button>
+      <button class="send-btn" id="send-btn" >&#x27A4;</button>
     </div>
   </div>
 
@@ -262,9 +262,9 @@ const API = 'https://pi.nexux.pro';
         Salon Elite <span class="badge-activo">Activo</span>
       </div>
       <div class="crm-nav">
-        <button class="nav-btn" onclick="moveWeek(-1)">&#x2190; Anterior</button>
+        <button class="nav-btn" >&#x2190; Anterior</button>
         <span class="crm-week-label" id="weekLabel"></span>
-        <button class="nav-btn" onclick="moveWeek(1)">Siguiente &#x2192;</button>
+        <button class="nav-btn" >Siguiente &#x2192;</button>
       </div>
       <a href="/prueba-gratis" style="background:var(--nx-dark);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12.5px;font-weight:700;text-decoration:none;cursor:pointer">+ Nueva cita</a>
     </div>
@@ -591,6 +591,21 @@ const API = 'https://pi.nexux.pro';
       renderMobile(lastNewId);
     }
   }
+
+  // ── Attach all event listeners (no inline onclick) ───
+  document.getElementById('btn-wa').addEventListener('click', function(){ setChannel('wa'); });
+  document.getElementById('btn-tg').addEventListener('click', function(){ setChannel('tg'); });
+  document.getElementById('send-btn').addEventListener('click', sendMsg);
+  document.getElementById('tab-chat').addEventListener('click', function(){ showTab('chat'); });
+  document.getElementById('tab-crm').addEventListener('click',  function(){ showTab('crm'); });
+
+  document.querySelectorAll('.sug').forEach(function(btn){
+    btn.addEventListener('click', function(){ useSug(this); });
+  });
+  var navBtns = document.querySelectorAll('.nav-btn');
+  if (navBtns[0]) navBtns[0].addEventListener('click', function(){ moveWeek(-1); });
+  if (navBtns[1]) navBtns[1].addEventListener('click', function(){ moveWeek(1); });
+
 </script>
 </body>
 </html>
