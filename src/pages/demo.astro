@@ -1,5 +1,4 @@
 ---
-// demo.astro — Demostración en vivo de Lara · Salón Élite
 const API = 'https://pi.nexux.pro';
 ---
 <!DOCTYPE html>
@@ -8,372 +7,285 @@ const API = 'https://pi.nexux.pro';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Demo en vivo — Lara, tu asistente IA | Nexux.pro</title>
-  <meta name="description" content="Habla con Lara, la asistente IA de Nexux. Ve en tiempo real cómo gestiona citas y atiende clientes por WhatsApp." />
+  <meta name="description" content="Habla con Lara en tiempo real y ve como gestiona citas automaticamente." />
   <link rel="icon" href="/favicon.ico" />
-  <style>
+  <style is:global>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --wa-green: #25D366;
-      --wa-dark: #128C7E;
-      --wa-header: #075E54;
-      --wa-bg: #ECE5DD;
-      --wa-bubble-in: #ffffff;
-      --wa-bubble-out: #DCF8C6;
-      --crm-bg: #f8fafc;
-      --crm-border: #e2e8f0;
-      --nexux: #4ECDC4;
-      --nexux-dark: #2a9d8f;
-      --text: #1a1a2e;
-      --muted: #64748b;
+      --wa-green:     #25D366;
+      --wa-dark:      #128C7E;
+      --wa-header:    #075E54;
+      --wa-bg:        #ECE5DD;
+      --bubble-in:    #ffffff;
+      --bubble-out:   #DCF8C6;
+      --crm-bg:       #f8fafc;
+      --crm-border:   #e2e8f0;
+      --nx:           #4ECDC4;
+      --nx-dark:      #2a9d8f;
+      --text:         #1a1a2e;
+      --muted:        #64748b;
     }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; overflow: hidden; }
 
-    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; }
-
-    /* TOP BAR */
+    /* ── TOP BAR ─────────────────────────────────────────── */
     .top-bar {
-      background: var(--nexux-dark);
-      color: #fff;
-      text-align: center;
-      padding: 10px 16px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      background: var(--nx-dark); color: #fff;
+      padding: 9px 16px; font-size: 13px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      flex-wrap: wrap; height: 40px;
     }
     .top-bar a {
-      background: #fff;
-      color: var(--nexux-dark);
-      font-weight: 700;
-      padding: 5px 14px;
-      border-radius: 20px;
-      text-decoration: none;
-      font-size: 12px;
-      white-space: nowrap;
+      background: #fff; color: var(--nx-dark);
+      font-weight: 700; padding: 4px 14px; border-radius: 20px;
+      text-decoration: none; font-size: 12px; white-space: nowrap;
     }
 
-    /* MAIN LAYOUT */
-    .demo-wrap {
-      display: flex;
-      height: calc(100dvh - 44px);
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    /* ── LAYOUT ──────────────────────────────────────────── */
+    .demo-wrap { display: flex; height: calc(100dvh - 40px); max-width: 1280px; margin: 0 auto; }
 
-    /* CHAT PANEL */
-    .chat-panel {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      background: var(--wa-bg);
-    }
+    /* ── CHAT PANEL (40%) ────────────────────────────────── */
+    .chat-panel { display: flex; flex-direction: column; flex: 0 0 40%; background: var(--wa-bg); border-right: 1px solid #ccc; }
+
     .chat-header {
-      background: var(--wa-header);
-      color: #fff;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
+      background: var(--wa-header); color: #fff;
+      padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
     }
-    .avatar {
-      width: 40px; height: 40px;
-      background: var(--wa-green);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; flex-shrink: 0;
+    .ch-avatar {
+      width: 38px; height: 38px; background: var(--wa-green);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
     }
-    .chat-header .info { flex: 1; }
-    .chat-header .name { font-weight: 700; font-size: 15px; }
-    .chat-header .status { font-size: 12px; opacity: .8; display: flex; align-items: center; gap: 4px; }
-    .status-dot { width: 7px; height: 7px; background: #4ade80; border-radius: 50%; display: inline-block; }
-    .badge-demo {
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.3);
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 12px;
-    }
+    .ch-info { flex: 1; }
+    .ch-name  { font-weight: 700; font-size: 14px; }
+    .ch-status { font-size: 11px; opacity: .8; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+    .dot-green { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; }
+    .badge-demo { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); font-size: 10px; padding: 2px 7px; border-radius: 10px; }
 
     /* MOBILE TABS */
-    .mobile-tab-bar {
-      display: none;
-      background: var(--wa-header);
-      border-top: 1px solid rgba(255,255,255,.1);
-    }
-    .tab-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      color: rgba(255,255,255,.7);
-      padding: 10px 0;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .2s;
-    }
+    .tab-bar { display: none; background: var(--wa-header); }
+    .tab-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,.65); padding: 9px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
     .tab-btn.active { color: #fff; border-bottom: 2px solid var(--wa-green); }
 
     /* MESSAGES */
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .msg { display: flex; flex-direction: column; max-width: 72%; }
+    .messages { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; scroll-behavior: smooth; }
+
+    .msg { display: flex; flex-direction: column; max-width: 78%; margin-bottom: 6px; }
     .msg.out { align-self: flex-end; align-items: flex-end; }
     .msg.in  { align-self: flex-start; }
+    /* Extra gap when switching sender */
+    .msg.in  + .msg.out,
+    .msg.out + .msg.in  { margin-top: 10px; }
+
     .bubble {
-      padding: 8px 12px;
+      padding: 7px 10px 4px 10px;
       border-radius: 8px;
-      font-size: 14px;
-      line-height: 1.45;
-      position: relative;
+      font-size: 13.5px;
+      line-height: 1.5;
       word-break: break-word;
-      box-shadow: 0 1px 2px rgba(0,0,0,.12);
+      box-shadow: 0 1px 1px rgba(0,0,0,.1);
+      position: relative;
     }
-    .msg.out .bubble { background: var(--wa-bubble-out); border-bottom-right-radius: 2px; }
-    .msg.in  .bubble { background: var(--wa-bubble-in);  border-bottom-left-radius: 2px; }
-    .bubble .ts { font-size: 11px; color: var(--muted); margin-top: 3px; display: block; text-align: right; }
+    .msg.out .bubble { background: var(--bubble-out); border-bottom-right-radius: 2px; }
+    .msg.in  .bubble { background: var(--bubble-in);  border-bottom-left-radius: 2px; }
 
-    .typing-indicator {
-      display: flex; gap: 4px; padding: 10px 14px;
-      background: #fff; border-radius: 8px; border-bottom-left-radius: 2px;
-      width: fit-content; box-shadow: 0 1px 2px rgba(0,0,0,.12);
+    .ts {
+      display: block;
+      font-size: 10.5px;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 2px;
     }
-    .dot { width: 8px; height: 8px; background: #999; border-radius: 50%; animation: bounce 1.2s infinite; }
-    .dot:nth-child(2) { animation-delay: .2s; }
-    .dot:nth-child(3) { animation-delay: .4s; }
-    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 
-    /* INPUT BAR */
-    .input-bar {
-      background: #f0f2f5;
-      padding: 10px 12px;
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-      flex-shrink: 0;
-    }
-    #msg-input {
-      flex: 1;
-      border: none;
-      background: #fff;
-      border-radius: 22px;
-      padding: 10px 16px;
-      font-size: 14px;
-      outline: none;
-      resize: none;
-      max-height: 100px;
-      line-height: 1.4;
-      font-family: inherit;
-    }
-    .send-btn {
-      width: 44px; height: 44px;
-      background: var(--wa-green);
-      border: none; border-radius: 50%;
-      color: #fff; font-size: 18px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: background .2s;
-    }
+    /* Typing */
+    .typing-wrap { align-self: flex-start; }
+    .typing-indicator { display: flex; gap: 4px; padding: 10px 14px; background: #fff; border-radius: 8px; border-bottom-left-radius: 2px; width: fit-content; box-shadow: 0 1px 1px rgba(0,0,0,.1); }
+    .tdot { width: 7px; height: 7px; background: #aaa; border-radius: 50%; animation: tdot 1.2s infinite; }
+    .tdot:nth-child(2) { animation-delay: .2s; }
+    .tdot:nth-child(3) { animation-delay: .4s; }
+    @keyframes tdot { 0%,60%,100%{transform:translateY(0);opacity:.5} 30%{transform:translateY(-5px);opacity:1} }
+
+    /* SUGGESTIONS */
+    .suggestions { display: flex; gap: 5px; flex-wrap: wrap; padding: 7px 10px 0; flex-shrink: 0; }
+    .sug { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 5px 11px; font-size: 11.5px; cursor: pointer; color: var(--text); transition: all .15s; }
+    .sug:hover { background: var(--nx); color: #fff; border-color: var(--nx); }
+
+    /* MOBILE CRM SHEET */
+    .crm-mobile { display: none; flex-direction: column; flex: 1; overflow-y: auto; background: var(--crm-bg); padding: 14px; gap: 10px; }
+
+    /* INPUT */
+    .input-bar { background: #f0f2f5; padding: 8px 10px; display: flex; gap: 7px; align-items: flex-end; flex-shrink: 0; }
+    #msg-input { flex: 1; border: none; background: #fff; border-radius: 20px; padding: 9px 14px; font-size: 13.5px; outline: none; resize: none; max-height: 90px; line-height: 1.4; font-family: inherit; }
+    .send-btn { width: 42px; height: 42px; background: var(--wa-green); border: none; border-radius: 50%; color: #fff; font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s; }
     .send-btn:hover { background: var(--wa-dark); }
     .send-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-    /* SUGGESTIONS */
-    .suggestions {
-      display: flex; gap: 6px; flex-wrap: wrap;
-      padding: 8px 12px 0;
-    }
-    .sug-btn {
-      background: #fff; border: 1px solid #ddd; border-radius: 16px;
-      padding: 6px 12px; font-size: 12px; cursor: pointer; color: var(--text);
-      transition: all .15s;
-    }
-    .sug-btn:hover { background: var(--nexux); color: #fff; border-color: var(--nexux); }
+    /* ── CRM PANEL (60%) ─────────────────────────────────── */
+    .crm-panel { display: none; flex-direction: column; flex: 0 0 60%; background: var(--crm-bg); overflow: hidden; }
 
-    /* CRM PANEL (desktop) */
-    .crm-panel {
-      display: none;
-      flex-direction: column;
-      width: 420px; min-width: 340px;
-      background: var(--crm-bg);
-      border-left: 1px solid var(--crm-border);
-      flex-shrink: 0;
+    /* STATS ROW */
+    .crm-stats-row {
+      background: #fff; border-bottom: 1px solid var(--crm-border);
+      padding: 14px 18px; display: flex; gap: 10px; flex-shrink: 0;
     }
-    .crm-header {
-      background: #fff;
-      border-bottom: 1px solid var(--crm-border);
-      padding: 16px 20px;
-      flex-shrink: 0;
+    .stat {
+      flex: 1; background: var(--crm-bg); border: 1px solid var(--crm-border);
+      border-radius: 10px; padding: 10px 12px; text-align: center; transition: transform .2s;
     }
-    .crm-header h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
-    .crm-stats { display: flex; gap: 10px; }
-    .stat-card {
-      flex: 1; background: #f8fafc;
-      border: 1px solid var(--crm-border); border-radius: 8px;
-      padding: 10px; text-align: center;
-    }
-    .stat-card .num { font-size: 22px; font-weight: 800; color: var(--nexux-dark); }
-    .stat-card .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .stat:hover { transform: translateY(-1px); }
+    .stat .num { font-size: 26px; font-weight: 900; line-height: 1; }
+    .stat .lbl { font-size: 10px; font-weight: 600; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: .3px; }
+    .stat.green .num { color: #16a34a; }
+    .stat.teal  .num { color: var(--nx-dark); }
+    .stat.amber .num { color: #d97706; }
+    .stat.blue  .num { color: #2563eb; }
 
-    .crm-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-    .crm-date-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    /* CALENDAR HEADER */
+    .cal-header {
+      background: #fff; border-bottom: 1px solid var(--crm-border);
+      padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .cal-header h3 { font-size: 14px; font-weight: 700; color: var(--text); }
+    .cal-header .cal-date { font-size: 12px; color: var(--muted); }
 
-    .apt-card {
-      background: #fff; border: 1px solid var(--crm-border);
-      border-radius: 10px; padding: 12px 14px;
-      display: flex; gap: 12px; align-items: center;
-      transition: box-shadow .2s, transform .2s;
-    }
-    .apt-card.new-apt {
-      border-color: var(--nexux);
-      animation: aptIn .5s ease;
-    }
-    @keyframes aptIn {
-      from { opacity: 0; transform: translateY(-10px); box-shadow: 0 0 0 3px rgba(78,205,196,.3); }
-      to   { opacity: 1; transform: translateY(0);     box-shadow: 0 0 0 0 transparent; }
-    }
-    .apt-time { text-align: center; min-width: 46px; }
-    .apt-time .h { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
-    .apt-time .d { font-size: 10px; color: var(--muted); margin-top: 2px; }
-    .apt-info { flex: 1; }
-    .apt-name { font-weight: 700; font-size: 14px; color: var(--text); }
-    .apt-svc  { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .apt-badge {
-      font-size: 11px; padding: 3px 8px; border-radius: 12px;
-      font-weight: 600; white-space: nowrap;
-    }
-    .badge-confirmed { background: #dcfce7; color: #166534; }
-    .badge-pending   { background: #fef9c3; color: #854d0e; }
-    .badge-new       { background: #cffafe; color: #164e63; }
+    /* CALENDAR BODY */
+    .cal-body { flex: 1; overflow-y: auto; padding: 6px 14px 14px; }
+    .cal-row { display: flex; align-items: flex-start; min-height: 48px; border-top: 1px solid #f1f5f9; }
+    .cal-row:first-child { border-top: none; }
+    .cal-hour { width: 42px; flex-shrink: 0; padding-top: 6px; font-size: 11px; font-weight: 600; color: var(--muted); }
+    .cal-slot { flex: 1; padding: 4px 0 4px 8px; display: flex; flex-direction: column; gap: 4px; }
 
-    .crm-footer {
-      padding: 16px 20px;
-      border-top: 1px solid var(--crm-border);
-      background: #fff; flex-shrink: 0;
+    .cal-apt {
+      border-radius: 6px; padding: 5px 10px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; cursor: default;
+      border-left: 3px solid transparent;
     }
-    .cta-btn {
-      display: block; width: 100%;
-      background: var(--nexux-dark); color: #fff;
-      text-align: center; padding: 14px; border-radius: 10px;
-      font-weight: 700; font-size: 15px; text-decoration: none;
-      transition: background .2s, transform .15s;
-    }
-    .cta-btn:hover { background: #1a7a6e; transform: translateY(-1px); }
-    .cta-sub { font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px; }
+    .cal-apt.confirmed { background: #dcfce7; border-color: #16a34a; }
+    .cal-apt.pending   { background: #fef9c3; border-color: #d97706; }
+    .cal-apt.new-apt   { background: #cffafe; border-color: var(--nx); animation: calIn .4s ease; }
+    @keyframes calIn { from { opacity: 0; transform: scaleY(.8); } to { opacity: 1; transform: scaleY(1); } }
+    .cal-apt-name { font-weight: 700; color: var(--text); }
+    .cal-apt-svc  { color: var(--muted); font-size: 11px; }
+    .cal-apt-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .confirmed .cal-apt-badge { background: #16a34a; color: #fff; }
+    .pending   .cal-apt-badge { background: #d97706; color: #fff; }
+    .new-apt   .cal-apt-badge { background: var(--nx-dark); color: #fff; }
 
-    /* MOBILE CRM SHEET */
-    .crm-mobile-sheet {
-      display: none;
-      flex-direction: column;
-      flex: 1; overflow-y: auto;
-      background: var(--crm-bg);
-      padding: 16px; gap: 10px;
-    }
+    /* CRM FOOTER CTA */
+    .crm-cta { padding: 14px 18px; border-top: 1px solid var(--crm-border); background: #fff; flex-shrink: 0; }
+    .cta-btn { display: block; width: 100%; background: var(--nx-dark); color: #fff; text-align: center; padding: 13px; border-radius: 10px; font-weight: 700; font-size: 15px; text-decoration: none; transition: background .2s; }
+    .cta-btn:hover { background: #1a7a6e; }
+    .cta-sub { font-size: 11px; color: var(--muted); text-align: center; margin-top: 5px; }
 
-    /* DESKTOP */
+    /* ── DESKTOP ─────────────────────────────────────────── */
     @media (min-width: 768px) {
       .crm-panel { display: flex; }
-      .chat-panel { width: auto; flex: 1; }
-      .mobile-tab-bar { display: none !important; }
-      .crm-mobile-sheet { display: none !important; }
+      .chat-panel { flex: 0 0 40%; }
+      .tab-bar { display: none !important; }
+      .crm-mobile { display: none !important; }
     }
 
-    /* MOBILE */
+    /* ── MOBILE ──────────────────────────────────────────── */
     @media (max-width: 767px) {
-      .mobile-tab-bar { display: flex; }
+      .tab-bar { display: flex; }
       .crm-panel { display: none !important; }
-      .top-bar strong { display: none; }
-      .msg { max-width: 85%; }
+      .msg { max-width: 86%; }
+      .top-bar .top-label { display: none; }
     }
   </style>
 </head>
 <body>
 
 <div class="top-bar">
-  <strong>Demo en vivo — Salón Élite (simulado)</strong>
-  <span>¿Lo quieres para tu negocio?</span>
+  <span class="top-label">Demo en vivo &mdash; Salon Elite (simulado)</span>
+  <span>Lo quieres para tu negocio?</span>
   <a href="/prueba-gratis">Empieza gratis en segundos</a>
 </div>
 
 <div class="demo-wrap">
 
-  <!-- CHAT PANEL -->
-  <div class="chat-panel" id="chatPanel">
+  <!-- ══ CHAT PANEL (40%) ══════════════════════════════════ -->
+  <div class="chat-panel">
     <div class="chat-header">
-      <div class="avatar">&#x1F487;</div>
-      <div class="info">
-        <div class="name">Salon Elite &middot; Lara</div>
-        <div class="status"><span class="status-dot"></span> En linea &middot; Asistente IA</div>
+      <div class="ch-avatar">&#x2702;</div>
+      <div class="ch-info">
+        <div class="ch-name">Salon Elite &middot; Lara</div>
+        <div class="ch-status"><span class="dot-green"></span>En linea &middot; Asistente IA</div>
       </div>
       <span class="badge-demo">DEMO</span>
     </div>
 
-    <div class="mobile-tab-bar">
+    <div class="tab-bar">
       <button class="tab-btn active" id="tab-chat" onclick="showTab('chat')">&#x1F4AC; Chat</button>
-      <button class="tab-btn" id="tab-crm" onclick="showTab('crm')">&#x1F4CB; Panel del salon</button>
+      <button class="tab-btn" id="tab-crm"  onclick="showTab('crm')">&#x1F4C5; Agenda</button>
     </div>
 
     <div class="messages" id="messages">
       <div class="msg in">
         <div class="bubble">
-          Hola! Soy Lara, la asistente del Salon Elite &#x1F487;&#x200D;&#x2640;&#xFE0F;<br><br>
-          Puedo ayudarte a reservar cita, informarte de precios y horarios, o gestionar tu reserva. En que puedo ayudarte hoy?
+          Hola! Soy Lara, la asistente del Salon Elite &#x2702;&#xFE0F;<br><br>
+          Puedo ayudarte a reservar cita, informarte de precios y horarios, o gestionar tu reserva existente. En que puedo ayudarte hoy?
           <span class="ts" id="init-ts"></span>
         </div>
       </div>
     </div>
 
     <div class="suggestions" id="suggestions">
-      <button class="sug-btn" onclick="useSuggestion(this)">Que servicios teneis?</button>
-      <button class="sug-btn" onclick="useSuggestion(this)">Quiero reservar cita</button>
-      <button class="sug-btn" onclick="useSuggestion(this)">Cuanto cuesta un tinte?</button>
-      <button class="sug-btn" onclick="useSuggestion(this)">Teneis hueco manana?</button>
+      <button class="sug" onclick="useSug(this)">Que servicios teneis?</button>
+      <button class="sug" onclick="useSug(this)">Quiero reservar cita</button>
+      <button class="sug" onclick="useSug(this)">Cuanto cuesta un tinte?</button>
+      <button class="sug" onclick="useSug(this)">Teneis hueco manana?</button>
     </div>
 
-    <div class="crm-mobile-sheet" id="crmMobile">
-      <div class="crm-date-label" id="mDateLabel">Citas de hoy</div>
-      <div id="mAptList"></div>
+    <!-- MOBILE AGENDA -->
+    <div class="crm-mobile" id="crmMobile">
+      <div id="mCalBody"></div>
       <a href="/prueba-gratis" class="cta-btn" style="margin-top:auto">Quiero esto para mi negocio</a>
       <p class="cta-sub">7 dias gratis &middot; Activo en segundos</p>
     </div>
 
     <div class="input-bar" id="inputBar">
       <textarea id="msg-input" rows="1" placeholder="Escribe un mensaje..." maxlength="500"></textarea>
-      <button class="send-btn" id="send-btn" onclick="sendMessage()">&#x27A4;</button>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">&#x27A4;</button>
     </div>
   </div>
 
-  <!-- CRM PANEL (desktop) -->
+  <!-- ══ CRM PANEL (60%) ═══════════════════════════════════ -->
   <div class="crm-panel">
-    <div class="crm-header">
-      <h2>Panel del negocio &mdash; Vista del dueno</h2>
-      <div class="crm-stats">
-        <div class="stat-card">
-          <div class="num" id="stat-total">3</div>
-          <div class="lbl">Citas hoy</div>
-        </div>
-        <div class="stat-card">
-          <div class="num" id="stat-conf">2</div>
-          <div class="lbl">Confirmadas</div>
-        </div>
-        <div class="stat-card">
-          <div class="num" id="stat-pend">1</div>
-          <div class="lbl">Pendientes</div>
-        </div>
+
+    <!-- STATS -->
+    <div class="crm-stats-row">
+      <div class="stat teal">
+        <div class="num" id="st-total">3</div>
+        <div class="lbl">Citas hoy</div>
+      </div>
+      <div class="stat green">
+        <div class="num" id="st-conf">2</div>
+        <div class="lbl">Confirmadas</div>
+      </div>
+      <div class="stat amber">
+        <div class="num" id="st-pend">1</div>
+        <div class="lbl">Pendientes</div>
+      </div>
+      <div class="stat blue">
+        <div class="num">&lt;8s</div>
+        <div class="lbl">Respuesta Lara</div>
       </div>
     </div>
-    <div class="crm-body" id="aptList">
-      <div class="crm-date-label" id="dateLabel"></div>
+
+    <!-- CALENDAR HEADER -->
+    <div class="cal-header">
+      <h3>&#x1F4C5; Agenda del dia</h3>
+      <span class="cal-date" id="calDateLabel"></span>
     </div>
-    <div class="crm-footer">
+
+    <!-- CALENDAR BODY -->
+    <div class="cal-body" id="calBody"></div>
+
+    <!-- CTA -->
+    <div class="crm-cta">
       <a href="/prueba-gratis" class="cta-btn">Quiero esto para mi negocio &rarr;</a>
-      <p class="cta-sub">7 dias gratis &middot; Activo en segundos</p>
+      <p class="cta-sub">7 dias gratis &middot; Activo en segundos &middot; Sin tarjeta</p>
     </div>
   </div>
 
@@ -382,71 +294,110 @@ const API = 'https://pi.nexux.pro';
 <script define:vars={{ API }}>
   var history = [];
   var sending = false;
-  var apts = [];
+  var apts    = [];
+  var lastNewId = null;
 
-  document.getElementById('init-ts').textContent = fmtTime(new Date());
+  // Init timestamp
+  document.getElementById('init-ts').textContent = hhmm(new Date());
 
+  // Calendar date label
+  var calLabel = document.getElementById('calDateLabel');
+  if (calLabel) calLabel.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  // Load initial appointments
   fetch(API + '/demo/appointments')
     .then(function(r){ return r.json(); })
-    .then(function(data){ apts = data; renderApts(); })
-    .catch(function(){ apts = []; renderApts(); });
+    .then(function(d){ apts = d; renderAll(); })
+    .catch(function(){ renderAll(); });
 
-  function fmtTime(d) {
-    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-  }
-  function fmtAptTime(iso) {
-    return new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-  }
-  function fmtAptDate(iso) {
-    return new Date(iso).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-  }
-  function todayLabel() {
-    return new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-  }
+  // ── Helpers ────────────────────────────────────────────
+  function hhmm(d) { return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); }
+  function aptHour(iso) { return new Date(iso).getHours(); }
+  function aptHHMM(iso) { return hhmm(new Date(iso)); }
 
-  function renderApts(newId) {
-    var confirmed = apts.filter(function(a){ return a.status === 'confirmed'; }).length;
-    var pending   = apts.filter(function(a){ return a.status === 'pending' || a.status === 'new'; }).length;
-    var totalEl = document.getElementById('stat-total');
-    var confEl  = document.getElementById('stat-conf');
-    var pendEl  = document.getElementById('stat-pend');
-    if (totalEl) totalEl.textContent = apts.length;
-    if (confEl)  confEl.textContent  = confirmed;
-    if (pendEl)  pendEl.textContent  = pending;
+  // ── Render stats + calendar ────────────────────────────
+  function renderAll(newId) {
+    lastNewId = newId || null;
 
-    var cards = apts.map(function(a){ return aptCard(a, a.id === newId); }).join('');
-    var label = todayLabel();
+    var conf  = apts.filter(function(a){ return a.status === 'confirmed'; }).length;
+    var pend  = apts.filter(function(a){ return a.status !== 'confirmed'; }).length;
 
-    var aptList = document.getElementById('aptList');
-    var mAptList = document.getElementById('mAptList');
-    var dateLabel = document.getElementById('dateLabel');
-    var mDateLabel = document.getElementById('mDateLabel');
+    var stTotal = document.getElementById('st-total');
+    var stConf  = document.getElementById('st-conf');
+    var stPend  = document.getElementById('st-pend');
+    if (stTotal) stTotal.textContent = apts.length;
+    if (stConf)  stConf.textContent  = conf;
+    if (stPend)  stPend.textContent  = pend;
 
-    if (dateLabel) dateLabel.textContent = label;
-    if (mDateLabel) mDateLabel.textContent = 'Citas de hoy';
-    if (aptList) aptList.innerHTML = '<div class="crm-date-label">' + label + '</div>' + cards;
-    if (mAptList) mAptList.innerHTML = cards;
+    renderCalendar('calBody', newId);
+    renderCalendar('mCalBody', newId);
   }
 
-  function aptCard(a, isNew) {
-    var badgeClass = isNew ? 'badge-new' : (a.status === 'confirmed' ? 'badge-confirmed' : 'badge-pending');
-    var badgeText  = isNew ? 'Nueva!' : (a.status === 'confirmed' ? 'Confirmada' : 'Pendiente');
-    return '<div class="apt-card ' + (isNew ? 'new-apt' : '') + '">'
-      + '<div class="apt-time"><div class="h">' + fmtAptTime(a.datetime) + '</div>'
-      + '<div class="d">' + fmtAptDate(a.datetime) + '</div></div>'
-      + '<div class="apt-info"><div class="apt-name">' + a.client_name + '</div>'
-      + '<div class="apt-svc">' + a.service + '</div></div>'
-      + '<span class="apt-badge ' + badgeClass + '">' + badgeText + '</span>'
-      + '</div>';
+  function renderCalendar(containerId, newId) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    var hours = [9,10,11,12,13,14,15,16,17,18,19];
+    var html = '';
+    hours.forEach(function(h) {
+      var slotApts = apts.filter(function(a){ return aptHour(a.datetime) === h; });
+      var slotsHtml = '';
+      slotApts.forEach(function(a) {
+        var isNew = a.id === newId;
+        var cls = isNew ? 'new-apt' : (a.status === 'confirmed' ? 'confirmed' : 'pending');
+        var badge = isNew ? 'Nueva!' : (a.status === 'confirmed' ? 'Confirmada' : 'Pendiente');
+        slotsHtml += '<div class="cal-apt ' + cls + '">'
+          + '<div><div class="cal-apt-name">' + a.client_name + '</div>'
+          + '<div class="cal-apt-svc">' + a.service + '</div></div>'
+          + '<span class="cal-apt-badge">' + badge + '</span>'
+          + '</div>';
+      });
+      html += '<div class="cal-row">'
+        + '<div class="cal-hour">' + h + ':00</div>'
+        + '<div class="cal-slot">' + slotsHtml + '</div>'
+        + '</div>';
+    });
+    el.innerHTML = html;
+
+    // Scroll to first appointment
+    if (apts.length > 0 && containerId === 'calBody') {
+      var firstHour = Math.min.apply(null, apts.map(function(a){ return aptHour(a.datetime); }));
+      var rows = el.querySelectorAll('.cal-row');
+      var HOURS = [9,10,11,12,13,14,15,16,17,18,19];
+      var idx = HOURS.indexOf(firstHour);
+      if (idx > 0 && rows[Math.max(0, idx - 1)]) {
+        rows[Math.max(0, idx - 1)].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   }
 
-  function appendMsg(text, role) {
+  // ── Chat ───────────────────────────────────────────────
+  function addMsg(text, role) {
     var msgs = document.getElementById('messages');
+
+    // Check if switching sender for extra margin
+    var lastMsg = msgs.querySelector('.msg:last-child');
+    var lastRole = lastMsg ? (lastMsg.classList.contains('out') ? 'user' : 'assistant') : null;
+    if (lastRole && lastRole !== role) {
+      var spacer = document.createElement('div');
+      spacer.style.height = '8px';
+      msgs.appendChild(spacer);
+    }
+
     var div = document.createElement('div');
     div.className = 'msg ' + (role === 'user' ? 'out' : 'in');
+
     var bubble = document.createElement('div');
     bubble.className = 'bubble';
-    bubble.innerHTML = text.replace(/\n/g, '<br>') + '<span class="ts">' + fmtTime(new Date()) + '</span>';
+
+    var textNode = document.createElement('span');
+    textNode.innerHTML = text.replace(/\n/g, '<br>');
+
+    var ts = document.createElement('span');
+    ts.className = 'ts';
+    ts.textContent = hhmm(new Date());
+
+    bubble.appendChild(textNode);
+    bubble.appendChild(ts);
     div.appendChild(bubble);
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
@@ -455,19 +406,16 @@ const API = 'https://pi.nexux.pro';
   function showTyping() {
     var msgs = document.getElementById('messages');
     var div = document.createElement('div');
-    div.className = 'msg in';
+    div.className = 'msg in typing-wrap';
     div.id = 'typing';
-    div.innerHTML = '<div class="typing-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+    div.innerHTML = '<div class="typing-indicator"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>';
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
   }
+  function hideTyping() { var t = document.getElementById('typing'); if (t) t.remove(); }
 
-  function hideTyping() {
-    var t = document.getElementById('typing');
-    if (t) t.remove();
-  }
-
-  function sendMessage() {
+  // ── Send ───────────────────────────────────────────────
+  function sendMsg() {
     if (sending) return;
     var input = document.getElementById('msg-input');
     var text = input.value.trim();
@@ -479,7 +427,7 @@ const API = 'https://pi.nexux.pro';
     document.getElementById('send-btn').disabled = true;
     sending = true;
 
-    appendMsg(text, 'user');
+    addMsg(text, 'user');
     history.push({ role: 'user', content: text });
     showTyping();
 
@@ -492,9 +440,9 @@ const API = 'https://pi.nexux.pro';
     .then(function(data) {
       hideTyping();
       if (data.error) {
-        appendMsg('Lo siento, hubo un problema. Intentalo de nuevo.', 'assistant');
+        addMsg('Lo siento, hubo un problema. Intentalo de nuevo.', 'assistant');
       } else {
-        appendMsg(data.reply, 'assistant');
+        addMsg(data.reply, 'assistant');
         history.push({ role: 'assistant', content: data.reply });
 
         if (data.appointmentBooked) {
@@ -502,8 +450,7 @@ const API = 'https://pi.nexux.pro';
           var parts = (apt.time || '10:00').split(':');
           var hh = parseInt(parts[0]) || 10;
           var mm = parseInt(parts[1]) || 0;
-          var dt = new Date();
-          dt.setHours(hh, mm, 0, 0);
+          var dt = new Date(); dt.setHours(hh, mm, 0, 0);
           var newApt = {
             id: 'new-' + Date.now(),
             client_name: apt.name || 'Cliente',
@@ -512,16 +459,15 @@ const API = 'https://pi.nexux.pro';
             status: 'new'
           };
           apts = apts.concat([newApt]);
-          renderApts(newApt.id);
+          renderAll(newApt.id);
 
+          // Flash CRM tab on mobile
           var crmTab = document.getElementById('tab-crm');
           if (crmTab) {
+            var orig = crmTab.textContent;
             crmTab.style.color = '#4ade80';
             crmTab.textContent = 'Nueva cita!';
-            setTimeout(function() {
-              crmTab.style.color = '';
-              crmTab.textContent = 'Panel del salon';
-            }, 3000);
+            setTimeout(function(){ crmTab.style.color = ''; crmTab.textContent = orig; }, 3000);
           }
         }
       }
@@ -531,53 +477,42 @@ const API = 'https://pi.nexux.pro';
     })
     .catch(function() {
       hideTyping();
-      appendMsg('Error de conexion. Recarga la pagina.', 'assistant');
+      addMsg('Error de conexion. Recarga la pagina.', 'assistant');
       sending = false;
       document.getElementById('send-btn').disabled = false;
     });
   }
 
-  function useSuggestion(btn) {
-    var input = document.getElementById('msg-input');
-    input.value = btn.textContent;
-    sendMessage();
+  function useSug(btn) {
+    document.getElementById('msg-input').value = btn.textContent;
+    sendMsg();
   }
 
   document.getElementById('msg-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
   });
-
   document.getElementById('msg-input').addEventListener('input', function() {
     this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    this.style.height = Math.min(this.scrollHeight, 90) + 'px';
   });
 
+  // ── Mobile tabs ────────────────────────────────────────
   function showTab(tab) {
-    var messages  = document.getElementById('messages');
-    var sugs      = document.getElementById('suggestions');
-    var inputBar  = document.getElementById('inputBar');
-    var crmSheet  = document.getElementById('crmMobile');
-    var tabChat   = document.getElementById('tab-chat');
-    var tabCrm    = document.getElementById('tab-crm');
-
+    var msgs     = document.getElementById('messages');
+    var sugs     = document.getElementById('suggestions');
+    var inputBar = document.getElementById('inputBar');
+    var crmMob   = document.getElementById('crmMobile');
+    var tabChat  = document.getElementById('tab-chat');
+    var tabCrm   = document.getElementById('tab-crm');
     if (tab === 'chat') {
-      messages.style.display = '';
-      sugs.style.display     = '';
-      inputBar.style.display = '';
-      crmSheet.style.display = 'none';
-      tabChat.classList.add('active');
-      tabCrm.classList.remove('active');
+      msgs.style.display = ''; sugs.style.display = ''; inputBar.style.display = '';
+      crmMob.style.display = 'none';
+      tabChat.classList.add('active'); tabCrm.classList.remove('active');
     } else {
-      messages.style.display = 'none';
-      sugs.style.display     = 'none';
-      inputBar.style.display = 'none';
-      crmSheet.style.display = 'flex';
-      tabCrm.classList.add('active');
-      tabChat.classList.remove('active');
-      renderApts();
+      msgs.style.display = 'none'; sugs.style.display = 'none'; inputBar.style.display = 'none';
+      crmMob.style.display = 'flex';
+      tabCrm.classList.add('active'); tabChat.classList.remove('active');
+      renderAll(lastNewId);
     }
   }
 </script>
