@@ -578,6 +578,10 @@ const API = 'https://pi.nexux.pro';
         if (data.appointmentBooked) {
           var apt = data.appointmentBooked;
           var iso = apt.datetime || new Date().toISOString();
+          // Reprogramacion: si Lara cancelo, quitamos la cita previa de este cliente creada en la sesion
+          if (data.rescheduled) {
+            apts = apts.filter(function(a){ return !(a.status === 'new' && a.client_name === apt.name); });
+          }
           var dup = apts.some(function(a){ return a.client_name === apt.name && a.service === apt.service && a.datetime === iso; });
           if (!dup) {
             var newApt = { id: 'new-' + Date.now(), client_name: apt.name || 'Cliente', service: apt.service || 'Servicio', datetime: iso, status: 'new' };
@@ -586,6 +590,8 @@ const API = 'https://pi.nexux.pro';
             renderAll(newApt.id);
             var tabCrm = document.getElementById('tab-crm');
             if (tabCrm) { var o=tabCrm.textContent; tabCrm.style.color='#4ade80'; tabCrm.textContent='Nueva cita!'; setTimeout(function(){ tabCrm.style.color=''; tabCrm.textContent=o; }, 3000); }
+          } else {
+            renderAll();
           }
         }
       }
