@@ -12,94 +12,88 @@ const API = 'https://pi.nexux.pro';
   <style is:global>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --wa-green:     #25D366;
-      --wa-dark:      #128C7E;
-      --wa-header:    #075E54;
-      --wa-bg:        #ECE5DD;
-      --bubble-in:    #ffffff;
-      --bubble-out:   #DCF8C6;
-      --crm-bg:       #f8fafc;
-      --crm-border:   #e2e8f0;
-      --nx:           #4ECDC4;
-      --nx-dark:      #2a9d8f;
-      --text:         #1a1a2e;
-      --muted:        #64748b;
+      --nx:        #4ECDC4;
+      --nx-dark:   #2a9d8f;
+      --text:      #1a1a2e;
+      --muted:     #64748b;
+      --border:    #e2e8f0;
+      --bg:        #f1f5f9;
+      /* WhatsApp */
+      --wa-header: #075E54;
+      --wa-green:  #25D366;
+      --wa-bg:     #ECE5DD;
+      --wa-out:    #DCF8C6;
+      --wa-in:     #ffffff;
+      /* Telegram */
+      --tg-header: #2CA5E0;
+      --tg-bg:     #DAE7F3;
+      --tg-out:    #EFFDDD;
+      --tg-in:     #ffffff;
     }
-    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; overflow: hidden; }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; }
 
-    /* ── TOP BAR ─────────────────────────────────────────── */
-    .top-bar {
-      background: var(--nx-dark); color: #fff;
-      padding: 9px 16px; font-size: 13px;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      flex-wrap: wrap; height: 40px;
-    }
-    .top-bar a {
-      background: #fff; color: var(--nx-dark);
-      font-weight: 700; padding: 4px 14px; border-radius: 20px;
-      text-decoration: none; font-size: 12px; white-space: nowrap;
-    }
+    /* TOP BAR */
+    .top-bar { background: var(--nx-dark); color: #fff; height: 38px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 12.5px; }
+    .top-bar a { background: #fff; color: var(--nx-dark); font-weight: 700; padding: 4px 13px; border-radius: 20px; text-decoration: none; font-size: 11.5px; white-space: nowrap; }
+    .top-label { opacity: .85; }
 
-    /* ── LAYOUT ──────────────────────────────────────────── */
-    .demo-wrap { display: flex; height: calc(100dvh - 40px); max-width: 1280px; margin: 0 auto; }
+    /* LAYOUT */
+    .demo-wrap { display: flex; height: calc(100dvh - 38px); max-width: 1400px; margin: 0 auto; }
 
-    /* ── CHAT PANEL (40%) ────────────────────────────────── */
-    .chat-panel { display: flex; flex-direction: column; flex: 0 0 40%; background: var(--wa-bg); border-right: 1px solid #ccc; }
+    /* ═══════════════════════════════════════════════════════
+       CHAT PANEL — 40%
+    ═══════════════════════════════════════════════════════ */
+    .chat-panel { display: flex; flex-direction: column; flex: 0 0 40%; min-width: 0; border-right: 1px solid var(--border); transition: background .3s; }
+    .chat-panel.wa { background: var(--wa-bg); }
+    .chat-panel.tg { background: var(--tg-bg); }
 
-    .chat-header {
-      background: var(--wa-header); color: #fff;
-      padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-    }
-    .ch-avatar {
-      width: 38px; height: 38px; background: var(--wa-green);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
-    }
-    .ch-info { flex: 1; }
+    /* CHANNEL TOGGLE */
+    .channel-toggle { display: flex; gap: 0; flex-shrink: 0; }
+    .ch-btn { flex: 1; border: none; padding: 7px 0; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all .2s; color: #fff; opacity: .6; }
+    .ch-btn.active { opacity: 1; }
+    .ch-btn.wa-btn { background: #075E54; }
+    .ch-btn.tg-btn { background: #1a8fc2; }
+    .ch-btn.active.wa-btn { background: var(--wa-header); }
+    .ch-btn.active.tg-btn { background: var(--tg-header); }
+
+    /* CHAT HEADER */
+    .chat-header { color: #fff; padding: 9px 13px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; transition: background .3s; }
+    .wa .chat-header { background: var(--wa-header); }
+    .tg .chat-header { background: var(--tg-header); }
+    .ch-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; font-weight: 700; }
+    .wa .ch-avatar { background: var(--wa-green); }
+    .tg .ch-avatar { background: rgba(255,255,255,.2); }
     .ch-name  { font-weight: 700; font-size: 14px; }
     .ch-status { font-size: 11px; opacity: .8; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
-    .dot-green { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; }
-    .badge-demo { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+    .dot-on { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; }
+    .badge-demo { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); font-size: 10px; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
 
     /* MOBILE TABS */
-    .tab-bar { display: none; background: var(--wa-header); }
-    .tab-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,.65); padding: 9px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .tab-btn.active { color: #fff; border-bottom: 2px solid var(--wa-green); }
+    .tab-bar { display: none; }
+    .tab-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,.65); padding: 8px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .tab-btn.active { color: #fff; border-bottom: 2px solid #4ade80; }
+    .wa .tab-bar { background: var(--wa-header); }
+    .tg .tab-bar { background: var(--tg-header); }
 
     /* MESSAGES */
-    .messages { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; scroll-behavior: smooth; }
+    .messages { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; }
 
-    .msg { display: flex; flex-direction: column; max-width: 78%; margin-bottom: 6px; }
+    .msg { display: flex; flex-direction: column; max-width: 80%; margin-bottom: 3px; }
     .msg.out { align-self: flex-end; align-items: flex-end; }
     .msg.in  { align-self: flex-start; }
-    /* Extra gap when switching sender */
-    .msg.in  + .msg.out,
-    .msg.out + .msg.in  { margin-top: 10px; }
+    .msg.switch-sender { margin-top: 10px; }
 
-    .bubble {
-      padding: 7px 10px 4px 10px;
-      border-radius: 8px;
-      font-size: 13.5px;
-      line-height: 1.5;
-      word-break: break-word;
-      box-shadow: 0 1px 1px rgba(0,0,0,.1);
-      position: relative;
-    }
-    .msg.out .bubble { background: var(--bubble-out); border-bottom-right-radius: 2px; }
-    .msg.in  .bubble { background: var(--bubble-in);  border-bottom-left-radius: 2px; }
+    .bubble { padding: 7px 10px 4px 10px; border-radius: 8px; font-size: 13.5px; line-height: 1.5; word-break: break-word; box-shadow: 0 1px 1px rgba(0,0,0,.1); }
+    .wa .msg.out .bubble { background: var(--wa-out); border-bottom-right-radius: 2px; }
+    .wa .msg.in  .bubble { background: var(--wa-in);  border-bottom-left-radius: 2px; }
+    .tg .msg.out .bubble { background: var(--tg-out); border-bottom-right-radius: 2px; }
+    .tg .msg.in  .bubble { background: var(--tg-in);  border-bottom-left-radius: 2px; }
 
-    .ts {
-      display: block;
-      font-size: 10.5px;
-      color: var(--muted);
-      text-align: right;
-      margin-top: 2px;
-    }
+    .ts { display: block; font-size: 10.5px; color: var(--muted); text-align: right; margin-top: 2px; }
 
     /* Typing */
-    .typing-wrap { align-self: flex-start; }
-    .typing-indicator { display: flex; gap: 4px; padding: 10px 14px; background: #fff; border-radius: 8px; border-bottom-left-radius: 2px; width: fit-content; box-shadow: 0 1px 1px rgba(0,0,0,.1); }
-    .tdot { width: 7px; height: 7px; background: #aaa; border-radius: 50%; animation: tdot 1.2s infinite; }
+    .typing-indicator { display: flex; gap: 4px; padding: 9px 13px; background: #fff; border-radius: 8px; border-bottom-left-radius: 2px; width: fit-content; box-shadow: 0 1px 1px rgba(0,0,0,.1); }
+    .tdot { width: 7px; height: 7px; background: #bbb; border-radius: 50%; animation: tdot 1.2s infinite; }
     .tdot:nth-child(2) { animation-delay: .2s; }
     .tdot:nth-child(3) { animation-delay: .4s; }
     @keyframes tdot { 0%,60%,100%{transform:translateY(0);opacity:.5} 30%{transform:translateY(-5px);opacity:1} }
@@ -110,87 +104,84 @@ const API = 'https://pi.nexux.pro';
     .sug:hover { background: var(--nx); color: #fff; border-color: var(--nx); }
 
     /* MOBILE CRM SHEET */
-    .crm-mobile { display: none; flex-direction: column; flex: 1; overflow-y: auto; background: var(--crm-bg); padding: 14px; gap: 10px; }
+    .crm-mobile { display: none; flex-direction: column; flex: 1; overflow-y: auto; background: var(--bg); padding: 12px; gap: 10px; }
 
     /* INPUT */
-    .input-bar { background: #f0f2f5; padding: 8px 10px; display: flex; gap: 7px; align-items: flex-end; flex-shrink: 0; }
-    #msg-input { flex: 1; border: none; background: #fff; border-radius: 20px; padding: 9px 14px; font-size: 13.5px; outline: none; resize: none; max-height: 90px; line-height: 1.4; font-family: inherit; }
-    .send-btn { width: 42px; height: 42px; background: var(--wa-green); border: none; border-radius: 50%; color: #fff; font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s; }
-    .send-btn:hover { background: var(--wa-dark); }
-    .send-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .input-bar { padding: 8px 10px; display: flex; gap: 7px; align-items: flex-end; flex-shrink: 0; }
+    .wa .input-bar { background: #f0f2f5; }
+    .tg .input-bar { background: #c8d9e8; }
+    #msg-input { flex: 1; border: none; border-radius: 20px; padding: 9px 14px; font-size: 13.5px; outline: none; resize: none; max-height: 90px; line-height: 1.4; font-family: inherit; background: #fff; }
+    .send-btn { width: 42px; height: 42px; border: none; border-radius: 50%; color: #fff; font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s; }
+    .wa .send-btn { background: var(--wa-green); }
+    .wa .send-btn:hover { background: #128C7E; }
+    .tg .send-btn { background: var(--tg-header); }
+    .tg .send-btn:hover { background: #1a8fc2; }
+    .send-btn:disabled { background: #ccc !important; cursor: not-allowed; }
 
-    /* ── CRM PANEL (60%) ─────────────────────────────────── */
-    .crm-panel { display: none; flex-direction: column; flex: 0 0 60%; background: var(--crm-bg); overflow: hidden; }
+    /* ═══════════════════════════════════════════════════════
+       CRM PANEL — 60% (copia fiel del portal real)
+    ═══════════════════════════════════════════════════════ */
+    .crm-panel { display: none; flex-direction: column; flex: 0 0 60%; min-width: 0; background: #fff; border-left: 1px solid var(--border); }
 
-    /* STATS ROW */
-    .crm-stats-row {
-      background: #fff; border-bottom: 1px solid var(--crm-border);
-      padding: 14px 18px; display: flex; gap: 10px; flex-shrink: 0;
-    }
-    .stat {
-      flex: 1; background: var(--crm-bg); border: 1px solid var(--crm-border);
-      border-radius: 10px; padding: 10px 12px; text-align: center; transition: transform .2s;
-    }
-    .stat:hover { transform: translateY(-1px); }
-    .stat .num { font-size: 26px; font-weight: 900; line-height: 1; }
-    .stat .lbl { font-size: 10px; font-weight: 600; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: .3px; }
-    .stat.green .num { color: #16a34a; }
-    .stat.teal  .num { color: var(--nx-dark); }
-    .stat.amber .num { color: #d97706; }
-    .stat.blue  .num { color: #2563eb; }
+    /* CRM TOP BAR */
+    .crm-topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .crm-topbar .crm-business { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .badge-activo { background: #dcfce7; color: #166534; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+    .crm-topbar .crm-nav { display: flex; gap: 4px; }
+    .nav-btn { background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text); transition: all .15s; }
+    .nav-btn:hover { background: var(--nx); color: #fff; border-color: var(--nx); }
+    .crm-week-label { font-size: 12px; color: var(--muted); font-weight: 600; min-width: 100px; text-align: center; }
 
-    /* CALENDAR HEADER */
-    .cal-header {
-      background: #fff; border-bottom: 1px solid var(--crm-border);
-      padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .cal-header h3 { font-size: 14px; font-weight: 700; color: var(--text); }
-    .cal-header .cal-date { font-size: 12px; color: var(--muted); }
+    /* STATS CARDS */
+    .crm-stats { display: flex; gap: 14px; padding: 14px 20px; flex-shrink: 0; background: #fff; border-bottom: 1px solid var(--border); }
+    .stat-card { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .stat-card .sc-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+    .stat-card .sc-val { font-size: 22px; font-weight: 900; color: var(--text); line-height: 1; }
+    .stat-card .sc-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .stat-card.highlight .sc-val { color: var(--nx-dark); }
 
-    /* CALENDAR BODY */
-    .cal-body { flex: 1; overflow-y: auto; padding: 6px 14px 14px; }
-    .cal-row { display: flex; align-items: flex-start; min-height: 48px; border-top: 1px solid #f1f5f9; }
-    .cal-row:first-child { border-top: none; }
-    .cal-hour { width: 42px; flex-shrink: 0; padding-top: 6px; font-size: 11px; font-weight: 600; color: var(--muted); }
-    .cal-slot { flex: 1; padding: 4px 0 4px 8px; display: flex; flex-direction: column; gap: 4px; }
+    /* CALENDAR WEEK VIEW */
+    .cal-container { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .cal-head { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; background: #fff; }
+    .cal-head-time { width: 50px; flex-shrink: 0; }
+    .cal-head-day { flex: 1; text-align: center; padding: 8px 2px; border-left: 1px solid var(--border); }
+    .cal-head-day .day-name { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+    .cal-head-day .day-num  { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.2; }
+    .cal-head-day .day-num.today { background: var(--nx-dark); color: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin: 2px auto 0; }
 
-    .cal-apt {
-      border-radius: 6px; padding: 5px 10px;
-      display: flex; align-items: center; gap: 8px;
-      font-size: 12px; cursor: default;
-      border-left: 3px solid transparent;
-    }
-    .cal-apt.confirmed { background: #dcfce7; border-color: #16a34a; }
-    .cal-apt.pending   { background: #fef9c3; border-color: #d97706; }
-    .cal-apt.new-apt   { background: #cffafe; border-color: var(--nx); animation: calIn .4s ease; }
-    @keyframes calIn { from { opacity: 0; transform: scaleY(.8); } to { opacity: 1; transform: scaleY(1); } }
-    .cal-apt-name { font-weight: 700; color: var(--text); }
-    .cal-apt-svc  { color: var(--muted); font-size: 11px; }
-    .cal-apt-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
-    .confirmed .cal-apt-badge { background: #16a34a; color: #fff; }
-    .pending   .cal-apt-badge { background: #d97706; color: #fff; }
-    .new-apt   .cal-apt-badge { background: var(--nx-dark); color: #fff; }
+    .cal-body { flex: 1; overflow-y: auto; }
+    .cal-row { display: flex; min-height: 44px; border-bottom: 1px solid #f1f5f9; }
+    .cal-time { width: 50px; flex-shrink: 0; padding: 4px 8px 0 0; text-align: right; font-size: 10.5px; color: var(--muted); font-weight: 600; }
+    .cal-cell { flex: 1; border-left: 1px solid #f1f5f9; padding: 2px 3px; position: relative; min-height: 44px; }
+    .cal-cell.today-col { background: #f0fdf9; }
 
-    /* CRM FOOTER CTA */
-    .crm-cta { padding: 14px 18px; border-top: 1px solid var(--crm-border); background: #fff; flex-shrink: 0; }
-    .cta-btn { display: block; width: 100%; background: var(--nx-dark); color: #fff; text-align: center; padding: 13px; border-radius: 10px; font-weight: 700; font-size: 15px; text-decoration: none; transition: background .2s; }
+    .wcal-apt { border-radius: 5px; padding: 3px 7px; margin-bottom: 2px; font-size: 11.5px; border-left: 3px solid transparent; cursor: default; }
+    .wcal-apt.confirmed { background: #dcfce7; border-color: #16a34a; }
+    .wcal-apt.pending   { background: #fef9c3; border-color: #d97706; }
+    .wcal-apt.new-apt   { background: #cffafe; border-color: var(--nx); animation: aptIn .4s ease; }
+    @keyframes aptIn { from { opacity: 0; transform: scaleY(.8); } to { opacity: 1; transform: scaleY(1); } }
+    .wcal-apt .apt-name { font-weight: 700; color: var(--text); }
+    .wcal-apt .apt-svc  { color: var(--muted); font-size: 10.5px; }
+
+    /* CRM FOOTER */
+    .crm-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: #fff; flex-shrink: 0; display: flex; align-items: center; gap: 14px; }
+    .cta-btn { flex: 1; background: var(--nx-dark); color: #fff; text-align: center; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; transition: background .2s; white-space: nowrap; }
     .cta-btn:hover { background: #1a7a6e; }
-    .cta-sub { font-size: 11px; color: var(--muted); text-align: center; margin-top: 5px; }
+    .cta-sub { font-size: 11px; color: var(--muted); white-space: nowrap; }
 
-    /* ── DESKTOP ─────────────────────────────────────────── */
+    /* ── DESKTOP ──────────────────────────────────────── */
     @media (min-width: 768px) {
       .crm-panel { display: flex; }
-      .chat-panel { flex: 0 0 40%; }
       .tab-bar { display: none !important; }
       .crm-mobile { display: none !important; }
     }
-
-    /* ── MOBILE ──────────────────────────────────────────── */
+    /* ── MOBILE ───────────────────────────────────────── */
     @media (max-width: 767px) {
       .tab-bar { display: flex; }
       .crm-panel { display: none !important; }
       .msg { max-width: 86%; }
-      .top-bar .top-label { display: none; }
+      .top-label { display: none; }
+      .chat-panel { flex: 1; }
     }
   </style>
 </head>
@@ -204,27 +195,40 @@ const API = 'https://pi.nexux.pro';
 
 <div class="demo-wrap">
 
-  <!-- ══ CHAT PANEL (40%) ══════════════════════════════════ -->
-  <div class="chat-panel">
+  <!-- ══ CHAT PANEL (40%) ══════════════════════════════ -->
+  <div class="chat-panel wa" id="chatPanel">
+
+    <!-- CHANNEL TOGGLE -->
+    <div class="channel-toggle">
+      <button class="ch-btn wa-btn active" id="btn-wa" onclick="setChannel('wa')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.552 4.122 1.523 5.858L0 24l6.286-1.493C8.019 23.453 9.972 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.899 0-3.68-.496-5.22-1.366l-.374-.222-3.734.887.927-3.644-.243-.387C2.498 15.67 2 13.9 2 12 2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        WhatsApp
+      </button>
+      <button class="ch-btn tg-btn" id="btn-tg" onclick="setChannel('tg')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Telegram
+      </button>
+    </div>
+
     <div class="chat-header">
-      <div class="ch-avatar">&#x2702;</div>
-      <div class="ch-info">
-        <div class="ch-name">Salon Elite &middot; Lara</div>
-        <div class="ch-status"><span class="dot-green"></span>En linea &middot; Asistente IA</div>
+      <div class="ch-avatar" id="ch-avatar">&#x2702;</div>
+      <div style="flex:1">
+        <div class="ch-name" id="ch-name">Salon Elite &middot; Lara</div>
+        <div class="ch-status"><span class="dot-on"></span><span id="ch-sub">En linea &middot; Asistente IA</span></div>
       </div>
       <span class="badge-demo">DEMO</span>
     </div>
 
-    <div class="tab-bar">
+    <div class="tab-bar" id="tabBar">
       <button class="tab-btn active" id="tab-chat" onclick="showTab('chat')">&#x1F4AC; Chat</button>
-      <button class="tab-btn" id="tab-crm"  onclick="showTab('crm')">&#x1F4C5; Agenda</button>
+      <button class="tab-btn" id="tab-crm" onclick="showTab('crm')">&#x1F4C5; Agenda</button>
     </div>
 
     <div class="messages" id="messages">
       <div class="msg in">
         <div class="bubble">
           Hola! Soy Lara, la asistente del Salon Elite &#x2702;&#xFE0F;<br><br>
-          Puedo ayudarte a reservar cita, informarte de precios y horarios, o gestionar tu reserva existente. En que puedo ayudarte hoy?
+          Puedo ayudarte a reservar cita, informarte de precios y horarios, o gestionar tu reserva. En que puedo ayudarte hoy?
           <span class="ts" id="init-ts"></span>
         </div>
       </div>
@@ -237,11 +241,10 @@ const API = 'https://pi.nexux.pro';
       <button class="sug" onclick="useSug(this)">Teneis hueco manana?</button>
     </div>
 
-    <!-- MOBILE AGENDA -->
     <div class="crm-mobile" id="crmMobile">
-      <div id="mCalBody"></div>
-      <a href="/prueba-gratis" class="cta-btn" style="margin-top:auto">Quiero esto para mi negocio</a>
-      <p class="cta-sub">7 dias gratis &middot; Activo en segundos</p>
+      <div id="mCalRows"></div>
+      <a href="/prueba-gratis" class="cta-btn" style="margin-top:auto;display:block;text-align:center">Quiero esto para mi negocio</a>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">7 dias gratis &middot; Activo en segundos</p>
     </div>
 
     <div class="input-bar" id="inputBar">
@@ -250,153 +253,252 @@ const API = 'https://pi.nexux.pro';
     </div>
   </div>
 
-  <!-- ══ CRM PANEL (60%) ═══════════════════════════════════ -->
+  <!-- ══ CRM PANEL (60%) — copia fiel del portal real ══ -->
   <div class="crm-panel">
 
-    <!-- STATS -->
-    <div class="crm-stats-row">
-      <div class="stat teal">
-        <div class="num" id="st-total">3</div>
-        <div class="lbl">Citas hoy</div>
+    <!-- TOP BAR (igual que el portal real) -->
+    <div class="crm-topbar">
+      <div class="crm-business">
+        Salon Elite <span class="badge-activo">Activo</span>
       </div>
-      <div class="stat green">
-        <div class="num" id="st-conf">2</div>
-        <div class="lbl">Confirmadas</div>
+      <div class="crm-nav">
+        <button class="nav-btn" onclick="moveWeek(-1)">&#x2190; Anterior</button>
+        <span class="crm-week-label" id="weekLabel"></span>
+        <button class="nav-btn" onclick="moveWeek(1)">Siguiente &#x2192;</button>
       </div>
-      <div class="stat amber">
-        <div class="num" id="st-pend">1</div>
-        <div class="lbl">Pendientes</div>
+      <a href="/prueba-gratis" style="background:var(--nx-dark);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12.5px;font-weight:700;text-decoration:none;cursor:pointer">+ Nueva cita</a>
+    </div>
+
+    <!-- STATS (igual que el portal real) -->
+    <div class="crm-stats">
+      <div class="stat-card highlight">
+        <div class="sc-label">Citas hoy</div>
+        <div class="sc-val" id="sc-total">3</div>
+        <div class="sc-sub" id="sc-sub">Proximas citas</div>
       </div>
-      <div class="stat blue">
-        <div class="num">&lt;8s</div>
-        <div class="lbl">Respuesta Lara</div>
+      <div class="stat-card">
+        <div class="sc-label">Mensajes a revisar</div>
+        <div class="sc-val" id="sc-msgs">0</div>
+        <div class="sc-sub">Sin intervencion pendiente</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Huecos libres</div>
+        <div class="sc-val" style="font-size:16px;margin-top:2px" id="sc-slots">8 disponibles</div>
+        <div class="sc-sub">Estimado segun horario</div>
       </div>
     </div>
 
-    <!-- CALENDAR HEADER -->
-    <div class="cal-header">
-      <h3>&#x1F4C5; Agenda del dia</h3>
-      <span class="cal-date" id="calDateLabel"></span>
+    <!-- CALENDAR WEEK VIEW -->
+    <div class="cal-container">
+      <!-- Day headers -->
+      <div class="cal-head" id="calHead"></div>
+      <!-- Body -->
+      <div class="cal-body" id="calBody"></div>
     </div>
 
-    <!-- CALENDAR BODY -->
-    <div class="cal-body" id="calBody"></div>
-
-    <!-- CTA -->
-    <div class="crm-cta">
+    <!-- FOOTER CTA -->
+    <div class="crm-footer">
       <a href="/prueba-gratis" class="cta-btn">Quiero esto para mi negocio &rarr;</a>
-      <p class="cta-sub">7 dias gratis &middot; Activo en segundos &middot; Sin tarjeta</p>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">7 dias gratis</div>
+        <div class="cta-sub">Activo en segundos &middot; Sin tarjeta</div>
+      </div>
     </div>
   </div>
 
 </div>
 
 <script define:vars={{ API }}>
-  var history = [];
-  var sending = false;
-  var apts    = [];
+  var history  = [];
+  var sending  = false;
+  var apts     = [];
+  var channel  = 'wa';
+  var weekOffset = 0;
   var lastNewId = null;
 
-  // Init timestamp
   document.getElementById('init-ts').textContent = hhmm(new Date());
 
-  // Calendar date label
-  var calLabel = document.getElementById('calDateLabel');
-  if (calLabel) calLabel.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-
-  // Load initial appointments
   fetch(API + '/demo/appointments')
     .then(function(r){ return r.json(); })
     .then(function(d){ apts = d; renderAll(); })
     .catch(function(){ renderAll(); });
 
-  // ── Helpers ────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────
   function hhmm(d) { return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); }
-  function aptHour(iso) { return new Date(iso).getHours(); }
-  function aptHHMM(iso) { return hhmm(new Date(iso)); }
 
-  // ── Render stats + calendar ────────────────────────────
-  function renderAll(newId) {
-    lastNewId = newId || null;
-
-    var conf  = apts.filter(function(a){ return a.status === 'confirmed'; }).length;
-    var pend  = apts.filter(function(a){ return a.status !== 'confirmed'; }).length;
-
-    var stTotal = document.getElementById('st-total');
-    var stConf  = document.getElementById('st-conf');
-    var stPend  = document.getElementById('st-pend');
-    if (stTotal) stTotal.textContent = apts.length;
-    if (stConf)  stConf.textContent  = conf;
-    if (stPend)  stPend.textContent  = pend;
-
-    renderCalendar('calBody', newId);
-    renderCalendar('mCalBody', newId);
+  function getWeekStart(offset) {
+    var d = new Date();
+    var day = d.getDay(); // 0=Sun
+    var diff = (day === 0 ? -6 : 1 - day); // Monday
+    d.setDate(d.getDate() + diff + offset * 7);
+    d.setHours(0, 0, 0, 0);
+    return d;
   }
 
-  function renderCalendar(containerId, newId) {
-    var el = document.getElementById(containerId);
-    if (!el) return;
-    var hours = [9,10,11,12,13,14,15,16,17,18,19];
-    var html = '';
-    hours.forEach(function(h) {
-      var slotApts = apts.filter(function(a){ return aptHour(a.datetime) === h; });
-      var slotsHtml = '';
-      slotApts.forEach(function(a) {
-        var isNew = a.id === newId;
-        var cls = isNew ? 'new-apt' : (a.status === 'confirmed' ? 'confirmed' : 'pending');
-        var badge = isNew ? 'Nueva!' : (a.status === 'confirmed' ? 'Confirmada' : 'Pendiente');
-        slotsHtml += '<div class="cal-apt ' + cls + '">'
-          + '<div><div class="cal-apt-name">' + a.client_name + '</div>'
-          + '<div class="cal-apt-svc">' + a.service + '</div></div>'
-          + '<span class="cal-apt-badge">' + badge + '</span>'
+  function sameDay(a, b) {
+    return a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+  }
+
+  // ── Stats ─────────────────────────────────────────────
+  function renderStats() {
+    var today = new Date();
+    var todayApts = apts.filter(function(a){ return sameDay(new Date(a.datetime), today); });
+    var scTotal = document.getElementById('sc-total');
+    var scSub   = document.getElementById('sc-sub');
+    if (scTotal) scTotal.textContent = todayApts.length;
+    if (scSub)   scSub.textContent   = todayApts.length > 0 ? todayApts.length + ' citas programadas' : 'Sin proximas citas';
+  }
+
+  // ── Week Calendar ─────────────────────────────────────
+  function renderWeek(newId) {
+    var mon = getWeekStart(weekOffset);
+    var days = [];
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(mon);
+      d.setDate(mon.getDate() + i);
+      days.push(d);
+    }
+
+    // Week label
+    var wLabel = document.getElementById('weekLabel');
+    if (wLabel) {
+      var d0 = days[0], d6 = days[6];
+      wLabel.textContent = d0.getDate() + '/' + (d0.getMonth()+1) + ' – ' + d6.getDate() + '/' + (d6.getMonth()+1);
+    }
+
+    // Day headers
+    var head = document.getElementById('calHead');
+    if (head) {
+      var today = new Date();
+      var hhtml = '<div class="cal-head-time"></div>';
+      days.forEach(function(d) {
+        var isToday = sameDay(d, today);
+        var numHtml = isToday
+          ? '<div class="day-num today">' + d.getDate() + '</div>'
+          : '<div class="day-num">' + d.getDate() + '</div>';
+        hhtml += '<div class="cal-head-day">'
+          + '<div class="day-name">' + d.toLocaleDateString('es-ES', {weekday: 'short'}).toUpperCase() + '</div>'
+          + numHtml
           + '</div>';
       });
-      html += '<div class="cal-row">'
-        + '<div class="cal-hour">' + h + ':00</div>'
-        + '<div class="cal-slot">' + slotsHtml + '</div>'
-        + '</div>';
-    });
-    el.innerHTML = html;
+      head.innerHTML = hhtml;
+    }
 
-    // Scroll to first appointment
-    if (apts.length > 0 && containerId === 'calBody') {
-      var firstHour = Math.min.apply(null, apts.map(function(a){ return aptHour(a.datetime); }));
-      var rows = el.querySelectorAll('.cal-row');
-      var HOURS = [9,10,11,12,13,14,15,16,17,18,19];
-      var idx = HOURS.indexOf(firstHour);
-      if (idx > 0 && rows[Math.max(0, idx - 1)]) {
-        rows[Math.max(0, idx - 1)].scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    // Calendar body
+    var body = document.getElementById('calBody');
+    if (!body) return;
+    var today = new Date();
+    var hours = [9,10,11,12,13,14,15,16,17,18,19];
+    var bhtml = '';
+    hours.forEach(function(h) {
+      bhtml += '<div class="cal-row"><div class="cal-time">' + h + ':00</div>';
+      days.forEach(function(d) {
+        var isToday = sameDay(d, today);
+        var slotApts = apts.filter(function(a) {
+          var ad = new Date(a.datetime);
+          return sameDay(ad, d) && ad.getHours() === h;
+        });
+        bhtml += '<div class="cal-cell' + (isToday ? ' today-col' : '') + '">';
+        slotApts.forEach(function(a) {
+          var isNew = a.id === newId;
+          var cls = isNew ? 'new-apt' : (a.status === 'confirmed' ? 'confirmed' : 'pending');
+          bhtml += '<div class="wcal-apt ' + cls + '">'
+            + '<div class="apt-name">' + a.client_name + '</div>'
+            + '<div class="apt-svc">' + a.service + '</div>'
+            + '</div>';
+        });
+        bhtml += '</div>';
+      });
+      bhtml += '</div>';
+    });
+    body.innerHTML = bhtml;
+
+    // Scroll to 9am
+    var rows = body.querySelectorAll('.cal-row');
+    if (rows.length > 0) body.scrollTop = 0;
+  }
+
+  // Mobile compact view
+  function renderMobile(newId) {
+    var el = document.getElementById('mCalRows');
+    if (!el) return;
+    var hours = [9,10,11,12,13,14,15,16,17,18,19];
+    var today = new Date();
+    var html = '<div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px">Agenda de hoy &mdash; ' + today.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'short'}) + '</div>';
+    hours.forEach(function(h) {
+      var slotApts = apts.filter(function(a){ var ad=new Date(a.datetime); return sameDay(ad,today) && ad.getHours()===h; });
+      if (slotApts.length === 0) return;
+      slotApts.forEach(function(a) {
+        var isNew = a.id === newId;
+        var cls = isNew ? 'new-apt' : (a.status==='confirmed' ? 'confirmed' : 'pending');
+        html += '<div class="wcal-apt ' + cls + '" style="margin-bottom:6px;padding:8px 10px">'
+          + '<div class="apt-name">' + h + ':00 &mdash; ' + a.client_name + '</div>'
+          + '<div class="apt-svc">' + a.service + '</div>'
+          + '</div>';
+      });
+    });
+    if (apts.length === 0) html += '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Sin citas programadas</div>';
+    el.innerHTML = html;
+  }
+
+  function renderAll(newId) {
+    lastNewId = newId || null;
+    renderStats();
+    renderWeek(newId);
+    renderMobile(newId);
+  }
+
+  function moveWeek(dir) {
+    weekOffset += dir;
+    renderWeek(lastNewId);
+  }
+
+  // ── Channel toggle ────────────────────────────────────
+  function setChannel(ch) {
+    channel = ch;
+    var panel = document.getElementById('chatPanel');
+    var btnWa = document.getElementById('btn-wa');
+    var btnTg = document.getElementById('btn-tg');
+    var avatar = document.getElementById('ch-avatar');
+    var name   = document.getElementById('ch-name');
+    var sub    = document.getElementById('ch-sub');
+
+    panel.className = 'chat-panel ' + ch;
+    btnWa.classList.toggle('active', ch === 'wa');
+    btnTg.classList.toggle('active', ch === 'tg');
+
+    if (ch === 'wa') {
+      avatar.textContent = '✂️';
+      name.textContent   = 'Salon Elite · Lara';
+      sub.textContent    = 'En linea · Asistente IA';
+    } else {
+      avatar.textContent = 'L';
+      name.textContent   = 'Lara — Salon Elite';
+      sub.textContent    = 'bot · En linea';
     }
   }
 
-  // ── Chat ───────────────────────────────────────────────
+  // ── Chat ──────────────────────────────────────────────
   function addMsg(text, role) {
     var msgs = document.getElementById('messages');
-
-    // Check if switching sender for extra margin
-    var lastMsg = msgs.querySelector('.msg:last-child');
-    var lastRole = lastMsg ? (lastMsg.classList.contains('out') ? 'user' : 'assistant') : null;
-    if (lastRole && lastRole !== role) {
-      var spacer = document.createElement('div');
-      spacer.style.height = '8px';
-      msgs.appendChild(spacer);
-    }
+    var last = msgs.querySelector('.msg:last-child');
+    var lastRole = last ? (last.classList.contains('out') ? 'user' : 'assistant') : null;
 
     var div = document.createElement('div');
     div.className = 'msg ' + (role === 'user' ? 'out' : 'in');
+    if (lastRole && lastRole !== role) div.classList.add('switch-sender');
 
     var bubble = document.createElement('div');
     bubble.className = 'bubble';
 
-    var textNode = document.createElement('span');
-    textNode.innerHTML = text.replace(/\n/g, '<br>');
+    var span = document.createElement('span');
+    span.innerHTML = text.replace(/\n/g, '<br>');
 
     var ts = document.createElement('span');
     ts.className = 'ts';
     ts.textContent = hhmm(new Date());
 
-    bubble.appendChild(textNode);
+    bubble.appendChild(span);
     bubble.appendChild(ts);
     div.appendChild(bubble);
     msgs.appendChild(div);
@@ -406,7 +508,7 @@ const API = 'https://pi.nexux.pro';
   function showTyping() {
     var msgs = document.getElementById('messages');
     var div = document.createElement('div');
-    div.className = 'msg in typing-wrap';
+    div.className = 'msg in switch-sender';
     div.id = 'typing';
     div.innerHTML = '<div class="typing-indicator"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>';
     msgs.appendChild(div);
@@ -414,19 +516,15 @@ const API = 'https://pi.nexux.pro';
   }
   function hideTyping() { var t = document.getElementById('typing'); if (t) t.remove(); }
 
-  // ── Send ───────────────────────────────────────────────
   function sendMsg() {
     if (sending) return;
     var input = document.getElementById('msg-input');
     var text = input.value.trim();
     if (!text) return;
-
-    input.value = '';
-    input.style.height = 'auto';
+    input.value = ''; input.style.height = 'auto';
     document.getElementById('suggestions').style.display = 'none';
     document.getElementById('send-btn').disabled = true;
     sending = true;
-
     addMsg(text, 'user');
     history.push({ role: 'user', content: text });
     showTyping();
@@ -448,27 +546,14 @@ const API = 'https://pi.nexux.pro';
         if (data.appointmentBooked) {
           var apt = data.appointmentBooked;
           var parts = (apt.time || '10:00').split(':');
-          var hh = parseInt(parts[0]) || 10;
-          var mm = parseInt(parts[1]) || 0;
-          var dt = new Date(); dt.setHours(hh, mm, 0, 0);
-          var newApt = {
-            id: 'new-' + Date.now(),
-            client_name: apt.name || 'Cliente',
-            service: apt.service || 'Servicio',
-            datetime: dt.toISOString(),
-            status: 'new'
-          };
+          var dt = new Date(); dt.setHours(parseInt(parts[0])||10, parseInt(parts[1])||0, 0, 0);
+          var newApt = { id: 'new-' + Date.now(), client_name: apt.name || 'Cliente', service: apt.service || 'Servicio', datetime: dt.toISOString(), status: 'new' };
           apts = apts.concat([newApt]);
           renderAll(newApt.id);
-
-          // Flash CRM tab on mobile
-          var crmTab = document.getElementById('tab-crm');
-          if (crmTab) {
-            var orig = crmTab.textContent;
-            crmTab.style.color = '#4ade80';
-            crmTab.textContent = 'Nueva cita!';
-            setTimeout(function(){ crmTab.style.color = ''; crmTab.textContent = orig; }, 3000);
-          }
+          var scMsgs = document.getElementById('sc-msgs');
+          if (scMsgs) { scMsgs.textContent = parseInt(scMsgs.textContent||0) + 1; }
+          var tabCrm = document.getElementById('tab-crm');
+          if (tabCrm) { var o=tabCrm.textContent; tabCrm.style.color='#4ade80'; tabCrm.textContent='Nueva cita!'; setTimeout(function(){ tabCrm.style.color=''; tabCrm.textContent=o; }, 3000); }
         }
       }
       sending = false;
@@ -483,10 +568,7 @@ const API = 'https://pi.nexux.pro';
     });
   }
 
-  function useSug(btn) {
-    document.getElementById('msg-input').value = btn.textContent;
-    sendMsg();
-  }
+  function useSug(btn) { document.getElementById('msg-input').value = btn.textContent; sendMsg(); }
 
   document.getElementById('msg-input').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
@@ -496,23 +578,17 @@ const API = 'https://pi.nexux.pro';
     this.style.height = Math.min(this.scrollHeight, 90) + 'px';
   });
 
-  // ── Mobile tabs ────────────────────────────────────────
   function showTab(tab) {
-    var msgs     = document.getElementById('messages');
-    var sugs     = document.getElementById('suggestions');
-    var inputBar = document.getElementById('inputBar');
-    var crmMob   = document.getElementById('crmMobile');
-    var tabChat  = document.getElementById('tab-chat');
-    var tabCrm   = document.getElementById('tab-crm');
-    if (tab === 'chat') {
-      msgs.style.display = ''; sugs.style.display = ''; inputBar.style.display = '';
-      crmMob.style.display = 'none';
-      tabChat.classList.add('active'); tabCrm.classList.remove('active');
+    var msgs=document.getElementById('messages'), sugs=document.getElementById('suggestions'),
+        bar=document.getElementById('inputBar'), mob=document.getElementById('crmMobile'),
+        tc=document.getElementById('tab-chat'), tk=document.getElementById('tab-crm');
+    if (tab==='chat') {
+      msgs.style.display=''; sugs.style.display=''; bar.style.display=''; mob.style.display='none';
+      tc.classList.add('active'); tk.classList.remove('active');
     } else {
-      msgs.style.display = 'none'; sugs.style.display = 'none'; inputBar.style.display = 'none';
-      crmMob.style.display = 'flex';
-      tabCrm.classList.add('active'); tabChat.classList.remove('active');
-      renderAll(lastNewId);
+      msgs.style.display='none'; sugs.style.display='none'; bar.style.display='none'; mob.style.display='flex';
+      tk.classList.add('active'); tc.classList.remove('active');
+      renderMobile(lastNewId);
     }
   }
 </script>
