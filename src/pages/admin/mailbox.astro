@@ -69,6 +69,35 @@ if (q) params.set('q', q);
 let events: MailEvent[] = [];
 let status: MailStatus | null = null;
 let fetchError = '';
+let sendNotice = '';
+let sendNoticeType: 'ok' | 'error' = 'ok';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    const payload = {
+      to: String(form.get('to') || ''),
+      subject: String(form.get('subject') || ''),
+      text: String(form.get('text') || ''),
+    };
+    const sendResp = await fetch(`${PI_URL}/mailbox/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-provision-secret': PROVISION_SECRET },
+      body: JSON.stringify(payload),
+    });
+    if (sendResp.ok) {
+      sendNotice = 'Correo enviado y registrado en la bandeja.';
+      sendNoticeType = 'ok';
+    } else {
+      const data = await sendResp.json().catch(() => ({}));
+      sendNotice = `No se pudo enviar: ${data.error || sendResp.status}`;
+      sendNoticeType = 'error';
+    }
+  } catch (err: any) {
+    sendNotice = err?.message || 'No se pudo enviar el correo.';
+    sendNoticeType = 'error';
+  }
+}
 
 try {
   const [eventsResp, statusResp] = await Promise.all([
@@ -138,6 +167,17 @@ const recipientText = (event: MailEvent) => {
       .status-value.ok { color: #50e3b8; }
       .status-value.warn { color: #fbbf24; }
       .status-note { color: #85859f; font-size: 12px; line-height: 1.4; margin: 8px 0 0; }
+      .compose { background: #12121a; border: 1px solid #1f1f31; border-radius: 8px; padding: 14px; margin: 18px 0; }
+      .compose-title { color: #e8e8f0; font-size: 14px; font-weight: 800; margin: 0 0 12px; }
+      .compose-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .compose label { color: #71718d; display: grid; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+      .compose input, .compose textarea { background: #0d0d14; border: 1px solid #24243a; border-radius: 8px; color: #e8e8f0; font: inherit; padding: 10px 11px; }
+      .compose textarea { min-height: 120px; resize: vertical; }
+      .compose .wide { grid-column: 1 / -1; }
+      .compose button { align-self: end; background: #4ECDC4; border: 0; border-radius: 8px; color: #071010; cursor: pointer; font-size: 13px; font-weight: 800; padding: 10px 14px; }
+      .notice { border-radius: 8px; font-size: 13px; margin: 10px 0 0; padding: 10px 12px; }
+      .notice.ok { background: #073326; color: #50e3b8; }
+      .notice.error { background: #331018; color: #f87171; }
       .mail { display: grid; grid-template-columns: 116px minmax(150px, 230px) 1fr 92px; gap: 14px; align-items: start; background: #12121a; border: 1px solid #1f1f31; border-radius: 8px; padding: 13px 14px; }
       .mail:hover { border-color: #34344f; }
       .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
@@ -157,6 +197,7 @@ const recipientText = (event: MailEvent) => {
       @media (max-width: 760px) {
         .topbar { display: block; }
         .status-grid { grid-template-columns: 1fr; }
+        .compose-grid { grid-template-columns: 1fr; }
         .mail { grid-template-columns: 1fr; gap: 8px; }
         .meta { text-align: left; }
         .filters input { width: 100%; min-width: 0; }
@@ -195,6 +236,26 @@ const recipientText = (event: MailEvent) => {
     {!status?.improvmx?.hasApiKey ? (
       <p class="status-note">Para activar recibidos reales: confirmar dominio, añadir IMPROVMX_API_KEY en la Pi y ejecutar el configurador de ImprovMX.</p>
     ) : null}
+
+    <section class="compose" aria-label="Enviar correo">
+      <p class="compose-title">Enviar correo</p>
+      <form method="post" class="compose-grid">
+        <label>
+          Para
+          <input type="email" name="to" placeholder="cliente@salon.com" required />
+        </label>
+        <label>
+          Asunto
+          <input type="text" name="subject" placeholder="Asunto" required />
+        </label>
+        <label class="wide">
+          Mensaje
+          <textarea name="text" placeholder="Escribe el mensaje..." required></textarea>
+        </label>
+        <button type="submit">Enviar</button>
+      </form>
+      {sendNotice ? <p class={`notice ${sendNoticeType}`}>{sendNotice}</p> : null}
+    </section>
 
     <form class="filters" method="get">
       <a class={direction === 'all' ? 'active' : ''} href="/admin/mailbox">Todos</a>
