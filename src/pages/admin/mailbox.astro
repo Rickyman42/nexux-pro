@@ -38,6 +38,25 @@ type MailEvent = {
   preview: string;
 };
 
+type MailStatus = {
+  mailbox?: {
+    total: number;
+    inbound: number;
+    outbound: number;
+    lastEventAt: string | null;
+  };
+  improvmx?: {
+    domain: string;
+    alias: string;
+    hasApiKey: boolean;
+    webhookUrl: string;
+    sync?: {
+      lastRunAt?: string;
+      lastAdded?: number;
+    } | null;
+  };
+};
+
 const direction = Astro.url.searchParams.get('direction') || 'all';
 const q = Astro.url.searchParams.get('q') || '';
 const params = new URLSearchParams({ key: PROVISION_SECRET, limit: '300' });
@@ -45,20 +64,38 @@ if (direction === 'inbound' || direction === 'outbound') params.set('direction',
 if (q) params.set('q', q);
 
 let events: MailEvent[] = [];
+let status: MailStatus | null = null;
 let fetchError = '';
 
 try {
-  const resp = await fetch(`${PI_URL}/mailbox/events?${params.toString()}`, {
-    headers: { 'x-provision-secret': PROVISION_SECRET },
-  });
-  if (resp.ok) {
-    const data = await resp.json();
+  const [eventsResp, statusResp] = await Promise.all([
+    fetch(`${PI_URL}/mailbox/events?${params.toString()}`, {
+      headers: { 'x-provision-secret': PROVISION_SECRET },
+    }),
+    fetch(`${PI_URL}/mailbox/status?key=${encodeURIComponent(PROVISION_SECRET)}`, {
+      headers: { 'x-provision-secret': PROVISION_SECRET },
+    }),
+  ]);
+  if (eventsResp.ok) {
+    const data = await eventsResp.json();
     events = data.events || [];
   } else {
-    fetchError = `Pi respondio ${resp.status}`;
+    fetchError = `Pi respondio ${eventsResp.status}`;
+  }
+  if (statusResp.ok) {
+    status = await statusResp.json();
   }
 } catch (err: any) {
   fetchError = err?.message || 'Error cargando mailbox';
+}
+
+if (!status) {
+  try {
+    const statusResp = await fetch(`${PI_URL}/mailbox/status?key=${encodeURIComponent(PROVISION_SECRET)}`, {
+      headers: { 'x-provision-secret': PROVISION_SECRET },
+    });
+    if (statusResp.ok) status = await statusResp.json();
+  } catch {}
 }
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleString('es-ES', {
@@ -91,6 +128,13 @@ const recipientText = (event: MailEvent) => {
       .filters a.active { border-color: #4ECDC4; color: #4ECDC4; }
       .filters input { min-width: 240px; background: #0d0d14; border: 1px solid #24243a; color: #e8e8f0; border-radius: 8px; padding: 9px 11px; font-size: 13px; }
       .mail-list { display: grid; gap: 8px; }
+      .status-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 18px 0 8px; }
+      .status-card { background: #12121a; border: 1px solid #1f1f31; border-radius: 8px; padding: 12px 14px; min-height: 62px; }
+      .status-label { color: #71718d; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin: 0 0 6px; }
+      .status-value { color: #e8e8f0; font-size: 14px; font-weight: 700; margin: 0; overflow-wrap: anywhere; }
+      .status-value.ok { color: #50e3b8; }
+      .status-value.warn { color: #fbbf24; }
+      .status-note { color: #85859f; font-size: 12px; line-height: 1.4; margin: 8px 0 0; }
       .mail { display: grid; grid-template-columns: 116px minmax(150px, 230px) 1fr 92px; gap: 14px; align-items: start; background: #12121a; border: 1px solid #1f1f31; border-radius: 8px; padding: 13px 14px; }
       .mail:hover { border-color: #34344f; }
       .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
@@ -104,6 +148,7 @@ const recipientText = (event: MailEvent) => {
       .error { color: #f87171; border-color: #5a1f2a; }
       @media (max-width: 760px) {
         .topbar { display: block; }
+        .status-grid { grid-template-columns: 1fr; }
         .mail { grid-template-columns: 1fr; gap: 8px; }
         .meta { text-align: left; }
         .filters input { width: 100%; min-width: 0; }
@@ -120,6 +165,28 @@ const recipientText = (event: MailEvent) => {
       </div>
       <p class="sub">{events.length} eventos</p>
     </div>
+
+    <section class="status-grid" aria-label="Estado del mailbox">
+      <div class="status-card">
+        <p class="status-label">Correo</p>
+        <p class="status-value">{status?.improvmx?.alias || 'info'}@{status?.improvmx?.domain || 'nexux.pro'}</p>
+      </div>
+      <div class="status-card">
+        <p class="status-label">Eventos</p>
+        <p class="status-value">{status?.mailbox?.total ?? events.length} total · {status?.mailbox?.inbound ?? 0} recibidos · {status?.mailbox?.outbound ?? 0} enviados</p>
+      </div>
+      <div class="status-card">
+        <p class="status-label">ImprovMX API</p>
+        <p class={`status-value ${status?.improvmx?.hasApiKey ? 'ok' : 'warn'}`}>{status?.improvmx?.hasApiKey ? 'Conectada' : 'Falta API key'}</p>
+      </div>
+      <div class="status-card">
+        <p class="status-label">Última sync</p>
+        <p class="status-value">{status?.improvmx?.sync?.lastRunAt ? fmtDate(status.improvmx.sync.lastRunAt) : 'Sin ejecutar'}</p>
+      </div>
+    </section>
+    {!status?.improvmx?.hasApiKey ? (
+      <p class="status-note">Para activar recibidos reales: confirmar dominio, añadir IMPROVMX_API_KEY en la Pi y ejecutar el configurador de ImprovMX.</p>
+    ) : null}
 
     <form class="filters" method="get">
       <a class={direction === 'all' ? 'active' : ''} href="/admin/mailbox">Todos</a>
@@ -157,4 +224,3 @@ const recipientText = (event: MailEvent) => {
     )}
   </main>
 </Layout>
-
