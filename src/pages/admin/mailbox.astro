@@ -53,6 +53,7 @@ type MailStatus = {
     alias: string;
     hasApiKey: boolean;
     webhookUrl: string;
+    targetEmail?: string;
     sync?: {
       lastRunAt?: string;
       lastAdded?: number;
@@ -218,7 +219,7 @@ const recipientText = (event: MailEvent) => {
     <section class="status-grid" aria-label="Estado del mailbox">
       <div class="status-card">
         <p class="status-label">Correo</p>
-        <p class="status-value">{status?.improvmx?.alias || 'info'}@{status?.improvmx?.domain || 'nexux.pro'}</p>
+        <p class="status-value">{status?.improvmx?.targetEmail || `${status?.improvmx?.alias || 'info'}@${status?.improvmx?.domain || 'nexux.pro'}`}</p>
       </div>
       <div class="status-card">
         <p class="status-label">Eventos</p>
