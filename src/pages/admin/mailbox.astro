@@ -1,0 +1,160 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+
+const ADMIN_SECRET = import.meta.env.ADMIN_SECRET || 'nexux-admin-2026';
+const PI_URL = import.meta.env.NEXUX_CLIENTS_URL || 'https://pi.nexux.pro';
+const PROVISION_SECRET = import.meta.env.PROVISION_SECRET || '9eb46b31794b43332c8a2358497b18df68174b6111cbdbea7b226ad254f311e0';
+
+const cookieSecret = Astro.cookies.get('nexux_admin')?.value;
+const urlSecret = Astro.url.searchParams.get('s');
+const authed = urlSecret === ADMIN_SECRET || cookieSecret === ADMIN_SECRET;
+
+if (urlSecret === ADMIN_SECRET && cookieSecret !== ADMIN_SECRET) {
+  Astro.cookies.set('nexux_admin', ADMIN_SECRET, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    maxAge: 86400 * 7,
+    path: '/admin',
+  });
+}
+
+if (!authed) {
+  return new Response('Unauthorized — go to /admin?s=YOUR_SECRET first', { status: 401 });
+}
+
+type MailEvent = {
+  id: string;
+  ts: string;
+  direction: 'inbound' | 'outbound';
+  source: string;
+  status: string;
+  provider: string;
+  from?: { email?: string; name?: string };
+  to?: Array<{ email?: string; name?: string }>;
+  subject: string;
+  preview: string;
+};
+
+const direction = Astro.url.searchParams.get('direction') || 'all';
+const q = Astro.url.searchParams.get('q') || '';
+const params = new URLSearchParams({ key: PROVISION_SECRET, limit: '300' });
+if (direction === 'inbound' || direction === 'outbound') params.set('direction', direction);
+if (q) params.set('q', q);
+
+let events: MailEvent[] = [];
+let fetchError = '';
+
+try {
+  const resp = await fetch(`${PI_URL}/mailbox/events?${params.toString()}`, {
+    headers: { 'x-provision-secret': PROVISION_SECRET },
+  });
+  if (resp.ok) {
+    const data = await resp.json();
+    events = data.events || [];
+  } else {
+    fetchError = `Pi respondio ${resp.status}`;
+  }
+} catch (err: any) {
+  fetchError = err?.message || 'Error cargando mailbox';
+}
+
+const fmtDate = (iso: string) => new Date(iso).toLocaleString('es-ES', {
+  timeZone: 'Europe/Madrid',
+  day: '2-digit',
+  month: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+const recipientText = (event: MailEvent) => {
+  if (event.direction === 'inbound') return event.from?.email || 'desconocido';
+  return (event.to || []).map(r => r.email).filter(Boolean).join(', ') || 'sin destinatario';
+};
+---
+
+<Layout title="Admin Mailbox — Nexux Pro">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex,nofollow" />
+    <style>
+      body { background: #0a0a0f; color: #e8e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 30px 16px 64px; }
+      .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+      .back { color: #7b7b96; text-decoration: none; font-size: 13px; }
+      .back:hover { color: #4ECDC4; }
+      h1 { color: #4ECDC4; font-size: 22px; margin: 8px 0 4px; }
+      .sub { color: #73738f; font-size: 13px; margin: 0; }
+      .filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 18px 0 22px; }
+      .filters a, .filters button { background: #12121a; border: 1px solid #24243a; color: #e8e8f0; border-radius: 8px; padding: 9px 12px; font-size: 13px; text-decoration: none; cursor: pointer; }
+      .filters a.active { border-color: #4ECDC4; color: #4ECDC4; }
+      .filters input { min-width: 240px; background: #0d0d14; border: 1px solid #24243a; color: #e8e8f0; border-radius: 8px; padding: 9px 11px; font-size: 13px; }
+      .mail-list { display: grid; gap: 8px; }
+      .mail { display: grid; grid-template-columns: 116px minmax(150px, 230px) 1fr 92px; gap: 14px; align-items: start; background: #12121a; border: 1px solid #1f1f31; border-radius: 8px; padding: 13px 14px; }
+      .mail:hover { border-color: #34344f; }
+      .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+      .inbound .badge { background: #073326; color: #50e3b8; }
+      .outbound .badge { background: #101f46; color: #8eb2ff; }
+      .person { color: #b6b6ca; font-size: 12px; overflow-wrap: anywhere; }
+      .subject { font-size: 14px; font-weight: 700; margin: 0 0 5px; }
+      .preview { color: #8989a3; font-size: 13px; line-height: 1.4; margin: 0; }
+      .meta { color: #666680; font-size: 11px; text-align: right; }
+      .empty, .error { background: #12121a; border: 1px solid #24243a; border-radius: 8px; padding: 24px; color: #8b8ba4; }
+      .error { color: #f87171; border-color: #5a1f2a; }
+      @media (max-width: 760px) {
+        .topbar { display: block; }
+        .mail { grid-template-columns: 1fr; gap: 8px; }
+        .meta { text-align: left; }
+        .filters input { width: 100%; min-width: 0; }
+      }
+    </style>
+  </Fragment>
+
+  <main class="wrap">
+    <div class="topbar">
+      <div>
+        <a class="back" href="/admin">← Panel admin</a>
+        <h1>Mailbox</h1>
+        <p class="sub">Correos enviados por Brevo y entradas registradas para info@nexux.pro.</p>
+      </div>
+      <p class="sub">{events.length} eventos</p>
+    </div>
+
+    <form class="filters" method="get">
+      <a class={direction === 'all' ? 'active' : ''} href="/admin/mailbox">Todos</a>
+      <a class={direction === 'outbound' ? 'active' : ''} href="/admin/mailbox?direction=outbound">Enviados</a>
+      <a class={direction === 'inbound' ? 'active' : ''} href="/admin/mailbox?direction=inbound">Recibidos</a>
+      {direction !== 'all' ? <input type="hidden" name="direction" value={direction} /> : null}
+      <input type="search" name="q" value={q} placeholder="Buscar asunto, email o texto" />
+      <button type="submit">Buscar</button>
+    </form>
+
+    {fetchError ? (
+      <div class="error">{fetchError}</div>
+    ) : events.length === 0 ? (
+      <div class="empty">Todavia no hay correos para este filtro.</div>
+    ) : (
+      <section class="mail-list">
+        {events.map(event => (
+          <article class={`mail ${event.direction}`}>
+            <div>
+              <span class="badge">{event.direction === 'inbound' ? 'Recibido' : 'Enviado'}</span>
+            </div>
+            <div class="person">{recipientText(event)}</div>
+            <div>
+              <p class="subject">{event.subject || '(sin asunto)'}</p>
+              <p class="preview">{event.preview || ''}</p>
+            </div>
+            <div class="meta">
+              <div>{fmtDate(event.ts)}</div>
+              <div>{event.status}</div>
+              <div>{event.source}</div>
+            </div>
+          </article>
+        ))}
+      </section>
+    )}
+  </main>
+</Layout>
+

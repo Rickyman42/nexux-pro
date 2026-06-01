@@ -108,6 +108,9 @@ const planColor: Record<string, string> = {
       .err { color: #f87171; font-size: 13px; margin: 16px 0 0; }
       a.portal-link { color: #4ECDC4; text-decoration: none; font-size: 12px; }
       a.portal-link:hover { text-decoration: underline; }
+      .admin-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+      .admin-actions a { border: 1px solid #25253a; background: #12121a; color: #e8e8f0; border-radius: 8px; padding: 9px 12px; font-size: 13px; font-weight: 700; text-decoration: none; }
+      .admin-actions a:hover { border-color: #4ECDC4; color: #4ECDC4; }
     </style>
   </Fragment>
 
@@ -124,6 +127,9 @@ const planColor: Record<string, string> = {
       <div class="adm-header">
         <h1 class="adm-title">nexux.pro — Panel Admin</h1>
         <p class="adm-sub">Actualizado: {new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })}</p>
+        <div class="admin-actions">
+          <a href="/admin/mailbox">Mailbox</a>
+        </div>
       </div>
 
       <div class="kpi-row">
