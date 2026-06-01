@@ -36,6 +36,9 @@ type MailEvent = {
   to?: Array<{ email?: string; name?: string }>;
   subject: string;
   preview: string;
+  text?: string;
+  html?: string;
+  meta?: Record<string, unknown>;
 };
 
 type MailStatus = {
@@ -144,6 +147,11 @@ const recipientText = (event: MailEvent) => {
       .subject { font-size: 14px; font-weight: 700; margin: 0 0 5px; }
       .preview { color: #8989a3; font-size: 13px; line-height: 1.4; margin: 0; }
       .meta { color: #666680; font-size: 11px; text-align: right; }
+      details.mail-detail { margin-top: 10px; border-top: 1px solid #24243a; padding-top: 10px; }
+      details.mail-detail summary { color: #4ECDC4; cursor: pointer; font-size: 12px; font-weight: 700; list-style: none; }
+      details.mail-detail summary::-webkit-details-marker { display: none; }
+      .mail-body { margin: 10px 0 0; background: #0d0d14; border: 1px solid #24243a; border-radius: 8px; padding: 12px; color: #c9c9d8; font-size: 12px; line-height: 1.5; white-space: pre-wrap; overflow-x: auto; }
+      .mail-technical { margin-top: 8px; color: #666680; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; overflow-wrap: anywhere; }
       .empty, .error { background: #12121a; border: 1px solid #24243a; border-radius: 8px; padding: 24px; color: #8b8ba4; }
       .error { color: #f87171; border-color: #5a1f2a; }
       @media (max-width: 760px) {
@@ -212,6 +220,14 @@ const recipientText = (event: MailEvent) => {
             <div>
               <p class="subject">{event.subject || '(sin asunto)'}</p>
               <p class="preview">{event.preview || ''}</p>
+              <details class="mail-detail">
+                <summary>Ver contenido</summary>
+                <pre class="mail-body">{event.text || event.preview || '(sin contenido de texto)'}</pre>
+                <div class="mail-technical">
+                  ID: {event.id}<br />
+                  Provider: {event.provider} · Source: {event.source}
+                </div>
+              </details>
             </div>
             <div class="meta">
               <div>{fmtDate(event.ts)}</div>
