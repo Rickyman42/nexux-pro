@@ -31,3 +31,12 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 };
+
+export const GET: APIRoute = async () => {
+  let upstream = '';
+  try {
+    const r = await fetch(`${PI_URL}/api/stripe/create-session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan: 'promo' }) });
+    upstream = r.status + ':' + (await r.text()).slice(0, 70);
+  } catch (e) { upstream = 'ERR:' + String(e).slice(0, 70); }
+  return new Response(JSON.stringify({ piUrl: PI_URL, upstream, build: 'v2-debug' }), { headers: { 'Content-Type': 'application/json' } });
+};
