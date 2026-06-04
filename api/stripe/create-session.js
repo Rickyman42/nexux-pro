@@ -12,6 +12,7 @@ export default async function handler(req, res) {
     starter: { name: 'Lara Starter', amount: 24900, priceEnv: 'STRIPE_PRICE_STARTER' },
     pro:     { name: 'Lara Pro',     amount: 44900, priceEnv: 'STRIPE_PRICE_PRO' },
     total:   { name: 'Lara Total',   amount: 74900, priceEnv: 'STRIPE_PRICE_TOTAL' },
+    promo:   { name: 'Lara Promo Especial', amount: 4900, priceEnv: 'STRIPE_PRICE_PROMO' },
   };
 
   if (!PLANS[plan]) return res.status(400).json({ error: 'invalid_plan' });
