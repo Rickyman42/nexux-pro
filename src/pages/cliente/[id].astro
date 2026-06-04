@@ -96,7 +96,7 @@ function renderAppointmentDate(item: Appointment) {
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   </Fragment>
 
-  <div id="crm" class="crm-light" data-clientid={clientId}>
+  <div id="crm" class="crm-light" data-clientid={clientId} data-inbox-token={token}>
 
     <!-- SIDEBAR -->
     <aside class="crm-sidebar" id="crm-sidebar">
@@ -728,7 +728,7 @@ function renderAppointmentDate(item: Appointment) {
     // Inbox iframe — lazy load on first click
     var inboxLoaded = false;
     var piBase = 'https://pi.nexux.pro';
-    var inboxToken = document.cookie.match(/nexux_token=([^;]+)/)?.[1] || '';
+    var inboxToken = document.getElementById('crm').dataset.inboxToken || '';
     var inboxUrl = piBase + '/client/' + clientId + '/inbox?t=' + encodeURIComponent(inboxToken);
 
     navBtns.forEach(function (btn) {
