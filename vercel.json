@@ -5,6 +5,10 @@
     {
       "source": "/webhook/stripe",
       "destination": "/api/webhook/stripe"
+    },
+    {
+      "source": "/api/stripe/create-session",
+      "destination": "https://pi.nexux.pro/api/stripe/create-session"
     }
   ]
 }
