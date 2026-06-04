@@ -2,7 +2,10 @@ import type { APIRoute } from 'astro';
 
 export const prerender = false;
 
-const PI_URL = import.meta.env.NEXUX_CLIENTS_URL || 'https://pi.nexux.pro';
+// Apunta directo al endpoint público de provisioning (provision-http :3460 vía
+// Cloudflare). NO usamos NEXUX_CLIENTS_URL porque en este proyecto apunta a un
+// endpoint con whitelist antigua que rechaza el plan "promo".
+const PI_URL = 'https://pi.nexux.pro';
 
 // Forwards the embedded-checkout session request to the Pi (which holds the
 // Stripe secret key + price IDs) and returns { clientSecret } to the browser.
