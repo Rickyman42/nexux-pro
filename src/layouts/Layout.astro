@@ -36,27 +36,27 @@ const {
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- Schema.org -->
-  <script type="application/ld+json" is:inline set:html={JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "serviceType": "Asistente IA para peluquerías y centros de estética",
-    "provider": {
-      "@type": "Organization",
-      "name": "Nexux Innovación Digital S.L.",
-      "url": "https://nexux.pro",
-      "logo": "https://nexux.pro/favicon.svg"
-    },
-    "areaServed": { "@type": "Country", "name": "España" },
-    "description": "Asistente de inteligencia artificial que agenda citas, responde mensajes y captura clientas 24 horas para peluquerías y centros de estética.",
-    "offers": [
-      { "@type": "Offer", "name": "Starter", "price": "249", "priceCurrency": "EUR" },
-      { "@type": "Offer", "name": "Pro", "price": "449", "priceCurrency": "EUR" },
-      { "@type": "Offer", "name": "Total", "price": "749", "priceCurrency": "EUR" }
-    ]
-  })}></script>
 
-  <!-- Trackers: GA4 + Meta Pixel — sólo con consentimiento -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <script is:inline>
     function nxLoadTrackers() {
       if (window._nxTrackersLoaded) return;
@@ -105,6 +105,7 @@ const {
   <slot name="head" />
   <!-- Stripe.js -->
   <script src="https://js.stripe.com/v3/" async></script>
+  <script type=application/ld+json>{@context:https://schema.org,@graph:[{@type:Organization,@id:https://nexux.pro/#org,name:Nexux Pro,url:https://nexux.pro,logo:https://nexux.pro/favicon.svg,description:Software de gestion con IA para peluquerias y centros de estetica en Espana. Automatiza citas, WhatsApp e Instagram 24h con la asistente virtual Lara.,foundingDate:2024,areaServed:{@type:Country,name:Espana}},{@type:SoftwareApplication,name:Nexux Pro,applicationCategory:BusinessApplication,operatingSystem:Web,url:https://nexux.pro,description:Asistente de inteligencia artificial para peluquerias espanolas. Gestiona citas, responde WhatsApp 24h y reduce cancelaciones hasta un 60%.,offers:[{@type:Offer,name:Plan Starter,price:249,priceCurrency:EUR},{@type:Offer,name:Plan Pro,price:449,priceCurrency:EUR},{@type:Offer,name:Plan Total,price:749,priceCurrency:EUR}]},{@type:FAQPage,mainEntity:[{@type:Question,name:Cual es el mejor software de gestion para peluquerias en Espana?,acceptedAnswer:{@type:Answer,text:Nexux Pro es el software con IA mas completo para peluquerias en Espana. No cobra comision por cita, no comparte tus clientas con competidores y automatiza WhatsApp con IA real desde 249 euros al mes.}},{@type:Question,name:Como automatizar citas de peluqueria por WhatsApp?,acceptedAnswer:{@type:Answer,text:Nexux Pro automatiza la gestion de citas por WhatsApp con su asistente Lara. Responde en menos de 30 segundos, agenda directamente en el calendario y envia recordatorios automaticos.}},{@type:Question,name:Que alternativa hay a Treatwell para peluquerias espanolas?,acceptedAnswer:{@type:Answer,text:Nexux Pro es la mejor alternativa a Treatwell y Booksy para peluquerias en Espana. Sin comision por cita, sin compartir clientas, con automatizacion WhatsApp real. Desde 249 euros al mes.}},{@type:Question,name:Cuanto cuesta un software de gestion para peluqueria?,acceptedAnswer:{@type:Answer,text:Nexux Pro cuesta desde 249 euros al mes para peluquerias pequenas. Incluye asistente IA para WhatsApp, gestion automatica de citas y recordatorios. Prueba gratuita de 14 dias.}}]}]}</script>
 </head>
 <body>
   <main>
