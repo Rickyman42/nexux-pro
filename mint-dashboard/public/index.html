@@ -20,6 +20,7 @@
       </div>
 
       <div class="right">
+        <div id="serverClock" style="font-size:13px;font-weight:600;color:var(--fg);font-family:var(--mono);letter-spacing:.04em;margin-right:6px">--:--:--</div>
         <div id="statusPill" class="pill">Cargando…</div>
         <button id="refreshBtn" class="btn">Refrescar</button>
       </div>
@@ -128,6 +129,97 @@
         </div>
         <div class="note">Haz clic en un hot lead (o pega `id` en el chat) para ver detalles.</div>
         <div id="journey" class="journey"></div>
+      </section>
+
+      <section class="card span-12" id="scraperSection">
+        <div class="cardHead">
+          <h2>Scraper de Leads</h2>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="scraperPill" class="pill">cargando...</div>
+            <span class="muted" style="font-size:12px">↺ <span id="scraperRestarts">-</span> reinicios</span>
+          </div>
+        </div>
+
+        <!-- Phase stepper -->
+        <div class="scPhases">
+          <div class="scPhase" id="scPhase1">
+            <div class="scPhaseCircle">1</div>
+            <div class="scPhaseInfo">
+              <div class="scPhaseName">Mapeo</div>
+              <div class="scPhaseSub">ciudades &amp; categorías</div>
+            </div>
+          </div>
+          <div class="scPhaseLine" id="scLine1"></div>
+          <div class="scPhase" id="scPhase4">
+            <div class="scPhaseCircle">2</div>
+            <div class="scPhaseInfo">
+              <div class="scPhaseName">Extracción</div>
+              <div class="scPhaseSub">datos de negocios</div>
+            </div>
+          </div>
+          <div class="scPhaseLine" id="scLine2"></div>
+          <div class="scPhase" id="scPhaseDone">
+            <div class="scPhaseCircle">✓</div>
+            <div class="scPhaseInfo">
+              <div class="scPhaseName">Completado</div>
+              <div class="scPhaseSub">CSV guardado</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main progress block -->
+        <div class="scProgressBlock">
+          <div class="scProgressTop">
+            <div>
+              <div id="scPhaseLabel" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">-</div>
+              <div id="scraperPct" style="font-size:32px;font-weight:800;line-height:1">-%</div>
+            </div>
+            <div style="text-align:right">
+              <div id="scEta" style="font-size:18px;font-weight:700;color:var(--accent2)">-</div>
+              <div style="font-size:11px;color:var(--muted)">tiempo restante</div>
+            </div>
+          </div>
+          <div class="bar" style="height:12px;border-radius:6px;overflow:hidden;margin:10px 0 6px">
+            <div class="barFill" id="scraperBar" style="width:0%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .8s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+            <span id="scProgress">-</span>
+            <span id="scSpeed">-</span>
+          </div>
+          <div id="scActivity" style="margin-top:8px;font-size:12px;color:var(--fg);font-family:var(--mono);padding:6px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid var(--accent)">-</div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="scStats">
+          <div class="scStat">
+            <div class="scStatVal" id="statBiz">-</div>
+            <div class="scStatLbl">negocios encontrados</div>
+          </div>
+          <div class="scStat">
+            <div class="scStatVal" id="statQueries">-</div>
+            <div class="scStatLbl">consultas realizadas</div>
+          </div>
+          <div class="scStat">
+            <div class="scStatVal" id="statUptime">-</div>
+            <div class="scStatLbl">tiempo activo</div>
+          </div>
+          <div class="scStat">
+            <div class="scStatVal" id="statSpeed">-</div>
+            <div class="scStatLbl">velocidad actual</div>
+          </div>
+        </div>
+
+        <!-- Error alert -->
+        <div id="scraperErr" style="display:none;margin-top:10px;padding:8px 12px;background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.25);border-radius:8px;font-size:11px;font-family:var(--mono);color:rgba(255,150,150,1);white-space:pre-wrap;word-break:break-all;max-height:60px;overflow:hidden"></div>
+
+        <!-- Log viewer -->
+        <div style="margin-top:14px">
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="segBtn isOn" data-logtype="scraper" onclick="handleScraperLogTab(this)">actividad en vivo</button>
+            <button class="segBtn" data-logtype="error" onclick="handleScraperLogTab(this)">errores</button>
+          </div>
+          <div id="scraperLog" style="background:rgba(0,0,0,.35);border:1px solid var(--stroke);border-radius:10px;height:180px;overflow-y:auto;padding:10px;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.55">cargando...</div>
+        </div>
       </section>
 
       <section class="card span-12">

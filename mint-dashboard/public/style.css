@@ -239,3 +239,28 @@ tr:hover td{background: rgba(255,255,255,.03)}
   .right{width:100%; justify-content:flex-end}
 }
 
+/* ─── Scraper redesign ─────────────────────────────── */
+.scPhases{display:flex;align-items:center;gap:0;margin:16px 0 20px;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid var(--stroke);border-radius:10px}
+.scPhase{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.scPhaseCircle{width:32px;height:32px;border-radius:50%;border:2px solid var(--stroke);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);transition:.3s}
+.scPhaseName{font-size:13px;font-weight:600;color:var(--muted);transition:.3s}
+.scPhaseSub{font-size:11px;color:var(--muted);opacity:.6}
+.scPhaseLine{flex:1;height:2px;background:var(--stroke);margin:0 12px;min-width:30px;transition:.3s}
+.scPhase.active .scPhaseCircle{border-color:var(--accent);background:rgba(120,120,255,.15);color:var(--accent)}
+.scPhase.active .scPhaseName{color:var(--fg)}
+.scPhase.done .scPhaseCircle{border-color:var(--good);background:rgba(0,200,100,.12);color:var(--good)}
+.scPhase.done .scPhaseName{color:var(--good)}
+.scPhaseLine.done{background:var(--good)}
+.scPhaseLine.active{background:linear-gradient(90deg,var(--good),var(--stroke))}
+.scProgressBlock{padding:16px;background:rgba(255,255,255,.025);border:1px solid var(--stroke);border-radius:10px;margin-bottom:14px}
+.scProgressTop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.scStats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px}
+@media(max-width:640px){.scStats{grid-template-columns:repeat(2,1fr)}}
+.scStat{background:rgba(255,255,255,.03);border:1px solid var(--stroke);border-radius:8px;padding:10px 12px;text-align:center}
+.scStatVal{font-size:20px;font-weight:800;color:var(--fg);font-variant-numeric:tabular-nums}
+.scStatLbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:2px}
+.logLine{white-space:pre-wrap;word-break:break-all;padding:1px 0}
+.logErr{color:var(--bad)!important}
+.logWarn{color:var(--warn)!important}
+.logInfo{color:var(--accent2)!important}
+.logCity{color:var(--fg)!important;font-weight:600}

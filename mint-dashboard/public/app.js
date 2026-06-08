@@ -163,6 +163,20 @@ async function loadJourney(id) {
   }
 }
 
+// ── Server clock ─────────────────────────────────────────────────────────────
+var _clockOffset = 0; // ms difference: serverTime - Date.now()
+async function initServerClock() {
+  try {
+    var d = await api('/api/time');
+    _clockOffset = d.ts - Date.now();
+  } catch(e) { _clockOffset = 0; }
+  setInterval(function() {
+    var now = new Date(Date.now() + _clockOffset);
+    var el = $('serverClock');
+    if (el) el.textContent = now.toLocaleTimeString('es-ES', {timeZone: 'Europe/Madrid', hour12: false});
+  }, 1000);
+}
+
 async function refreshAll() {
   try {
     const status = await api('/api/status');
@@ -211,6 +225,7 @@ async function refreshAll() {
 
     const hot = await api('/api/hot');
     renderHot(hot.items || []);
+    await loadScraper();
   } catch (e) {
     setPill($('statusPill'), 'bad', 'Error');
   }
@@ -297,6 +312,121 @@ async function sendChat() {
   }
 }
 
+
+let currentLogType = 'scraper';
+
+function fmtEta(min) {
+  if (min === null || min === undefined || min < 0) return '-';
+  if (min < 1) return '< 1 min';
+  if (min < 60) return min + ' min';
+  var h = Math.floor(min / 60), m = min % 60;
+  return h + 'h ' + (m > 0 ? m + 'm' : '');
+}
+
+function fmtUptime(isoStr) {
+  if (!isoStr) return '-';
+  var ms = Date.now() - new Date(isoStr).getTime();
+  var m = Math.floor(ms / 60000), h = Math.floor(m / 60);
+  if (h > 0) return h + 'h ' + (m % 60) + 'm';
+  return m + ' min';
+}
+
+function setPhaseUI(phase) {
+  // phase: 1=mapeo, 4=extraccion, 9=done, 0=idle
+  var p1 = $('scPhase1'), p4 = $('scPhase4'), pd = $('scPhaseDone');
+  var l1 = $('scLine1'), l2 = $('scLine2');
+  [p1, p4, pd].forEach(function(el) { if (el) { el.classList.remove('active', 'done'); } });
+  [l1, l2].forEach(function(el) { if (el) { el.classList.remove('active', 'done'); } });
+  if (phase === 1) {
+    if (p1) p1.classList.add('active');
+  } else if (phase === 4) {
+    if (p1) p1.classList.add('done');
+    if (l1) l1.classList.add('done');
+    if (p4) p4.classList.add('active');
+  } else if (phase === 9) {
+    [p1, p4, pd].forEach(function(el) { if (el) el.classList.add('done'); });
+    [l1, l2].forEach(function(el) { if (el) el.classList.add('done'); });
+  }
+}
+
+async function loadScraper() {
+  try {
+    var d = await api('/api/scraper');
+    var level = d.status === 'online' ? 'good' : d.status === 'stopped' ? 'bad' : 'warn';
+    setPill($('scraperPill'), level, d.status || '?');
+    if ($('scraperRestarts')) $('scraperRestarts').textContent = d.restarts != null ? d.restarts : '-';
+    if ($('statUptime')) $('statUptime').textContent = fmtUptime(d.uptime);
+
+    var eb = $('scraperErr');
+    if (d.last_error && eb) { eb.style.display = 'block'; eb.textContent = d.last_error; }
+    else if (eb) { eb.style.display = 'none'; }
+
+    if (d.phase === 1 && d.phase1) {
+      var p = d.phase1;
+      setPhaseUI(1);
+      if ($('scPhaseLabel')) $('scPhaseLabel').textContent = 'FASE 1 — Mapeando ciudades';
+      if ($('scraperPct')) $('scraperPct').textContent = p.pct + '%';
+      if ($('scraperBar')) $('scraperBar').style.width = p.pct + '%';
+      if ($('scEta')) $('scEta').textContent = fmtEta(p.etaMin);
+      if ($('scProgress')) $('scProgress').textContent = p.queriesDone.toLocaleString() + ' / ' + p.queriesTotal.toLocaleString() + ' consultas';
+      if ($('scSpeed')) $('scSpeed').textContent = p.pairsPerMin + ' consultas/min';
+      if ($('scActivity')) $('scActivity').textContent = '▶ ' + (p.currentActivity || '-');
+      if ($('statBiz')) $('statBiz').textContent = p.businessesFound > 0 ? p.businessesFound.toLocaleString() : '-';
+      if ($('statQueries')) $('statQueries').textContent = p.queriesDone + ' / ' + p.queriesTotal;
+      if ($('statSpeed')) $('statSpeed').textContent = p.pairsPerMin + '/min';
+
+    } else if (d.phase === 4 && d.phase4) {
+      var p4 = d.phase4;
+      setPhaseUI(4);
+      if ($('scPhaseLabel')) $('scPhaseLabel').textContent = 'FASE 2 — Extrayendo datos';
+      if ($('scraperPct')) $('scraperPct').textContent = p4.pct + '%';
+      if ($('scraperBar')) $('scraperBar').style.width = p4.pct + '%';
+      if ($('scEta')) $('scEta').textContent = fmtEta(p4.etaMin);
+      if ($('scProgress')) $('scProgress').textContent = p4.current.toLocaleString() + ' / ' + p4.total.toLocaleString() + ' negocios';
+      if ($('scSpeed')) { var rate = p4.etaMin && p4.etaMin > 0 ? Math.round((p4.total - p4.current) / p4.etaMin) : '-'; $('scSpeed').textContent = rate + ' neg/min'; }
+      if ($('scActivity')) $('scActivity').textContent = '▶ ' + (p4.item || '-');
+      if ($('statBiz')) $('statBiz').textContent = p4.current.toLocaleString();
+      if ($('statQueries')) $('statQueries').textContent = p4.current + ' / ' + p4.total;
+      if ($('statSpeed')) $('statSpeed').textContent = '-';
+
+    } else {
+      setPhaseUI(0);
+      if ($('scPhaseLabel')) $('scPhaseLabel').textContent = d.status === 'online' ? 'Iniciando...' : 'Sin actividad';
+      if ($('scraperPct')) $('scraperPct').textContent = '-';
+      if ($('scraperBar')) $('scraperBar').style.width = '0%';
+      if ($('scEta')) $('scEta').textContent = '-';
+      if ($('scActivity')) $('scActivity').textContent = d.status === 'online' ? 'Cargando actividad...' : '-';
+    }
+  } catch (e) {}
+  await loadScraperLog(currentLogType);
+}
+
+async function loadScraperLog(type) {
+  try {
+    var d = await api('/api/scraper-log?type=' + type + '&n=80');
+    var lines = d.lines || [];
+    if ($('scraperLog')) {
+      $('scraperLog').innerHTML = lines.map(function(l) {
+        var c = /error|Error|SIGINT|Traceback|Exception/i.test(l) ? 'logErr'
+              : /warning|warn/i.test(l) ? 'logWarn'
+              : /\[\d+\/\d+\]/.test(l) ? 'logInfo'
+              : !/\//.test(l) && l.trim().length > 0 && l.trim().length < 40 ? 'logCity'
+              : '';
+        return '<div class="logLine' + (c ? ' ' + c : '') + '">' + esc(l) + '</div>';
+      }).join('');
+      $('scraperLog').scrollTop = $('scraperLog').scrollHeight;
+    }
+  } catch (e) {}
+}
+
+function handleScraperLogTab(btn) {
+  var type = btn.getAttribute('data-logtype') || 'scraper';
+  currentLogType = type;
+  document.querySelectorAll('#scraperSection .segBtn').forEach(function(b) { b.classList.remove('isOn'); });
+  btn.classList.add('isOn');
+  loadScraperLog(type);
+}
+
 function esc(s) {
   return String(s ?? '')
     .replaceAll('&', '&amp;')
@@ -322,7 +452,8 @@ function wire() {
       for (const b of document.querySelectorAll('.segBtn')) b.classList.remove('isOn');
       btn.classList.add('isOn');
       currentDays = Number(btn.getAttribute('data-days') || 7);
-      await refreshAll();
+      initServerClock();
+  await refreshAll();
     });
   }
 }

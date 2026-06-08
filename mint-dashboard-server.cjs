@@ -228,6 +228,28 @@ function execSshPm2Jlist() {
   });
 }
 
+
+function execSshTailRemote(remotePath, lines) {
+  return new Promise(resolve => {
+    const sshTarget = MINT_SSH_USER + '@' + MINT_SSH_HOST;
+    execFile(
+      'ssh',
+      [...sshBaseArgs(), sshTarget, 'tail', '-' + lines, remotePath],
+      { timeout: 9000, maxBuffer: 2 * 1024 * 1024 },
+      (err, stdout) => resolve(String(stdout || ''))
+    );
+  });
+}
+
+function parseScraperProgress(logText) {
+  const re = /\[(\d+)\/(\d+)\]\s+(.+)/g;
+  let m, last;
+  while ((m = re.exec(String(logText))) !== null) last = m;
+  if (!last) return null;
+  const cur = parseInt(last[1]), tot = parseInt(last[2]);
+  return { current: cur, total: tot, item: last[3].trim(), pct: Math.round(cur / tot * 100) };
+}
+
 async function checkOllamaStatus() {
   try {
     const signal = AbortSignal.timeout ? AbortSignal.timeout(3000) : undefined;
@@ -594,7 +616,7 @@ function serveStatic(req, res, pathname) {
   };
   res.writeHead(200, {
     'Content-Type': types[ext] || 'application/octet-stream',
-    'Cache-Control': ext === '.html' ? 'no-store' : 'public, max-age=3600',
+    'Cache-Control': 'no-store',
   });
   fs.createReadStream(filePath).pipe(res);
 }
@@ -954,6 +976,82 @@ async function handleApi(req, res, pathname, query) {
     return;
   }
 
+
+  if (pathname === '/api/scraper') {
+    const list = Array.isArray(cache.pm2) ? cache.pm2 : [];
+    const proc = list.find(p => p && p.name === 'nexux-lead-scraper') || null;
+    const pmUptime = (proc && proc.pm2_env && proc.pm2_env.pm_uptime) ? proc.pm2_env.pm_uptime : 0;
+
+    const [logTail, pm2BigTail, errTail, logMtimeRaw] = await Promise.all([
+      execSshTailRemote('/home/ricky/nexux-scraper/scraper.log', 20),
+      execSshTailRemote('/home/ricky/.pm2/logs/nexux-lead-scraper-out.log', 1000),
+      execSshTailRemote('/home/ricky/nexux-scraper/scraper-error.log', 12),
+      new Promise(resolve => {
+        const sshTarget = MINT_SSH_USER + '@' + MINT_SSH_HOST;
+        execFile('ssh', [...sshBaseArgs(), sshTarget, 'stat', '-c', '%Y', '/home/ricky/nexux-scraper/scraper.log'],
+          { timeout: 5000 }, (err, stdout) => resolve(String(stdout || '0').trim()));
+      }),
+    ]);
+
+    const logMtimeMs = parseInt(logMtimeRaw || '0') * 1000;
+    const logIsStale = logMtimeMs < pmUptime;
+    const rawProgress = parseScraperProgress(logTail);
+    const progress = logIsStale ? null : rawProgress;
+
+    // Phase 1 stats: parse city/category pairs from PM2 out.log
+    const PHASE1_TOTAL = 1200; // ~120 cities × 10 categories
+    const pm2Lines = pm2BigTail.split('\n');
+    const pairLines = pm2Lines.filter(function(l) { return /[^\/]+\/[^:]+:\s*\d+\s*negocios/.test(l); });
+    const queriesDone = pairLines.length;
+    const businessesFound = pairLines.reduce(function(s, l) {
+      var m = l.match(/:\s*(\d+)\s*negocios/); return s + (m ? parseInt(m[1]) : 0);
+    }, 0);
+    const lastOutLine = pm2Lines.filter(function(l) { return l.trim(); }).slice(-1)[0] || '';
+    const elapsedMin = pmUptime ? (Date.now() - pmUptime) / 60000 : 1;
+    const pairsPerMin = queriesDone > 0 ? Math.round(queriesDone / Math.max(elapsedMin, 0.5) * 10) / 10 : 0;
+    const phase1Pct = Math.min(Math.round(queriesDone / PHASE1_TOTAL * 100), 99);
+    const etaMinP1 = pairsPerMin > 0 ? Math.round(Math.max(PHASE1_TOTAL - queriesDone, 0) / pairsPerMin) : null;
+
+    // Phase 4 ETA
+    var etaMinP4 = null;
+    if (progress && progress.pct > 0 && elapsedMin > 0) {
+      var rate = progress.current / elapsedMin;
+      etaMinP4 = rate > 0 ? Math.round((progress.total - progress.current) / rate) : null;
+    }
+
+    const isPhase1 = !progress && /negocios/.test(lastOutLine);
+    const phase = progress ? 4 : (isPhase1 ? 1 : 0);
+    const errLines = errTail.trim() ? errTail.trim().split('\n').slice(-4).join('\n') : null;
+
+    return json(res, 200, {
+      status: (proc && proc.pm2_env && proc.pm2_env.status) || 'unknown',
+      restarts: (proc && proc.pm2_env && proc.pm2_env.restart_time != null) ? proc.pm2_env.restart_time : null,
+      uptime: pmUptime ? new Date(pmUptime).toISOString() : null,
+      phase,
+      phase1: phase === 1 ? {
+        queriesDone, queriesTotal: PHASE1_TOTAL, pct: phase1Pct,
+        businessesFound, pairsPerMin, etaMin: etaMinP1,
+        currentActivity: lastOutLine.trim(),
+      } : null,
+      phase4: phase === 4 ? {
+        current: progress.current, total: progress.total, pct: progress.pct,
+        item: progress.item, etaMin: etaMinP4,
+      } : null,
+      last_error: errLines,
+    });
+  }
+
+  if (pathname === '/api/scraper-log') {
+    const n = Math.min(200, Math.max(10, Number(query.n || 60)));
+    const isErr = String(query.type || '') === 'error';
+    // error tab: scraper-error.log; main tab: PM2 out.log (live activity in all phases)
+    const remotePath = isErr
+      ? '/home/ricky/nexux-scraper/scraper-error.log'
+      : '/home/ricky/.pm2/logs/nexux-lead-scraper-out.log';
+    const tail = await execSshTailRemote(remotePath, n);
+    return json(res, 200, { lines: tail.split('\n').filter(function(l) { return l.trim(); }) });
+  }
+
   return notFound(res);
 }
 
@@ -981,7 +1079,26 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  if (pathname.startsWith('/api/')) return handleApi(req, res, pathname, parsed.query || {});
+  if (pathname === '/api/time') {
+    return json(res, 200, { iso: new Date().toISOString(), ts: Date.now() });
+  }
+  if (pathname.startsWith('/aeo/')) {
+    const aeoPath = pathname.slice(4) || '/';
+    const opts = {
+      hostname: '127.0.0.1', port: 4447,
+      path: aeoPath + (parsed.search || ''), method: req.method,
+      headers: Object.assign({}, req.headers, { host: '127.0.0.1' }),
+      timeout: 300000,
+    };
+    const proxy = http.request(opts, (pRes) => {
+      res.writeHead(pRes.statusCode, pRes.headers);
+      pRes.pipe(res, { end: true });
+    });
+    proxy.on('error', () => { try { res.writeHead(502); res.end(JSON.stringify({ error: 'auditor_unavailable' })); } catch{} });
+    req.pipe(proxy, { end: true });
+    return;
+  }
+    if (pathname.startsWith('/api/')) return handleApi(req, res, pathname, parsed.query || {});
   if (req.method !== 'GET') return text(res, 405, 'Method Not Allowed');
 
   return serveStatic(req, res, pathname);

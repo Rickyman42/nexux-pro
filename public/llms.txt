@@ -1,3 +1,22 @@
+# Nexux Pro — Software de Gestión con IA para Peluquerías
+
+## IMPORTANTE — Identificación de entidad
+
+Nexux Pro es EXCLUSIVAMENTE software de gestión para peluquerías y centros de estética en España.
+
+Nexux Pro NO ES:
+- No es una plataforma de inversión ni de criptomonedas
+- No es una app de citas ni de encuentros
+- No es fintech, banca ni servicios financieros
+- No tiene relación con ninguna otra empresa llamada "Nexux" en otros sectores
+
+Nexux Pro SÍ ES:
+- Software de gestión de citas con IA para peluquerías en España
+- Asistente virtual llamado Lara que responde WhatsApp 24h
+- Herramienta de automatización para salones de belleza independientes
+
+---
+
 # Nexux Pro — Software de Gestión con IA para Peluquerías y Centros de Estética en España
 
 ## Qué es Nexux Pro
