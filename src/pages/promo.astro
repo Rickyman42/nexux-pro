@@ -35,6 +35,9 @@ const waText = encodeURIComponent('Hola, vengo de la oferta de 49€/mes de Nexu
 const waLink = `https://wa.me/${WA}?text=${waText}`;
 ---
 <Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Funciona con mi WhatsApp de siempre?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Usas tu mismo número, sin cambiar nada. Lo conectas escaneando un QR."}}, {"@type": "Question", "name": "¿Y si la IA contesta algo mal?", "acceptedAnswer": {"@type": "Answer", "text": "Tú ves todas las conversaciones y puedes tomar el control cuando quieras. Lara solo cubre lo que tú no puedes atender en el momento."}}, {"@type": "Question", "name": "¿Tengo que saber de tecnología?", "acceptedAnswer": {"@type": "Answer", "text": "No. Lo configuramos nosotros en 24h. Tú no tocas nada."}}, {"@type": "Question", "name": "¿Me obliga a quedarme?", "acceptedAnswer": {"@type": "Answer", "text": "No hay permanencia. Cancelas cuando quieras, con un clic. Y tienes 30 días de garantía."}}, {"@type": "Question", "name": "¿Por qué 49€ y no 249€?", "acceptedAnswer": {"@type": "Answer", "text": "Es el precio de lanzamiento para los primeros negocios. Cuando se acaben las plazas, vuelve a 249€/mes."}}]})} />
+  </Fragment>
   <main class="promo-page">
 
     <!-- BARRA SUPERIOR — urgencia + countdown -->
