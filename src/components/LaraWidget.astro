@@ -78,6 +78,16 @@ const { trial = false } = Astro.props;
     }
   };
 
+  function extractName(input) {
+    let name = input.trim();
+    const prefixes = [/^(?:me\s+)?llamo\s+/i, /^soy\s+/i, /^mi\s+nombre\s+es\s+/i, /^(?:yo\s+)?soy\s+/i];
+    for (const p of prefixes) name = name.replace(p, '');
+    name = name.trim();
+    const parts = name.split(/[\s,;.]+/).filter(Boolean);
+    if (parts.length > 3) name = parts.slice(0, 2).join(' ');
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
   function recomendar(data) {
     const esGrande = ['4-8', '+8'].includes(data.trabajadoras);
     const conInstagram = ['Instagram', 'Por todos lados'].includes(data.canal);
@@ -93,7 +103,7 @@ const { trial = false } = Astro.props;
   const FLOW_STANDARD = [
     {
       id: 'welcome',
-      bot: '¡Hola! 👋 Soy Lara, la asistente IA que gestiona peluquerías mientras las dueñas trabajan.<br/><br/>¿Cómo te llamas?',
+      bot: '¡Hola! 👋 Soy Lara, la asistente IA que gestiona negocios de cita previa mientras los dueños trabajan.<br/><br/>¿Cómo te llamas?',
       field: 'nombre',
       validate: v => v.length >= 2,
     },
@@ -112,7 +122,7 @@ const { trial = false } = Astro.props;
     },
     {
       id: 'trabajadoras',
-      bot: '¿Cuántas personas trabajáis en el salón?',
+      bot: '¿Cuántas personas trabajáis en el negocio?',
       field: 'trabajadoras',
       validate: v => v.length >= 1,
       suggestions: ['Solo yo', '2-3', '4-8', '+8'],
@@ -384,8 +394,9 @@ const { trial = false } = Astro.props;
     if (!value) return;
     const step = flow[state.step];
     if (!step || !step.field) return;
+    const processedValue = step.field === 'nombre' ? extractName(value) : value;
     if (!step.validate(value, state.data)) {
-      addMsg(value, 'user');
+      addMsg(processedValue, 'user');
       addTyping();
       await new Promise(r => setTimeout(r, 700));
       removeTyping();
@@ -393,8 +404,8 @@ const { trial = false } = Astro.props;
       input.value = '';
       return;
     }
-    addMsg(value, 'user');
-    state.data[step.field] = value;
+    addMsg(processedValue, 'user');
+    state.data[step.field] = processedValue;
     input.value = '';
     track('lara_step_' + step.id, { value });
     state.step += 1;
