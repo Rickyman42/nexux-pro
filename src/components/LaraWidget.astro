@@ -41,213 +41,27 @@ const { trial = false } = Astro.props;
 
 <script is:inline>
 (function() {
-
-  const PLANES = {
-    starter: {
-      nombre: 'Starter',
-      precio: '249 €/mes',
-      emoji: '🌱',
-      puntos: [
-        'Lara responde WhatsApp 24h sin que hagas nada',
-        'Agenda citas automáticamente y sin errores',
-        'Nunca más una cita perdida por no contestar',
-      ],
-      desc: 'Perfecto si empiezas: tu asistente siempre activa en WhatsApp.'
-    },
-    pro: {
-      nombre: 'Pro',
-      precio: '449 €/mes',
-      emoji: '⚡',
-      puntos: [
-        'WhatsApp + Instagram DMs cubiertos 24h',
-        'Recupera automáticamente clientas que llevan meses sin venir',
-        'Analítica de qué servicios te dan más dinero',
-      ],
-      desc: 'El más elegido: cubre todos tus canales y hace crecer tu cartera de clientas.'
-    },
-    total: {
-      nombre: 'Total',
-      precio: '749 €/mes',
-      emoji: '👑',
-      puntos: [
-        'Todo lo anterior, sin límites de mensajes ni trabajadoras',
-        'Campañas de marketing automatizadas cada mes',
-        'Tu asistente con nombre y personalidad propios',
-      ],
-      desc: 'Para salones que quieren dominar su zona: marketing, agenda y atención en piloto automático.'
-    }
-  };
-
-  function extractName(input) {
-    let name = input.trim();
-    const prefixes = [/^(?:me\s+)?llamo\s+/i, /^soy\s+/i, /^mi\s+nombre\s+es\s+/i, /^(?:yo\s+)?soy\s+/i];
-    for (const p of prefixes) name = name.replace(p, '');
-    name = name.trim();
-    const firstWord = name.split(/[\s,;.]+/)[0];
-    return firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
-  }
-
-  function recomendar(data) {
-    const esGrande = ['4-8', '+8'].includes(data.trabajadoras);
-    const conInstagram = ['Instagram', 'Por todos lados'].includes(data.canal);
-    const muchasPerdidas = data.citas_perdidas === 'Más de 5';
-    const todo = data.mayor_dolor === 'Todo a la vez';
-    const captarClientas = data.mayor_dolor === 'Recuperar clientas';
-
-    if (esGrande || todo || (conInstagram && muchasPerdidas)) return 'total';
-    if (conInstagram || captarClientas || data.citas_perdidas === '3-5' || data.trabajadoras === '2-3') return 'pro';
-    return 'starter';
-  }
-
-  const FLOW_STANDARD = [
-    {
-      id: 'welcome',
-      bot: '¡Hola! 👋 Soy Lara, la asistente IA que gestiona negocios de cita previa mientras los dueños trabajan.<br/><br/>¿Cómo te llamas?',
-      field: 'nombre',
-      validate: v => v.length >= 2,
-    },
-    {
-      id: 'salon',
-      bot: (data) => `Encantada, ${data.nombre} 🌸. ¿Cómo se llama tu negocio?`,
-      field: 'salon',
-      validate: v => v.length >= 2,
-    },
-    {
-      id: 'canal',
-      bot: '¿Por dónde te contactan más tus clientas?',
-      field: 'canal',
-      validate: v => v.length >= 2,
-      suggestions: ['WhatsApp', 'Instagram', 'Teléfono', 'Por todos lados'],
-    },
-    {
-      id: 'trabajadoras',
-      bot: '¿Cuántas personas trabajáis en el negocio?',
-      field: 'trabajadoras',
-      validate: v => v.length >= 1,
-      suggestions: ['Solo yo', '2-3', '4-8', '+8'],
-    },
-    {
-      id: 'citas_perdidas',
-      bot: (data) => `${data.salon}, ¿cuántas citas crees que se os escapan a la semana por no contestar a tiempo?`,
-      field: 'citas_perdidas',
-      validate: v => v.length >= 1,
-      suggestions: ['1-2', '3-5', 'Más de 5', 'No lo sé bien'],
-    },
-    {
-      id: 'mayor_dolor',
-      bot: '¿Qué es lo que más te come el tiempo en el día a día?',
-      field: 'mayor_dolor',
-      validate: v => v.length >= 2,
-      suggestions: ['Responder mensajes', 'Gestionar la agenda', 'Recuperar clientas', 'Todo a la vez'],
-    },
-    {
-      id: 'recomendacion',
-      bot: (data) => {
-        const planKey = recomendar(data);
-        data._plan = planKey;
-        const p = PLANES[planKey];
-        const alts = Object.entries(PLANES).filter(([k]) => k !== planKey);
-        return `Con lo que me has contado, el plan ideal para <strong>${data.salon}</strong> es:<br/><br/>` +
-          `<div class="lara-plan-card">` +
-          `<div class="lara-plan-badge">⭐ Recomendado</div>` +
-          `<div class="lara-plan-header">${p.emoji} <strong>Plan ${p.nombre}</strong> · <span class="lara-plan-price">${p.precio}</span></div>` +
-          `<ul class="lara-plan-list">${p.puntos.map(pt => `<li>${pt}</li>`).join('')}</ul>` +
-          `<div class="lara-plan-desc">${p.desc}</div>` +
-          `</div>` +
-          `<div class="lara-plan-alts-label">También disponibles:</div>` +
-          alts.map(([k, alt]) =>
-            `<div class="lara-plan-alt">` +
-            `<div class="lara-plan-alt-header">${alt.emoji} <strong>Plan ${alt.nombre}</strong> · <span class="lara-plan-price">${alt.precio}</span></div>` +
-            `<div class="lara-plan-alt-desc">${alt.desc}</div>` +
-            `</div>`
-          ).join('') +
-          `<br/>¿Con cuál te quedas?`;
-      },
-      field: 'plan_elegido',
-      validate: (v, data) => {
-        const lower = v.toLowerCase();
-        if (lower.includes('starter')) { data._plan = 'starter'; return true; }
-        if (lower.includes('pro')) { data._plan = 'pro'; return true; }
-        if (lower.includes('total')) { data._plan = 'total'; return true; }
-        return false;
-      },
-      suggestions: (data) => {
-        const rec = data._plan || 'pro';
-        return ['starter', 'pro', 'total'].map(k =>
-          k === rec ? `✓ Plan ${PLANES[k].nombre}` : `Plan ${PLANES[k].nombre}`
-        );
-      },
-    },
-    {
-      id: 'telefono',
-      bot: (data) => {
-        const p = PLANES[data._plan || 'pro'];
-        return `Para activar el <strong>Plan ${p.nombre}</strong> solo necesito un dato más.<br/>¿Cuál es tu teléfono? Te confirmo la activación por Telegram en menos de 24h.`;
-      },
-      field: 'telefono',
-      validate: v => /^[+\d\s\-()]{9,}$/.test(v),
-    },
-    {
-      id: 'final',
-      bot: (data) => {
-        const p = PLANES[data._plan || 'pro'];
-        return `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu solicitud para el <strong>Plan ${p.nombre}</strong> de ${data.salon}. Recibirás un mensaje en el ${data.telefono} con todos los pasos para activar Lara en tu salón.`;
-      },
-      field: null,
-      final: true,
-      showCTA: true,
-    },
-  ];
-
-
-  // ── TRIAL FLOW (prueba gratis) ─────────────────────────────────────────
-  const FLOW_TRIAL = [
-    {
-      id: 'welcome',
-      bot: '¡Hola! 👋 Soy Lara.<br/><br/>Voy a activarte la prueba gratis en menos de 24h. Es muy rápido. ¿Cómo te llamas?',
-      field: 'nombre',
-      validate: v => v.length >= 2,
-    },
-    {
-      id: 'salon',
-      bot: (data) => `Encantada, ${data.nombre} 🌸. ¿Cómo se llama tu negocio?`,
-      field: 'salon',
-      validate: v => v.length >= 2,
-    },
-    {
-      id: 'canal',
-      bot: '¿Por dónde te contactan más tus clientas?',
-      field: 'canal',
-      validate: v => v.length >= 2,
-      suggestions: ['WhatsApp', 'Instagram', 'Teléfono', 'Por todos lados'],
-    },
-    {
-      id: 'telefono',
-      bot: (data) => `Perfecto. Para activar Lara en <strong>${data.salon}</strong> solo necesito tu número de Telegram o WhatsApp.<br/><br/>Te activo Lara en tu negocio en minutos — gratis, sin tarjeta. Te contacto por Telegram.`,
-      field: 'telefono',
-      validate: v => /^[+\d\s\-()]{9,}$/.test(v),
-    },
-    {
-      id: 'final',
-      bot: (data) => `¡Listo, ${data.nombre}! 🎉<br/><br/>He registrado tu prueba gratuita para <strong>${data.salon}</strong>. En pocos minutos te escribo por Telegram al ${data.telefono} para activar Lara.<br/><br/><em>Sin tarjeta · Sin compromisos · 7 días para probarlo todo</em>`,
-      field: null,
-      final: true,
-      showCTA: false,
-    },
-  ];
-
-  // Detect trial mode from launcher data attribute
-  const IS_TRIAL = document.getElementById('lara-launcher')?.dataset?.trial === '1';
-  const flow = IS_TRIAL ? FLOW_TRIAL : FLOW_STANDARD;
-
-  const state = {
-    step: 0,
-    data: {},
+  var state = {
+    history: [],
+    sessionData: {},
+    sessionId: '',
     opened: false,
     finished: false,
+    loading: false
   };
 
   function $(id) { return document.getElementById(id); }
+
+  function genId() {
+    try { return crypto.randomUUID(); } catch (e) { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+  }
+
+  function getSessionId() {
+    var sid;
+    try { sid = sessionStorage.getItem('laraSessionId'); } catch (e) {}
+    if (!sid) { sid = genId(); try { sessionStorage.setItem('laraSessionId', sid); } catch (e) {} }
+    return sid;
+  }
 
   function track(event, props) {
     if (window.gtag) gtag('event', event, props || {});
@@ -256,18 +70,18 @@ const { trial = false } = Astro.props;
   }
 
   function addMsg(text, who) {
-    const body = $('lara-body');
-    const msg = document.createElement('div');
+    var body = $('lara-body');
+    var msg = document.createElement('div');
     msg.className = 'lara-msg lara-msg-' + who;
     if (who === 'bot') { msg.innerHTML = text; } else { msg.textContent = text; }
     body.appendChild(msg);
-    requestAnimationFrame(() => msg.classList.add('show'));
+    requestAnimationFrame(function() { msg.classList.add('show'); });
     body.scrollTop = body.scrollHeight;
   }
 
   function addTyping() {
-    const body = $('lara-body');
-    const t = document.createElement('div');
+    var body = $('lara-body');
+    var t = document.createElement('div');
     t.className = 'lara-msg lara-msg-bot lara-typing';
     t.innerHTML = '<span></span><span></span><span></span>';
     t.id = 'lara-typing';
@@ -276,150 +90,97 @@ const { trial = false } = Astro.props;
   }
 
   function removeTyping() {
-    const t = $('lara-typing');
+    var t = $('lara-typing');
     if (t) t.remove();
   }
 
-  function addSuggestions(suggestions) {
-    const body = $('lara-body');
-    const wrap = document.createElement('div');
-    wrap.className = 'lara-chips';
-    wrap.id = 'lara-chips';
-    suggestions.forEach(s => {
-      const b = document.createElement('button');
-      b.className = 'lara-chip';
-      b.textContent = s;
-      b.onclick = () => {
-        $('lara-input').value = s;
-        handleSend();
-      };
-      wrap.appendChild(b);
-    });
+  function renderPlanCard(plan) {
+    var body = $('lara-body');
+    var wrap = document.createElement('div');
+    wrap.className = 'lara-plan-card';
+    wrap.innerHTML =
+      '<div class="lara-plan-badge">⭐ Recomendado</div>' +
+      '<div class="lara-plan-header">' + plan.emoji + ' <strong>Plan ' + plan.nombre + '</strong> · <span class="lara-plan-price">' + plan.precio + '</span></div>' +
+      '<ul class="lara-plan-list">' + plan.puntos.map(function(p) { return '<li>' + p + '</li>'; }).join('') + '</ul>' +
+      '<div class="lara-plan-desc">' + plan.desc + '</div>';
     body.appendChild(wrap);
-    body.scrollTop = body.scrollHeight;
-  }
 
-  function removeSuggestions() {
-    const c = $('lara-chips');
-    if (c) c.remove();
-  }
-
-  function addCTA() {
-    const body = $('lara-body');
-    const wrap = document.createElement('div');
-    wrap.className = 'lara-cta-wrap';
-    const planKey = state.data._plan || 'pro';
-    const p = PLANES[planKey];
-    const btn = document.createElement('button');
+    var cta = document.createElement('div');
+    cta.className = 'lara-cta-wrap';
+    var btn = document.createElement('button');
     btn.className = 'lara-cta-btn';
-    btn.setAttribute('data-checkout-plan', planKey);
-    btn.textContent = `Activar Plan ${p.nombre} — ${p.precio} →`;
-    wrap.appendChild(btn);
-    body.appendChild(wrap);
+    btn.textContent = 'Quiero empezar con ' + plan.nombre + ' — ' + plan.precio + ' →';
+    btn.onclick = function() {
+      track('lara_plan_click', { plan: plan.plan });
+      window.open('https://wa.me/34630745369?text=Hola%2C%20quiero%20el%20plan%20' + plan.plan, '_blank');
+    };
+    cta.appendChild(btn);
+    body.appendChild(cta);
     body.scrollTop = body.scrollHeight;
   }
 
-  async function showStep(idx) {
-    const step = flow[idx];
-    if (!step) return;
-    removeSuggestions();
-    const delay = step.autoNext ? 700 : 900 + Math.random() * 600;
+  async function sendToAI(value) {
+    if (state.loading) return;
+    state.loading = true;
     addTyping();
-    await new Promise(r => setTimeout(r, delay));
-    removeTyping();
-    const text = typeof step.bot === 'function' ? step.bot(state.data) : step.bot;
-    addMsg(text, 'bot');
-    if (step.suggestions) {
-      const suggs = typeof step.suggestions === 'function' ? step.suggestions(state.data) : step.suggestions;
-      setTimeout(() => addSuggestions(suggs), 200);
-    }
-    if (step.autoNext) {
-      setTimeout(() => {
-        state.step += 1;
-        showStep(state.step);
-      }, step.autoNextDelay || 1200);
-      return;
-    }
-    if (step.final) {
-      if (step.showCTA) setTimeout(addCTA, 500);
-      $('lara-input').disabled = true;
-      $('lara-send').disabled = true;
-      state.finished = true;
-      sendLead();
-      track('lara_lead_complete', { plan: state.data._plan });
-    }
-  }
-
-  async function sendLead() {
-    const payload = {
-      ...state.data,
-      source: 'nexux.pro',
-      _trial: IS_TRIAL ? '1' : '0',
-      timestamp: new Date().toISOString(),
-      utm: new URLSearchParams(location.search).toString(),
-    };
-
     try {
-      sessionStorage.setItem('laraData', JSON.stringify(state.data));
-    } catch (e) {
-      console.warn('[lara] sessionStorage unavailable', e);
-    }
-
-    try {
-      const res  = await fetch('/api/leads/pro', {
+      var res = await fetch('/api/lara-web/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          sessionId: state.sessionId,
+          message: value,
+          history: state.history,
+          sessionData: state.sessionData
+        })
       });
-      const data = await res.json();
-
-      // Trial: show Telegram deep-link button once provisioned
-      if (IS_TRIAL && data.telegramDeepLink) {
-        await new Promise(r => setTimeout(r, 1200));
-        const btn = `<a href="${data.telegramDeepLink}" target="_blank"
-          style="display:inline-block;margin-top:12px;background:#229ED9;color:#fff;
-          text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:700;
-          font-size:13px;">&#128172; Hablar con Lara en Telegram &rarr;</a>`;
-        addMsg(`Lara ya está lista para <strong>${state.data.salon}</strong>. ` +
-               `Haz clic para empezar la conversación:${btn}`, 'bot');
+      removeTyping();
+      if (!res.ok) {
+        addMsg('Lo siento, hubo un error. ¿Puedes intentarlo de nuevo? 🌷', 'bot');
+        state.loading = false;
+        return;
       }
-    } catch { /* non-blocking */ }
+      var data = await res.json();
+      addMsg(data.reply, 'bot');
+      state.history.push({ role: 'user', content: value });
+      state.history.push({ role: 'assistant', content: data.reply });
+      if (data.sessionData) state.sessionData = data.sessionData;
+      if (state.history.length > 20) state.history = state.history.slice(-20);
+
+      if (data.done && data.planRecommendation) {
+        state.finished = true;
+        $('lara-input').disabled = true;
+        $('lara-send').disabled = true;
+        setTimeout(function() { renderPlanCard(data.planRecommendation); }, 500);
+        track('lara_lead_complete', { plan: data.planRecommendation.plan });
+      }
+    } catch (e) {
+      removeTyping();
+      addMsg('Lo siento, no he podido conectarme. ¿Puedes escribirme por WhatsApp? 💬', 'bot');
+    }
+    state.loading = false;
   }
 
-  async function handleSend() {
-    if (state.finished) return;
-    const input = $('lara-input');
-    const value = input.value.trim();
+  function handleSend() {
+    if (state.finished || state.loading) return;
+    var input = $('lara-input');
+    var value = input.value.trim();
     if (!value) return;
-    const step = flow[state.step];
-    if (!step || !step.field) return;
-    const processedValue = step.field === 'nombre' ? extractName(value) : value;
-    if (!step.validate(value, state.data)) {
-      addMsg(processedValue, 'user');
-      addTyping();
-      await new Promise(r => setTimeout(r, 700));
-      removeTyping();
-      addMsg('Mmm, ¿podrías concretar un poquito más? 🌷', 'bot');
-      input.value = '';
-      return;
-    }
-    addMsg(processedValue, 'user');
-    state.data[step.field] = processedValue;
+    addMsg(value, 'user');
     input.value = '';
-    track('lara_step_' + step.id, { value });
-    state.step += 1;
-    showStep(state.step);
+    sendToAI(value);
   }
 
   function open() {
     if (state.opened) return;
     state.opened = true;
+    state.sessionId = getSessionId();
     $('lara-chat').classList.add('open');
     $('lara-chat').setAttribute('aria-hidden', 'false');
     $('lara-launcher').classList.add('hidden');
     track('lara_opened');
-    if (state.step === 0 && $('lara-body').children.length === 0) {
-      showStep(0);
+    if (state.history.length === 0 && $('lara-body').children.length === 0) {
+      sendToAI('Hola');
     }
   }
 
@@ -434,11 +195,11 @@ const { trial = false } = Astro.props;
     $('lara-launcher').addEventListener('click', open);
     $('lara-close').addEventListener('click', close);
     $('lara-send').addEventListener('click', handleSend);
-    $('lara-input').addEventListener('keydown', e => {
+    $('lara-input').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') handleSend();
     });
-    document.querySelectorAll('a[href="#hablar"]').forEach(a => {
-      a.addEventListener('click', e => { e.preventDefault(); open(); });
+    document.querySelectorAll('a[href="#hablar"]').forEach(function(a) {
+      a.addEventListener('click', function(e) { e.preventDefault(); open(); });
     });
   }
 
