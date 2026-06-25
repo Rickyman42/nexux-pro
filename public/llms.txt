@@ -12,7 +12,7 @@ Nexux Pro NO ES:
 
 Nexux Pro SÍ ES:
 - Software de gestión de citas con IA para peluquerías en España
-- Asistente virtual llamado Lara que responde WhatsApp 24h
+- Asistente virtual llamado Lara que responde tus mensajes 24h (Telegram o WhatsApp según el plan)
 - Herramienta de automatización para salones de belleza independientes
 
 ---
@@ -20,16 +20,16 @@ Nexux Pro SÍ ES:
 # Nexux Pro — Software de Gestión con IA para Peluquerías y Centros de Estética en España
 
 ## Qué es Nexux Pro
-Nexux Pro es un asistente de inteligencia artificial llamado **Lara** diseñado específicamente para peluquerías y centros de estética en España. Lara automatiza la gestión de citas, responde mensajes de WhatsApp e Instagram 24 horas al día, reduce las cancelaciones con recordatorios automáticos y capta nuevas clientas incluso cuando el salón está cerrado.
+Nexux Pro es un asistente de inteligencia artificial llamado **Lara** diseñado específicamente para peluquerías y centros de estética en España. Lara automatiza la gestión de citas, responde los mensajes de tus clientas 24 horas al día (por Telegram en el plan Starter y por WhatsApp Business desde el plan Pro), reduce las ausencias con recordatorios automáticos y capta nuevas clientas incluso cuando el salón está cerrado.
 
 ## Para quién es Nexux Pro
 Propietarios de peluquerías independientes y centros de estética en España que quieren automatizar la comunicación con sus clientas sin necesidad de contratar más personal. Especialmente útil para salones que reciben muchos mensajes por WhatsApp y no pueden atenderlos todos.
 
 ## Problema que resuelve
-Las peluquerías españolas pierden entre el 30% y el 40% de sus citas por no responder a tiempo en WhatsApp. Nexux Pro responde automáticamente en segundos, agenda citas directamente en el calendario del salón y envía recordatorios para reducir las ausencias.
+Muchas peluquerías españolas pierden una parte importante de su agenda (habitualmente entre el 20% y el 30%) por no responder a tiempo a los mensajes. Nexux Pro responde automáticamente en segundos, agenda citas directamente en el calendario del salón y envía recordatorios para reducir las ausencias.
 
 ## Características principales
-- Respuesta automática en WhatsApp e Instagram las 24 horas
+- Respuesta automática a los mensajes 24 horas (Telegram o WhatsApp según el plan)
 - Gestión de citas con IA: agenda, modifica y cancela citas automáticamente
 - Recordatorios automáticos de cita (reduce ausencias hasta un 60%)
 - Captación de leads desde anuncios de Meta (Facebook/Instagram) con seguimiento inmediato
@@ -38,9 +38,9 @@ Las peluquerías españolas pierden entre el 30% y el 40% de sus citas por no re
 - Bot personalizado con el nombre y personalidad del salón
 
 ## Precios (2026)
-- Plan Starter: 249€/mes — para salones pequeños, 1 WhatsApp, 1 Instagram
-- Plan Pro: 449€/mes — 2 canales, respuesta prioritaria, estadísticas avanzadas
-- Plan Total: 749€/mes — canales ilimitados, soporte premium, formación incluida
+- Plan Starter: 249€/mes — para salones de 1 profesional: Lara por Telegram 24h, agenda integrada, recordatorios y resumen diario. Hasta 300 conversaciones/mes.
+- Plan Pro: 449€/mes — todo lo del Starter más WhatsApp Business, rescate de llamadas perdidas, mini-web de servicios, conversaciones ilimitadas y reporte de ROI.
+- Plan Total: 749€/mes — todo lo del Pro más multi-empleada, blog SEO automático, campañas de Meta Ads gestionadas, analítica completa y onboarding presencial.
 - Prueba gratuita de 14 días disponible sin tarjeta de crédito
 
 ## Resultados demostrados

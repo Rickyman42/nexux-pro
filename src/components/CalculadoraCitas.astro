@@ -1,0 +1,223 @@
+---
+---
+
+<div class="calc-citas" id="calc-citas">
+  <h2 class="calc-title">Calcula lo que pierdes al mes</h2>
+  <p class="calc-sub">Mete tus números reales. Sin registro.</p>
+
+  <div class="calc-grid">
+    <div class="calc-field">
+      <label for="calc-ticket">Ticket medio (€)</label>
+      <input type="number" id="calc-ticket" min="0" step="1" value="50" />
+    </div>
+    <div class="calc-field">
+      <label for="calc-citas-mes">Citas al mes</label>
+      <input type="number" id="calc-citas-mes" min="0" step="1" value="200" />
+    </div>
+    <div class="calc-field">
+      <label for="calc-noshow">% de no-shows</label>
+      <input type="number" id="calc-noshow" min="0" max="100" step="1" value="25" />
+    </div>
+  </div>
+
+  <div class="calc-results">
+    <div class="calc-result">
+      <span class="calc-result-label">Sangría mensual</span>
+      <span class="calc-result-value" id="calc-sangria-mes">0 €</span>
+    </div>
+    <div class="calc-result">
+      <span class="calc-result-label">Sangría anual</span>
+      <span class="calc-result-value" id="calc-sangria-anio">0 €</span>
+    </div>
+  </div>
+
+  <div class="calc-plans" id="calc-plans">
+    <div class="calc-plan" data-plan="starter" data-coste="2988">
+      <span class="calc-plan-name">Starter</span>
+      <span class="calc-plan-price">249€/mes</span>
+      <span class="calc-plan-result" id="calc-ahorro-starter"></span>
+    </div>
+    <div class="calc-plan" data-plan="pro" data-coste="5388">
+      <span class="calc-plan-name">Pro</span>
+      <span class="calc-plan-price">449€/mes</span>
+      <span class="calc-plan-result" id="calc-ahorro-pro"></span>
+    </div>
+    <div class="calc-plan" data-plan="total" data-coste="8988">
+      <span class="calc-plan-name">Total</span>
+      <span class="calc-plan-price">749€/mes</span>
+      <span class="calc-plan-result" id="calc-ahorro-total"></span>
+    </div>
+  </div>
+
+  <a href="/prueba-gratis" class="btn-primary calc-cta">Activa tu prueba gratis &rarr;</a>
+</div>
+
+<style>
+  .calc-citas {
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .calc-title {
+    font-family: var(--nx-font-serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--nx-ink);
+    margin-bottom: 0.4rem;
+  }
+  .calc-sub {
+    color: var(--nx-ink-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .calc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .calc-field label {
+    font-family: var(--nx-font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--nx-ink-faint);
+  }
+  .calc-field input {
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-line);
+    border-radius: 10px;
+    padding: 0.65rem 0.8rem;
+    color: var(--nx-ink);
+    font-size: 1rem;
+    font-family: var(--nx-font-sans);
+  }
+  .calc-field input:focus {
+    outline: none;
+    border-color: var(--nx-magnet);
+  }
+
+  .calc-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .calc-result {
+    background: var(--nx-surface);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .calc-result-label {
+    font-size: 0.78rem;
+    color: var(--nx-ink-muted);
+  }
+  .calc-result-value {
+    font-family: var(--nx-font-serif);
+    font-size: 1.8rem;
+    color: var(--nx-danger);
+  }
+
+  .calc-plans {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .calc-plan {
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-line);
+    border-radius: 12px;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: center;
+  }
+  .calc-plan-name {
+    font-weight: 600;
+    color: var(--nx-ink);
+    font-size: 0.9rem;
+  }
+  .calc-plan-price {
+    font-size: 0.78rem;
+    color: var(--nx-ink-muted);
+  }
+  .calc-plan-result {
+    font-size: 0.78rem;
+    margin-top: 0.4rem;
+    color: var(--nx-success);
+    font-weight: 500;
+  }
+  .calc-plan-result.is-negative {
+    color: var(--nx-ink-faint);
+  }
+
+  .calc-cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (max-width: 600px) {
+    .calc-grid, .calc-plans { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  function nxFormatEuro(n) {
+    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+  }
+
+  function nxCalcUpdate() {
+    const ticketEl = document.getElementById('calc-ticket');
+    const citasEl = document.getElementById('calc-citas-mes');
+    const noshowEl = document.getElementById('calc-noshow');
+    if (!(ticketEl instanceof HTMLInputElement) || !(citasEl instanceof HTMLInputElement) || !(noshowEl instanceof HTMLInputElement)) return;
+
+    const ticket = parseFloat(ticketEl.value) || 0;
+    const citas = parseFloat(citasEl.value) || 0;
+    const noshow = parseFloat(noshowEl.value) || 0;
+
+    const sangriaMes = ticket * citas * (noshow / 100);
+    const sangriaAnio = sangriaMes * 12;
+
+    const sangriaMesEl = document.getElementById('calc-sangria-mes');
+    const sangriaAnioEl = document.getElementById('calc-sangria-anio');
+    if (sangriaMesEl) sangriaMesEl.textContent = nxFormatEuro(sangriaMes);
+    if (sangriaAnioEl) sangriaAnioEl.textContent = nxFormatEuro(sangriaAnio);
+
+    const plans = document.querySelectorAll('.calc-plan');
+    plans.forEach((plan) => {
+      if (!(plan instanceof HTMLElement)) return;
+      const coste = parseFloat(plan.dataset.coste || '0');
+      const resultEl = plan.querySelector('.calc-plan-result');
+      if (!resultEl) return;
+      const ahorro = sangriaAnio - coste;
+      if (ahorro > 0) {
+        resultEl.textContent = `Ahorras ${nxFormatEuro(ahorro)}/año`;
+        resultEl.classList.remove('is-negative');
+      } else {
+        resultEl.textContent = 'Tu sangría ya está optimizada';
+        resultEl.classList.add('is-negative');
+      }
+    });
+  }
+
+  ['calc-ticket', 'calc-citas-mes', 'calc-noshow'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', nxCalcUpdate);
+  });
+
+  nxCalcUpdate();
+</script>

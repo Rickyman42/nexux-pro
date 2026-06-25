@@ -1,0 +1,57 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/\.md$/, '') },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const slug = post.id.replace(/\.md$/, '');
+
+const allPosts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const currentIndex = allPosts.findIndex((p) => p.id === post.id);
+const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+
+const currentTags = post.data.tags || [];
+const recommended = allPosts
+  .filter((p) => p.id !== post.id)
+  .map((p) => ({
+    post: p,
+    shared: (p.data.tags || []).filter((t) => currentTags.includes(t)).length,
+  }))
+  .filter((p) => p.shared > 0)
+  .sort((a, b) => b.shared - a.shared)
+  .slice(0, 3)
+  .map((p) => p.post);
+---
+<BlogPost
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  author={post.data.author}
+  tags={post.data.tags}
+  faq={post.data.faq}
+  slug={slug}
+  prevPost={prevPost ? { slug: prevPost.id.replace(/\.md$/, ''), title: prevPost.data.title } : null}
+  nextPost={nextPost ? { slug: nextPost.id.replace(/\.md$/, ''), title: nextPost.data.title } : null}
+  recommended={recommended.map((p) => ({
+    slug: p.id.replace(/\.md$/, ''),
+    title: p.data.title,
+    description: p.data.description,
+    tags: p.data.tags,
+  }))}
+  showCalculator={slug === 'cuanto-cuesta-cita-perdida'}
+>
+  <Content />
+</BlogPost>
