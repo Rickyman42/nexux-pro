@@ -57,6 +57,13 @@ const fmt = (d: string | null) => d ? new Date(d).toLocaleDateString('es-ES', { 
 const fmtDt = (d: string) => new Date(d).toLocaleString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 const upcoming  = appointments.filter((a: any) => a.status === 'confirmed' && new Date(a.datetime) >= new Date());
 const past      = appointments.filter((a: any) => a.status !== 'confirmed' || new Date(a.datetime) < new Date()).slice(0, 20);
+const _renewISO = client?.trialEndsAt || client?.expiresAt || null;
+const renewDaysLeft = _renewISO
+  ? Math.ceil((new Date(_renewISO).getTime() - Date.now()) / 86400000)
+  : null;
+const convCount = client?.conversationCount ?? 0;
+const convLimit = client?.conversationLimit ?? null;
+const convRemaining = convLimit != null ? Math.max(0, convLimit - convCount) : null;
 ---
 
 <Layout title={`Admin — ${client?.name || clientId}`}>
@@ -141,6 +148,27 @@ const past      = appointments.filter((a: any) => a.status !== 'confirmed' || ne
           <div class="card">
             <div class="card-label">Alta</div>
             <div class="card-value" style="font-size:15px">{fmt(client.createdAt)}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">{client.isTrial ? 'Prueba — días restantes' : 'Renueva en'}</div>
+            <div class="card-value">
+              {renewDaysLeft != null ? (
+                <span class={`chip ${renewDaysLeft <= 3 ? 'chip-red' : renewDaysLeft <= 7 ? 'chip-yellow' : 'chip-green'}`}>
+                  {renewDaysLeft < 0 ? 'Caducado' : `${renewDaysLeft} días`}
+                </span>
+              ) : '—'}
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-label">Conversaciones este mes</div>
+            <div class="card-value" style="font-size:16px">
+              {convCount}{convLimit != null ? `/${convLimit}` : ''}
+              {convRemaining != null && (
+                <span style={`font-size:12px;margin-left:6px;color:${convRemaining <= 30 ? '#ef4444' : '#888'}`}>
+                  ({convRemaining} restantes)
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

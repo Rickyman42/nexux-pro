@@ -25,6 +25,11 @@ export interface ClientData {
   };
   schedule: Record<string, { open: string; close: string } | null>;
   services?: { name: string; duration: number; price: number }[];
+  billing?: {
+    isTrial: boolean;
+    trialEndsAt: string | null;
+    expiresAt: string | null;
+  };
   channels: {
     whatsapp: { provider: 'baileys' | 'twilio'; connected: boolean };
     telegram: { enabled: boolean; ownerLinked: boolean };

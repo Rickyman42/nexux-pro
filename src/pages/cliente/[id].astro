@@ -38,6 +38,21 @@ const avgPrice = data.services?.length
   : 30;
 const roiRevenue = Math.round(booked * avgPrice);
 const roiTimeSaved = booked * 5;
+
+// Contador regresivo de conversaciones (plan starter)
+const convCount = data.metrics.conversationCount ?? 0;
+const convLimit = data.metrics.conversationLimit;
+const convRemaining = convLimit != null ? Math.max(0, convLimit - convCount) : null;
+
+// Renovacion / prueba
+const _renewISO = data.billing?.trialEndsAt || data.billing?.expiresAt || null;
+const renewDaysLeft = _renewISO
+  ? Math.max(0, Math.ceil((new Date(_renewISO).getTime() - Date.now()) / 86400000))
+  : null;
+const renewLabel = data.billing?.isTrial ? 'Días de prueba' : 'Renueva en';
+const renewDate = _renewISO
+  ? new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' }).format(new Date(_renewISO))
+  : null;
 const nextApt = data.nextAppointments?.[0] ?? null;
 const nextAptFormatted = nextApt
   ? { date: dateFormatter.format(new Date(nextApt.datetime)), time: timeFormatter.format(new Date(nextApt.datetime)) }
@@ -211,9 +226,9 @@ function renderAppointmentDate(item: Appointment) {
               <strong class="crm-kpi-val">{data.metrics.appointmentsBooked}</strong>
             </div>
             <div class="crm-kpi">
-              <span class="crm-kpi-lbl">Conversaciones</span>
-              <strong class="crm-kpi-val">{data.metrics.conversationCount}{data.metrics.conversationLimit ? `/${data.metrics.conversationLimit}` : ''}</strong>
-              {data.plan === 'starter' && data.metrics.conversationLimit && (
+              <span class="crm-kpi-lbl">{convRemaining != null ? 'Conversaciones restantes' : 'Conversaciones'}</span>
+              <strong class="crm-kpi-val">{convRemaining != null ? convRemaining : convCount}{convLimit != null && (<span class="crm-kpi-sub">de {convLimit}</span>)}</strong>
+              {convLimit != null && (
                 <div class="crm-progress"><div class="crm-progress-bar" style={`width:${limitedProgress}%`}></div></div>
               )}
             </div>
@@ -221,6 +236,12 @@ function renderAppointmentDate(item: Appointment) {
               <span class="crm-kpi-lbl">Cancelaciones</span>
               <strong class="crm-kpi-val">{data.metrics.appointmentsCancelled}</strong>
             </div>
+            {renewDaysLeft != null && (
+              <div class="crm-kpi">
+                <span class="crm-kpi-lbl">{renewLabel}</span>
+                <strong class="crm-kpi-val">{renewDaysLeft}<span class="crm-kpi-sub">{renewDate ? renewDate : ''}</span></strong>
+              </div>
+            )}
           </div>
 
           <div class="crm-dash-row">
@@ -1801,6 +1822,7 @@ function renderAppointmentDate(item: Appointment) {
       color: var(--crm-muted);
     }
 
+    .crm-kpi-sub { display:block; font-size:12px; font-weight:500; color:#888; margin-top:2px; }
     .crm-kpi-val {
       font-size: 28px;
       font-weight: 700;
