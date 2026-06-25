@@ -9,7 +9,7 @@ export default defineConfig({
   output: 'server',
   adapter: vercel(),
   integrations: [sitemap({
-    filter: (page) => !page.includes('/gracias'),
+    filter: (page) => !page.includes('/gracias') && !page.includes('/admin'),
   })],
   vite: {
     plugins: [tailwindcss()],

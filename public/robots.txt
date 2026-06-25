@@ -1,6 +1,7 @@
 # nexux.pro — robots.txt
 User-agent: *
 Allow: /
+Disallow: /admin
 
 # AI Answer Bots — PERMITIDOS (citan fuente, no entrenan con datos)
 User-agent: GPTBot
