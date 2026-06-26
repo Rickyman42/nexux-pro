@@ -16,8 +16,8 @@ if (!data) {
   return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' });
-const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });
+const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long', timeZone: data.timezone || 'Europe/Madrid' });
+const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: data.timezone || 'Europe/Madrid' });
 
 const todayKey = new Date().toDateString();
 const todayAppointments = data.nextAppointments.filter(item => new Date(item.datetime).toDateString() === todayKey).length;
@@ -51,7 +51,7 @@ const renewDaysLeft = _renewISO
   : null;
 const renewLabel = data.billing?.isTrial ? 'Días de prueba' : 'Renueva en';
 const renewDate = _renewISO
-  ? new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' }).format(new Date(_renewISO))
+  ? new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: data.timezone || 'Europe/Madrid' }).format(new Date(_renewISO))
   : null;
 const nextApt = data.nextAppointments?.[0] ?? null;
 const nextAptFormatted = nextApt

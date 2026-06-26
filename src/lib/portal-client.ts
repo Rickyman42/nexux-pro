@@ -12,6 +12,7 @@ export interface Appointment {
 export interface ClientData {
   clientId: string;
   name: string;
+  timezone?: string;
   plan: 'starter' | 'pro' | 'total';
   active: boolean;
   botStatus: 'connected' | 'disconnected' | 'pending_qr';
