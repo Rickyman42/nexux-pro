@@ -715,7 +715,13 @@ function renderAppointmentDate(item: Appointment) {
     const themeBtn = document.getElementById('crm-theme-btn');
 
     function applyTheme(t) {
-      crm.className = t === 'dark' ? 'crm-dark' : 'crm-light';
+      var cls = t === 'dark' ? 'crm-dark' : 'crm-light';
+      crm.className = cls;
+      // Los <dialog> viven fuera de #crm (top-layer): heredan el tema por su propia clase
+      document.querySelectorAll('.crm-dialog').forEach(function (d) {
+        d.classList.remove('crm-light', 'crm-dark');
+        d.classList.add(cls);
+      });
       localStorage.setItem('crm-theme', t);
     }
     applyTheme(localStorage.getItem('crm-theme') || 'light');
