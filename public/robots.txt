@@ -35,8 +35,9 @@ User-agent: Gemini
 Allow: /
 
 # Scrapers de entrenamiento — BLOQUEADOS
+# CCBot (Common Crawl) — PERMITIDO: alimenta el entrenamiento de modelos IA
 User-agent: CCBot
-Disallow: /
+Allow: /
 
 User-agent: Bytespider
 Disallow: /
