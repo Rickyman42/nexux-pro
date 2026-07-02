@@ -6,8 +6,8 @@ import Layout from '../layouts/Layout.astro';
 export const prerender = false;
 
 const canonical = 'https://nexux.pro/promo';
-const title = 'Oferta Especial — 49€/mes | Nexux Pro';
-const description = 'Precio de lanzamiento exclusivo. Lara, tu asistente IA en WhatsApp 24h, agenda citas y no deja un solo mensaje sin responder. 49€/mes en vez de 249€. Sin tarjeta, sin permanencia.';
+const title = 'Oferta Especial — Primer mes a 49€ | Nexux Pro';
+const description = 'Precio de lanzamiento exclusivo. Lara, tu asistente IA en WhatsApp 24h, agenda citas y no deja un solo mensaje sin responder. Primer mes a 49€ (después, precio normal). Sin tarjeta, sin permanencia.';
 
 // --- Personalización por geolocalización + parámetros ---
 const headers = Astro.request.headers;
@@ -31,12 +31,12 @@ const SECTORS: Record<string, { plural: string; client: string }> = {
 const sector = SECTORS[sectorParam] || { plural: 'negocios con cita previa', client: 'clientes' };
 
 const WA = '34630745369';
-const waText = encodeURIComponent('Hola, vengo de la oferta de 49€/mes de Nexux Pro. ¿Me cuentas cómo funciona?');
+const waText = encodeURIComponent('Hola, vengo de la oferta del primer mes a 49€ de Nexux Pro. ¿Me cuentas cómo funciona?');
 const waLink = `https://wa.me/${WA}?text=${waText}`;
 ---
 <Layout title={title} description={description} canonical={canonical}>
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Funciona con mi WhatsApp de siempre?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Usas tu mismo número, sin cambiar nada. Lo conectas escaneando un QR."}}, {"@type": "Question", "name": "¿Y si la IA contesta algo mal?", "acceptedAnswer": {"@type": "Answer", "text": "Tú ves todas las conversaciones y puedes tomar el control cuando quieras. Lara solo cubre lo que tú no puedes atender en el momento."}}, {"@type": "Question", "name": "¿Tengo que saber de tecnología?", "acceptedAnswer": {"@type": "Answer", "text": "No. Lo configuramos nosotros en 24h. Tú no tocas nada."}}, {"@type": "Question", "name": "¿Me obliga a quedarme?", "acceptedAnswer": {"@type": "Answer", "text": "No hay permanencia. Cancelas cuando quieras, con un clic. Y tienes 30 días de garantía."}}, {"@type": "Question", "name": "¿Por qué 49€ y no 249€?", "acceptedAnswer": {"@type": "Answer", "text": "Es el precio de lanzamiento para los primeros negocios. Cuando se acaben las plazas, vuelve a 249€/mes."}}]})} />
+    <script type="application/ld+json" set:html={JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Funciona con mi WhatsApp de siempre?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Usas tu mismo número, sin cambiar nada. Lo conectas escaneando un QR."}}, {"@type": "Question", "name": "¿Y si la IA contesta algo mal?", "acceptedAnswer": {"@type": "Answer", "text": "Tú ves todas las conversaciones y puedes tomar el control cuando quieras. Lara solo cubre lo que tú no puedes atender en el momento."}}, {"@type": "Question", "name": "¿Tengo que saber de tecnología?", "acceptedAnswer": {"@type": "Answer", "text": "No. Lo configuramos nosotros en 24h. Tú no tocas nada."}}, {"@type": "Question", "name": "¿Me obliga a quedarme?", "acceptedAnswer": {"@type": "Answer", "text": "No hay permanencia. Cancelas cuando quieras, con un clic. Y tienes 30 días de garantía."}}, {"@type": "Question", "name": "¿Por qué 49€ y no 249€?", "acceptedAnswer": {"@type": "Answer", "text": "Es el precio de lanzamiento. El primer mes pagas 49€ y a partir del segundo mes se aplica el precio normal de 249€/mes."}}]})} />
   </Fragment>
   <main class="promo-page">
 
@@ -44,12 +44,11 @@ const waLink = `https://wa.me/${WA}?text=${waText}`;
     <div class="topbar" id="topbar">
       <span class="topbar-dot"></span>
       Precio de lanzamiento — termina en <strong id="countdown">--:--:--</strong>
-      <span class="topbar-spots">· quedan <strong id="spots">7</strong> plazas</span>
     </div>
 
     <!-- HERO -->
     <section class="hero">
-      <div class="badge-promo">🔥 OFERTA DE LANZAMIENTO · PLAZAS LIMITADAS</div>
+      <div class="badge-promo">🔥 OFERTA DE LANZAMIENTO · PRIMER MES A 49€</div>
       <h1>Tu negocio pierde <span class="accent">3-4 citas al día</span><br/>no por falta de clientas. Por falta de tiempo.</h1>
       <p class="sub">
         Lara contesta en 3 segundos. Agenda la cita. Confirma por WhatsApp.
@@ -59,11 +58,11 @@ const waLink = `https://wa.me/${WA}?text=${waText}`;
       <div class="price-block">
         <div class="price-row">
           <span class="price-old">249€</span>
-          <div class="price-new">49<span class="price-sup">€/mes</span></div>
+          <div class="price-new">49<span class="price-sup">€ el primer mes</span></div>
         </div>
-        <div class="price-save">Ahorras 200€/mes · <span data-city>para {sector.plural} {cityPhrase}</span></div>
+        <div class="price-save">Después, 249€/mes · <span data-city>para {sector.plural} {cityPhrase}</span></div>
         <button class="btn-cta btn-pulse" data-checkout-plan="promo" data-ev="hero">
-          Activar Lara por 49€/mes →
+          Activar Lara — primer mes a 49€ →
         </button>
         <ul class="trust-row">
                     <li>✓ Sin permanencia</li>
@@ -127,8 +126,8 @@ const waLink = `https://wa.me/${WA}?text=${waText}`;
           <p class="anchor-line">Una recepcionista: <s>1.200€/mes</s></p>
           <p class="anchor-line">Una clienta perdida: <s>30-50€</s></p>
           <p class="anchor-vs">Lara hace el trabajo por</p>
-          <p class="anchor-price">49€<span>/mes</span></p>
-          <button class="btn-cta" data-checkout-plan="promo" data-ev="stack">Lo quiero por 49€/mes</button>
+          <p class="anchor-price">49€<span>el primer mes</span></p>
+          <button class="btn-cta" data-checkout-plan="promo" data-ev="stack">Lo quiero — primer mes a 49€</button>
         </div>
       </div>
     </section>
@@ -161,15 +160,15 @@ const waLink = `https://wa.me/${WA}?text=${waText}`;
       <details><summary>¿Y si la IA contesta algo mal?</summary><p>Tú ves todas las conversaciones y puedes tomar el control cuando quieras. Lara solo cubre lo que tú no puedes atender en el momento.</p></details>
       <details><summary>¿Tengo que saber de tecnología?</summary><p>No. Lo configuramos nosotros en 24h. Tú no tocas nada.</p></details>
       <details><summary>¿Me obliga a quedarme?</summary><p>No hay permanencia. Cancelas cuando quieras, con un clic. Y tienes 30 días de garantía.</p></details>
-      <details><summary>¿Por qué 49€ y no 249€?</summary><p>Es el precio de lanzamiento para los primeros negocios. Cuando se acaben las plazas, vuelve a 249€/mes.</p></details>
+      <details><summary>¿Por qué 49€ y no 249€?</summary><p>Es el precio de lanzamiento. El primer mes pagas 49€ y a partir del segundo mes se aplica el precio normal de 249€/mes.</p></details>
     </section>
 
     <!-- CTA FINAL -->
     <section class="cta-final">
       <div class="urgency-box">
-        <p>Cada día sin Lara = <strong>3-4 citas que pierdes.</strong> Quedan <strong id="spots2">7</strong> plazas. Cuando se acaben, vuelve a <strong>249€/mes</strong>.</p>
+        <p>Cada día sin Lara = <strong>3-4 citas que pierdes.</strong> Precio de lanzamiento: <strong>primer mes a 49€</strong>, después <strong>249€/mes</strong>.</p>
       </div>
-      <button class="btn-cta btn-big btn-pulse" data-checkout-plan="promo" data-ev="final">Activar Lara por 49€/mes →</button>
+      <button class="btn-cta btn-big btn-pulse" data-checkout-plan="promo" data-ev="final">Activar Lara — primer mes a 49€ →</button>
       <p class="demo-link">¿Dudas? <a href={waLink} data-ev="wa-final">Pregúntanos por WhatsApp →</a></p>
     </section>
 
@@ -177,7 +176,7 @@ const waLink = `https://wa.me/${WA}?text=${waText}`;
 
   <!-- BARRA STICKY MÓVIL -->
   <div class="sticky-cta" id="stickyCta">
-    <div class="sticky-info"><strong>49€/mes</strong><span>antes 249€</span></div>
+    <div class="sticky-info"><strong>49€ el 1er mes</strong><span>después 249€/mes</span></div>
     <button class="btn-cta" data-checkout-plan="promo" data-ev="sticky">Activar Lara →</button>
   </div>
 
@@ -216,12 +215,6 @@ const waLink = `https://wa.me/${WA}?text=${waText}`;
         if (cd) cd.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
       }
       tick(); setInterval(tick, 1000);
-
-      // --- Plazas (decrece despacio, persistente) ---
-      var SKEY = 'nx_promo_spots';
-      var spots = parseInt(localStorage.getItem(SKEY) || '0', 10);
-      if (!spots) { spots = 7; localStorage.setItem(SKEY, '7'); }
-      ['spots', 'spots2'].forEach(function (id) { var e = document.getElementById(id); if (e) e.textContent = spots; });
 
       // --- Geo fallback cliente si el servidor no detectó ciudad ---
       var cityEls = document.querySelectorAll('[data-city]');
@@ -281,7 +274,6 @@ const waLink = `https://wa.me/${WA}?text=${waText}`;
   }
   .topbar strong { font-variant-numeric: tabular-nums; }
   .topbar-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--nx-void); margin-right: 6px; animation: blink 1.2s infinite; }
-  .topbar-spots { opacity: 0.85; }
   @keyframes blink { 50% { opacity: 0.2; } }
 
   /* HERO */
