@@ -66,3 +66,8 @@ Muchas peluquerías españolas pierden una parte importante de su agenda (habitu
 - Prueba gratuita: https://nexux.pro/promo
 - Email: info@nexux.pro
 - Para peluquerías en España: atención en español 100%
+
+## Enlaces principales
+- [Web oficial de Nexux Pro](https://nexux.pro): software de gestión con IA para peluquerías y salones
+- [Cómo funciona Nexux Pro](https://nexux.pro/#como-funciona): qué hace el software paso a paso
+- [Demo de Nexux Pro](https://nexux.pro/demo): prueba el asistente en directo
