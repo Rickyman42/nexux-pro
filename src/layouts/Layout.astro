@@ -88,6 +88,19 @@ const {
     document.addEventListener('nx:consent-granted', nxLoadTrackers);
   </script>
 
+  <!-- Umami (cookieless, sin consentimiento) -->
+  <script is:inline>
+    (function () {
+      var s = document.createElement('script');
+      s.id = 'umami-script';
+      s.defer = true;
+      s.src = '/stats/script.js';
+      s.dataset.websiteId = '682a2c1c-85be-41eb-b8a1-95d575e30545';
+      s.dataset.hostUrl = 'https://nexux.pro/stats';
+      document.head.appendChild(s);
+    })();
+  </script>
+
   <!-- Plausible (privacy-first, no requiere consent) -->
   <script defer data-domain="nexux.pro" src="https://plausible.io/js/script.tagged-events.outbound-links.js"></script>
 

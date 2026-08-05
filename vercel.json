@@ -13,6 +13,10 @@
     {
       "source": "/api/lara-web/chat",
       "destination": "https://pi.nexux.pro/api/lara-web/chat"
+    },
+    {
+      "source": "/stats/:match*",
+      "destination": "https://umami.nexux.pro/:match*"
     }
   ]
 }
