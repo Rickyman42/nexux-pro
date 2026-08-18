@@ -4,10 +4,15 @@ export interface Props {
   description?: string;
   canonical?: string;
 }
+// Por defecto el canonical se deriva de la URL de la pagina, no de la home:
+// un valor fijo hacia que /blog, /comparativa, /oferta y /demo se declarasen
+// duplicados de la portada y Google las descartara. (2026-08-18)
+const canonicalPorDefecto =
+  `https://nexux.pro${Astro.url.pathname}`.replace(/\/+$/, '') || 'https://nexux.pro';
 const {
   title = 'Nexux Pro — IA que atiende a tus clientas mientras tú trabajas',
   description = 'Tu peluquería en piloto automático. Lara, tu asistente IA, agenda citas y responde mensajes 24h. Sin contratar a nadie.',
-  canonical = 'https://nexux.pro'
+  canonical = canonicalPorDefecto
 } = Astro.props;
 ---
 <!DOCTYPE html>
