@@ -97,5 +97,7 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
 - Publicado: `www.nexux.pro` redirige al dominio principal desde middleware (`3bf18c4`); compilación correcta.
 - Verificado en producción: `www` devuelve `308` a `https://nexux.pro/`; `robots.txt`, home, comparativa y
   blog sirven el contenido nuevo el 21-ago-2026.
+- Publicado y verificado: sección de “Ejemplos de uso” en la home, etiquetada como ejemplos y no como
+  testimonios (`5c39f54`).
 - Pendiente prioritario: unificación final de barras/canonicals y nueva medición en Search Console.
 - No autorizado todavía: publicar, hacer push o desplegar cambios.
