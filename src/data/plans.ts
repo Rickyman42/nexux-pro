@@ -1,7 +1,6 @@
 export type PlanSlug = 'recepcionista';
 
 export interface PlanFeature {
-  icon: string;
   title: string;
   detail: string;
 }
@@ -43,32 +42,26 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     ],
     features: [
       {
-        icon: '💬',
         title: 'Contesta mientras tú atiendes',
         detail: 'Lara responde por WhatsApp, Telegram o tu web, también fuera de horario. El cliente recibe respuesta sin esperar a que sueltes las tijeras, cierres la consulta o termines el trabajo.',
       },
       {
-        icon: '📅',
         title: 'Convierte la conversación en una cita',
         detail: 'Consulta los huecos libres de tu calendario, propone el que encaja y deja la reserva apuntada. Sin cruces y sin que tengas que intervenir.',
       },
       {
-        icon: '⏰',
         title: 'Persigue la cita, no al cliente',
         detail: 'Envía recordatorios 24 horas y 1 hora antes para que no tengas que hacerlo tú y el hueco tenga menos posibilidades de quedarse vacío.',
       },
       {
-        icon: '📊',
         title: 'Te cuenta el día sin obligarte a mirar el móvil',
         detail: 'Cada tarde recibes un resumen con las citas nuevas, las preguntas recibidas y lo que necesita tu atención.',
       },
       {
-        icon: '🚫',
         title: '29 € al mes. Tus citas siguen siendo tuyas',
         detail: 'Sin comisión por cliente y sin pagar por cada empleado. Factures una cita o cien, Nexux no se queda un porcentaje.',
       },
       {
-        icon: '⚡',
         title: 'Empieza sin instalaciones ni llamadas comerciales',
         detail: 'La activas tú y Lara te pregunta lo necesario para conocer tu negocio, tus servicios, tus horarios y tu forma de trabajar.',
       },
