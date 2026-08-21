@@ -120,6 +120,9 @@ const { trial = false } = Astro.props;
   }
 
   async function sendToAI(value) {
+    var isTrial = false; try { isTrial = document.getElementById("lara-launcher").getAttribute("data-trial") === "1"; } catch(e) {}
+    var body = { sessionId: state.sessionId, message: value, history: state.history, sessionData: state.sessionData };
+    if (isTrial) body.trial = true;
     if (state.loading) return;
     state.loading = true;
     addTyping();
@@ -127,12 +130,7 @@ const { trial = false } = Astro.props;
       var res = await fetch('/api/lara-web/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: state.sessionId,
-          message: value,
-          history: state.history,
-          sessionData: state.sessionData
-        })
+        body: JSON.stringify(body)
       });
       removeTyping();
       if (!res.ok) {
