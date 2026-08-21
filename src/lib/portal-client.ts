@@ -165,7 +165,7 @@ export async function updateAppointmentById(
   clientId: string,
   token: string,
   aptId: string,
-  data: { client_name?: string; client_phone?: string; service?: string; datetime?: string; duration_min?: number },
+  data: { client_name?: string; client_phone?: string; service?: string; datetime?: string; duration_min?: number; professional_id?: string },
 ): Promise<{ ok: boolean; status: number; error?: string }> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/appointments/${aptId}/update`, {
@@ -180,15 +180,73 @@ export async function updateAppointmentById(
   }
 }
 
-export async function createAppointmentManual(clientId: string, token: string, data: { client_name: string; client_phone?: string; service: string; datetime: string; duration_min?: number }): Promise<boolean> {
+export async function createAppointmentManual(
+  clientId: string,
+  token: string,
+  data: {
+    client_name: string;
+    client_phone?: string;
+    service: string;
+    datetime: string;
+    duration_min?: number;
+    professional_id?: string;
+  },
+): Promise<{ ok: boolean; status: number; error?: string; message?: string }> {
+  // Antes devolvia solo true/false y se perdia el motivo. Ahora el backend
+  // responde 409 cuando la hora choca con otra cita, y eso hay que poder
+  // contarselo al usuario en vez de un "no se pudo" generico.
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/appointments`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(data),
     });
-    return response.ok;
-  } catch { return false; }
+    const payload = await response.json().catch(() => ({})) as { error?: string; message?: string };
+    return { ok: response.ok, status: response.status, error: payload.error, message: payload.message };
+  } catch {
+    return { ok: false, status: 502, error: 'connection_error' };
+  }
+}
+
+export interface Professional {
+  id: string;
+  name: string;
+  active?: boolean;
+  color?: string | null;
+  priority?: number;
+}
+
+export async function fetchProfessionals(
+  clientId: string,
+  token: string,
+): Promise<{ ok: boolean; mode?: string; professionals?: Professional[]; error?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/professionals`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const payload = await response.json().catch(() => ({}));
+    return response.ok ? payload : { ok: false, error: payload?.error || 'request_failed' };
+  } catch {
+    return { ok: false, error: 'connection_error' };
+  }
+}
+
+export async function saveProfessionals(
+  clientId: string,
+  token: string,
+  data: { mode?: string; professionals?: Professional[] },
+): Promise<{ ok: boolean; status: number; mode?: string; professionals?: Professional[]; error?: string; message?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/professionals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+    const payload = await response.json().catch(() => ({}));
+    return { ...payload, ok: response.ok, status: response.status };
+  } catch {
+    return { ok: false, status: 502, error: 'connection_error' };
+  }
 }
 
 export async function reportMissedCall(clientId: string, token: string, phone: string): Promise<{ ok: boolean; channel?: string }> {

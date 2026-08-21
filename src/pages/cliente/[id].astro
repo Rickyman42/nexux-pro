@@ -539,6 +539,26 @@ function renderAppointmentDate(item: Appointment) {
             <button type="button" id="svc-save" class="crm-btn-primary">Guardar servicios</button>
           </div>
 
+          <div class="crm-card crm-mb" id="team-card">
+            <h2 class="crm-card-title">Mi equipo</h2>
+            <p class="crm-team-help">
+              Si sois varias personas atendiendo, activa el modo equipo: cada una tiene su propia agenda
+              y podéis tener dos citas a la misma hora. Si trabajas solo, déjalo desactivado.
+            </p>
+            <label class="crm-team-toggle">
+              <input type="checkbox" id="team-mode" />
+              <span>Somos varias personas y atendemos a la vez</span>
+            </label>
+            <div id="team-list-wrap"></div>
+            <div class="crm-team-add-row">
+              <input type="text" id="team-name" placeholder="Nombre" class="crm-input" />
+              <input type="color" id="team-color" value="#2A9D97" class="crm-team-color" aria-label="Color en el calendario" />
+              <button type="button" id="team-add" class="crm-btn-ghost">+ Añadir</button>
+            </div>
+            <button type="button" id="team-save" class="crm-btn-primary">Guardar equipo</button>
+            <p class="crm-team-msg" id="team-msg" role="status"></p>
+          </div>
+
           <div class="crm-card">
             <h2 class="crm-card-title">Horario</h2>
             <form id="schedule-form" class="crm-schedule-form">
@@ -729,6 +749,13 @@ function renderAppointmentDate(item: Appointment) {
         Duración (min)
         <input type="number" name="duration_min" value="60" min="15" step="15" class="crm-input" />
       </label>
+      <label class="crm-form-lbl crm-hidden" id="apt-pro-wrap">
+        Quién atiende
+        <select name="professional_id" id="apt-pro" class="crm-input">
+          <option value="">Quien esté libre</option>
+        </select>
+      </label>
+      <p class="crm-apt-error crm-hidden" id="apt-error" role="alert"></p>
       <div class="crm-modal-actions">
         <button type="submit" class="crm-btn-primary">Reservar cita</button>
         <button type="button" id="close-apt-modal" class="crm-btn-ghost">Cancelar</button>
@@ -970,6 +997,121 @@ function renderAppointmentDate(item: Appointment) {
         showToast(response && response.ok ? 'Guardado ✅' : 'No se pudo guardar');
       });
     }
+
+    // ── Equipo (varias agendas) ───────────────────────────────────────
+    // Con el modo equipo activo, cada persona tiene su agenda: puede haber dos
+    // citas a la misma hora. Con una sola persona todo funciona como siempre.
+    var COLORES_EQUIPO = ['#2A9D97', '#C2683F', '#5C6BC0', '#8E6BA8', '#4A8F5B', '#B5804A'];
+    var equipo = [];
+    var modoEquipo = false;
+
+    function colorDe(profesional, indice) {
+      return (profesional && profesional.color) || COLORES_EQUIPO[indice % COLORES_EQUIPO.length];
+    }
+
+    function renderEquipo() {
+      var wrap = document.getElementById('team-list-wrap');
+      if (!wrap) return;
+      if (!equipo.length) {
+        wrap.innerHTML = '<p class="crm-empty">Solo tú. Añade a alguien si atendéis a la vez.</p>';
+        return;
+      }
+      wrap.innerHTML = '<div class="crm-table-wrap"><table class="crm-table"><tbody>'
+        + equipo.map(function (profesional, i) {
+          return '<tr>'
+            + '<td><span class="crm-team-dot" style="background:' + esc(colorDe(profesional, i)) + '"></span>'
+            + esc(profesional.name) + '</td>'
+            + '<td><button type="button" class="crm-btn-del" data-i="' + i + '">🗑</button></td>'
+            + '</tr>';
+        }).join('') + '</tbody></table></div>';
+      wrap.querySelectorAll('.crm-btn-del').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          equipo.splice(parseInt(btn.dataset.i, 10), 1);
+          renderEquipo();
+        });
+      });
+    }
+
+    async function cargarEquipo() {
+      try {
+        var res = await fetch('/portal-api/professionals?clientId=' + clientId);
+        if (!res.ok) return;
+        var data = await res.json();
+        equipo = (data.professionals || []).map(function (profesional, i) {
+          return {
+            id: profesional.id,
+            name: profesional.name,
+            active: profesional.active !== false,
+            color: colorDe(profesional, i),
+          };
+        });
+        modoEquipo = data.mode === 'team';
+        var check = document.getElementById('team-mode');
+        if (check) check.checked = modoEquipo;
+        var colorInicial = document.getElementById('team-color');
+        if (colorInicial) colorInicial.value = COLORES_EQUIPO[equipo.length % COLORES_EQUIPO.length];
+        renderEquipo();
+      } catch (_) { /* el portal sigue funcionando sin esto */ }
+    }
+
+    var teamAdd = document.getElementById('team-add');
+    if (teamAdd) {
+      teamAdd.addEventListener('click', function () {
+        var nameInput = document.getElementById('team-name');
+        var colorInput = document.getElementById('team-color');
+        var nombre = nameInput ? nameInput.value.trim() : '';
+        if (!nombre) { showToast('Escribe un nombre'); return; }
+        equipo.push({ name: nombre, active: true, color: colorInput ? colorInput.value : null });
+        renderEquipo();
+        if (nameInput) nameInput.value = '';
+        // Avanzar al siguiente color de la paleta: si no, todos salen del mismo
+        // color y deja de servir para distinguirlos en el calendario.
+        if (colorInput) colorInput.value = COLORES_EQUIPO[equipo.length % COLORES_EQUIPO.length];
+      });
+    }
+
+    var teamSave = document.getElementById('team-save');
+    if (teamSave) {
+      teamSave.addEventListener('click', async function () {
+        var check = document.getElementById('team-mode');
+        var msg = document.getElementById('team-msg');
+        var quiereEquipo = check ? check.checked : false;
+        if (quiereEquipo && equipo.length < 2) {
+          if (msg) msg.textContent = 'Para el modo equipo hacen falta al menos dos personas.';
+          return;
+        }
+        if (msg) msg.textContent = '';
+        teamSave.disabled = true;
+        var res = await fetch('/portal-api/professionals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientId: clientId,
+            mode: quiereEquipo ? 'team' : 'single',
+            professionals: equipo,
+          }),
+        }).catch(function () { return null; });
+        teamSave.disabled = false;
+
+        if (res && res.ok) {
+          modoEquipo = quiereEquipo;
+          await cargarEquipo();
+          await loadCalendar();
+          showToast('Equipo guardado ✅');
+          return;
+        }
+        // El backend responde 409 cuando pasar a equipo romperia las citas ya
+        // guardadas. Se cuenta el motivo en vez de un "no se pudo" a secas.
+        var detalle = res ? await res.json().catch(function () { return {}; }) : {};
+        if (msg) {
+          msg.textContent = detalle.message
+            || 'No se pudo guardar. Revisa las citas ya existentes antes de activar el modo equipo.';
+        }
+        showToast('No se pudo guardar el equipo');
+      });
+    }
+
+    cargarEquipo();
 
     // ── Telegram copy ─────────────────────────────────────────────────
     // ── Telegram QR ───────────────────────────────────────────────────────────
@@ -1233,6 +1375,40 @@ function renderAppointmentDate(item: Appointment) {
       }
 
       async function loadCalendar() {
+        // Reparte en columnas las citas que se pisan en el tiempo. Devuelve, por
+        // cita, en que columna va y cuantas hay en su grupo.
+        function repartirSolapes(lista) {
+          var mapa = {};
+          var grupo = [];
+          var finGrupo = 0;
+
+          function cerrarGrupo() {
+            if (!grupo.length) return;
+            var columnas = [];
+            grupo.forEach(function (cita) {
+              var inicio = new Date(cita.datetime).getTime();
+              var fin = inicio + (cita.duration_min || 60) * 60000;
+              var c = 0;
+              while (columnas[c] !== undefined && columnas[c] > inicio) c += 1;
+              columnas[c] = fin;
+              mapa[cita.id] = { columna: c, total: 1 };
+            });
+            grupo.forEach(function (cita) { mapa[cita.id].total = columnas.length; });
+            grupo = [];
+            finGrupo = 0;
+          }
+
+          lista.forEach(function (cita) {
+            var inicio = new Date(cita.datetime).getTime();
+            var fin = inicio + (cita.duration_min || 60) * 60000;
+            if (grupo.length && inicio >= finGrupo) cerrarGrupo();
+            grupo.push(cita);
+            finGrupo = Math.max(finGrupo, fin);
+          });
+          cerrarGrupo();
+          return mapa;
+        }
+
         var grid = document.getElementById('cal-grid');
         var label = document.getElementById('cal-week-label');
         if (!grid) return;
@@ -1313,6 +1489,11 @@ function renderAppointmentDate(item: Appointment) {
           cDay.setDate(monday.getDate() + ci);
           var cStr = fmtDate(cDay);
           var cApts = apts.filter(function(a) { return fmtDate(new Date(a.datetime)) === cStr; });
+          // Con varias agendas puede haber dos citas a la misma hora. Antes se
+          // pintaban una encima de otra y la de debajo era invisible: se reparte
+          // el ancho de la columna entre las que se solapan.
+          cApts.sort(function(a, b) { return new Date(a.datetime) - new Date(b.datetime); });
+          var colocacion = repartirSolapes(cApts);
 
           var col = document.createElement('div');
           col.className = 'crm-tac-col' + (isToday(cDay) ? ' today' : '');
@@ -1329,10 +1510,35 @@ function renderAppointmentDate(item: Appointment) {
             blk.className = 'crm-tac-apt ' + st2;
             blk.style.top = top + 'px';
             blk.style.height = height + 'px';
-            blk.title = appointmentName(apt) + ' · ' + (apt.service || 'Sin servicio') + ' · ' + fmtTime(apt.datetime);
+
+            var sitio = colocacion[apt.id] || { columna: 0, total: 1 };
+            if (sitio.total > 1) {
+              var ancho = 100 / sitio.total;
+              blk.style.left = (sitio.columna * ancho) + '%';
+              blk.style.width = 'calc(' + ancho + '% - 3px)';
+              blk.classList.add('compartido');
+            }
+
+            // Quien atiende: nombre y color, solo si el negocio tiene equipo.
+            var quien = null;
+            if (apt.professional_id) {
+              for (var qi = 0; qi < equipo.length; qi++) {
+                if (equipo[qi].id === apt.professional_id) { quien = equipo[qi]; break; }
+              }
+            }
+            var nombreQuien = quien ? quien.name : (apt.professional_name || '');
+            var mostrarQuien = (modoEquipo || sitio.total > 1) && nombreQuien
+              && nombreQuien !== 'Agenda principal';
+            if (mostrarQuien && quien && quien.color) {
+              blk.style.borderLeft = '3px solid ' + quien.color;
+            }
+
+            blk.title = appointmentName(apt) + ' · ' + (apt.service || 'Sin servicio') + ' · ' + fmtTime(apt.datetime)
+              + (mostrarQuien ? ' · ' + nombreQuien : '');
             blk.innerHTML =
               '<span class="crm-tac-apt-main"><strong>' + fmtTime(apt.datetime) + '</strong><span>' + esc(appointmentName(apt)) + '</span></span>' +
-              '<span class="crm-tac-apt-s">' + esc(apt.service || 'Sin servicio') + '</span>';
+              '<span class="crm-tac-apt-s">' + esc(apt.service || 'Sin servicio') + '</span>' +
+              (mostrarQuien ? '<span class="crm-tac-apt-pro">' + esc(nombreQuien) + '</span>' : '');
             if (st2 !== 'cancelled') {
               var actions = document.createElement('span');
               actions.className = 'crm-tac-apt-actions';
@@ -1402,6 +1608,22 @@ function renderAppointmentDate(item: Appointment) {
           var dd = document.getElementById('apt-date-display'); if (dd) dd.textContent = 'Selecciona una fecha';
           var svcList = document.getElementById('svc-suggest');
           if (svcList) svcList.innerHTML = services.map(function(s) { return '<option value="' + esc(s.name) + '">'; }).join('');
+          // El selector de persona solo aparece si de verdad hay equipo.
+          var proWrap = document.getElementById('apt-pro-wrap');
+          var proSel = document.getElementById('apt-pro');
+          if (proWrap && proSel) {
+            if (modoEquipo && equipo.length > 1) {
+              proSel.innerHTML = '<option value="">Quien esté libre</option>'
+                + equipo.map(function (profesional) {
+                  return '<option value="' + esc(profesional.id) + '">' + esc(profesional.name) + '</option>';
+                }).join('');
+              proWrap.classList.remove('crm-hidden');
+            } else {
+              proWrap.classList.add('crm-hidden');
+            }
+          }
+          var errBox = document.getElementById('apt-error');
+          if (errBox) { errBox.textContent = ''; errBox.classList.add('crm-hidden'); }
           renderDatePicker(); renderTimePicker();
           if (aptModal instanceof HTMLDialogElement) aptModal.showModal();
         });
@@ -1415,12 +1637,33 @@ function renderAppointmentDate(item: Appointment) {
           var fd = new FormData(e.target);
           var date = fd.get('date'); var time = fd.get('time');
           if (!date || !time) { showToast('Selecciona fecha y hora'); return; }
+          var errBox = document.getElementById('apt-error');
+          if (errBox) { errBox.textContent = ''; errBox.classList.add('crm-hidden'); }
           try {
+            var cuerpo = {
+              clientId: clientId,
+              client_name: fd.get('client_name'),
+              service: fd.get('service'),
+              datetime: date + 'T' + time + ':00',
+              duration_min: parseInt(fd.get('duration_min'), 10) || 60,
+            };
+            var proElegido = fd.get('professional_id');
+            if (proElegido) cuerpo.professional_id = proElegido;
+
             var r = await fetch('/portal-api/appointments', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ clientId, client_name: fd.get('client_name'), service: fd.get('service'), datetime: date + 'T' + time + ':00', duration_min: parseInt(fd.get('duration_min'), 10) || 60 })
+              body: JSON.stringify(cuerpo)
             });
-            if (!r.ok) throw new Error('api error');
+            if (!r.ok) {
+              // 409 = esa hora ya está cogida. Antes se decía "error" a secas.
+              var detalle = await r.json().catch(function () { return {}; });
+              var texto = r.status === 409
+                ? (detalle.message || 'Esa hora ya está ocupada. Elige otra o cambia de persona.')
+                : 'No se pudo crear la cita.';
+              if (errBox) { errBox.textContent = texto; errBox.classList.remove('crm-hidden'); }
+              showToast(texto);
+              return;
+            }
             showToast('Cita creada ✅');
             if (aptModal instanceof HTMLDialogElement) aptModal.close();
             e.target.reset();
@@ -2508,6 +2751,110 @@ function renderAppointmentDate(item: Appointment) {
     .crm-tac-apt-main span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 600; }
     .crm-tac-apt-s { font-size: 9.5px; color: var(--crm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .crm-tac-apt-actions { position: absolute; top: 3px; right: 3px; display: flex; gap: 2px; }
+
+    /* Quién atiende, dentro del bloque de la cita */
+    .crm-tac-apt-pro {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--crm-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0.85;
+    }
+    /* Citas a la misma hora: se reparten el ancho en vez de taparse.
+       Al partirse la columna quedan ~60px, y los botones se comian 38: sin texto
+       legible. Se esconden hasta pasar por encima (o al tocar en movil, que
+       dispara el hover), que es lo que hacen los calendarios al uso. */
+    .crm-tac-apt.compartido {
+      padding-left: 0.35rem;
+      padding-right: 0.25rem;
+      font-size: 9px;
+    }
+    .crm-tac-apt.compartido .crm-tac-apt-actions {
+      top: 2px;
+      right: 2px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.14s ease;
+    }
+    .crm-tac-apt.compartido:hover .crm-tac-apt-actions,
+    .crm-tac-apt.compartido:focus-within .crm-tac-apt-actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Al asomar los botones, el fondo evita que se lean encima del texto */
+    .crm-tac-apt.compartido:hover .crm-tac-apt-actions,
+    .crm-tac-apt.compartido:focus-within .crm-tac-apt-actions {
+      background: var(--crm-surface);
+      border-radius: 4px;
+    }
+    .crm-tac-apt.compartido .crm-tac-apt-main strong { font-size: 9px; }
+    .crm-tac-apt.compartido .crm-tac-apt-main span { font-size: 9px; }
+    .crm-tac-apt.compartido .crm-tac-apt-s { display: none; }
+    .crm-tac-apt.compartido .crm-tac-apt-pro { font-size: 8.5px; opacity: 1; }
+
+    /* ── Equipo ─────────────────────────────────────────────────────── */
+    .crm-team-help {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--crm-muted);
+      margin: 0 0 0.9rem;
+      max-width: 62ch;
+    }
+    .crm-team-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--crm-text);
+      margin-bottom: 1rem;
+      cursor: pointer;
+    }
+    .crm-team-toggle input { width: 17px; height: 17px; accent-color: var(--crm-accent); cursor: pointer; }
+    .crm-team-add-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.5rem;
+      align-items: center;
+      margin: 0.9rem 0;
+    }
+    .crm-team-color {
+      width: 42px;
+      height: 38px;
+      padding: 2px;
+      border: 1px solid var(--crm-line);
+      border-radius: 8px;
+      background: var(--crm-surface);
+      cursor: pointer;
+    }
+    .crm-team-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    .crm-team-msg {
+      margin: 0.7rem 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--crm-danger, #B4342E);
+      min-height: 1em;
+    }
+    .crm-apt-error {
+      margin: 0.2rem 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--crm-danger, #B4342E);
+    }
+
+    @media (max-width: 640px) {
+      .crm-team-add-row { grid-template-columns: 1fr auto; }
+      .crm-team-add-row .crm-btn-ghost { grid-column: 1 / -1; }
+    }
 
     .crm-cal-apt-edit,
     .crm-cal-apt-cancel {

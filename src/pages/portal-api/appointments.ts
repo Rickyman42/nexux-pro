@@ -38,6 +38,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   // create
-  const ok = await createAppointmentManual(clientId, token, data);
-  return new Response(JSON.stringify({ ok }), { status: ok ? 200 : 502, headers: { "Content-Type": "application/json" } });
+  const result = await createAppointmentManual(clientId, token, data);
+  return new Response(JSON.stringify(result), { status: result.ok ? 200 : result.status, headers: { "Content-Type": "application/json" } });
 };
