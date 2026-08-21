@@ -27,5 +27,5 @@ Compara calendarios, servicios, empleados, recordatorios, exportación de datos 
 
 Ese es el problema que aborda Nexux. Lara responde por WhatsApp, Telegram y web, consulta los huecos configurados y ayuda a dejar la reserva registrada.
 
-Nexux no es un marketplace y no atiende llamadas telefónicas. Cuesta 29 € al mes, sin comisión por cita. Comprueba el flujo en la [demo](/demo) antes de decidir.
+Nexux no es un marketplace y no atiende llamadas telefónicas. Cuesta 29 € al mes, sin comisión por cita. Comprueba el flujo en la [demo](/demo) o revisa la [página de la recepcionista IA](/paquetes/recepcionista) antes de decidir.
 

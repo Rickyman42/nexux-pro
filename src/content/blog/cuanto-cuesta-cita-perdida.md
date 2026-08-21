@@ -1,6 +1,6 @@
 ---
-title: "Cuánto puede costarte una consulta sin responder"
-description: "Una forma sencilla de estimar el valor de los mensajes que no puedes contestar, sin convertir una hipótesis en una promesa."
+title: "Cuánto cuesta una cita perdida y cómo calcularlo"
+description: "Cómo estimar el valor de las citas que pueden perderse por no responder a tiempo, sin convertir una hipótesis en una promesa."
 pubDate: 2026-06-25
 author: "Nexux Pro"
 tags: ["peluqueria", "citas-perdidas", "rentabilidad"]
@@ -28,5 +28,5 @@ El resultado no es una predicción. Sirve para hacerte una pregunta más útil: 
 
 No uses porcentajes de estudios genéricos como si fueran tus datos. Si no tienes histórico, empieza con una estimación conservadora y compárala después con tus conversaciones reales.
 
-Nexux cuesta 29 € al mes. Puedes ver cómo responde Lara en la [demo](/demo) antes de decidir.
+Nexux cuesta 29 € al mes. Puedes ver cómo responde Lara en la [demo](/demo) y consultar la [página de la recepcionista IA](/paquetes/recepcionista) antes de decidir.
 
