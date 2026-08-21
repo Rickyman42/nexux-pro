@@ -21,6 +21,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const url = new URL(context.request.url);
   const pathname = url.pathname;
 
+  // Mantener una sola autoridad de dominio para SEO y analítica.
+  if (url.hostname.toLowerCase() === 'www.nexux.pro') {
+    url.hostname = 'nexux.pro';
+    return sec(context.redirect(url, 308));
+  }
+
   if (pathname.startsWith('/api/') || pathname === '/health') {
     return sec(await next());
   }
