@@ -101,5 +101,7 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
   testimonios (`5c39f54`).
 - Publicado y verificado: sitemap y URLs sin barra final; la variante con barra redirige con `308`
   (`067baa9`).
+- Publicado y verificado: home reescrita con técnicas Miralles + Bravo y SEO natural para “recepcionista IA”
+  (`54cd2b7`).
 - Pendiente prioritario: nueva medición en Search Console y baseline de asistentes IA.
 - No autorizado todavía: publicar, hacer push o desplegar cambios.
