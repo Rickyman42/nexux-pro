@@ -15,8 +15,8 @@ export function getStaticPaths() {
 
 const { slug, plan } = Astro.props as { slug: PlanSlug; plan: PlanData };
 const canonical = `https://nexux.pro/paquetes/${slug}`;
-const title = `${plan.name} | Nexux`;
-const description = `${plan.name}: ${plan.sub}. Desde ${plan.price}€/mes con configuración completa y garantía de 30 días.`;
+const title = 'Recepcionista IA para negocios | Nexux';
+const description = `Recepcionista IA para WhatsApp, Telegram y web que responde mensajes y reserva citas en tu calendario. ${plan.price} €/mes, sin permanencia y con 30 días de garantía.`;
 
 const faqSchema = {
   '@context': 'https://schema.org',
@@ -31,7 +31,7 @@ const faqSchema = {
 const productSchema = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: `Nexux ${plan.name}`,
+  name: plan.name,
   description: plan.sub,
   brand: { '@type': 'Brand', name: 'Nexux' },
   offers: {
