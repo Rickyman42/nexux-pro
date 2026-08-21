@@ -10,6 +10,9 @@ Dominio canónico: `https://nexux.pro/`
 - Datos: 1 impresión, 0 clics; única consulta registrada: `treatwell pro tarif`, posición 18,
   hacia un artículo antiguo.
 - Esto es una señal inicial, no una conclusión sobre la demanda actual de “recepcionista IA”.
+- Búsqueda pública exploratoria del 21-08-2026: `site:nexux.pro "recepcionista IA"` y `site:nexux.pro Nexux
+  recepcionista IA` no devolvieron resultados. La búsqueda amplia de `Nexux.pro` devolvió entidades ajenas.
+  Esto apunta a un problema de descubrimiento/indexación de marca, no a una razón para crear contenido en masa.
 
 ## Consultas fijas para la primera medición
 
