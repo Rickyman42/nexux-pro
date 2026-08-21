@@ -4,6 +4,9 @@
 > Ley general de Nexux: `~/nexus-brain/AGENTS.md` en la Pi. Este archivo NO la repite: solo añade lo propio de nexux.pro.
 > Si hay conflicto, manda la ley general. Estado del proyecto: `~/nexus-brain/nexux-live-state.md`.
 > Historial de trabajo de este repo: `progress/REGISTRO.md` (léete las últimas 20 líneas).
+> **Investigación de mercado, DAFO, competencia y keywords (volumen real de Google Ads):**
+> `progress/investigacion/investigacion-seo-20260821.md`. Léelo ANTES de proponer cualquier táctica de
+> SEO o de producto — es la base de datos de todo lo que dice §3 (descartado) y §4 (estrategia).
 > ⛔ nexux.pro (SaaS B2B) es INDEPENDIENTE de nexux.es (app de citas B2C). No mezclar código, DB, bots ni tokens.
 
 ---
