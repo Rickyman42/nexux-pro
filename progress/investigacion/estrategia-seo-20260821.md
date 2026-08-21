@@ -105,5 +105,7 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
   (`54cd2b7`).
 - Publicado y verificado: hook de pérdida, cita de 42 €, recuperación y ROI dinámicos según los datos del
   visitante; CTA reforzado (`e957cc9`).
-- Pendiente prioritario: nueva medición en Search Console y baseline de asistentes IA.
-- No autorizado todavía: publicar, hacer push o desplegar cambios.
+- Publicado: la incidencia de visibilidad queda anotada: Ricardo no ve el copy nuevo en su navegador,
+  aunque `origin/main` y el HTML público servido con cachebuster ya contienen el cambio. Queda pendiente
+  verificarlo visualmente en navegador y descartar caché o URL distinta; no se marca como resuelto para el usuario.
+- Siguiente: nueva medición en Search Console y baseline de asistentes IA, sin inventar menciones ni citas.
