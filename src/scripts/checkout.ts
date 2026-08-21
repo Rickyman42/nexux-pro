@@ -1,10 +1,7 @@
 declare const Stripe: undefined | ((key: string) => any);
 
 const PLAN_LABELS: Record<string, string> = {
-  starter: 'Starter — 249€/mes',
-  pro: 'Pro — 449€/mes',
-  total: 'Total — 749€/mes',
-  promo: 'Promoción Especial — 49€/mes',
+  recepcionista: 'Nexux Recepcionista IA — 29€/mes',
 };
 
 let stripeInstance: any = null;

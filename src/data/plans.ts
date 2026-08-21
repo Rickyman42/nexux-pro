@@ -33,7 +33,7 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     name: 'Nexux Recepcionista IA',
     price: LAUNCH_PRICE,
     sub: 'Un precio. Todo incluido. Sin permanencia.',
-    stripe_url: 'https://buy.stripe.com/recepcionista_placeholder',
+    stripe_url: '/paquetes/recepcionista',
     color: '#4ECDC4',
     badge: 'Precio de lanzamiento',
     for: [

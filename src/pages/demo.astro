@@ -197,7 +197,7 @@ const API = 'https://pi.nexux.pro';
 <div class="top-bar">
   <span class="top-label">Demo en vivo &mdash; Salon Elite (simulado)</span>
   <span>Lo quieres para tu negocio?</span>
-  <a href="/prueba-gratis">Empieza gratis en segundos</a>
+  <a href="/paquetes/recepcionista">Empieza gratis en segundos</a>
 </div>
 
 <div class="demo-wrap">
@@ -251,7 +251,7 @@ const API = 'https://pi.nexux.pro';
     <div class="crm-mobile" id="crmMobile">
       <div class="crm-mobile-scroll"><div id="mCalRows"></div><p style="font-size:11px;color:var(--muted);text-align:center;padding:10px 0 4px;border-top:1px solid var(--border);margin-top:8px">Vista CRM completa disponible en tablet y escritorio</p></div>
       <div class="crm-mobile-cta">
-        <a href="/prueba-gratis" class="cta-btn" style="display:block;text-align:center">Quiero esto para mi negocio</a>
+        <a href="/paquetes/recepcionista" class="cta-btn" style="display:block;text-align:center">Quiero esto para mi negocio</a>
         <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">7 dias gratis &middot; Activo en segundos</p>
       </div>
     </div>
@@ -275,7 +275,7 @@ const API = 'https://pi.nexux.pro';
         <span class="crm-week-label" id="weekLabel"></span>
         <button class="nav-btn" >Siguiente &#x2192;</button>
       </div>
-      <a href="/prueba-gratis" style="background:var(--nx-dark);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12.5px;font-weight:700;text-decoration:none;cursor:pointer">+ Nueva cita</a>
+      <a href="/paquetes/recepcionista" style="background:var(--nx-dark);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12.5px;font-weight:700;text-decoration:none;cursor:pointer">+ Nueva cita</a>
     </div>
 
     <!-- STATS (igual que el portal real) -->
@@ -307,7 +307,7 @@ const API = 'https://pi.nexux.pro';
 
     <!-- FOOTER CTA -->
     <div class="crm-footer">
-      <a href="/prueba-gratis" class="cta-btn">Quiero esto para mi negocio &rarr;</a>
+      <a href="/paquetes/recepcionista" class="cta-btn">Quiero esto para mi negocio &rarr;</a>
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--text)">7 dias gratis</div>
         <div class="cta-sub">Activo en segundos &middot; Sin tarjeta</div>
@@ -720,8 +720,8 @@ const API = 'https://pi.nexux.pro';
   if (navBtns[0]) navBtns[0].addEventListener('click', function(){ moveWeek(-1); });
   if (navBtns[1]) navBtns[1].addEventListener('click', function(){ moveWeek(1); });
 
-  // CTA prueba-gratis -> track interes
-  document.querySelectorAll('a[href*="prueba-gratis"]').forEach(function(a){
+  // CTA de compra -> track interes
+  document.querySelectorAll('a[href*="paquetes/recepcionista"]').forEach(function(a){
     a.addEventListener('click', function(){ track('cta_click'); });
   });
 
