@@ -11,23 +11,27 @@
       </div>
 
       <h1 class="h-display hero-title">
-        Cada mensaje que no contestas es...<br/>
-        <em>una cita que no vuelve.</em>
+        Una <em>recepcionista IA</em><br/>
+        para que no pierdas citas.
       </h1>
 
       <p class="hero-sub">
-        Imagina que estás atendiendo y entra otro mensaje.
         Lara responde por WhatsApp, Telegram o tu web, mira tu calendario y deja la cita puesta.
         <strong>Tú sigues trabajando.</strong>
       </p>
 
+      <div class="hero-profit" aria-label="Ejemplo de recuperación de citas">
+        <p>Cada mensaje que no contestas es una cita que no vuelve.</p>
+        <p><strong>Cita de 42 € confirmada.</strong> Podrías recuperar lo que hoy se te escapa.</p>
+      </div>
+
       <div class="hero-ctas">
-        <a href="/demo" class="btn-primary" data-track="hero_cta_primary">
-          ¿Quieres verla responder?
+        <a href="#calculadora" class="btn-primary" data-track="hero_cta_primary">
+          Quiero recuperar ese dinero
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
-        <a href="/paquetes/recepcionista" class="btn-ghost" data-track="hero_cta_secondary">
-          Ver precio
+        <a href="/demo" class="btn-ghost" data-track="hero_cta_secondary">
+          Ver cómo responde
         </a>
       </div>
 
@@ -210,6 +214,21 @@
     line-height: 1.65;
   }
   .hero-sub strong { color: var(--nx-ink); font-weight: 600; }
+
+  .hero-profit {
+    max-width: 540px;
+    margin: -1.25rem 0 2rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--nx-magnet);
+  }
+  .hero-profit p {
+    margin: 0;
+    color: var(--nx-ink-muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .hero-profit p + p { margin-top: 0.2rem; }
+  .hero-profit strong { color: var(--nx-ink); }
 
   .hero-ctas {
     display: flex;
