@@ -165,8 +165,10 @@ Si devuelve FALLO, **no está hecho**. (El verificador no valida `.css` ni `.ast
 5. **Hay dos listas blancas de planes** en `nexux-clients/provision-http.js` (líneas ~230 y ~942).
    Cambiar solo una deja el pago roto con un `invalid_plan` que no explica nada.
 6. ~~**`nexux-clients` NO tiene control de versiones propio**~~ → **RESUELTO 21-ago-2026.**
-   `~/nexux-clients` ya es un repositorio git independiente (`git init`, commit inicial `578bc52`,
-   89 ficheros: solo código y documentación). `git status` pasó de colgarse a 0,009 s.
+   `~/nexux-clients` ya es un repositorio git independiente (commit inicial `578bc52`, 89 ficheros:
+   solo código y documentación), con remote **privado** `github.com/Rickyman42/nexux-clients-core`.
+   `git status` pasó de colgarse a 0,009 s. ⛔ No confundir con el repo `nexux-clients` de GitHub:
+   ese es el del home entero y no se toca.
    **Lo que sigue siendo cierto y peligroso:** `/home/nexux` es OTRO repo git que trackea la carpeta
    personal entera —11.183 ficheros, incluidos `.ssh/authorized_keys`, `.claude-bot.env` y varios
    `.credentials.json`— con remote `nexux-clients.git`. Un `pull`/`rebase` allí puede sobrescribir tus
