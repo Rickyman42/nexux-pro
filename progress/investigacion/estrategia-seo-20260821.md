@@ -99,5 +99,7 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
   blog sirven el contenido nuevo el 21-ago-2026.
 - Publicado y verificado: sección de “Ejemplos de uso” en la home, etiquetada como ejemplos y no como
   testimonios (`5c39f54`).
-- Pendiente prioritario: unificación final de barras/canonicals y nueva medición en Search Console.
+- Publicado y verificado: sitemap y URLs sin barra final; la variante con barra redirige con `308`
+  (`067baa9`).
+- Pendiente prioritario: nueva medición en Search Console y baseline de asistentes IA.
 - No autorizado todavía: publicar, hacer push o desplegar cambios.
