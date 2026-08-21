@@ -1,7 +1,8 @@
 # Arquitectura multiagenda — Nexux Recepcionista IA
 
 > Diseñada por Sol y revisada contra el código real el 21-08-2026.
-> **Estado: Fases 1 y 2 CERRADAS y verificadas en producción. Fases 3-5 sin empezar.**
+> **Estado: Fases 1 y 2 CERRADAS y verificadas en producción. Fase 3 construida pero SIN
+> CONECTAR — bloqueada por horarios contradictorios en la config (ver §Fase 3). Fases 4-5 sin empezar.**
 > **Modo `single` (una agenda, sin solapes) es el producto actual y es intencionado.** El modo `team`
 > es una capacidad distinta, no un arreglo del actual: se activa por configuración, no sustituye nada.
 > Reparto: Sol diseña y refuta, Luna implementa. Ver "Estado real" al final.
@@ -264,13 +265,43 @@ la primera versión llevaba dos que el motor nunca emite.
   17/17 fallos porque la fecha elegida caía en domingo y los horarios reales tienen `sunday: null`.
   Era fallo de la prueba, no del motor.)*
 
-### Fases 3-5: ❌ SIN EMPEZAR
+### Fase 3 — disponibilidad por profesional: ✅ CONSTRUIDA · ⛔ SIN CONECTAR (bloqueada)
 
-Falta lo que da valor comercial al modo `team`:
+`engine.availability()` ya calcula huecos **por profesional** y devuelve, para cada uno, **quién** puede
+atenderlo (commit `f28bb21`). Reutiliza `candidateIsAvailable`, el mismo que decide al reservar, para que
+no puedan divergir — hay un test que comprueba que todo hueco ofrecido se puede reservar de verdad.
 
-- **Disponibilidad por profesional.** `getAvailableSlots` (`lib/data.js:84`) sigue calculando para todo
-  el negocio. Mientras siga así, Lara no puede ofrecer dos huecos a la misma hora aunque el motor los
-  acepte.
+6 tests nuevos (37/37), incluido el que desbloquea el producto: **con dos profesionales, ocupar a uno no
+borra el hueco**.
+
+#### 🔴 BLOQUEANTE: horarios contradictorios en la configuración
+
+**No se ha conectado a WhatsApp/Telegram a propósito.** Al comparar la disponibilidad nueva contra la
+vieja en las 17 configuraciones reales: 14 idénticas, 3 distintas — y una destapa un fallo del
+normalizador que ofrecería huecos fuera de horario:
+
+> `new-look-7320e8` tiene el horario **duplicado en inglés y en español, y se contradicen**:
+> `saturday` = 09:00–14:00 pero `sabado` = 09:00–20:00 con parada 10:00–16:00.
+> `normalizeConfig` **deja ganar al español y además pierde la parada** (`breaks: []`).
+> Efecto: se ofrecería sábado por la tarde en un salón que cierra a las 14:00.
+
+Añadido: `lunch_open` / `lunch_close` **no se convierten en `breaks`** en ningún caso, así que las
+paradas de mediodía se ignoran siempre.
+
+Hay que decidir, no adivinar: ¿gana el inglés? ¿gana el más restrictivo? ¿o `normalizeConfig` falla con
+`ambiguous_schedule` y obliga a limpiar la config? Es una decisión de contrato, de Sol.
+
+#### Dos hallazgos que conviene registrar
+
+- **`nexux-empresa` tiene el horario solo en español y la disponibilidad VIEJA le devuelve cero huecos.**
+  Ese bot no puede coger citas hoy. La nueva lo arregla.
+- **`demo` no tiene horario** y el normalizador asume 09:00–19:00 Europe/Madrid. Es una suposición, no un
+  dato: conviene decidirla explícitamente en vez de heredarla.
+
+### Fase 4 y 5: ❌ SIN EMPEZAR
+
+- **Gestión de profesionales en el portal** — en el front del CRM (`nexux-pro`) hay **cero**
+  referencias a profesional.
 - **Gestión de profesionales en el portal** — en el front del CRM (`nexux-pro`) hay **cero**
   referencias a profesional.
 - **Conversación de Lara** para elegir profesional («¿con Ana, con Marta o te da igual?»).
