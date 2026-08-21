@@ -7,6 +7,9 @@
 > **Investigación de mercado, DAFO, competencia y keywords (volumen real de Google Ads):**
 > `progress/investigacion/investigacion-seo-20260821.md`. Léelo ANTES de proponer cualquier táctica de
 > SEO o de producto — es la base de datos de todo lo que dice §3 (descartado) y §4 (estrategia).
+> **Estrategia SEO en 5 capas, con estado ✅/❌ actualizado de cada tarea:**
+> `progress/investigacion/estrategia-seo-20260821.md`. Es el plan de ejecución; antes de proponer "qué
+> hacer ahora" en SEO, mira qué capa está a medias.
 > ⛔ nexux.pro (SaaS B2B) es INDEPENDIENTE de nexux.es (app de citas B2C). No mezclar código, DB, bots ni tokens.
 
 ---
