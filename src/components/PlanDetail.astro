@@ -63,13 +63,19 @@ const { plan, slug } = Astro.props as Props;
         </ul>
 
         <figure class="plan-crm-preview">
-          <img
-            src="/img/demo-crm.png"
-            alt="Vista del CRM de Nexux con agenda semanal, citas, clientes y canales"
-            width="1024"
-            height="1024"
-            loading="lazy"
-          />
+          <div class="plan-crm-toolbar">
+            <span>Vista del CRM</span>
+            <button type="button" data-crm-open>Ampliar</button>
+          </div>
+          <button type="button" class="plan-crm-image" data-crm-open aria-label="Ampliar captura del CRM">
+            <img
+              src="/img/demo-crm.png"
+              alt="Vista del CRM de Nexux con agenda semanal, citas, clientes y canales"
+              width="1024"
+              height="1024"
+              loading="lazy"
+            />
+          </button>
           <figcaption>El CRM que recibe el cliente: agenda, citas y conversaciones en un solo lugar.</figcaption>
         </figure>
       </section>
@@ -77,15 +83,26 @@ const { plan, slug } = Astro.props as Props;
       <section class="plan-panel">
         <h2 class="h-section">Lo que hace tu <em>recepcionista IA</em></h2>
         <div class="plan-feature-list">
-          {plan.features.map(feature => (
-            <article class="plan-feature-card">
-              <h3>{feature.title}</h3>
-              {feature.detail && <p>{feature.detail}</p>}
+          {plan.features.map((feature, index) => (
+            <article class:list={["plan-feature-card", { "is-active": index === 0 }]} data-feature-index={index} tabindex="0">
+              <span class="plan-feature-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <div>
+                <h3>{feature.title}</h3>
+                {feature.detail && <p>{feature.detail}</p>}
+              </div>
             </article>
           ))}
         </div>
       </section>
     </div>
+
+    <dialog class="plan-crm-dialog" data-crm-dialog aria-label="Vista ampliada del CRM de Nexux">
+      <div class="plan-crm-dialog-bar">
+        <strong>CRM Nexux</strong>
+        <button type="button" data-crm-close aria-label="Cerrar captura ampliada">Cerrar</button>
+      </div>
+      <img src="/img/demo-crm.png" alt="Vista ampliada del CRM de Nexux" width="1024" height="1024" />
+    </dialog>
 
     <section class="plan-panel plan-faq-panel">
       <div class="plan-panel-heading">
@@ -124,6 +141,46 @@ const { plan, slug } = Astro.props as Props;
     </section>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    const cards = Array.from(document.querySelectorAll('[data-feature-index]'));
+    const dialog = document.querySelector('[data-crm-dialog]');
+    const openButtons = document.querySelectorAll('[data-crm-open]');
+    const closeButton = document.querySelector('[data-crm-close]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let active = 0;
+    let rotation;
+
+    function activate(index) {
+      active = index;
+      cards.forEach((card, cardIndex) => card.classList.toggle('is-active', cardIndex === index));
+    }
+
+    function startRotation() {
+      if (reduceMotion || cards.length < 2) return;
+      window.clearInterval(rotation);
+      rotation = window.setInterval(() => activate((active + 1) % cards.length), 2800);
+    }
+
+    cards.forEach((card, index) => {
+      card.addEventListener('mouseenter', () => activate(index));
+      card.addEventListener('focus', () => activate(index));
+      card.addEventListener('click', () => {
+        activate(index);
+        startRotation();
+      });
+    });
+
+    openButtons.forEach(button => button.addEventListener('click', () => dialog?.showModal()));
+    closeButton?.addEventListener('click', () => dialog?.close());
+    dialog?.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    startRotation();
+  })();
+</script>
 
 <style>
   .plan-detail {
@@ -327,18 +384,60 @@ const { plan, slug } = Astro.props as Props;
 
   .plan-crm-preview {
     margin-top: 2rem;
-  }
-
-  .plan-crm-preview img {
-    display: block;
-    width: 100%;
-    height: auto;
+    overflow: hidden;
     border: 1px solid var(--nx-line);
     border-radius: 10px;
   }
 
+  .plan-crm-toolbar,
+  .plan-crm-dialog-bar {
+    min-height: 2.75rem;
+    padding: 0.65rem 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--nx-void);
+    border-bottom: 1px solid var(--nx-line);
+  }
+
+  .plan-crm-toolbar span,
+  .plan-crm-dialog-bar strong {
+    color: var(--nx-ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .plan-crm-toolbar button,
+  .plan-crm-dialog-bar button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--nx-magnet-deep);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .plan-crm-image {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    cursor: zoom-in;
+  }
+
+  .plan-crm-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   .plan-crm-preview figcaption {
-    margin-top: 0.75rem;
+    padding: 0.75rem 0.85rem;
+    border-top: 1px solid var(--nx-line);
     color: var(--nx-ink-muted);
     font-size: 0.82rem;
     line-height: 1.5;
@@ -352,8 +451,29 @@ const { plan, slug } = Astro.props as Props;
   }
 
   .plan-feature-card {
-    padding: 1.15rem 0;
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 1.15rem 1rem;
+    border-left: 3px solid transparent;
     border-bottom: 1px solid var(--nx-line);
+    transition: background-color 180ms ease, border-color 180ms ease;
+    outline: none;
+    cursor: default;
+  }
+
+  .plan-feature-card.is-active,
+  .plan-feature-card:focus-visible {
+    background: rgba(78, 205, 196, 0.08);
+    border-left-color: var(--nx-magnet);
+  }
+
+  .plan-feature-number {
+    padding-top: 0.15rem;
+    color: var(--nx-magnet-deep);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
   }
 
   .plan-feature-card h3 {
@@ -368,6 +488,31 @@ const { plan, slug } = Astro.props as Props;
     color: var(--nx-ink-muted);
     line-height: 1.7;
     font-size: 0.95rem;
+  }
+
+  .plan-crm-dialog {
+    width: min(92vw, 1050px);
+    max-height: 92vh;
+    padding: 0;
+    overflow: auto;
+    border: 1px solid var(--nx-line);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  }
+
+  .plan-crm-dialog::backdrop {
+    background: rgba(11, 13, 18, 0.72);
+  }
+
+  .plan-crm-dialog img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plan-feature-card { transition: none; }
   }
 
   .plan-faq-panel {
