@@ -3,13 +3,13 @@
 @import "tailwind-animations";
 
 :root {
-  --nx-void: #0B0D12;
-  --nx-deep: #13161E;
-  --nx-surface: #1A1E28;
-  --nx-elevate: #21252F;
-  --nx-ink: #F2F2EC;
-  --nx-ink-muted: #8B8E96;
-  --nx-ink-faint: #4A4D55;
+  --nx-void: #FFFFFF;
+  --nx-deep: #F7F6F3;
+  --nx-surface: #FFFFFF;
+  --nx-elevate: #F1EFEA;
+  --nx-ink: #14161A;
+  --nx-ink-muted: #5B5F66;
+  --nx-ink-faint: #9AA0A6;
   --nx-magnet: #4ECDC4;
   --nx-magnet-glow: #6FE5DB;
   --nx-magnet-deep: #2A8B84;
@@ -17,9 +17,9 @@
   --nx-rose: #E8A598;
   --nx-warning: #FFB347;
   --nx-danger: #FF6B6B;
-  --nx-success: #6FE5DB;
-  --nx-line: rgba(242, 242, 236, 0.06);
-  --nx-line-hover: rgba(242, 242, 236, 0.12);
+  --nx-success: #2A8B84;
+  --nx-line: rgba(20, 22, 26, 0.08);
+  --nx-line-hover: rgba(20, 22, 26, 0.16);
   --nx-font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
   --nx-font-serif: 'Instrument Serif', Georgia, serif;
   --nx-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
