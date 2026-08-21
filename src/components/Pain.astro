@@ -5,7 +5,7 @@
     <div class="pain-header">
       <div class="eyebrow">El mensaje que llega cuando no puedes responder</div>
       <h2 class="h-section pain-title">
-        Una clienta escribe. Tú estás ocupado. <em>Ella escribe a otro.</em>
+        Cada mensaje que no contestas es <em>una cita que no vuelve.</em>
       </h2>
       <p class="pain-sub">
         No pierdes citas porque falten clientes.
@@ -91,10 +91,24 @@
 
           <div class="output-divider"></div>
 
-          <p class="output-sub">Es una estimación con tus datos. Ahora imagina que Lara contesta a tiempo.</p>
+          <div class="output-roi">
+            <div class="roi-line">
+              <span class="roi-label">Recepcionista IA cuesta</span>
+              <span class="roi-val">348 €/año</span>
+            </div>
+            <div class="roi-line roi-result">
+              <span class="roi-label">Podrías recuperar</span>
+              <span class="roi-val" id="recovered">+2.052 €</span>
+            </div>
+            <div class="roi-x">
+              ROI estimado: <strong id="roi-x">×6,9</strong> tu inversión
+            </div>
+          </div>
+
+          <p class="output-sub">Estimación según los datos que has introducido.</p>
 
           <a href="/paquetes/recepcionista" class="btn-primary calc-cta" data-track="calc_cta">
-            Quiero dejar de contestar tarde
+            Quiero recuperar ese dinero
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -125,6 +139,12 @@
 
       document.getElementById('loss').textContent = fmt(lossYear);
       document.getElementById('citas-perdidas').textContent = fmt(citasMes * 12) + ' posibles citas';
+
+      const cost = 348;
+      const recovered = lossYear - cost;
+      const roi = lossYear / cost;
+      document.getElementById('recovered').textContent = (recovered >= 0 ? '+' : '') + fmt(recovered) + ' €';
+      document.getElementById('roi-x').textContent = '×' + roi.toFixed(1).replace('.', ',');
     }
 
     function attach() {
