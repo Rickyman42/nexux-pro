@@ -3,10 +3,16 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-# AI Answer Bots — PERMITIDOS (citan fuente, no entrenan con datos)
+# Crawlers de búsqueda y asistentes — permitidos
+# OAI-SearchBot sirve para que ChatGPT Search pueda descubrir y citar páginas.
+User-agent: OAI-SearchBot
+Allow: /
+
+# GPTBot se usa para entrenamiento; permanece permitido según la política actual del proyecto.
 User-agent: GPTBot
 Allow: /
 
+# ChatGPT-User es acceso iniciado por una petición del usuario, no el crawler de búsqueda.
 User-agent: ChatGPT-User
 Allow: /
 
@@ -34,8 +40,8 @@ Allow: /
 User-agent: Gemini
 Allow: /
 
-# Scrapers de entrenamiento — BLOQUEADOS
-# CCBot (Common Crawl) — PERMITIDO: alimenta el entrenamiento de modelos IA
+# Crawlers de entrenamiento o recopilación — política explícita actual
+# GPTBot y CCBot permanecen permitidos según la configuración vigente del proyecto.
 User-agent: CCBot
 Allow: /
 
