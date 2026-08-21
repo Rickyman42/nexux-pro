@@ -103,5 +103,7 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
   (`067baa9`).
 - Publicado y verificado: home reescrita con técnicas Miralles + Bravo y SEO natural para “recepcionista IA”
   (`54cd2b7`).
+- Publicado y verificado: hook de pérdida, cita de 42 €, recuperación y ROI dinámicos según los datos del
+  visitante; CTA reforzado (`e957cc9`).
 - Pendiente prioritario: nueva medición en Search Console y baseline de asistentes IA.
 - No autorizado todavía: publicar, hacer push o desplegar cambios.
