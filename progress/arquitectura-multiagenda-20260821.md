@@ -1,8 +1,8 @@
 # Arquitectura multiagenda — Nexux Recepcionista IA
 
 > Diseñada por Sol y revisada contra el código real el 21-08-2026.
-> **Estado: Fases 1 y 2 CERRADAS y verificadas en producción. Fase 3 construida pero SIN
-> CONECTAR — bloqueada por horarios contradictorios en la config (ver §Fase 3). Fases 4-5 sin empezar.**
+> **Estado: Fases 1, 2, 3 y 4 (backend) CERRADAS y verificadas en producción.**
+> **Falta el front del portal: gestionar profesionales y ver el calendario por persona.**
 > **Modo `single` (una agenda, sin solapes) es el producto actual y es intencionado.** El modo `team`
 > es una capacidad distinta, no un arreglo del actual: se activa por configuración, no sustituye nada.
 > Reparto: Sol diseña y refuta, Luna implementa. Ver "Estado real" al final.
@@ -265,43 +265,79 @@ la primera versión llevaba dos que el motor nunca emite.
   17/17 fallos porque la fecha elegida caía en domingo y los horarios reales tienen `sunday: null`.
   Era fallo de la prueba, no del motor.)*
 
-### Fase 3 — disponibilidad por profesional: ✅ CONSTRUIDA · ⛔ SIN CONECTAR (bloqueada)
+### Fase 3 — disponibilidad por profesional: ✅ CERRADA y verificada
 
-`engine.availability()` ya calcula huecos **por profesional** y devuelve, para cada uno, **quién** puede
-atenderlo (commit `f28bb21`). Reutiliza `candidateIsAvailable`, el mismo que decide al reservar, para que
-no puedan divergir — hay un test que comprueba que todo hueco ofrecido se puede reservar de verdad.
+`engine.availability()` calcula huecos **por profesional** y devuelve **quién** puede atender cada uno.
+Reutiliza `candidateIsAvailable`, el mismo que decide al reservar, para que no puedan divergir — hay un
+test que comprueba que todo hueco ofrecido se puede reservar de verdad.
 
-6 tests nuevos (37/37), incluido el que desbloquea el producto: **con dos profesionales, ocupar a uno no
-borra el hueco**.
+Conectada a WhatsApp y Telegram **con red**: si el cálculo nuevo fallara, cae al antiguo antes que dejar
+a Lara sin huecos.
 
-#### 🔴 BLOQUEANTE: horarios contradictorios en la configuración
+#### El bloqueante que estaba pendiente: resuelto
 
-**No se ha conectado a WhatsApp/Telegram a propósito.** Al comparar la disponibilidad nueva contra la
-vieja en las 17 configuraciones reales: 14 idénticas, 3 distintas — y una destapa un fallo del
-normalizador que ofrecería huecos fuera de horario:
+> `new-look-7320e8` tenía el horario duplicado en inglés y español, contradiciéndose
+> (`saturday` 09:00–14:00 vs `sabado` 09:00–20:00). Se recorrían las claves en orden y **la última
+> pisaba**, así que ganaba el español.
 
-> `new-look-7320e8` tiene el horario **duplicado en inglés y en español, y se contradicen**:
-> `saturday` = 09:00–14:00 pero `sabado` = 09:00–20:00 con parada 10:00–16:00.
-> `normalizeConfig` **deja ganar al español y además pierde la parada** (`breaks: []`).
-> Efecto: se ofrecería sábado por la tarde en un salón que cierra a las 14:00.
+**Regla decidida: la clave inglesa es la canónica y manda.** El alias solo rellena días que el inglés no
+define — ni siquiera puede abrir un día declarado cerrado. Se eligió así porque es *exactamente* lo que
+hacía la disponibilidad antigua (solo miraba claves inglesas), de modo que **ningún cliente actual
+cambia de comportamiento**. Las contradicciones se avisan por log en vez de resolverse en silencio.
 
-Añadido: `lunch_open` / `lunch_close` **no se convierten en `breaks`** en ningún caso, así que las
-paradas de mediodía se ignoran siempre.
+#### Dos fallos reales que salieron y se corrigieron
 
-Hay que decidir, no adivinar: ¿gana el inglés? ¿gana el más restrictivo? ¿o `normalizeConfig` falla con
-`ambiguous_schedule` y obliga a limpiar la config? Es una decisión de contrato, de Sol.
+1. **Las paradas de mediodía se perdían.** `lunch_open`/`lunch_close` no se convertían en `breaks`.
+   `nexux-demo-mostoles-42a928` declara parada 14:00–16:00 y **la disponibilidad antigua ofrecía citas
+   dentro de ella** (14:00, 14:30, 15:00 y 15:30 hora de Madrid, comprobado sobre su config real).
+   Ya no.
+2. **`nexux-empresa` no podía coger citas.** Tiene el horario solo en español y la disponibilidad
+   antigua no entiende `lunes`/`martes`: le devolvía **cero huecos**. Estaba roto en producción.
 
-#### Dos hallazgos que conviene registrar
+Comparación contra las 17 configuraciones reales: 14 idénticas y 3 distintas — las tres por estos
+fallos, todas a mejor.
 
-- **`nexux-empresa` tiene el horario solo en español y la disponibilidad VIEJA le devuelve cero huecos.**
-  Ese bot no puede coger citas hoy. La nueva lo arregla.
-- **`demo` no tiene horario** y el normalizador asume 09:00–19:00 Europe/Madrid. Es una suposición, no un
-  dato: conviene decidirla explícitamente en vez de heredarla.
+### Fase 4 — Lara y portal: ✅ BACKEND CERRADO · ❌ falta el front
 
-### Fase 4 y 5: ❌ SIN EMPEZAR
+**Lara pregunta por profesional** cuando el negocio está en `mode: team`:
 
-- **Gestión de profesionales en el portal** — en el front del CRM (`nexux-pro`) hay **cero**
-  referencias a profesional.
+- El token admite un **cuarto campo opcional**: `[RESERVA:Servicio|fecha|Nombre|Profesional]`.
+  Sin él, asignación automática — el comportamiento de siempre.
+- El puente resuelve el nombre a id; si el nombre no existe, **asigna solo en vez de tumbar la reserva**.
+- **En `mode: single` el prompt queda idéntico**, carácter por carácter. Riesgo cero para los clientes
+  de hoy: la funcionalidad entera vive detrás de la bandera `booking.mode`.
+
+**API del portal** (`provision-http.js`):
+
+| Ruta | Qué hace |
+|---|---|
+| `GET /client/:id/professionals` | modo actual y lista |
+| `POST /client/:id/professionals` | fija lista y modo (`single`/`team`) |
+
+Con salvaguarda: pasar a `team` puede romper si hay citas antiguas cuya duración no se puede resolver,
+así que **se valida contra las citas reales antes de escribir la config** y devuelve 409 con el motivo.
+
+#### La prueba que cierra el objetivo del proyecto
+
+En producción, tres reservas **a la misma hora** con el cliente en `team`:
+
+```
+1ª → HTTP 200  Ana
+2ª → HTTP 200  Marta      ← esto era imposible antes
+3ª → HTTP 409  appointment_conflict (ya no queda nadie)
+```
+
+43/43 tests. Cliente de prueba restaurado a `single` y citas de prueba borradas.
+
+### Lo que falta
+
+- **Front del portal**: pantalla para dar de alta profesionales y asignarles servicios. La API existe;
+  el CRM (`nexux-pro`) todavía **no menciona la palabra profesional** en ninguna parte.
+- **Calendario por persona**: columnas o colores, filtro, y que se vean dos citas a la misma hora.
+  Al arrastrar una cita debe conservarse su profesional salvo que se cambie a propósito.
+- **Fase 5**: recursos (cabinas, sillones) y calendario externo.
+- **Migración física** de citas antiguas (hoy se interpretan como `pro_default` al vuelo, sin tocar el
+  fichero).
 - **Gestión de profesionales en el portal** — en el front del CRM (`nexux-pro`) hay **cero**
   referencias a profesional.
 - **Conversación de Lara** para elegir profesional («¿con Ana, con Marta o te da igual?»).
