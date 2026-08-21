@@ -93,8 +93,8 @@
 
           <div class="output-roi">
             <div class="roi-line">
-              <span class="roi-label">Nexux Pro cuesta</span>
-              <span class="roi-val">2.988 €/año</span>
+              <span class="roi-label">Recepcionista IA cuesta</span>
+              <span class="roi-val">348 €/año</span>
             </div>
             <div class="roi-line roi-result">
               <span class="roi-label">Recuperas</span>
@@ -105,7 +105,7 @@
             </div>
           </div>
 
-          <a href="#hablar" class="btn-primary calc-cta" data-track="calc_cta">
+          <a href="/paquetes/recepcionista" class="btn-primary calc-cta" data-track="calc_cta">
             Quiero recuperar ese dinero
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
@@ -138,7 +138,7 @@
       document.getElementById('loss').textContent = fmt(lossYear);
       document.getElementById('citas-perdidas').textContent = fmt(citasMes * 12) + ' citas';
 
-      const cost = 2988;
+      const cost = 348;
       const recovered = lossYear - cost;
       const roi = lossYear / cost;
       document.getElementById('recovered').textContent = (recovered >= 0 ? '+' : '') + fmt(recovered) + ' €';
