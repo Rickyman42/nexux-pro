@@ -5,11 +5,11 @@
     <div class="pain-header">
       <div class="eyebrow">El problema invisible</div>
       <h2 class="h-section pain-title">
-        Cada llamada perdida es <em>una clienta que no vuelve.</em>
+        Cada mensaje sin responder es <em>una cita que puede perderse.</em>
       </h2>
       <p class="pain-sub">
-        Mientras tú estás secando, cortando o tiñendo, el teléfono no para de sonar.
-        Instagram acumula mensajes. WhatsApp también. Y cuando puedes responder, ya es tarde.
+        Mientras trabajas, llegan preguntas sobre precios, horarios y huecos disponibles.
+        Lara responde y consulta tu calendario aunque tú no puedas mirar el móvil.
       </p>
     </div>
 
@@ -18,16 +18,16 @@
         <div class="pain-icon">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
         </div>
-        <h3>Llamadas que nadie coge</h3>
-        <p>Las clientas que no encuentran respuesta llaman al salón de al lado. Y normalmente, no vuelven.</p>
+        <h3>Mensajes fuera de horario</h3>
+        <p>El cliente puede preguntar por la noche o en festivo. Lara sigue disponible para atenderle.</p>
       </div>
 
       <div class="pain-card-up">
         <div class="pain-icon">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         </div>
-        <h3>Instagram sin responder</h3>
-        <p>Mensajes acumulándose mientras trabajas. Cada DM ignorado son entre €30 y €120 que se van con la competencia.</p>
+        <h3>Preguntas repetidas</h3>
+        <p>Precios, servicios y disponibilidad se responden sin que tengas que repetir lo mismo cada día.</p>
       </div>
 
       <div class="pain-card-up">
@@ -35,22 +35,22 @@
           <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
         <h3>Agenda hecha a mano</h3>
-        <p>Citas dobles, huecos vacíos, clientas que no avisan. El caos del cuaderno tiene un coste real al mes.</p>
+        <p>Lara consulta los huecos disponibles y deja la cita registrada en tu calendario.</p>
       </div>
     </div>
 
-    <!-- Calculadora ROI -->
+    <!-- Calculadora de escenario -->
     <div class="calc-wrap" id="calculadora">
       <div class="calc-header">
-        <div class="eyebrow">Calculadora real</div>
-        <h3 class="calc-h">¿Cuánto pierdes al año por no contestar?</h3>
-        <p class="calc-sub">Ajusta los valores. La cifra cambia en tiempo real.</p>
+        <div class="eyebrow">Calculadora orientativa</div>
+        <h3 class="calc-h">¿Qué valor podrían tener tus consultas sin responder?</h3>
+        <p class="calc-sub">Introduce tus propios datos. Es una estimación, no una promesa de resultados.</p>
       </div>
 
       <div class="calc-grid">
         <div class="calc-inputs">
           <div class="calc-field">
-            <label for="precio">Precio medio de una clienta</label>
+            <label for="precio">Importe medio de una cita</label>
             <div class="input-row">
               <input type="range" id="precio" min="20" max="120" step="5" value="40" />
               <div class="input-val"><span id="precio-val">40</span><span class="unit">€</span></div>
@@ -58,55 +58,43 @@
           </div>
 
           <div class="calc-field">
-            <label for="perdidas">Llamadas / mensajes sin responder al día</label>
+            <label for="perdidas">Mensajes sin responder al día</label>
             <div class="input-row">
-              <input type="range" id="perdidas" min="1" max="10" step="1" value="3" />
-              <div class="input-val"><span id="perdidas-val">3</span></div>
+              <input type="range" id="perdidas" min="0" max="10" step="1" value="1" />
+              <div class="input-val"><span id="perdidas-val">1</span></div>
             </div>
           </div>
 
           <div class="calc-field">
-            <label for="conversion">Cuántas se habrían convertido en cita (%)</label>
+            <label for="conversion">Porcentaje que podría acabar en cita</label>
             <div class="input-row">
-              <input type="range" id="conversion" min="20" max="80" step="5" value="50" />
-              <div class="input-val"><span id="conversion-val">50</span><span class="unit">%</span></div>
+              <input type="range" id="conversion" min="0" max="100" step="5" value="25" />
+              <div class="input-val"><span id="conversion-val">25</span><span class="unit">%</span></div>
             </div>
           </div>
 
           <div class="calc-field">
             <label for="dias">Días trabajados al mes</label>
             <div class="input-row">
-              <input type="range" id="dias" min="15" max="26" step="1" value="22" />
-              <div class="input-val"><span id="dias-val">22</span></div>
+              <input type="range" id="dias" min="1" max="31" step="1" value="20" />
+              <div class="input-val"><span id="dias-val">20</span></div>
             </div>
           </div>
         </div>
 
         <div class="calc-output">
-          <div class="output-label">Estás perdiendo cada año</div>
+          <div class="output-label">Valor anual estimado de esas consultas</div>
           <div class="output-num" id="output-num">
-            <span class="prefix">−</span><span id="loss">7.920</span><span class="unit-large">€</span>
+            <span id="loss">2.400</span><span class="unit-large">€</span>
           </div>
-          <div class="output-sub">Equivale a <strong id="citas-perdidas">198 citas</strong> que se fueron a la competencia.</div>
+          <div class="output-sub">El cálculo supone <strong id="citas-perdidas">60 posibles citas</strong> al año según los valores elegidos.</div>
 
           <div class="output-divider"></div>
 
-          <div class="output-roi">
-            <div class="roi-line">
-              <span class="roi-label">Recepcionista IA cuesta</span>
-              <span class="roi-val">348 €/año</span>
-            </div>
-            <div class="roi-line roi-result">
-              <span class="roi-label">Recuperas</span>
-              <span class="roi-val" id="recovered">+4.932 €</span>
-            </div>
-            <div class="roi-x">
-              ROI: <strong id="roi-x">×2,6</strong> tu inversión
-            </div>
-          </div>
+          <p class="output-sub">Nexux no garantiza que todos esos mensajes se conviertan en citas.</p>
 
           <a href="/paquetes/recepcionista" class="btn-primary calc-cta" data-track="calc_cta">
-            Quiero recuperar ese dinero
+            Ver qué incluye por 29 €
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -136,13 +124,7 @@
       document.getElementById('dias-val').textContent = dias;
 
       document.getElementById('loss').textContent = fmt(lossYear);
-      document.getElementById('citas-perdidas').textContent = fmt(citasMes * 12) + ' citas';
-
-      const cost = 348;
-      const recovered = lossYear - cost;
-      const roi = lossYear / cost;
-      document.getElementById('recovered').textContent = (recovered >= 0 ? '+' : '') + fmt(recovered) + ' €';
-      document.getElementById('roi-x').textContent = '×' + roi.toFixed(1).replace('.', ',');
+      document.getElementById('citas-perdidas').textContent = fmt(citasMes * 12) + ' posibles citas';
     }
 
     function attach() {
