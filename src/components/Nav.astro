@@ -9,24 +9,53 @@
     <nav class="nav-links" aria-label="Principal">
       <a href="/#como-funciona">Cómo funciona</a>
       <a href="/#calculadora">Calculadora</a>
-      <a href="/#paquetes">Paquetes</a>
+      <a href="/paquetes/recepcionista">Precio</a>
+      <a href="/demo">Demo</a>
       <a href="/blog">Blog</a>
     </nav>
-    <a href="#hablar" class="btn-primary nav-cta plausible-event-name=Click+Nav+CTA" data-track="nav_cta">
-      Habla con Lara
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-    </a>
+    <button class="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-mobile">
+      <span></span><span></span><span></span>
+    </button>
   </div>
+  <nav id="nav-mobile" class="nav-mobile" aria-label="Menú móvil" hidden>
+    <a href="/#como-funciona">Cómo funciona</a>
+    <a href="/#calculadora">Calculadora</a>
+    <a href="/paquetes/recepcionista">Precio</a>
+    <a href="/demo">Demo</a>
+    <a href="/blog">Blog</a>
+  </nav>
 </header>
+
+<script is:inline>
+  (function () {
+    var btn = document.querySelector('.nav-toggle');
+    var menu = document.getElementById('nav-mobile');
+    if (!btn || !menu) return;
+    function setOpen(open) {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.classList.toggle('is-open', open);
+      if (open) { menu.removeAttribute('hidden'); } else { menu.setAttribute('hidden', ''); }
+    }
+    btn.addEventListener('click', function () {
+      setOpen(btn.getAttribute('aria-expanded') !== 'true');
+    });
+    menu.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') setOpen(false);
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 768) setOpen(false);
+    });
+  })();
+</script>
 
 <style>
   .nav {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 50;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.94);
     border-bottom: 1px solid var(--nx-line);
   }
   .nav-inner {
@@ -46,14 +75,14 @@
     width: 28px; height: 28px;
     display: grid; place-items: center;
     background: var(--nx-magnet);
-    color: var(--nx-void);
+    color: #fff;
     border-radius: 6px;
     font-family: var(--nx-font-serif);
     font-style: italic;
     font-size: 1.15rem;
     line-height: 1;
   }
-  .brand-name { font-size: 1rem; }
+  .brand-name { font-size: 1rem; color: var(--nx-ink); }
   .brand-pro { color: var(--nx-magnet); font-weight: 500; }
 
   .nav-links {
@@ -65,12 +94,50 @@
   .nav-links a { transition: color 0.2s; }
   .nav-links a:hover { color: var(--nx-ink); }
 
-  .nav-cta {
-    padding: 0.5rem 1rem !important;
-    font-size: 0.85rem !important;
+  /* Botón hamburguesa — solo móvil */
+  .nav-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px; height: 40px;
+    padding: 0 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
   }
+  .nav-toggle span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: var(--nx-ink);
+    border-radius: 2px;
+    transition: transform 0.25s var(--nx-ease), opacity 0.2s;
+  }
+  .nav-toggle.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .nav-toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .nav-toggle:focus-visible { outline: 2px solid var(--nx-magnet); outline-offset: 2px; border-radius: 6px; }
+
+  .nav-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 1.25rem 1.25rem;
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid var(--nx-line);
+  }
+  .nav-mobile a {
+    padding: 0.75rem 0;
+    font-size: 1rem;
+    color: var(--nx-ink);
+    border-bottom: 1px solid var(--nx-line);
+  }
+  .nav-mobile a:last-child { border-bottom: none; }
 
   @media (min-width: 768px) {
     .nav-links { display: flex; }
+    .nav-toggle { display: none; }
+    .nav-mobile { display: none !important; }
   }
 </style>

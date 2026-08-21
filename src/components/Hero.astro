@@ -71,14 +71,12 @@
       </div>
 
       <div class="float-tag float-tag-1">
-        <span class="tag-emoji">📅</span>
         <div>
           <div class="tag-title">Cita agendada</div>
           <div class="tag-time">hace 3 segundos</div>
         </div>
       </div>
       <div class="float-tag float-tag-2">
-        <span class="tag-emoji">💚</span>
         <div>
           <div class="tag-title">+€42 facturados</div>
           <div class="tag-time">sin coger el teléfono</div>
@@ -312,7 +310,7 @@
     width: 36px; height: 36px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--nx-magnet), var(--nx-magnet-deep));
-    color: var(--nx-void);
+    color: #0B0D12;
     display: grid;
     place-items: center;
     font-family: var(--nx-font-serif);
@@ -324,12 +322,12 @@
   .chat-name {
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--nx-ink);
+    color: #F2F2EC;
     line-height: 1.2;
   }
   .chat-status {
     font-size: 0.7rem;
-    color: var(--nx-ink-muted);
+    color: rgba(242,242,236,0.65);
     display: flex;
     align-items: center;
     gap: 0.3rem;
@@ -341,7 +339,7 @@
     background: var(--nx-success);
     box-shadow: 0 0 6px var(--nx-success);
   }
-  .chat-actions { color: var(--nx-ink-muted); }
+  .chat-actions { color: rgba(242,242,236,0.65); }
 
   .chat-body {
     flex: 1;
@@ -366,14 +364,14 @@
   }
   .msg-user {
     background: linear-gradient(135deg, var(--nx-magnet), var(--nx-magnet-deep));
-    color: var(--nx-void);
+    color: #0B0D12;
     align-self: flex-end;
     border-bottom-right-radius: 4px;
     font-weight: 500;
   }
   .msg-bot {
-    background: rgba(255,255,255,0.06);
-    color: var(--nx-ink);
+    background: rgba(255,255,255,0.10);
+    color: #F2F2EC;
     align-self: flex-start;
     border-bottom-left-radius: 4px;
   }
@@ -403,8 +401,8 @@
 
   .chat-input {
     padding: 0.7rem 0.95rem;
-    border-top: 1px solid rgba(255,255,255,0.04);
-    color: var(--nx-ink-faint);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    color: rgba(242,242,236,0.45);
     font-size: 0.78rem;
   }
 
@@ -427,7 +425,6 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
   }
-  .tag-emoji { font-size: 1.2rem; }
   .tag-title {
     font-size: 0.78rem;
     color: var(--nx-ink);
