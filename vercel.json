@@ -18,5 +18,22 @@
       "source": "/stats/:match*",
       "destination": "https://umami.nexux.pro/:match*"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/paquetes/starter",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    },
+    {
+      "source": "/paquetes/pro",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    },
+    {
+      "source": "/paquetes/total",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    }
   ]
 }

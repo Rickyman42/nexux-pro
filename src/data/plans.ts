@@ -1,4 +1,4 @@
-export type PlanSlug = 'starter' | 'pro' | 'total';
+export type PlanSlug = 'recepcionista';
 
 export interface PlanFeature {
   icon: string;
@@ -23,172 +23,84 @@ export interface PlanData {
   faqs: PlanFaq[];
 }
 
+/** Precio de lanzamiento. Congelado de por vida para los primeros LAUNCH_SEATS clientes. */
+export const LAUNCH_PRICE = 29;
+export const REGULAR_PRICE = 35;
+export const LAUNCH_SEATS = 50;
+
 export const PLANS: Record<PlanSlug, PlanData> = {
-  starter: {
-    name: 'Starter',
-    price: 249,
-    sub: 'Para salones que empiezan a profesionalizarse',
-    stripe_url: 'https://buy.stripe.com/starter_placeholder',
+  recepcionista: {
+    name: 'Nexux Recepcionista IA',
+    price: LAUNCH_PRICE,
+    sub: 'Un precio. Todo incluido. Sin permanencia.',
+    stripe_url: 'https://buy.stripe.com/recepcionista_placeholder',
     color: '#4ECDC4',
+    badge: 'Precio de lanzamiento',
     for: [
-      'Salones unipersonales',
-      'Peluquerías que reciben muchos mensajes',
-      'Dueñas que trabajan solas y no dan abasto',
+      'Negocios que trabajan con cita previa',
+      'Quien pierde clientes por no llegar a contestar',
+      'Quien no quiere pagar comisiones por cada cliente nuevo',
     ],
     features: [
       {
         icon: '💬',
-        title: 'Lara responde por Telegram 24h',
-        detail: 'Tu asistente IA responde al instante, a cualquier hora. Telegram es la opción oficial, sin riesgo de bloqueos.',
+        title: 'Contesta por WhatsApp, Telegram o tu web',
+        detail: 'Responde al momento a cualquier hora, tambien de madrugada y en festivos. Tu eliges por donde te escriben tus clientes.',
       },
       {
         icon: '📅',
-        title: 'Agenda de citas integrada',
-        detail: 'Las citas van directas a tu Google Calendar. Tú solo apareces y trabajas.',
+        title: 'Reserva la cita el solo',
+        detail: 'Mira los huecos libres de tu calendario, propone el que encaja y apunta la cita. Sin solaparse y sin que tu toques nada.',
       },
       {
         icon: '⏰',
-        title: 'Recordatorios automáticos',
-        detail: 'Lara avisa a la clienta 24h y 1h antes. Los no-shows se reducen hasta un 60%.',
+        title: 'Recuerda la cita por ti',
+        detail: 'Avisa al cliente 24 horas y 1 hora antes. Las ausencias bajan y el hueco no se pierde.',
       },
       {
         icon: '📊',
-        title: 'Resumen diario al cierre',
-        detail: 'Cada día a las 21:00 recibes un resumen de citas por Telegram.',
+        title: 'Te cuenta el dia al cerrar',
+        detail: 'Cada tarde recibes un resumen de lo que ha pasado: citas nuevas, preguntas y lo que necesita tu atencion.',
       },
       {
-        icon: '🔢',
-        title: 'Hasta 300 conversaciones/mes',
-        detail: 'Suficiente para un salón con flujo constante.',
-      },
-    ],
-    faqs: [
-      {
-        q: '¿Necesito instalar algo?',
-        a: 'No. Nosotros lo configuramos todo. Tú solo tienes que escanear un QR con tu móvil la primera vez.',
+        icon: '🚫',
+        title: 'Sin comisiones y sin pagar por empleado',
+        detail: 'Lo que factures es tuyo entero. Da igual si sois uno o sois seis: el precio no se mueve.',
       },
       {
-        q: '¿Qué pasa si WhatsApp bloquea el número?',
-        a: 'Por eso recomendamos Telegram como primera opción: es oficial y sin riesgo. Si prefieres WhatsApp, te explicamos el riesgo antes de configurarlo.',
-      },
-      {
-        q: '¿Puedo cancelar cuando quiera?',
-        a: 'Sí. Sin permanencia, sin penalizaciones. Y tienes 30 días de garantía.',
-      },
-    ],
-  },
-  pro: {
-    name: 'Pro',
-    price: 449,
-    sub: 'Para salones con flujo constante de clientas',
-    stripe_url: 'https://buy.stripe.com/pro_placeholder',
-    badge: 'Más elegido',
-    color: '#4ECDC4',
-    for: [
-      'Salones con 1-3 empleadas',
-      'Tu teléfono suena mientras atiendes — Lara lo gestiona',
-      'Centros que quieren captar clientas nuevas online',
-    ],
-    features: [
-      { icon: '✅', title: 'Todo lo del Starter', detail: '' },
-      {
-        icon: '📱',
-        title: 'WhatsApp Business (Baileys)',
-        detail: 'Lara también responde por WhatsApp. Usa tu número actual — sin coste adicional.',
-      },
-      {
-        icon: '📞',
-        title: 'Llamada no contestada → WhatsApp en 3 segundos',
-        detail: 'Tu teléfono suena, estás con una clienta. Lara contesta en voz: "Te escribo por WhatsApp ahora mismo". Antes de que cuelguen, ya tienen la respuesta. Cero citas perdidas.',
-      },
-      {
-        icon: '🌐',
-        title: 'Mini-web con tus servicios y precios',
-        detail: 'Una página profesional en nexux.pro/salon/tu-salon con todos tus servicios, horario y botón de reserva.',
-      },
-      {
-        icon: '♾️',
-        title: 'Conversaciones ilimitadas',
-        detail: 'Sin tope mensual. Cuantas más clientas, mejor.',
-      },
-      {
-        icon: '📈',
-        title: 'Reporte mensual de ROI',
-        detail: 'El día 1 de cada mes recibes un email con: citas completadas, ingresos estimados, clientas nuevas vs recurrentes, servicio más popular.',
-      },
-      {
-        icon: '📣',
-        title: 'Captura de clientas nuevas',
-        detail: 'El equipo Nexux gestiona publicidad en redes para traerte clientas nuevas.',
+        icon: '⚡',
+        title: 'Listo en cinco minutos',
+        detail: 'No instalas nada ni te llama ningun comercial. Lo activas tu y el propio asistente se configura hablando contigo.',
       },
     ],
     faqs: [
       {
-        q: '¿Cómo funciona lo de las llamadas perdidas?',
-        a: 'Desvías las llamadas no contestadas al número Twilio que te asignamos automáticamente. Lara responde en voz con Polly Conchita y en paralelo le escribe por WhatsApp antes de que cuelguen. Tu clienta nunca se va a la competencia.',
+        q: 'Cuanto cuesta exactamente?',
+        a: 'Veintinueve euros al mes, todo incluido. No hay alta, ni configuracion aparte, ni coste por empleado, ni comision por cliente. Es el precio de lanzamiento: subira a 35 euros, pero si entras ahora te quedas en 29 mientras sigas de alta.',
       },
       {
-        q: '¿La mini-web sale en Google?',
-        a: 'Sí, está optimizada para SEO local. Tu salón aparece cuando alguien busca peluquería + tu ciudad.',
+        q: 'Me va a llamar un comercial?',
+        a: 'No. Lo contratas tu cuando quieras y lo cancelas igual. Si necesitas ayuda nos escribes y te responde una persona, pero nadie te va a llamar para venderte nada.',
       },
       {
-        q: '¿La publicidad la gestiona una IA?',
-        a: 'La estrategia y optimización la hace el equipo Nexux. Tú no tienes que hacer nada.',
-      },
-    ],
-  },
-  total: {
-    name: 'Total',
-    price: 749,
-    sub: 'Para cadenas o salones con varios profesionales',
-    stripe_url: 'https://buy.stripe.com/total_placeholder',
-    badge: 'Premium',
-    color: '#4ECDC4',
-    for: [
-      'Salones con 3+ empleadas',
-      'Centros con varias sedes',
-      'Dueñas que quieren delegar la captación al completo',
-    ],
-    features: [
-      { icon: '✅', title: 'Todo lo del Pro', detail: '' },
-      {
-        icon: '👥',
-        title: 'Multi-empleada',
-        detail: 'Cada profesional tiene su propio calendario. Lara asigna la cita a quien corresponde y cada una ve su agenda.',
+        q: 'Hay permanencia?',
+        a: 'No. Cancelas cuando quieras desde tu panel, sin penalizacion y sin dar explicaciones.',
       },
       {
-        icon: '📝',
-        title: 'Blog automático SEO',
-        detail: 'Cada mes se publica un artículo optimizado para Google con tu salón y ciudad. Posicionamiento local sin esfuerzo.',
+        q: 'Tengo que instalar algo?',
+        a: 'No. Se configura solo: en cuanto te das de alta, el asistente te escribe y te pregunta lo que necesita saber de tu negocio. En cinco minutos esta funcionando.',
       },
       {
-        icon: '🎯',
-        title: 'Campañas Meta Ads gestionadas',
-        detail: 'El equipo Nexux crea, gestiona y optimiza tus anuncios en Facebook e Instagram.',
+        q: 'Sirve para mi tipo de negocio?',
+        a: 'Si trabajas con cita previa, si. Lo usan peluquerias, centros de estetica, talleres, fisioterapeutas, clinicas, asesorias y veterinarios. El asistente aprende tus servicios, tus precios y tu horario.',
       },
       {
-        icon: '📊',
-        title: 'Analítica completa de clientas',
-        detail: 'Dashboard con retención, ticket medio, horas punta, servicios más rentables y evolución mensual.',
+        q: 'Y si me escriben mas de la cuenta?',
+        a: 'El precio incluye hasta 1.000 conversaciones al mes, que es mucho mas de lo que gasta un negocio normal. Si algun mes te pasas, te avisamos antes de cobrarte nada de mas.',
       },
       {
-        icon: '🤝',
-        title: 'Onboarding presencial',
-        detail: 'Un especialista de Nexux va a tu salón (Madrid/Barcelona) a configurarlo todo y formar a tu equipo.',
-      },
-    ],
-    faqs: [
-      {
-        q: '¿Cómo funciona el multi-empleada?',
-        a: 'Cada empleada tiene su Google Calendar vinculado. Cuando una clienta reserva, Lara le pregunta si tiene preferencia de profesional y asigna la cita en el calendario correcto.',
-      },
-      {
-        q: '¿El onboarding presencial tiene coste adicional?',
-        a: 'No. Está incluido en el plan Total. Solo disponible en Madrid y Barcelona.',
-      },
-      {
-        q: '¿Puedo empezar con Starter y subir a Total?',
-        a: 'Sí. El cambio es inmediato y solo pagas la diferencia del mes en curso.',
+        q: 'Puedo probarlo antes de pagar?',
+        a: 'Si. El primer mes es gratis y no pedimos tarjeta para empezar.',
       },
     ],
   },
