@@ -95,5 +95,7 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
   antiguos reescritos (`08859a5`).
 - Publicado: `robots.txt` distingue `OAI-SearchBot`, `GPTBot` y `ChatGPT-User` (`b9731ac`).
 - Publicado: `www.nexux.pro` redirige al dominio principal desde middleware (`3bf18c4`); compilación correcta.
-- Pendiente prioritario: comprobar la redirección en producción y unificación final de barras/canonicals.
+- Verificado en producción: `www` devuelve `308` a `https://nexux.pro/`; `robots.txt`, home, comparativa y
+  blog sirven el contenido nuevo el 21-ago-2026.
+- Pendiente prioritario: unificación final de barras/canonicals y nueva medición en Search Console.
 - No autorizado todavía: publicar, hacer push o desplegar cambios.
