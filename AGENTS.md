@@ -3,6 +3,7 @@
 > **Léeme entero antes de tocar nada.** Vale para cualquier agente: Claude Code, Codex, OpenCode, Qwen, ZCODE.
 > Ley general de Nexux: `~/nexus-brain/AGENTS.md` en la Pi. Este archivo NO la repite: solo añade lo propio de nexux.pro.
 > Si hay conflicto, manda la ley general. Estado del proyecto: `~/nexus-brain/nexux-live-state.md`.
+> Historial de trabajo de este repo: `progress/REGISTRO.md` (léete las últimas 20 líneas).
 > ⛔ nexux.pro (SaaS B2B) es INDEPENDIENTE de nexux.es (app de citas B2C). No mezclar código, DB, bots ni tokens.
 
 ---
@@ -16,16 +17,16 @@ nexux.pro dejó de ser «software de gestión para peluquerías». Ahora es un *
 
 - **Marca:** Nexux. **Producto:** Recepcionista IA. **Asistente:** Lara. No inventar nombres nuevos.
 - **Cliente:** cualquier negocio que trabaje con cita previa. NO se verticaliza el producto; sí las páginas.
-- **Precio:** 29 € de lanzamiento, congelado de por vida para los primeros 50. Regular 35 €.
+- **Precio:** 29 € de lanzamiento (sube a 35 €; quien entra ahora se queda en 29 mientras siga de alta).
   Parámetros en `src/data/plans.ts` (`LAUNCH_PRICE`, `REGULAR_PRICE`, `LAUNCH_SEATS`).
+- **NO hay prueba gratuita.** Se paga desde el día 1, con **garantía de devolución de 30 días**
+  (decisión de Ricardo, 21-ago). Al cancelar, el mes en curso queda pagado y no se cobra el siguiente.
 - **Posicionamiento (estilo O2):** un precio, sin permanencia, sin comerciales, sin comisiones.
   «Cercanía» significa **trato**, no geografía: tecnología de las grandes para el negocio pequeño.
-- **Venta 100 % autoservicio.** Nadie llama a nadie. El alta ya es automática de punta a punta:
-  pago Stripe → webhook → se crea el cliente → email de bienvenida → **Lara configura el negocio hablando
-  con el dueño**. Ver `lib/stripe-webhook.js` y `lib/onboarding.js` en `~/nexux-clients`.
-- **Canal de captación:** SEO + visibilidad en buscadores de IA. **Sin email frío** (ver §3).
-- **Objetivo de la fase actual:** 10 negocios usándolo de verdad y 3 casos con cifras publicables.
-  Si a los dos meses no hay 3 pagando, el problema es el canal — se para y se replantea el canal, no el producto.
+- **Venta 100 % autoservicio.** Nadie llama a nadie.
+- **Canal:** SEO + visibilidad en buscadores de IA. **Sin email frío** (ver §3).
+- **Objetivo de fase:** 10 negocios usándolo y 3 casos con cifras publicables.
+  Si a los dos meses no hay 3 pagando, el problema es el canal — se para y se replantea el canal.
 
 ---
 
@@ -34,80 +35,134 @@ nexux.pro dejó de ser «software de gestión para peluquerías». Ahora es un *
 > «No tengo prisa y al revés, la prisa es peor. Lo que se haga se hace bien, contrastado, con datos y
 > medidos. Y lo que funciona AHORA, no lo de hace 10 años. Si no, no se hace nada.»
 
-Traducido a reglas que se cumplen o no se cumplen:
-
 1. **Ninguna táctica sin dato que la sostenga.** Si no hay dato, se dice «no verificado» y NO se ejecuta.
-   Entregar nada es una salida aceptable. Entregar sobre suposición, no.
 2. **Nada de buenas prácticas de memoria.** Contrastar contra fuentes del año en curso antes de proponer.
-   Vale especialmente para SEO: cambió de raíz (AI Overviews, señales de Google Business Profile, reseñas).
-3. **Medir en la capa real:** producción, navegador de verdad, y **control positivo** cuando se mide un
-   buscador. Un cero sin control positivo no distingue «no salgo» de «me están bloqueando».
+   Vale especialmente para SEO, que cambió de raíz (AI Overviews, señales de GBP, reseñas).
+3. **Medir en la capa real:** producción, navegador de verdad, y **control positivo** al medir un buscador.
 4. **Decir qué NO se ha podido medir.** Con esas palabras. No rellenar huecos a ojo.
-5. **Verificar lo que EJECUTA, no lo que documenta.** Que una norma esté escrita no prueba que se aplique.
-   Precedente: este mismo archivo mandaba escribir en `progress/` desde mayo y la carpeta no existía.
+5. **Verificar lo que EJECUTA, no lo que documenta.** Tres precedentes reales en este repo, en §7.
 
 ---
 
 ## 3. DESCARTADO — NO REPROPONER
 
-Cada línea costó tiempo o dinero. Si crees que hay que reabrir alguna, trae un dato nuevo, no una opinión.
+Cada línea costó tiempo o dinero, o la descartó un dato. Reabrirlas exige un dato nuevo, no una opinión.
 
 | Descartado | Por qué | Fecha |
 |---|---|---|
 | **Email en frío** | 86 leads, 31 rebotes (36 %), 0 respuestas, 0 €. Decisión de Ricardo | 19-ago-2026 |
-| **Páginas «producto + ciudad»** (recepcionista IA en Móstoles…) | Ningún competidor lo hace, y Google las trata como *doorway pages* si comparten ~95 % del texto | 21-ago-2026 |
-| **Atacar «alternativa a Booksy»** | Sin señal de demanda en el autocompletado de Google | 21-ago-2026 |
-| **Atacar «centralita virtual»** | Es la palabra con volumen, pero es TELEFONÍA. Sin voz, atrae tráfico que rebota | 21-ago-2026 |
-| **Planes 249/449/749 €** | Nunca validados: 0 cobros en Stripe. El mercado ancla en 29-48 € | 21-ago-2026 |
-| **Vender por teléfono / comerciales** | A 29 €/mes el coste de venta se come el margen de un año | 21-ago-2026 |
+| **Páginas «producto + ciudad»** | Ningún competidor lo hace, y Google las trata como *doorway* si comparten ~95 % del texto | 21-ago |
+| **Keywords largas de canal o problema** | «recepcionista ia whatsapp», «chatbot citas», «alternativa a booksy», «no perder llamadas», «software citas peluqueria», «agenda citas whatsapp», «bot whatsapp empresa» — **todas medidas a 0-10 búsquedas/mes** en Google Ads | 21-ago |
+| **«Centralita virtual»** | Tiene volumen pero es TELEFONÍA. Sin voz atraería tráfico que rebota | 21-ago |
+| **Planes 249/449/749 €** | Nunca validados: 0 cobros en Stripe. El mercado ancla en 29-48 € | 21-ago |
+| **Prueba gratuita de 7 días** | Sustituida por garantía de 30 días. La demo ya hace de prueba sin registro | 21-ago |
+| **Vender por teléfono o comerciales** | A 29 €/mes el coste de venta se come el margen de un año | 21-ago |
 
 **Pendiente de decidir, no descartado:** la voz (llamadas). Hoy solo existe llamada perdida → mensaje
-grabado → WhatsApp (`lib/twilio.js`). NO hay conversación de voz. **No prometerla en la web.**
+grabado → WhatsApp (`lib/twilio.js` en nexux-clients). NO hay conversación de voz. **No prometerla.**
 
 ---
 
-## 4. ARQUITECTURA
+## 4. ESTADO REAL — QUÉ ESTÁ HECHO Y QUÉ NO
+
+### ✅ Hecho y verificado en producción (21-ago-2026)
+
+| Qué | Dónde | Evidencia |
+|---|---|---|
+| Producto y precio únicos | `src/data/plans.ts` | slug `recepcionista`, 29 € |
+| Precio real en Stripe (cuenta **live**) | Stripe | `prod_V6xlRvLwrMTEJF` · `price_1U6jqd2SQwDzHtsFf3wEcuQe` |
+| **Checkout funcionando** | `api/stripe/create-session.js` | iframe de Stripe carga, 29 €, pide teléfono |
+| Guion de venta de Lara | `nexux-clients/lib/bot-prompt-lara.js` | probado en vivo: dice 29 €, no promete llamadas ni Instagram |
+| Lara en la ficha de producto | `src/pages/paquetes/[plan].astro` | widget presente; `data-open-lara` abre el chat |
+| Tema claro | `src/styles/global.css` | tokens invertidos; nav, ficha y mockup corregidos |
+| Menú hamburguesa móvil | `src/components/Nav.astro` | no existía; ahora abre con 5 enlaces |
+| Bloque de precio único + agenda | `src/components/Pricing.astro` | tarjeta partida: oferta + 7 citas de ejemplo |
+| Redirects de rutas muertas | `vercel.json` | 6 × 301 (starter/pro/total, prueba-gratis, oferta, promo) |
+| Calculadora con precio correcto | `src/components/Pain.astro` | 348 €/año (antes 2.988) |
+
+### ❌ NO hecho — y por qué importa
+
+| Qué falta | Impacto | Dónde |
+|---|---|---|
+| **Schema JSON-LD sin actualizar** | Google y las IAs leen **249/449/749 €** y FAQs de peluquerías. Es lo que declara el producto de forma estructurada | `src/layouts/Layout.astro` (bloque `application/ld+json`) |
+| **`llms.txt` sin actualizar** | Sigue diciendo «Software de Gestión con IA para Peluquerías» | `public/llms.txt` |
+| **Copy de secciones enteras** | `HowItWorks` promete «hablamos contigo 20 minutos» y «configuramos Lara por ti» — **falso**, el alta es autoservicio. `Pain`, `Proof` y `Testimonials` siguen en clave peluquería | `src/components/` |
+| **Enlaces de ciudades en la home** | Madrid/Barcelona/Valencia… es SEO de hace 10 años y contradice §3 | `src/pages/index.astro` |
+| Ficha de Google Business Profile | Un tercio del ranking local | — |
+| Bing Webmaster Tools | Bing sirve nexux.pro (verificado), pero falta el recuento real de indexación | — |
+| Baseline en buscadores de IA | Sin punto de partida no hay progreso medible | — |
+| Demo enlazada desde la home | Es el mejor argumento de venta y solo cuelga de páginas sueltas | `src/components/Hero.astro` ya enlaza; falta sección propia |
+
+---
+
+## 5. ARQUITECTURA — DÓNDE VIVE CADA COSA
 
 | Componente | Path | Deploy |
 |---|---|---|
 | Landing + portal | `~/nexux-pro/` | Vercel (push a main despliega) |
-| API de clientes | `~/nexux-clients/` | Pi :3460 (PM2: nexux-clients) |
+| **Funciones de pago y leads** | `~/nexux-pro/api/` | **Vercel serverless — ver aviso abajo** |
+| API de clientes / Lara / provisioning | `~/nexux-clients/` | Pi :3460 (PM2: nexux-clients) |
 | Servidor de leads | `~/nexux-pro/leads-server.cjs` | Pi (PM2: nexux-pro-leads) |
 | Dashboard Mint | `~/nexux-pro/mint-dashboard/` | Pi :3700 (PM2: mint-dashboard) |
 | Clientes | `~/nexux-clients/clients/<id>/config.json` | — |
 
+> 🔴 **AVISO QUE COSTÓ UNA SESIÓN ENTERA.** La carpeta `api/` de la raíz son **funciones serverless de
+> Vercel** y **ganan sobre los rewrites de `vercel.json`**. `/api/stripe/create-session` NO llega a la Pi:
+> lo sirve `api/stripe/create-session.js`. Hay lógica **duplicada** entre esa carpeta y `~/nexux-clients`.
+> Si cambias precios o planes, **hay que cambiarlo en los dos sitios** o el pago sigue con datos viejos.
+> Comprueba siempre qué responde de verdad: `curl -sD- https://nexux.pro/api/...` — si el header dice
+> `Server: Vercel`, no lo sirve la Pi.
+
 ---
 
-## 5. REGLAS DE CÓDIGO
+## 6. REGLAS DE CÓDIGO
 
 | Regla | Detalle |
 |---|---|
 | pnpm siempre | `pnpm add`, nunca `npm install` |
 | Pull antes de editar | `git -C ~/nexux-pro pull origin main` |
 | Vercel SSR | `prerender=false` en páginas dinámicas del portal |
-| Stripe | no duplicar sessions; comprobar con `stripe-setup.js` |
-| Portal auth | middleware en `src/middleware/auth.ts` — no bypassear |
+| Stripe | precio y producto ya creados; no duplicar |
+| Portal auth | middleware en `src/middleware.ts` — no bypassear |
 | owner_email | obligatorio en el config.json del cliente; sin él no salen los emails de ciclo de vida |
 | Rutas que desaparecen | **redirect 301 obligatorio**. Comprobar antes con `curl -o /dev/null -w '%{http_code}'` |
 | Copias .bak | van a `.gitignore`, no al repo |
+| Editar por SSH | los heredoc con `${...}` los expande bash. Escribe el script en local y pásalo por `ssh 'python3 -' < script.py`, o sube el fichero con `scp` |
 
-**Antes de commit:** `pnpm build` completo sin errores · sin claves de Stripe en el frontend ·
-`owner_email` presente donde toque · redirects puestos si una URL deja de existir.
+**Antes de commit:** `pnpm build` completo · sin claves de Stripe en el frontend · redirects puestos.
 
-**Antes de decir «hecho»** — obligatorio, sin excepción:
+**Antes de decir «hecho»** — obligatorio:
 
 ```bash
 export NEXUX_AGENT=<tu-nombre>
 python3 ~/scripts/nexux-verify.py gitclean:/home/nexux/nexux-pro syntax:<archivo> url:<url>
 ```
 
-Si devuelve FALLO, **no está hecho**: no se le dice a Ricardo y no se escribe OK en ningún registro.
+Si devuelve FALLO, **no está hecho**. (El verificador no valida `.css` ni `.astro`: para eso, `pnpm build`.)
 
 **NO se hace push sin OK de Ricardo**, salvo que diga «deploy».
 
 ---
 
-## 6. REGISTRO DE TRABAJO — OBLIGATORIO
+## 7. TRAMPAS YA PISADAS — no repetirlas
+
+1. **La carpeta `api/` de Vercel gana sobre la Pi.** Arreglé el backend entero y el checkout seguía roto
+   porque el pago lo servía otro archivo. Ver §5.
+2. **Astro no aplica estilos a elementos creados por JavaScript.** Las burbujas del chat del hero nacen
+   sin el atributo de ámbito, así que ninguna regla con scope les llegaba. Se resolvió con `:global()`.
+3. **El CDN de Vercel cachea el HTML unos minutos.** Verifica con `?cb=$(date +%s)` o leerás el título
+   viejo y parecerá que el deploy falló.
+4. **Las memorias envejecen.** Una nota antigua decía que `ui_mode` debía ser `embedded`; Stripe responde
+   hoy que `embedded` está retirado y hay que usar `embedded_page`. Lee el error del proveedor.
+5. **Hay dos listas blancas de planes** en `nexux-clients/provision-http.js` (líneas ~230 y ~942).
+   Cambiar solo una deja el pago roto con un `invalid_plan` que no explica nada.
+6. **`nexux-clients` NO tiene control de versiones propio** (es el repo de `/home/nexux`, con el que está
+   prohibido hacer pull/rebase). Los cambios ahí solo tienen copias `*.PREPIVOTE-20260821` en disco.
+   **Antes de tocar un archivo de ese repo, haz una copia con fecha.**
+
+---
+
+## 8. REGISTRO DE TRABAJO — OBLIGATORIO
 
 Al terminar una tarea, **una línea** al final de `progress/REGISTRO.md`:
 
@@ -118,15 +173,15 @@ YYYY-MM-DD | agente | qué se hizo | commit o evidencia | OK|PARCIAL|FALLO
 Si es PARCIAL o FALLO, la línea siguiente lleva exactamente `  causa: <texto>` (dos espacios delante),
 o el escáner de kaizen no la ve y el fallo nunca se corrige.
 
-Ese registro es el índice local del repo. La evidencia completa va además al ledger general
-(`~/nexus-brain/quality-ledger.md`) y el estado a `nexux-update-brain.py`, como manda la ley general.
-No se duplica el contenido: aquí una línea, allí la evidencia.
+La evidencia completa va además al ledger general (`~/nexus-brain/quality-ledger.md`) y el estado a
+`nexux-update-brain.py`. No se duplica el contenido: aquí una línea, allí la evidencia.
 
 ---
 
-## 7. AL ENTRAR AL PROYECTO
+## 9. AL ENTRAR AL PROYECTO
 
 1. Leer este archivo entero.
-2. Leer `~/nexus-brain/nexux-live-state.md` (estado real) y las últimas 15 líneas de `progress/REGISTRO.md`.
-3. `git -C ~/nexux-pro pull origin main` y `git log --oneline -10`.
+2. Leer `~/nexus-brain/nexux-live-state.md` y las últimas 20 líneas de `progress/REGISTRO.md`.
+3. `git -C ~/nexux-pro pull origin main` y `git log --oneline -15`.
 4. Comprobar §3 antes de proponer nada: si tu idea está ahí, ya se descartó y por qué.
+5. Comprobar §4 para saber qué falta de verdad, y §7 para no repetir trampas ya pisadas.
