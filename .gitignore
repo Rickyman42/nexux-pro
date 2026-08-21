@@ -8,3 +8,7 @@ leads.jsonl
 .env.*
 !.env.example
 .vercel
+
+# copias de seguridad locales de ediciones puntuales
+*.bak-*
+*.bak
