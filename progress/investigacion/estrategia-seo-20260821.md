@@ -90,6 +90,9 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
 
 - Hecho anteriormente: keyword en title/H1/meta, precio de 29 €, schema base, `llms.txt` y retirada de
   páginas de ciudades.
-- En progreso local: limpieza de la home y schema en `codex/seo-truth`; compilación correcta, aún sin publicar.
-- Pendiente prioritario: contenido antiguo y coherencia técnica de la fase 1.
+- Publicado: limpieza de la home, schema e imagen social (`fc9334f`).
+- Publicado: sitemap sin `/acceso-denegado/`, página de acceso con `noindex` y artículos/comparativa
+  antiguos reescritos (`08859a5`).
+- Publicado: `robots.txt` distingue `OAI-SearchBot`, `GPTBot` y `ChatGPT-User` (`b9731ac`).
+- Pendiente prioritario: redirección `www` → dominio principal y unificación final de barras/canonicals.
 - No autorizado todavía: publicar, hacer push o desplegar cambios.
