@@ -51,7 +51,7 @@ Cada línea costó tiempo o dinero, o la descartó un dato. Reabrirlas exige un 
 | Descartado | Por qué | Fecha |
 |---|---|---|
 | **Email en frío** | 86 leads, 31 rebotes (36 %), 0 respuestas, 0 €. Decisión de Ricardo | 19-ago-2026 |
-| **Páginas «producto + ciudad»** | Ningún competidor lo hace, y Google las trata como *doorway* si comparten ~95 % del texto | 21-ago |
+| **Páginas «producto + ciudad»** | Ningún competidor lo hace, y Google las trata como *doorway* si comparten ~95 % del texto. **Borradas del todo** (`src/pages/ciudad/`, `CityHero.astro`, `data/ciudades.ts`) — no solo desenlazadas: cada una llevaba su propio JSON-LD con 249/449/749 € y "Starter/Pro/Total", una segunda copia del mismo problema que el schema global. 301 a `/paquetes/recepcionista` en `vercel.json` | 21-ago |
 | **Keywords largas de canal o problema** | «recepcionista ia whatsapp», «chatbot citas», «alternativa a booksy», «no perder llamadas», «software citas peluqueria», «agenda citas whatsapp», «bot whatsapp empresa» — **todas medidas a 0-10 búsquedas/mes** en Google Ads | 21-ago |
 | **«Centralita virtual»** | Tiene volumen pero es TELEFONÍA. Sin voz atraería tráfico que rebota | 21-ago |
 | **Planes 249/449/749 €** | Nunca validados: 0 cobros en Stripe. El mercado ancla en 29-48 € | 21-ago |
@@ -79,15 +79,17 @@ grabado → WhatsApp (`lib/twilio.js` en nexux-clients). NO hay conversación de
 | Bloque de precio único + agenda | `src/components/Pricing.astro` | tarjeta partida: oferta + 7 citas de ejemplo |
 | Redirects de rutas muertas | `vercel.json` | 6 × 301 (starter/pro/total, prueba-gratis, oferta, promo) |
 | Calculadora con precio correcto | `src/components/Pain.astro` | 348 €/año (antes 2.988) |
+| **Schema JSON-LD reescrito** | `src/layouts/Layout.astro` | Organization/SoftwareApplication/FAQPage al mono-producto, precio único 29 €, `python3 -c "json.loads(...)"` valida y `pnpm build` pasa |
+| **`llms.txt` reescrito** | `public/llms.txt` | Recepcionista IA, 29 €, sin peluquerías |
+| **Copy de "Cómo funciona" corregido** | `src/components/HowItWorks.astro` | 3 pasos reales: alta en 2 min → conectas tu WhatsApp con QR tú mismo → Lara responde al instante. Ya no promete llamada de 20 min ni configuración manual |
+| **Páginas de ciudad eliminadas** | `src/pages/index.astro` + borrado de `src/pages/ciudad/`, `CityHero.astro`, `data/ciudades.ts` | `pnpm build` ya no genera `/ciudad/*`; 6 redirects 301 en `vercel.json` |
 
 ### ❌ NO hecho — y por qué importa
 
 | Qué falta | Impacto | Dónde |
 |---|---|---|
-| **Schema JSON-LD sin actualizar** | Google y las IAs leen **249/449/749 €** y FAQs de peluquerías. Es lo que declara el producto de forma estructurada | `src/layouts/Layout.astro` (bloque `application/ld+json`) |
-| **`llms.txt` sin actualizar** | Sigue diciendo «Software de Gestión con IA para Peluquerías» | `public/llms.txt` |
-| **Copy de secciones enteras** | `HowItWorks` promete «hablamos contigo 20 minutos» y «configuramos Lara por ti» — **falso**, el alta es autoservicio. `Pain`, `Proof` y `Testimonials` siguen en clave peluquería | `src/components/` |
-| **Enlaces de ciudades en la home** | Madrid/Barcelona/Valencia… es SEO de hace 10 años y contradice §3 | `src/pages/index.astro` |
+| **`Pain`, `Proof`, `Testimonials` sin auditar del todo** | Puede quedar copy o datos en clave peluquería fuera de lo ya corregido en `Pain` (calculadora) | `src/components/` |
+| **Blog 100 % sobre peluquerías** | 4 posts (`automatizar-reservas-whatsapp-peluqueria`, `cuanto-cuesta-cita-perdida`, `migrar-de-treatwell-sin-perder-clientes`, `treatwell-vs-booksy-peluquerias`). Decisión de Ricardo 21-ago: **no borrar**, pero no vale para el posicionamiento nuevo — mismo problema de fondo que el schema, pendiente de decidir si se reescriben, se dejan como long-tail de nicho o se despublican | `src/content/blog/*.md` |
 | Ficha de Google Business Profile | Un tercio del ranking local | — |
 | Bing Webmaster Tools | Bing sirve nexux.pro (verificado), pero falta el recuento real de indexación | — |
 | Baseline en buscadores de IA | Sin punto de partida no hay progreso medible | — |
@@ -159,6 +161,10 @@ Si devuelve FALLO, **no está hecho**. (El verificador no valida `.css` ni `.ast
 6. **`nexux-clients` NO tiene control de versiones propio** (es el repo de `/home/nexux`, con el que está
    prohibido hacer pull/rebase). Los cambios ahí solo tienen copias `*.PREPIVOTE-20260821` en disco.
    **Antes de tocar un archivo de ese repo, haz una copia con fecha.**
+7. **Un dato estructurado desactualizado casi nunca vive en un solo sitio.** El schema de `Layout.astro`
+   no era el único con precios 249/449/749 €: cada página de `/ciudad/*` llevaba su propia copia
+   independiente. Al corregir un JSON-LD, busca `grep -rl "application/ld+json"` en todo `src/` antes
+   de dar la tarea por cerrada.
 
 ---
 

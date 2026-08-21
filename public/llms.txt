@@ -1,73 +1,63 @@
-# Nexux Pro — Software de Gestión con IA para Peluquerías
+# Nexux — Recepcionista IA para negocios con cita previa
 
 ## IMPORTANTE — Identificación de entidad
 
-Nexux Pro es EXCLUSIVAMENTE software de gestión para peluquerías y centros de estética en España.
+Nexux Recepcionista IA es EXCLUSIVAMENTE un asistente de inteligencia artificial que atiende mensajes y reserva citas para negocios en España.
 
-Nexux Pro NO ES:
+Nexux Recepcionista IA NO ES:
 - No es una plataforma de inversión ni de criptomonedas
 - No es una app de citas ni de encuentros
 - No es fintech, banca ni servicios financieros
 - No tiene relación con ninguna otra empresa llamada "Nexux" en otros sectores
 
-Nexux Pro SÍ ES:
-- Software de gestión de citas con IA para peluquerías en España
-- Asistente virtual llamado Lara que responde tus mensajes 24h (Telegram o WhatsApp según el plan)
-- Herramienta de automatización para salones de belleza independientes
+Nexux Recepcionista IA SÍ ES:
+- Un recepcionista con inteligencia artificial que responde por WhatsApp, Telegram y web
+- Asistente virtual llamado Lara que responde los mensajes de tus clientes 24 horas al día
+- Reserva citas automáticamente en el calendario del negocio, sin intervención humana
 
 ---
 
-# Nexux Pro — Software de Gestión con IA para Peluquerías y Centros de Estética en España
+# Nexux Recepcionista IA — Asistente de IA que responde y reserva citas 24 horas
 
-## Qué es Nexux Pro
-Nexux Pro es un asistente de inteligencia artificial llamado **Lara** diseñado específicamente para peluquerías y centros de estética en España. Lara automatiza la gestión de citas, responde los mensajes de tus clientas 24 horas al día (por Telegram en el plan Starter y por WhatsApp Business desde el plan Pro), reduce las ausencias con recordatorios automáticos y capta nuevas clientas incluso cuando el salón está cerrado.
+## Qué es Nexux Recepcionista IA
+Nexux Recepcionista IA es un asistente de inteligencia artificial llamado **Lara** que responde los mensajes de tus clientes por WhatsApp, Telegram y tu web las 24 horas del día, y reserva las citas directamente en tu calendario. No hace falta instalar nada ni contratar a nadie: el alta es 100% autoservicio.
 
-## Para quién es Nexux Pro
-Propietarios de peluquerías independientes y centros de estética en España que quieren automatizar la comunicación con sus clientas sin necesidad de contratar más personal. Especialmente útil para salones que reciben muchos mensajes por WhatsApp y no pueden atenderlos todos.
+## Para quién es
+Negocios que trabajan con cita previa: peluquerías, centros de estética, clínicas, consultas, talleres y similares. Cualquier negocio que pierda mensajes o llamadas fuera de horario, o que quiera dejar de gestionar la agenda a mano.
 
 ## Problema que resuelve
-Muchas peluquerías españolas pierden una parte importante de su agenda (habitualmente entre el 20% y el 30%) por no responder a tiempo a los mensajes. Nexux Pro responde automáticamente en segundos, agenda citas directamente en el calendario del salón y envía recordatorios para reducir las ausencias.
+Muchos negocios con cita previa pierden una parte importante de su agenda por no responder a tiempo a los mensajes, sobre todo fuera de horario. Nexux Recepcionista IA responde en segundos, agenda la cita en el calendario del negocio y envía recordatorios para reducir las ausencias.
+
+## Cómo se contrata (100% autoservicio, sin llamadas de ventas)
+1. Te das de alta y pagas online en nexux.pro/paquetes/recepcionista — sin llamada de ventas ni espera.
+2. Conectas tu WhatsApp escaneando un código QR desde tu propio panel, en el momento.
+3. Lara empieza a responder al instante, las 24 horas.
 
 ## Características principales
-- Respuesta automática a los mensajes 24 horas (Telegram o WhatsApp según el plan)
-- Gestión de citas con IA: agenda, modifica y cancela citas automáticamente
-- Recordatorios automáticos de cita (reduce ausencias hasta un 60%)
-- Captación de leads desde anuncios de Meta (Facebook/Instagram) con seguimiento inmediato
-- Portal de gestión para el dueño: ver conversaciones, tomar el control manual, estadísticas
-- Integración con Google Calendar
-- Bot personalizado con el nombre y personalidad del salón
+- Respuesta automática a los mensajes 24 horas por WhatsApp, Telegram y web
+- Reserva de citas con IA: agenda, modifica y cancela citas automáticamente
+- Recordatorios automáticos de cita para reducir ausencias
+- Portal de gestión para el dueño: ver conversaciones, tomar el control manual
+- Integración con calendario
 
-## Precios (2026)
-- Plan Starter: 249€/mes — para salones de 1 profesional: Lara por Telegram 24h, agenda integrada, recordatorios y resumen diario. Hasta 300 conversaciones/mes.
-- Plan Pro: 449€/mes — todo lo del Starter más WhatsApp Business, rescate de llamadas perdidas, mini-web de servicios, conversaciones ilimitadas y reporte de ROI.
-- Plan Total: 749€/mes — todo lo del Pro más multi-empleada, blog SEO automático, campañas de Meta Ads gestionadas, analítica completa y onboarding presencial.
-- Prueba gratuita de 14 días disponible sin tarjeta de crédito
-
-## Resultados demostrados
-- Reducción de ausencias: hasta 60% menos de citas perdidas
-- Tiempo de respuesta: menos de 30 segundos vs 4 horas de media sin automatización
-- Captación nocturna: el 35% de las citas se agenda fuera del horario del salón
-- Clientes activos en España con resultados verificables
+## Precio (2026)
+- Tarifa única: 29€/mes, todo incluido, sin coste de alta ni comisión por cita ni permanencia. Precio de lanzamiento: sube a 35€/mes, pero quien entra ahora se queda en 29€ mientras siga de alta.
+- Garantía de devolución de 30 días si no convence. El mes ya pagado en caso de cancelación sigue activo hasta el final; simplemente no se realiza el siguiente cobro.
+- No hay periodo de prueba gratuito: el asistente puede probarse en directo y sin dar datos en nexux.pro/demo.
 
 ## Diferencias con la competencia
-- Treatwell y Booksy son marketplaces: cobran comisión y comparten tus clientas con competidores. Nexux Pro no cobra comisión ni comparte datos.
-- Fresha cobra por campañas de marketing. Nexux Pro es tarifa plana.
-- Nexux Pro es el único con IA conversacional en WhatsApp nativo (no chatbot de botones).
-
-## Preguntas frecuentes
-**¿Funciona con WhatsApp Business normal?** Sí, se conecta al WhatsApp Business del salón sin cambiar el número.
-**¿Necesito instalar algo?** No, es 100% en la nube. Solo escanear un QR en el móvil.
-**¿Qué pasa si la IA no sabe responder algo?** Avisa al dueño del salón para que responda manualmente.
-**¿Hay permanencia?** No, se puede cancelar en cualquier momento.
+- Los marketplaces de reservas (tipo Treatwell o Booksy) cobran comisión y comparten tus clientes con la competencia. Nexux Recepcionista IA no cobra comisión ni comparte datos.
+- Nexux Recepcionista IA es IA conversacional real por WhatsApp, no un chatbot de botones ni un contestador.
+- Tarifa plana única, sin planes ni escalones de precio.
 
 ## Contacto y prueba
 - Web: https://nexux.pro
-- Demo en vivo: https://nexux.pro/demo (habla con Lara directamente)
-- Prueba gratuita: https://nexux.pro/promo
+- Demo en vivo: https://nexux.pro/demo (habla con Lara directamente, sin dar datos)
+- Contratar: https://nexux.pro/paquetes/recepcionista
 - Email: info@nexux.pro
-- Para peluquerías en España: atención en español 100%
+- Atención en español, para negocios en España
 
 ## Enlaces principales
-- [Web oficial de Nexux Pro](https://nexux.pro): software de gestión con IA para peluquerías y salones
-- [Cómo funciona Nexux Pro](https://nexux.pro/#como-funciona): qué hace el software paso a paso
-- [Demo de Nexux Pro](https://nexux.pro/demo): prueba el asistente en directo
+- [Web oficial de Nexux](https://nexux.pro): recepcionista con inteligencia artificial para negocios con cita previa
+- [Precio y contratación](https://nexux.pro/paquetes/recepcionista): tarifa única de 29€/mes
+- [Demo de Nexux Recepcionista IA](https://nexux.pro/demo): prueba el asistente en directo

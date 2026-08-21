@@ -49,6 +49,36 @@
       "source": "/promo",
       "destination": "/paquetes/recepcionista",
       "permanent": true
+    },
+    {
+      "source": "/ciudad/madrid",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    },
+    {
+      "source": "/ciudad/barcelona",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    },
+    {
+      "source": "/ciudad/valencia",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    },
+    {
+      "source": "/ciudad/sevilla",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    },
+    {
+      "source": "/ciudad/bilbao",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
+    },
+    {
+      "source": "/ciudad/zaragoza",
+      "destination": "/paquetes/recepcionista",
+      "permanent": true
     }
   ]
 }

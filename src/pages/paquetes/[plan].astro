@@ -15,7 +15,7 @@ export function getStaticPaths() {
 
 const { slug, plan } = Astro.props as { slug: PlanSlug; plan: PlanData };
 const canonical = `https://nexux.pro/paquetes/${slug}`;
-const title = `${plan.name} | Nexux Pro`;
+const title = `${plan.name} | Nexux`;
 const description = `${plan.name}: ${plan.sub}. Desde ${plan.price}€/mes con configuración completa y garantía de 30 días.`;
 
 const faqSchema = {
@@ -33,7 +33,7 @@ const productSchema = {
   '@type': 'Product',
   name: `Nexux ${plan.name}`,
   description: plan.sub,
-  brand: { '@type': 'Brand', name: 'Nexux Pro' },
+  brand: { '@type': 'Brand', name: 'Nexux' },
   offers: {
     '@type': 'Offer',
     price: plan.price,
