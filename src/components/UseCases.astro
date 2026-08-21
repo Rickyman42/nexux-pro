@@ -1,0 +1,65 @@
+---
+const examples = [
+  {
+    quote: 'Estoy atendiendo y no puedo mirar el móvil. Lara responde las preguntas y deja preparada la cita.',
+    label: 'Ejemplo · peluquería',
+  },
+  {
+    quote: 'Cuando alguien escribe por la noche, no tiene que esperar hasta mañana para saber horarios y precios.',
+    label: 'Ejemplo · negocio con cita previa',
+  },
+  {
+    quote: 'Antes de contratar quiero comprobarlo con mis propios ojos. La demo me enseña el flujo completo.',
+    label: 'Ejemplo · primera visita',
+  },
+];
+---
+
+<section class="use-cases">
+  <div class="container-nx">
+    <header class="use-cases-header">
+      <div class="eyebrow">Ejemplos de uso</div>
+      <h2 class="h-section">Lo que cambia cuando <em>no dejas mensajes pendientes.</em></h2>
+      <p>
+        Son situaciones habituales, no testimonios de clientes. La demo te permite comprobar cómo responde Lara
+        antes de decidir.
+      </p>
+    </header>
+
+    <div class="use-cases-grid">
+      {examples.map(({ quote, label }) => (
+        <article class="use-case-card">
+          <div class="quote-mark" aria-hidden="true">“</div>
+          <blockquote>{quote}</blockquote>
+          <span>{label}</span>
+        </article>
+      ))}
+    </div>
+
+    <div class="use-cases-cta">
+      <a href="/demo" class="btn-ghost" data-track="use_cases_demo">Ver la demo de Lara →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .use-cases { padding: 7rem 0; }
+  .use-cases-header { max-width: 680px; margin: 0 auto 3rem; text-align: center; }
+  .use-cases-header .eyebrow { margin-bottom: 1.25rem; }
+  .use-cases-header h2 { margin-bottom: 1rem; }
+  .use-cases-header p { color: var(--nx-ink-muted); line-height: 1.7; }
+  .use-cases-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+  .use-case-card {
+    position: relative;
+    background: var(--nx-deep);
+    border: 1px solid var(--nx-line);
+    border-radius: 20px;
+    padding: 2rem;
+  }
+  .quote-mark { color: var(--nx-magnet); font-family: var(--nx-font-serif); font-size: 3rem; line-height: 0.7; }
+  .use-case-card blockquote { color: var(--nx-ink); font-size: 1rem; line-height: 1.7; margin: 1rem 0 1.25rem; }
+  .use-case-card span { color: var(--nx-ink-muted); font-size: 0.78rem; }
+  .use-cases-cta { margin-top: 2rem; text-align: center; }
+  @media (min-width: 800px) { .use-cases-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) { .use-cases { padding: 4rem 0; } }
+</style>
