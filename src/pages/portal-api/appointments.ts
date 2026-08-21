@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { fetchAllAppointments, cancelAppointmentById, createAppointmentManual } from "../../lib/portal-client";
+import { fetchAllAppointments, cancelAppointmentById, createAppointmentManual, updateAppointmentById } from "../../lib/portal-client";
 
 export const prerender = false;
 
@@ -29,6 +29,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (action === "cancel") {
     const ok = await cancelAppointmentById(clientId, token, aptId);
     return new Response(JSON.stringify({ ok }), { status: ok ? 200 : 502, headers: { "Content-Type": "application/json" } });
+  }
+
+  if (action === "update") {
+    if (!aptId) return new Response(JSON.stringify({ ok: false, error: "missing_appointment" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    const result = await updateAppointmentById(clientId, token, aptId, data);
+    return new Response(JSON.stringify(result), { status: result.ok ? 200 : result.status, headers: { "Content-Type": "application/json" } });
   }
 
   // create

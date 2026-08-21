@@ -34,8 +34,10 @@ const API = 'https://pi.nexux.pro';
     html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; }
 
     /* TOP BAR */
-    .top-bar { background: var(--nx-dark); color: #fff; height: 38px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 12.5px; }
+    .top-bar { position: relative; background: var(--nx-dark); color: #fff; height: 38px; padding: 0 52px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 12.5px; }
     .top-bar a { background: #fff; color: var(--nx-dark); font-weight: 700; padding: 4px 13px; border-radius: 20px; text-decoration: none; font-size: 11.5px; white-space: nowrap; }
+    .top-bar .home-back { position: absolute; left: 10px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.45); border-radius: 7px; background: transparent; color: #fff; font-size: 18px; line-height: 1; }
+    .top-bar .home-back:hover { background: rgba(255,255,255,.12); }
     .top-label { opacity: .85; }
 
     /* LAYOUT */
@@ -195,9 +197,10 @@ const API = 'https://pi.nexux.pro';
 <body>
 
 <div class="top-bar">
+  <a href="/" class="home-back" aria-label="Volver a la página principal" title="Volver a inicio">&#x2190;</a>
   <span class="top-label">Demo en vivo &mdash; Salon Elite (simulado)</span>
-  <span>Lo quieres para tu negocio?</span>
-  <a href="/paquetes/recepcionista">Empieza gratis en segundos</a>
+  <span>¿Lo quieres para tu negocio?</span>
+  <a href="/paquetes/recepcionista">Ver Recepcionista IA</a>
 </div>
 
 <div class="demo-wrap">
@@ -252,7 +255,7 @@ const API = 'https://pi.nexux.pro';
       <div class="crm-mobile-scroll"><div id="mCalRows"></div><p style="font-size:11px;color:var(--muted);text-align:center;padding:10px 0 4px;border-top:1px solid var(--border);margin-top:8px">Vista CRM completa disponible en tablet y escritorio</p></div>
       <div class="crm-mobile-cta">
         <a href="/paquetes/recepcionista" class="cta-btn" style="display:block;text-align:center">Quiero esto para mi negocio</a>
-        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">7 dias gratis &middot; Activo en segundos</p>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">29 €/mes &middot; Sin comisiones</p>
       </div>
     </div>
 
@@ -309,8 +312,8 @@ const API = 'https://pi.nexux.pro';
     <div class="crm-footer">
       <a href="/paquetes/recepcionista" class="cta-btn">Quiero esto para mi negocio &rarr;</a>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--text)">7 dias gratis</div>
-        <div class="cta-sub">Activo en segundos &middot; Sin tarjeta</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">29 €/mes</div>
+        <div class="cta-sub">Sin comisiones &middot; 30 días de garantía</div>
       </div>
     </div>
   </div>

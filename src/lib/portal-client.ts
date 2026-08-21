@@ -2,10 +2,13 @@ const BASE_URL = import.meta.env.NEXUX_CLIENTS_URL || 'https://pi.nexux.pro';
 
 export interface Appointment {
   id: string;
-  clientPhone: string;
+  clientPhone?: string;
   clientName?: string;
+  client_phone?: string;
+  client_name?: string;
   service: string;
   datetime: string;
+  duration_min?: number;
   status: 'confirmed' | 'cancelled';
 }
 
@@ -156,6 +159,25 @@ export async function cancelAppointmentById(clientId: string, token: string, apt
     });
     return response.ok;
   } catch { return false; }
+}
+
+export async function updateAppointmentById(
+  clientId: string,
+  token: string,
+  aptId: string,
+  data: { client_name?: string; client_phone?: string; service?: string; datetime?: string; duration_min?: number },
+): Promise<{ ok: boolean; status: number; error?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/appointments/${aptId}/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+    const payload = await response.json().catch(() => ({})) as { error?: string };
+    return { ok: response.ok, status: response.status, error: payload.error };
+  } catch {
+    return { ok: false, status: 502, error: 'connection_error' };
+  }
 }
 
 export async function createAppointmentManual(clientId: string, token: string, data: { client_name: string; client_phone?: string; service: string; datetime: string; duration_min?: number }): Promise<boolean> {
