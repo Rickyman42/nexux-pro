@@ -1,7 +1,7 @@
 # Arquitectura multiagenda — Nexux Recepcionista IA
 
 > Diseñada por Sol y revisada contra el código real el 21-08-2026.
-> **Estado: Fase 1 CERRADA y verificada. Fases 2-5 sin empezar. Nada conectado a producción.**
+> **Estado: Fases 1 y 2 CERRADAS y verificadas en producción. Fases 3-5 sin empezar.**
 > **Modo `single` (una agenda, sin solapes) es el producto actual y es intencionado.** El modo `team`
 > es una capacidad distinta, no un arreglo del actual: se activa por configuración, no sustituye nada.
 > Reparto: Sol diseña y refuta, Luna implementa. Ver "Estado real" al final.
@@ -213,24 +213,71 @@ Corregido con `canonicalAllocations()`, que lleva `Map` y lista a la misma forma
 **Verificado que la prueba detecta el fallo**: contra el motor sin corregir, `un reintento con recursos
 explicitos identicos no duplica la cita` falla; con la corrección, pasa.
 
-### Fases 2-5: ❌ SIN EMPEZAR
+### Fase 2 — integración monoagenda: ✅ CERRADA y verificada en producción (21-08-2026)
 
-El motor **no lo importa nadie salvo los tests**. Hoy las citas se siguen creando por el camino viejo
-(`lib/data.js` → `createAppointment`), que **no comprueba conflictos en absoluto**. Cuatro caminos
-distintos siguen sin unificar:
+Los cuatro caminos pasan ya por el motor, vía `lib/booking-bridge.js` (commit `507ad0f`):
 
-| Camino | Dónde |
-|---|---|
-| CRM del portal | `provision-http.js:687` |
-| Reserva pública | `provision-http.js:960` |
-| Telegram | `lib/telegram.js:152` |
-| WhatsApp | `lib/whatsapp.js:267` |
+| Camino | Dónde | `source` |
+|---|---|---|
+| CRM del portal | `provision-http.js` | `crm` |
+| Reserva pública | `provision-http.js` | `web` |
+| Telegram | `lib/telegram.js` | `telegram` |
+| WhatsApp | `lib/whatsapp.js` | `whatsapp` |
 
-La disponibilidad (`getAvailableSlots`, `lib/data.js:84`) se sigue calculando para todo el negocio, no
-por profesional. En el front del CRM (`nexux-pro`) hay **cero** referencias a profesional.
+**Qué cambia de verdad.** `createAppointment()` de `data.js` **no comprobaba conflictos**: escribía la
+cita y ya. La protección contra solapes vivía solo en `getAvailableSlots()`, que *ofrece* huecos libres
+— pero nada impedía escribir encima de una cita existente (dos clientes confirmando a la vez, o un POST
+directo al endpoint). Ahora se valida antes de escribir.
 
-**Traducido: hoy sigue sin poderse solapar dos citas.** El motor que sabe hacerlo existe y está probado,
-pero está desconectado.
+**Verificado en producción**, no solo en tests:
+
+```
+POST /public/<cliente>/book  (misma hora, dos veces)
+  1ª → HTTP 200  {"ok":true, ...service_id, professional_id: "pro_default"...}
+  2ª → HTTP 409  {"ok":false,"error":"appointment_conflict"}
+```
+
+Antes de este cambio, la segunda creaba una cita encima de la primera.
+
+#### Dos compatibilidades deliberadas, medidas contra los datos reales
+
+1. **Servicios de texto libre.** Cuatro clientes reales tienen `services: []` y reservan por nombre
+   libre. El motor exige que el servicio exista, así que el puente lo añade a una **copia** de la
+   config con la duración que indica el llamador — la misma que ya se usaba. Sin este apaño, esos
+   cuatro bots dejarían de coger citas.
+2. **Reservas del dueño** (`source` = `crm`/`portal`): sin margen de antelación ni rejilla de huecos.
+   Esas dos reglas existen para lo que se **ofrece** al cliente, no para lo que el negocio puede
+   anotar; el CRM ya podía registrar una cita a las 10:07 o para dentro de un año.
+
+#### Cuando el hueco no está libre
+
+CRM y web devuelven **409** con el código; Lara responde ofreciendo otro momento en vez de romperse.
+Los códigos de «no disponible» se sacaron del propio motor (`grep` de `fail(...)`), no inventados —
+la primera versión llevaba dos que el motor nunca emite.
+
+#### Evidencia
+
+- **31/31 tests** (23 núcleo + 8 puente), incluido uno que comprueba que escribe en el mismo
+  `clients/<id>/appointments.json` que lee el CRM.
+- Probado contra **las 17 configuraciones reales con sus citas ya guardadas**, en copia: 17/17 reservan
+  y el motor lee y valida las citas antiguas sin rechazarlas. *(Ojo con la prueba: un primer intento dio
+  17/17 fallos porque la fecha elegida caía en domingo y los horarios reales tienen `sunday: null`.
+  Era fallo de la prueba, no del motor.)*
+
+### Fases 3-5: ❌ SIN EMPEZAR
+
+Falta lo que da valor comercial al modo `team`:
+
+- **Disponibilidad por profesional.** `getAvailableSlots` (`lib/data.js:84`) sigue calculando para todo
+  el negocio. Mientras siga así, Lara no puede ofrecer dos huecos a la misma hora aunque el motor los
+  acepte.
+- **Gestión de profesionales en el portal** — en el front del CRM (`nexux-pro`) hay **cero**
+  referencias a profesional.
+- **Conversación de Lara** para elegir profesional («¿con Ana, con Marta o te da igual?»).
+- **Recursos** (cabinas, sillones) y calendario externo.
+
+**Traducido: con la Fase 2 el sistema ya no se pisa las citas. Para que dos personas puedan atender a
+la misma hora hacen falta las fases 3 y 4.**
 
 ### ✅ Bloqueo de la Fase 2: LEVANTADO (21-ago-2026, 22:15)
 
