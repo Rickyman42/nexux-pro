@@ -3,6 +3,7 @@ export interface Props {
   title?: string;
   description?: string;
   canonical?: string;
+  noindex?: boolean;
 }
 // Por defecto el canonical se deriva de la URL de la pagina, no de la home:
 // un valor fijo hacia que /blog, /comparativa, /oferta y /demo se declarasen
@@ -12,7 +13,8 @@ const canonicalPorDefecto =
 const {
   title = 'Recepcionista IA para tu negocio — 29 €/mes | Nexux',
   description = 'Recepcionista IA que contesta por WhatsApp, Telegram y tu web 24 horas y reserva las citas en tu calendario. 29 € al mes, todo incluido, sin permanencia y con 30 días de garantía.',
-  canonical = canonicalPorDefecto
+  canonical = canonicalPorDefecto,
+  noindex = false
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -23,6 +25,7 @@ const {
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
