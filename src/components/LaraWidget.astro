@@ -100,7 +100,7 @@ const { trial = false } = Astro.props;
     wrap.className = 'lara-plan-card';
     wrap.innerHTML =
       '<div class="lara-plan-badge">⭐ Recomendado</div>' +
-      '<div class="lara-plan-header">' + plan.emoji + ' <strong>Plan ' + plan.nombre + '</strong> · <span class="lara-plan-price">' + plan.precio + '</span></div>' +
+      '<div class="lara-plan-header">' + plan.emoji + ' <strong>' + plan.nombre + '</strong> · <span class="lara-plan-price">' + plan.precio + '</span></div>' +
       '<ul class="lara-plan-list">' + plan.puntos.map(function(p) { return '<li>' + p + '</li>'; }).join('') + '</ul>' +
       '<div class="lara-plan-desc">' + plan.desc + '</div>';
     body.appendChild(wrap);
@@ -109,10 +109,10 @@ const { trial = false } = Astro.props;
     cta.className = 'lara-cta-wrap';
     var btn = document.createElement('button');
     btn.className = 'lara-cta-btn';
-    btn.textContent = 'Quiero empezar con ' + plan.nombre + ' — ' + plan.precio + ' →';
+    btn.textContent = 'Empezar por ' + plan.precio + ' →';
     btn.onclick = function() {
       track('lara_plan_click', { plan: plan.plan });
-      window.open('https://wa.me/34630745369?text=Hola%2C%20quiero%20el%20plan%20' + plan.plan, '_blank');
+      window.location.href = '/paquetes/' + plan.plan;
     };
     cta.appendChild(btn);
     body.appendChild(cta);
