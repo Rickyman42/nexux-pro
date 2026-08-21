@@ -21,6 +21,17 @@
   ],
   "redirects": [
     {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.nexux.pro"
+        }
+      ],
+      "destination": "https://nexux.pro/$1",
+      "permanent": true
+    },
+    {
       "source": "/paquetes/starter",
       "destination": "/paquetes/recepcionista",
       "permanent": true
