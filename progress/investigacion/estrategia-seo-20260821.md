@@ -109,3 +109,9 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
   aunque `origin/main` y el HTML público servido con cachebuster ya contienen el cambio. Queda pendiente
   verificarlo visualmente en navegador y descartar caché o URL distinta; no se marca como resuelto para el usuario.
 - Siguiente: nueva medición en Search Console y baseline de asistentes IA, sin inventar menciones ni citas.
+- Auditoría técnica de la página de producto verificada el 21-ago-2026: HTTP 200, un solo H1 con
+  “Nexux Recepcionista IA”, title y meta description orientados a “recepcionista IA”, canonical propio,
+  Product schema, FAQPage schema, imagen con alt descriptivo, enlaces internos desde la home y URL presente
+  en `sitemap-0.xml`.
+- Siguiente acción SEO: solicitar en Search Console la indexación de `/paquetes/recepcionista` y comparar
+  impresiones, consultas y posición a 7 y 28 días. Publicar no se contará como indexación.
