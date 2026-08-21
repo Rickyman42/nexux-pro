@@ -75,16 +75,16 @@ export const PLANS: Record<PlanSlug, PlanData> = {
     ],
     faqs: [
       {
-        q: 'Cuanto cuesta exactamente?',
-        a: 'Veintinueve euros al mes, todo incluido. No hay alta, ni configuracion aparte, ni coste por empleado, ni comision por cliente. Es el precio de lanzamiento: subira a 35 euros, pero si entras ahora te quedas en 29 mientras sigas de alta.',
+        q: '¿Cuánto cuesta exactamente?',
+        a: 'Veintinueve euros al mes, todo incluido. No hay alta, ni configuración aparte, ni coste por empleado, ni comisión por cliente. Es el precio de lanzamiento: subirá a 35 euros, pero si entras ahora te quedas en 29 mientras sigas de alta.',
       },
       {
         q: 'Me va a llamar un comercial?',
         a: 'No. Lo contratas tu cuando quieras y lo cancelas igual. Si necesitas ayuda nos escribes y te responde una persona, pero nadie te va a llamar para venderte nada.',
       },
       {
-        q: 'Hay permanencia?',
-        a: 'No. Cancelas cuando quieras desde tu panel, sin penalizacion y sin dar explicaciones.',
+        q: '¿Hay permanencia?',
+        a: 'No. Cancelas cuando quieras y sin dar explicaciones. El mes que ya has pagado sigue activo hasta el final, y simplemente no se te vuelve a cobrar.',
       },
       {
         q: 'Tengo que instalar algo?',
@@ -99,8 +99,8 @@ export const PLANS: Record<PlanSlug, PlanData> = {
         a: 'El precio incluye hasta 1.000 conversaciones al mes, que es mucho mas de lo que gasta un negocio normal. Si algun mes te pasas, te avisamos antes de cobrarte nada de mas.',
       },
       {
-        q: 'Puedo probarlo antes de pagar?',
-        a: 'Si. El primer mes es gratis y no pedimos tarjeta para empezar.',
+        q: '¿Puedo probarlo antes de pagar?',
+        a: 'Puedes probar el asistente ahora mismo y sin dar ningún dato en nexux.pro/demo: hablas con él y lo ves reservar una cita de verdad. Para usarlo en tu negocio sí se paga desde el primer día, pero tienes 30 días para pedir la devolución si no te convence.',
       },
     ],
   },

@@ -28,14 +28,18 @@ const { plan, slug } = Astro.props as Props;
           <span class="plan-price-value">{plan.price}€</span>
           <span class="plan-price-unit">/mes</span>
         </div>
+        <p class="plan-price-warn">
+          <span class="warn-dot"></span>
+          Sube a 35 € en 5 días. Si entras ahora, te quedas en 29 € mientras sigas de alta.
+        </p>
 
         <div class="plan-actions">
           <button type="button" data-checkout-plan={slug} class="btn-primary plan-action-primary" data-track={`plan_${slug}_checkout_top`}>
             Empezar con {plan.name} →
           </button>
-          <a href="https://nexux.pro/#hablar" class="btn-ghost plan-action-secondary" data-track={`plan_${slug}_talk`}>
-            Hablar con Ricardo
-          </a>
+          <button type="button" class="btn-ghost plan-action-secondary" data-open-lara data-track={`plan_${slug}_talk`}>
+            Preguntar a Lara
+          </button>
         </div>
 
         <p class="plan-guarantee">30 días de garantía o te devolvemos el dinero.</p>
@@ -235,6 +239,23 @@ const { plan, slug } = Astro.props as Props;
     min-width: 13.5rem;
   }
 
+  .plan-price-warn {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--nx-ink-muted);
+  }
+  .warn-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--nx-warning);
+    flex-shrink: 0;
+    margin-top: 0.4rem;
+    box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.18);
+  }
   .plan-guarantee {
     color: var(--nx-ink-muted);
     font-size: 0.9rem;

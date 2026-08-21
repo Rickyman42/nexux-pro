@@ -191,6 +191,11 @@ const { trial = false } = Astro.props;
 
   function init() {
     $('lara-launcher').addEventListener('click', open);
+    // Cualquier boton de la pagina con data-open-lara abre el chat.
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-open-lara]');
+      if (t) { e.preventDefault(); open(); }
+    });
     $('lara-close').addEventListener('click', close);
     $('lara-send').addEventListener('click', handleSend);
     $('lara-input').addEventListener('keydown', function(e) {

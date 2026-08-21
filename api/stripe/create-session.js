@@ -8,17 +8,22 @@ export default async function handler(req, res) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const { plan } = body;
 
+  // Producto unico. Los planes starter/pro/total se retiraron el 21-ago-2026.
   const PLANS = {
-    starter: { name: 'Lara Starter', amount: 24900, priceEnv: 'STRIPE_PRICE_STARTER' },
-    pro:     { name: 'Lara Pro',     amount: 44900, priceEnv: 'STRIPE_PRICE_PRO' },
-    total:   { name: 'Lara Total',   amount: 74900, priceEnv: 'STRIPE_PRICE_TOTAL' },
-    promo:   { name: 'Lara Promo Especial', amount: 4900, priceEnv: 'STRIPE_PRICE_PROMO' },
+    recepcionista: {
+      name: 'Nexux Recepcionista IA',
+      amount: 2900,
+      priceEnv: 'STRIPE_PRICE_RECEPCIONISTA',
+      // Precio real creado en Stripe el 21-ago-2026. Se usa si la variable de
+      // entorno no esta configurada en Vercel, para que el pago no dependa de eso.
+      priceFallback: 'price_1U6jqd2SQwDzHtsFf3wEcuQe',
+    },
   };
 
   if (!PLANS[plan]) return res.status(400).json({ error: 'invalid_plan' });
 
   const planData = PLANS[plan];
-  const priceId = process.env[planData.priceEnv];
+  const priceId = process.env[planData.priceEnv] || planData.priceFallback;
   const origin = req.headers['x-forwarded-host']
     ? `https://${req.headers['x-forwarded-host']}`
     : 'https://nexux.pro';
@@ -28,6 +33,8 @@ export default async function handler(req, res) {
   params.append('mode', 'subscription');
   params.append('return_url', `${origin}/gracias?plan=${plan}`);
   params.append('metadata[plan]', plan);
+  // Sin telefono, el asistente no puede arrancar el onboarding solo.
+  params.append('phone_number_collection[enabled]', 'true');
 
   const metadataFields = ['nombre', 'salon', 'telefono', 'ciudad', 'canal', 'trabajadoras'];
   for (const key of metadataFields) {
