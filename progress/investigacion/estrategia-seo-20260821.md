@@ -94,5 +94,6 @@ de conversión. Ningún agente puede prometer posiciones; sí debe evitar contra
 - Publicado: sitemap sin `/acceso-denegado/`, página de acceso con `noindex` y artículos/comparativa
   antiguos reescritos (`08859a5`).
 - Publicado: `robots.txt` distingue `OAI-SearchBot`, `GPTBot` y `ChatGPT-User` (`b9731ac`).
-- Pendiente prioritario: redirección `www` → dominio principal y unificación final de barras/canonicals.
+- Publicado: `www.nexux.pro` redirige al dominio principal desde middleware (`3bf18c4`); compilación correcta.
+- Pendiente prioritario: comprobar la redirección en producción y unificación final de barras/canonicals.
 - No autorizado todavía: publicar, hacer push o desplegar cambios.
