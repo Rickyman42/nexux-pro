@@ -33,25 +33,25 @@
   <text x="80" y="145" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" letter-spacing="3" fill="#4ECDC4" text-transform="uppercase">NEXUX PRO</text>
 
   <!-- Main headline -->
-  <text x="80" y="240" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" font-style="italic" fill="#F0F2F5">Tu peluquería</text>
-  <text x="80" y="330" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" font-style="italic" fill="#F0F2F5">en piloto</text>
-  <text x="80" y="420" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" font-style="italic" fill="url(#accent)">automático.</text>
+  <text x="80" y="240" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" font-style="italic" fill="#F0F2F5">Recepcionista IA</text>
+  <text x="80" y="330" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" font-style="italic" fill="#F0F2F5">para tu</text>
+  <text x="80" y="420" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" font-style="italic" fill="url(#accent)">negocio.</text>
 
   <!-- Subline -->
-  <text x="80" y="490" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#8892A0">Lara responde WhatsApp 24h · Agenda citas · Reduce no-shows</text>
+  <text x="80" y="490" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#8892A0">WhatsApp, Telegram y web · Reserva citas · 24 horas</text>
 
-  <!-- Stats right side -->
+  <!-- Product facts -->
   <rect x="800" y="180" width="320" height="140" rx="16" fill="#161A22" stroke="#222832" stroke-width="1" />
-  <text x="960" y="230" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#4ECDC4">&lt; 4s</text>
-  <text x="960" y="262" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#8892A0">Tiempo de respuesta</text>
+  <text x="960" y="230" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#4ECDC4">29 €/mes</text>
+  <text x="960" y="262" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#8892A0">Todo incluido</text>
   <line x1="960" y1="278" x2="960" y2="300" stroke="#222832" stroke-width="1" />
-  <text x="960" y="295" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#4ECDC4">87% sin intervención humana</text>
+  <text x="960" y="295" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#4ECDC4">Sin permanencia</text>
 
   <rect x="800" y="340" width="320" height="140" rx="16" fill="#161A22" stroke="#222832" stroke-width="1" />
-  <text x="960" y="390" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#4ECDC4">–60%</text>
-  <text x="960" y="422" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#8892A0">Reducción de no-shows</text>
+  <text x="960" y="390" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#4ECDC4">30 días</text>
+  <text x="960" y="422" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#8892A0">de garantía</text>
   <line x1="960" y1="438" x2="960" y2="458" stroke="#222832" stroke-width="1" />
-  <text x="960" y="455" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#4ECDC4">Desde 249€/mes · 30 días garantía</text>
+  <text x="960" y="455" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#4ECDC4">Pruébalo en nexux.pro/demo</text>
 
   <!-- Bottom domain -->
   <text x="80" y="580" font-family="system-ui, sans-serif" font-size="20" fill="#4A5568">nexux.pro</text>
