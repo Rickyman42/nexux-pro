@@ -21,6 +21,10 @@ const { plan, slug } = Astro.props as Props;
         <p class="eyebrow">Nexux Pro</p>
         <h1 class="plan-title">{plan.name}</h1>
         <p class="plan-sub">{plan.sub}</p>
+        <div class="plan-hook">
+          <p>Cada mensaje que no contestas es una cita que no vuelve.</p>
+          <p><strong>Lara contesta. La agenda se llena. Tú sigues trabajando.</strong></p>
+        </div>
       </div>
 
       <div class="plan-purchase-card">
@@ -30,25 +34,25 @@ const { plan, slug } = Astro.props as Props;
         </div>
         <p class="plan-price-warn">
           <span class="warn-dot"></span>
-          Sube a 35 € en 5 días. Si entras ahora, te quedas en 29 € mientras sigas de alta.
+          Precio de lanzamiento: mantienes los 29 € mientras sigas de alta.
         </p>
 
         <div class="plan-actions">
           <button type="button" data-checkout-plan={slug} class="btn-primary plan-action-primary" data-track={`plan_${slug}_checkout_top`}>
-            Empezar con {plan.name} →
+            Quiero recuperar esas citas →
           </button>
           <button type="button" class="btn-ghost plan-action-secondary" data-open-lara data-track={`plan_${slug}_talk`}>
-            Preguntar a Lara
+            Quiero verla responder
           </button>
         </div>
 
-        <p class="plan-guarantee">30 días de garantía o te devolvemos el dinero.</p>
+        <p class="plan-guarantee">Pruébala 30 días en tu negocio. Si no te compensa, te devolvemos el dinero.</p>
       </div>
     </div>
 
     <div class="plan-grid">
       <section class="plan-panel">
-        <h2 class="h-section">Para quién <em>es</em></h2>
+        <h2 class="h-section">Esto es para ti <em>si...</em></h2>
         <ul class="plan-fit-list">
           {plan.for.map(item => (
             <li>
@@ -60,7 +64,7 @@ const { plan, slug } = Astro.props as Props;
       </section>
 
       <section class="plan-panel">
-        <h2 class="h-section">Todo lo que <em>incluye</em></h2>
+        <h2 class="h-section">Lo que hace tu <em>recepcionista IA</em></h2>
         <div class="plan-feature-list">
           {plan.features.map(feature => (
             <article class="plan-feature-card">
@@ -96,18 +100,18 @@ const { plan, slug } = Astro.props as Props;
 
     <section class="plan-final-cta">
       <div>
-        <p class="eyebrow">Siguiente paso</p>
-        <h2 class="h-section">¿Lista para <em>empezar</em>?</h2>
+        <p class="eyebrow">La próxima cita puede entrar ahora</p>
+        <h2 class="h-section">¿Vas a contestarla tú... <em>o Lara?</em></h2>
         <p>
-          Activamos tu asistente, configuramos el canal y dejamos la agenda funcionando contigo desde el día uno.
+          Por 29 € al mes, Lara responde mensajes y convierte conversaciones en reservas mientras tú atiendes tu negocio.
         </p>
       </div>
 
       <div class="plan-final-actions">
         <button type="button" data-checkout-plan={slug} class="btn-primary" data-track={`plan_${slug}_checkout_bottom`}>
-          Comprar {plan.name} →
+          Quiero que Lara empiece →
         </button>
-        <span>30 días de garantía o te devolvemos el dinero.</span>
+        <span>30 días para decidir si realmente te compensa.</span>
       </div>
     </section>
   </div>
@@ -192,6 +196,23 @@ const { plan, slug } = Astro.props as Props;
     font-size: clamp(1.02rem, 2.2vw, 1.2rem);
     line-height: 1.7;
   }
+
+  .plan-hook {
+    max-width: 44rem;
+    margin-top: 1.25rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--nx-magnet);
+  }
+
+  .plan-hook p {
+    margin: 0;
+    color: var(--nx-ink-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .plan-hook p + p { margin-top: 0.25rem; }
+  .plan-hook strong { color: var(--nx-ink); }
 
   .plan-purchase-card {
     display: grid;
