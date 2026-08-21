@@ -20,3 +20,4 @@ La evidencia completa va además a ~/nexus-brain/quality-ledger.md. Aquí solo e
 2026-08-21 | claude-code | Estudio de mercado y DAFO del producto, con veredicto go/no-go | https://claude.ai/code/artifact/90466fee-720d-43dd-aa26-7edd8cb62635 | OK
 2026-08-21 | claude-code | AGENTS.md reescrito como norma de entrada al proyecto + CLAUDE.md puntero + este registro | commit pendiente | OK
   causa: (nota) el agents.md anterior mandaba escribir en progress/ desde el 30-may y la carpeta nunca existió
+2026-08-21 | claude-code | Google Ads Planificador de Palabras Clave, España, ago-2025/jul-2026, cuenta Ytical: volumen exacto de las 9 keywords candidatas de SEO | recepcionista ia 100-1mil/mes +900% interanual competencia Alta CPC 3.78-15.92EUR; recepcionista virtual 10-100/mes Media CPC 1.85-10.39EUR; chatbot citas, bot whatsapp empresa, software citas peluqueria, agenda citas whatsapp, no perder llamadas, alternativa a booksy = todas 0-10/mes | OK
