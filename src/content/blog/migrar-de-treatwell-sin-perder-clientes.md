@@ -24,5 +24,5 @@ Cambiar de herramienta no consiste solo en exportar una lista. También tienes q
 
 El RGPD reconoce derechos sobre los datos personales, pero su aplicación depende del caso y del contrato. Este artículo es informativo y no sustituye asesoramiento legal.
 
-Nexux puede ayudarte a responder nuevas conversaciones por WhatsApp, Telegram y web. Antes de contratarlo, comprueba en la [demo](/demo) si cubre tu flujo.
+Nexux puede ayudarte a responder nuevas conversaciones por WhatsApp, Telegram y web. Antes de contratarlo, comprueba en la [demo](/demo) si cubre tu flujo y consulta la [página de la recepcionista IA](/paquetes/recepcionista).
 
