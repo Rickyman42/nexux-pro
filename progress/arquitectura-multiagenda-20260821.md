@@ -2,6 +2,8 @@
 
 > Diseñada por Sol y revisada contra el código real el 21-08-2026.
 > **Estado: Fase 1 CERRADA y verificada. Fases 2-5 sin empezar. Nada conectado a producción.**
+> **Modo `single` (una agenda, sin solapes) es el producto actual y es intencionado.** El modo `team`
+> es una capacidad distinta, no un arreglo del actual: se activa por configuración, no sustituye nada.
 > Reparto: Sol diseña y refuta, Luna implementa. Ver "Estado real" al final.
 
 ## Decisión
@@ -230,13 +232,26 @@ por profesional. En el front del CRM (`nexux-pro`) hay **cero** referencias a pr
 **Traducido: hoy sigue sin poderse solapar dos citas.** El motor que sabe hacerlo existe y está probado,
 pero está desconectado.
 
-### 🔴 Bloqueo declarado para la Fase 2
+### ✅ Bloqueo de la Fase 2: LEVANTADO (21-ago-2026, 22:15)
 
-Los propios límites de seguridad de este documento dicen que `nexux-clients` no tiene repositorio
-independiente seguro y que el núcleo no se conecta *"hasta resolver su versionado"*. **Ese bloqueo sigue
-en pie**: los seis ficheros del núcleo NO están en git (`git ls-files` no los conoce).
+El diseño condicionaba la Fase 2 a *"resolver el versionado"* de `nexux-clients`. **Resuelto.**
 
-Respaldo manual mientras tanto: `~/backups/multiagenda-20260821/`. No es control de versiones.
+`~/nexux-clients` es ya un repositorio git independiente (commit inicial `578bc52`). Los seis ficheros
+del núcleo están versionados y se puede revertir cualquier cambio. `git status` pasó de colgarse a
+0,009 s porque antes escaneaba los 11.183 ficheros de la carpeta personal.
 
-Antes de la Fase 2 hay que decidir: o se arregla el versionado de `nexux-clients`, o se levanta el
-bloqueo de forma explícita asumiendo el riesgo de tocar los bots vivos sin poder revertir.
+Se versiona **solo código y documentación** (89 ficheros). Quedan fuera, verificado uno a uno antes del
+commit: `.env`, `**/creds.json`, `**/auth/`, `.wwebjs_auth/` (sesiones de WhatsApp Web), `clients/`
+(conversaciones, citas y teléfonos reales — RGPD), `data/`, los `.jsonl` de correo y visitas,
+`*-log.json` y `node_modules`. Auditoría: sin claves `sk_live`/`sk_test`, sin tokens de bot, sin cadenas
+de conexión.
+
+⚠️ **`/home/nexux` sigue siendo zona prohibida.** Es otro repo git, con la carpeta personal entera
+dentro (incluidas `.ssh/authorized_keys` y varios `.credentials.json`) y remote `nexux-clients.git`.
+Un `pull` o `rebase` allí puede dejarte sin acceso SSH a la Pi. Trabaja siempre desde
+`~/nexux-clients`. Sus 91 commits locales con secretos no han llegado a GitHub.
+
+**La Fase 2 ya se puede abordar.** Sigue tocando los bots vivos (`whatsapp.js`, `telegram.js`,
+`provision-http.js`), pero ahora con posibilidad de revertir. Recomendación: conectar el motor primero
+en `mode: single` —comportamiento idéntico al de hoy, pero pasando por las comprobaciones del motor— y
+validar con una cuenta interna antes de que lo toque un cliente.

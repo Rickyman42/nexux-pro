@@ -164,9 +164,15 @@ Si devuelve FALLO, **no está hecho**. (El verificador no valida `.css` ni `.ast
    hoy que `embedded` está retirado y hay que usar `embedded_page`. Lee el error del proveedor.
 5. **Hay dos listas blancas de planes** en `nexux-clients/provision-http.js` (líneas ~230 y ~942).
    Cambiar solo una deja el pago roto con un `invalid_plan` que no explica nada.
-6. **`nexux-clients` NO tiene control de versiones propio** (es el repo de `/home/nexux`, con el que está
-   prohibido hacer pull/rebase). Los cambios ahí solo tienen copias `*.PREPIVOTE-20260821` en disco.
-   **Antes de tocar un archivo de ese repo, haz una copia con fecha.**
+6. ~~**`nexux-clients` NO tiene control de versiones propio**~~ → **RESUELTO 21-ago-2026.**
+   `~/nexux-clients` ya es un repositorio git independiente (`git init`, commit inicial `578bc52`,
+   89 ficheros: solo código y documentación). `git status` pasó de colgarse a 0,009 s.
+   **Lo que sigue siendo cierto y peligroso:** `/home/nexux` es OTRO repo git que trackea la carpeta
+   personal entera —11.183 ficheros, incluidos `.ssh/authorized_keys`, `.claude-bot.env` y varios
+   `.credentials.json`— con remote `nexux-clients.git`. Un `pull`/`rebase` allí puede sobrescribir tus
+   claves SSH y dejarte fuera de la Pi. **Sigue prohibido operar en `/home/nexux`.** Trabaja siempre
+   desde `~/nexux-clients`, que ahora resuelve a su propio repo.
+   Sus 91 commits locales con secretos NO han llegado a GitHub (verificado contra `origin/master`).
 7. **Un dato estructurado desactualizado casi nunca vive en un solo sitio.** El schema de `Layout.astro`
    no era el único con precios 249/449/749 €: cada página de `/ciudad/*` llevaba su propia copia
    independiente. Al corregir un JSON-LD, busca `grep -rl "application/ld+json"` en todo `src/` antes
