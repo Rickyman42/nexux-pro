@@ -736,6 +736,44 @@ function renderAppointmentDate(item: Appointment) {
     </form>
   </dialog>
 
+  <dialog id="edit-apt-modal" class="crm-dialog">
+    <form id="edit-apt-form" class="crm-modal-form">
+      <h3>Editar cita</h3>
+      <input type="hidden" name="apt_id" />
+      <label class="crm-form-lbl">
+        Nombre del cliente
+        <input type="text" name="client_name" required maxlength="120" class="crm-input" />
+      </label>
+      <label class="crm-form-lbl">
+        Teléfono
+        <input type="tel" name="client_phone" maxlength="40" class="crm-input" />
+      </label>
+      <label class="crm-form-lbl">
+        Servicio
+        <input type="text" name="service" required maxlength="160" class="crm-input" list="svc-suggest" autocomplete="off" />
+      </label>
+      <div class="crm-edit-date-row">
+        <label class="crm-form-lbl">
+          Fecha
+          <input type="date" name="date" required class="crm-input" />
+        </label>
+        <label class="crm-form-lbl">
+          Hora
+          <input type="time" name="time" required step="900" class="crm-input" />
+        </label>
+      </div>
+      <label class="crm-form-lbl">
+        Duración (min)
+        <input type="number" name="duration_min" value="60" min="15" max="480" step="15" class="crm-input" />
+      </label>
+      <p class="crm-edit-hint">Antes de guardar te pediremos confirmación.</p>
+      <div class="crm-modal-actions">
+        <button type="submit" class="crm-btn-primary">Guardar cambios</button>
+        <button type="button" id="close-edit-apt-modal" class="crm-btn-ghost">Cerrar</button>
+      </div>
+    </form>
+  </dialog>
+
   <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: !hasLegacyAdvancedTools, customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []), scheduleJson: JSON.stringify(data.schedule ?? {}) }}>
   (function () {
 
@@ -1066,6 +1104,134 @@ function renderAppointmentDate(item: Appointment) {
       function fmtTime(iso) { if (!iso) return ''; var d = new Date(iso); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
       function isToday(d) { var t = new Date(); return d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth() && d.getDate() === t.getDate(); }
 
+      var editAptModal = document.getElementById('edit-apt-modal');
+      var editAptForm = document.getElementById('edit-apt-form');
+      var closeEditAptModal = document.getElementById('close-edit-apt-modal');
+
+      function appointmentName(apt) { return apt.client_name || apt.clientName || 'Cliente sin nombre'; }
+      function appointmentPhone(apt) { return apt.client_phone || apt.clientPhone || ''; }
+
+      function openAppointmentEditor(apt) {
+        if (!(editAptModal instanceof HTMLDialogElement) || !(editAptForm instanceof HTMLFormElement)) return;
+        var d = new Date(apt.datetime);
+        editAptForm.elements.apt_id.value = apt.id || '';
+        editAptForm.elements.client_name.value = appointmentName(apt) === 'Cliente sin nombre' ? '' : appointmentName(apt);
+        editAptForm.elements.client_phone.value = appointmentPhone(apt);
+        editAptForm.elements.service.value = apt.service || '';
+        editAptForm.elements.date.value = fmtDate(d);
+        editAptForm.elements.time.value = fmtTime(apt.datetime);
+        editAptForm.elements.duration_min.value = apt.duration_min || 60;
+        editAptModal.showModal();
+      }
+
+      async function updateAppointment(aptId, changes) {
+        try {
+          var response = await fetch('/portal-api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(Object.assign({ clientId: clientId, action: 'update', aptId: aptId }, changes)),
+          });
+          var payload = await response.json().catch(function () { return {}; });
+          if (!response.ok) {
+            showToast(payload.error === 'appointment_conflict' ? 'Ese horario ya está ocupado' : 'No se pudo modificar la cita');
+            return false;
+          }
+          showToast('Cita actualizada');
+          return true;
+        } catch (_) {
+          showToast('Error de conexión');
+          return false;
+        }
+      }
+
+      if (closeEditAptModal) closeEditAptModal.addEventListener('click', function () {
+        if (editAptModal instanceof HTMLDialogElement) editAptModal.close();
+      });
+
+      if (editAptForm) editAptForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        var fd = new FormData(editAptForm);
+        var date = String(fd.get('date') || '');
+        var time = String(fd.get('time') || '');
+        if (!date || !time) { showToast('Indica fecha y hora'); return; }
+        if (!window.confirm('¿Confirmas los cambios de esta cita?')) return;
+        var ok = await updateAppointment(String(fd.get('apt_id') || ''), {
+          client_name: String(fd.get('client_name') || '').trim(),
+          client_phone: String(fd.get('client_phone') || '').trim(),
+          service: String(fd.get('service') || '').trim(),
+          datetime: date + 'T' + time + ':00',
+          duration_min: parseInt(String(fd.get('duration_min') || '60'), 10) || 60,
+        });
+        if (ok && editAptModal instanceof HTMLDialogElement) editAptModal.close();
+        await loadCalendar();
+      });
+
+      function enableAppointmentDrag(block, apt, columns, monday, minH, maxH, slotHeight) {
+        if (!window.PointerEvent || (apt.status || 'confirmed').toLowerCase() === 'cancelled') return;
+        var pointerId = null;
+        var startX = 0;
+        var startY = 0;
+        var grabOffsetY = 0;
+        var moved = false;
+
+        block.addEventListener('pointerdown', function (event) {
+          if (event.button !== 0 || event.target.closest('button')) return;
+          pointerId = event.pointerId;
+          startX = event.clientX;
+          startY = event.clientY;
+          grabOffsetY = event.clientY - block.getBoundingClientRect().top;
+          moved = false;
+          block.setPointerCapture(pointerId);
+        });
+
+        block.addEventListener('pointermove', function (event) {
+          if (pointerId !== event.pointerId) return;
+          var dx = event.clientX - startX;
+          var dy = event.clientY - startY;
+          if (!moved && Math.hypot(dx, dy) < 6) return;
+          moved = true;
+          event.preventDefault();
+          block.classList.add('dragging');
+          block.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+        });
+
+        block.addEventListener('pointerup', async function (event) {
+          if (pointerId !== event.pointerId) return;
+          pointerId = null;
+          if (!moved) return;
+          block.classList.remove('dragging');
+          block.style.transform = '';
+
+          var rect = columns.getBoundingClientRect();
+          var dayWidth = rect.width / 7;
+          var dayIndex = Math.max(0, Math.min(6, Math.floor((event.clientX - rect.left) / dayWidth)));
+          var duration = parseInt(apt.duration_min || 60, 10) || 60;
+          var minute = minH * 60 + Math.round((((event.clientY - rect.top - grabOffsetY) / slotHeight) * 60) / 15) * 15;
+          minute = Math.max(minH * 60, Math.min(maxH * 60 - duration, minute));
+          var targetDay = new Date(monday);
+          targetDay.setDate(monday.getDate() + dayIndex);
+          var targetDatetime = fmtDate(targetDay) + 'T' + pad(Math.floor(minute / 60)) + ':' + pad(minute % 60) + ':00';
+          var current = new Date(apt.datetime);
+          var currentLocal = fmtDate(current) + 'T' + fmtTime(apt.datetime) + ':00';
+          if (targetDatetime === currentLocal) { await loadCalendar(); return; }
+
+          var readable = targetDay.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+          var targetTime = pad(Math.floor(minute / 60)) + ':' + pad(minute % 60);
+          if (!window.confirm('¿Mover la cita de ' + appointmentName(apt) + ' al ' + readable + ' a las ' + targetTime + '?')) {
+            await loadCalendar();
+            return;
+          }
+          await updateAppointment(apt.id, { datetime: targetDatetime });
+          await loadCalendar();
+        });
+
+        block.addEventListener('pointercancel', function () {
+          pointerId = null;
+          block.classList.remove('dragging');
+          block.style.transform = '';
+        });
+      }
+
       async function loadCalendar() {
         var grid = document.getElementById('cal-grid');
         var label = document.getElementById('cal-week-label');
@@ -1163,22 +1329,44 @@ function renderAppointmentDate(item: Appointment) {
             blk.className = 'crm-tac-apt ' + st2;
             blk.style.top = top + 'px';
             blk.style.height = height + 'px';
+            blk.title = appointmentName(apt) + ' · ' + (apt.service || 'Sin servicio') + ' · ' + fmtTime(apt.datetime);
             blk.innerHTML =
-              '<span class="crm-tac-apt-t">' + fmtTime(apt.datetime) + '</span>' +
-              '<span class="crm-tac-apt-n">' + esc(apt.clientName || apt.client_name || '') + '</span>' +
-              '<span class="crm-tac-apt-s">' + esc(apt.service || '') + '</span>';
+              '<span class="crm-tac-apt-main"><strong>' + fmtTime(apt.datetime) + '</strong><span>' + esc(appointmentName(apt)) + '</span></span>' +
+              '<span class="crm-tac-apt-s">' + esc(apt.service || 'Sin servicio') + '</span>';
             if (st2 !== 'cancelled') {
+              var actions = document.createElement('span');
+              actions.className = 'crm-tac-apt-actions';
+              var eb = document.createElement('button');
+              eb.type = 'button';
+              eb.className = 'crm-cal-apt-edit';
+              eb.textContent = '✎';
+              eb.title = 'Editar cita';
+              eb.setAttribute('aria-label', 'Editar cita de ' + appointmentName(apt));
+              (function(aa, bb) {
+                bb.addEventListener('click', function(event) {
+                  event.stopPropagation();
+                  openAppointmentEditor(aa);
+                });
+              })(apt, eb);
               var cb = document.createElement('button');
+              cb.type = 'button';
               cb.className = 'crm-cal-apt-cancel';
               cb.textContent = '×';
+              cb.title = 'Cancelar cita';
+              cb.setAttribute('aria-label', 'Cancelar cita de ' + appointmentName(apt));
               (function(aa, bb) {
-                bb.addEventListener('click', async function() {
+                bb.addEventListener('click', async function(event) {
+                  event.stopPropagation();
+                  if (!window.confirm('¿Confirmas que quieres cancelar la cita de ' + appointmentName(aa) + '?')) return;
                   bb.disabled = true;
                   try { await fetch('/portal-api/appointments', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({clientId, action:'cancel', aptId:aa.id}) }); } catch(_){}
                   await loadCalendar();
                 });
               })(apt, cb);
-              blk.appendChild(cb);
+              actions.appendChild(eb);
+              actions.appendChild(cb);
+              blk.appendChild(actions);
+              enableAppointmentDrag(blk, apt, colsEl, monday, minH, maxH, SLOT_H);
             }
             col.appendChild(blk);
           });
@@ -2298,23 +2486,45 @@ function renderAppointmentDate(item: Appointment) {
       left: 2px;
       right: 2px;
       border-radius: 6px;
-      padding: 2px 5px;
+      padding: 4px 42px 4px 6px;
       font-size: 10.5px;
       overflow: hidden;
       background: var(--crm-nav-hover);
       border: 1px solid var(--crm-line);
       display: flex;
       flex-direction: column;
-      gap: 1px;
+      gap: 2px;
       z-index: 1;
-      cursor: default;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
     }
 
     .crm-tac-apt.confirmed { background: rgba(99,102,241,0.13); border-color: rgba(99,102,241,0.4); color: #4338ca; }
     .crm-tac-apt.cancelled { opacity: 0.4; }
-    .crm-tac-apt-t { font-weight: 700; font-size: 10px; color: var(--crm-text); }
-    .crm-tac-apt-n { font-size: 10px; color: var(--crm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .crm-tac-apt.dragging { z-index: 10; cursor: grabbing; opacity: 0.86; box-shadow: 0 3px 8px rgba(0,0,0,0.18); }
+    .crm-tac-apt-main { display: flex; align-items: baseline; gap: 4px; min-width: 0; color: var(--crm-text); }
+    .crm-tac-apt-main strong { flex: 0 0 auto; font-size: 10px; }
+    .crm-tac-apt-main span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 600; }
     .crm-tac-apt-s { font-size: 9.5px; color: var(--crm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .crm-tac-apt-actions { position: absolute; top: 3px; right: 3px; display: flex; gap: 2px; }
+
+    .crm-cal-apt-edit,
+    .crm-cal-apt-cancel {
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      font-size: 11px;
+      line-height: 1;
+      color: var(--crm-muted);
+      background: var(--crm-surface);
+      border: 1px solid var(--crm-line);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .crm-cal-apt-edit:hover { border-color: var(--crm-accent); color: var(--crm-accent); }
 
     .crm-cal-day { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
 
@@ -2357,17 +2567,13 @@ function renderAppointmentDate(item: Appointment) {
 
     .crm-cal-apt-cancel {
       align-self: flex-start;
-      font-size: 10.5px;
-      color: var(--crm-muted);
-      background: transparent;
-      border: 1px solid var(--crm-line);
-      border-radius: 5px;
-      padding: 0.1rem 0.35rem;
-      cursor: pointer;
-      margin-top: 0.2rem;
+      margin-top: 0;
     }
 
     .crm-cal-apt-cancel:hover { border-color: #ef4444; color: #ef4444; }
+
+    .crm-edit-date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .crm-edit-hint { margin: -0.2rem 0 0; color: var(--crm-muted); font-size: 12px; }
 
     .crm-cal-empty-cell {
       font-size: 11.5px;
