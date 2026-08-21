@@ -13,7 +13,7 @@ export interface ClientData {
   clientId: string;
   name: string;
   timezone?: string;
-  plan: 'starter' | 'pro' | 'total';
+  plan: 'starter' | 'pro' | 'total' | 'recepcionista';
   active: boolean;
   botStatus: 'connected' | 'disconnected' | 'pending_qr';
   qrPngBase64?: string;

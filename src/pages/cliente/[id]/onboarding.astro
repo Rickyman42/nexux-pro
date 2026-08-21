@@ -9,7 +9,13 @@ if (!clientId || !token) return Astro.redirect(`/cliente/${clientId ?? ''}/login
 const data = await getClientData(clientId, token);
 if (!data) return Astro.redirect('/acceso-denegado');
 
-const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'Pro' : 'Total';
+const planLabel = data.plan === 'recepcionista'
+  ? 'Recepcionista IA'
+  : data.plan === 'starter'
+    ? 'Starter'
+    : data.plan === 'pro'
+      ? 'Pro'
+      : 'Total';
 ---
 
 <Layout title="Configuración inicial — Nexux Pro">
@@ -322,6 +328,7 @@ const planLabel = data.plan === 'starter' ? 'Starter' : data.plan === 'pro' ? 'P
 .ob-pill-starter { background: rgba(90,90,90,0.12); color: var(--ob-muted); }
 .ob-pill-pro     { background: var(--ob-accent-lt); color: var(--ob-accent); }
 .ob-pill-total   { background: rgba(255,179,0,0.12); color: #c98a00; }
+.ob-pill-recepcionista { background: var(--ob-accent-lt); color: var(--ob-accent); }
 
 /* ── Buttons ──────────────────────────────────────── */
 .ob-btn-primary {

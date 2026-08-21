@@ -24,7 +24,18 @@ const todayAppointments = data.nextAppointments.filter(item => new Date(item.dat
 const limitedProgress = data.metrics.conversationLimit
   ? Math.min(100, Math.round((data.metrics.conversationCount / data.metrics.conversationLimit) * 100))
   : 100;
-const planLabel = data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
+const isRecepcionista = data.plan === 'recepcionista';
+const hasLegacyAdvancedTools = data.plan === 'pro' || data.plan === 'total';
+const planLabel = isRecepcionista
+  ? 'Recepcionista IA'
+  : data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
+const planPriceLabel = isRecepcionista
+  ? '29€/mes'
+  : data.plan === 'starter'
+    ? '249€/mes'
+    : data.plan === 'pro'
+      ? '449€/mes'
+      : '749€/mes';
 const qrImageSrc = data.qrPngBase64
   ? data.qrPngBase64.startsWith('data:image') ? data.qrPngBase64 : `data:image/png;base64,${data.qrPngBase64}`
   : null;
@@ -342,7 +353,7 @@ function renderAppointmentDate(item: Appointment) {
           </div>
 
           <!-- ── Herramientas rápidas ─────────────────────────────── -->
-          <div class="crm-dash-row" style="margin-top:1.5rem">
+          {!isRecepcionista && <div class="crm-dash-row" style="margin-top:1.5rem">
             <div class="crm-card" style="flex:1">
               <h2 class="crm-card-title">⚡ Herramientas rápidas</h2>
               <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.75rem">
@@ -387,7 +398,7 @@ function renderAppointmentDate(item: Appointment) {
 
               </div>
             </div>
-          </div>
+          </div>}
         </section>
 
         <!-- ── CITAS ──────────────────────────────────────── -->
@@ -460,7 +471,7 @@ function renderAppointmentDate(item: Appointment) {
                   </div>
                 </div>
               )}
-              {data.plan !== 'starter' && (
+              {hasLegacyAdvancedTools && (
                 <div class="crm-provider-wrap">
                   <h3 class="crm-section-lbl">Proveedor</h3>
                   <div class="crm-provider-opts">
@@ -567,7 +578,7 @@ function renderAppointmentDate(item: Appointment) {
             <div class="billing-plan-row">
               <div class="billing-plan-badge">
                 <span class="billing-plan-name">{planLabel}</span>
-                <span class="billing-plan-sub">{data.plan === 'starter' ? '249€/mes' : data.plan === 'pro' ? '449€/mes' : '749€/mes'}</span>
+                <span class="billing-plan-sub">{planPriceLabel}</span>
               </div>
               <button id="btn-billing-portal" class="crm-btn-primary">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -579,6 +590,23 @@ function renderAppointmentDate(item: Appointment) {
 
           <div class="crm-section">
             <span class="crm-section-lbl">Planes disponibles</span>
+            {isRecepcionista ? (
+              <div class="billing-plans-grid">
+                <div class="billing-plan-card current">
+                  <div class="bpc-header">
+                    <span class="bpc-name">Recepcionista IA</span>
+                    <span class="bpc-price">29€<small>/mes</small></span>
+                  </div>
+                  <ul class="bpc-features">
+                    <li>✅ WhatsApp, Telegram y web</li>
+                    <li>✅ Hasta 1.000 conversaciones/mes</li>
+                    <li>✅ Agenda y reservas automáticas</li>
+                    <li>✅ Sin permanencia ni comisión por cita</li>
+                  </ul>
+                  <span class="bpc-current-tag">Plan actual</span>
+                </div>
+              </div>
+            ) : (
             <div class="billing-plans-grid">
               <div class={`billing-plan-card ${data.plan === 'starter' ? 'current' : ''}`}>
                 <div class="bpc-header">
@@ -620,6 +648,7 @@ function renderAppointmentDate(item: Appointment) {
                 {data.plan === 'total' && <span class="bpc-current-tag">Plan actual</span>}
               </div>
             </div>
+            )}
             <p class="billing-hint" style="margin-top:16px">Para cambiar de plan usa el botón “Gestionar suscripción” arriba — Stripe te mostrará las opciones disponibles.</p>
           </div>
 
@@ -648,7 +677,7 @@ function renderAppointmentDate(item: Appointment) {
 
   <div id="portal-toast" class="crm-toast" hidden></div>
 
-  {data.plan !== 'starter' && (
+  {hasLegacyAdvancedTools && (
     <dialog id="provider-dialog" class="crm-dialog">
       <div class="crm-dialog-card">
         <h3>Cambiar a Twilio WhatsApp Business</h3>
@@ -707,7 +736,7 @@ function renderAppointmentDate(item: Appointment) {
     </form>
   </dialog>
 
-  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: data.plan === 'starter', customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []), scheduleJson: JSON.stringify(data.schedule ?? {}) }}>
+  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: !hasLegacyAdvancedTools, customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []), scheduleJson: JSON.stringify(data.schedule ?? {}) }}>
   (function () {
 
     // ── Theme ─────────────────────────────────────────────────────────
