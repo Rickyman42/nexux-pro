@@ -2,106 +2,67 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Nexux Pro vs gestión manual - Comparativa" description="Cuánto pierde tu peluquería sin automatización. Datos verificados de no-shows, reservas perdidas y horas de administración.">
+<Layout
+  title="Recepcionista IA vs gestión manual | Nexux"
+  description="Qué cambia cuando una recepcionista IA responde mensajes y ayuda a gestionar citas por WhatsApp, Telegram y web."
+>
   <main class="max-w-4xl mx-auto px-6 py-16">
-    <h1 class="text-4xl font-bold mb-6">Nexux Pro vs gestión manual</h1>
-    <p class="text-xl text-gray-600 mb-12">Cuánto pierde tu peluquería sin automatización — datos verificados</p>
+    <h1 class="text-4xl font-bold mb-6">Recepcionista IA frente a gestionar las citas a mano</h1>
+    <p class="text-xl text-gray-600 mb-12">
+      Nexux no sustituye tu agenda ni promete resultados automáticos. Lara te ayuda a responder mensajes,
+      consultar disponibilidad y dejar las citas registradas.
+    </p>
 
     <section class="mb-16">
-      <h2 class="text-2xl font-bold mb-6">Tabla comparativa</h2>
+      <h2 class="text-2xl font-bold mb-6">Qué cambia</h2>
       <div class="overflow-x-auto">
         <table class="w-full border-collapse border border-gray-200">
           <thead>
             <tr class="bg-gray-50">
-              <th class="border border-gray-200 px-4 py-3 text-left">Categoría</th>
-              <th class="border border-gray-200 px-4 py-3 text-left">Gestión manual</th>
-              <th class="border border-gray-200 px-4 py-3 text-left">Nexux Pro (IA)</th>
+              <th class="border border-gray-200 px-4 py-3 text-left">Tarea</th>
+              <th class="border border-gray-200 px-4 py-3 text-left">A mano</th>
+              <th class="border border-gray-200 px-4 py-3 text-left">Con Nexux</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="border border-gray-200 px-4 py-3 font-semibold">Reservas</td>
-              <td class="border border-gray-200 px-4 py-3">Llamadas y mensajes manuales</td>
-              <td class="border border-gray-200 px-4 py-3">Reserva online 24/7 con confirmación automática</td>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Preguntas habituales</td>
+              <td class="border border-gray-200 px-4 py-3">Las respondes cuando puedes</td>
+              <td class="border border-gray-200 px-4 py-3">Lara responde por WhatsApp, Telegram y web</td>
             </tr>
             <tr class="bg-gray-50">
-              <td class="border border-gray-200 px-4 py-3 font-semibold">Recordatorios</td>
-              <td class="border border-gray-200 px-4 py-3">Manuales (cuando hay tiempo)</td>
-              <td class="border border-gray-200 px-4 py-3">Automáticos por SMS/WhatsApp 24h antes</td>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Disponibilidad</td>
+              <td class="border border-gray-200 px-4 py-3">Revisas la agenda y contestas</td>
+              <td class="border border-gray-200 px-4 py-3">Lara consulta los huecos configurados</td>
             </tr>
             <tr>
-              <td class="border border-gray-200 px-4 py-3 font-semibold">No-shows</td>
-              <td class="border border-gray-200 px-4 py-3">20-30% de citas perdidas</td>
-              <td class="border border-gray-200 px-4 py-3">Reducción del 27% con IA</td>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Confirmación</td>
+              <td class="border border-gray-200 px-4 py-3">La haces tú</td>
+              <td class="border border-gray-200 px-4 py-3">La conversación deja la cita registrada</td>
             </tr>
             <tr class="bg-gray-50">
-              <td class="border border-gray-200 px-4 py-3 font-semibold">Horas admin/semana</td>
-              <td class="border border-gray-200 px-4 py-3">15-20 horas</td>
-              <td class="border border-gray-200 px-4 py-3">2-3 horas (85% automatizado)</td>
-            </tr>
-            <tr>
-              <td class="border border-gray-200 px-4 py-3 font-semibold">Gestión clientes</td>
-              <td class="border border-gray-200 px-4 py-3">Sin historial centralizado</td>
-              <td class="border border-gray-200 px-4 py-3">Perfil completo con historial y preferencias</td>
-            </tr>
-            <tr class="bg-gray-50">
-              <td class="border border-gray-200 px-4 py-3 font-semibold">Facturación</td>
-              <td class="border border-gray-200 px-4 py-3">Manual, sin control en tiempo real</td>
-              <td class="border border-gray-200 px-4 py-3">Dashboard con ingresos y tendencias</td>
-            </tr>
-            <tr>
-              <td class="border border-gray-200 px-4 py-3 font-semibold">Marketing</td>
-              <td class="border border-gray-200 px-4 py-3">Sin sistema</td>
-              <td class="border border-gray-200 px-4 py-3">Campañas automáticas y fidelización</td>
-            </tr>
-            <tr class="bg-gray-50">
-              <td class="border border-gray-200 px-4 py-3 font-semibold">Costo</td>
-              <td class="border border-gray-200 px-4 py-3">0€ + tiempo perdido</td>
-              <td class="border border-gray-200 px-4 py-3">Se paga solo con 2-3 no-shows evitados</td>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Precio</td>
+              <td class="border border-gray-200 px-4 py-3">Tiempo de gestión</td>
+              <td class="border border-gray-200 px-4 py-3">29 € al mes, sin comisión por cita</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="text-sm text-gray-500 mt-3">Datos: Market Growth Reports 2026, Gitnux AI Salon Statistics 2026</p>
     </section>
 
     <section class="mb-16">
-      <h2 class="text-2xl font-bold mb-6">El problema de los no-shows</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-red-50 p-4 rounded-lg text-center">
-          <div class="text-3xl font-bold text-red-600">20-30%</div>
-          <div class="text-sm text-gray-600">No-shows sin recordatorios</div>
-        </div>
-        <div class="bg-green-50 p-4 rounded-lg text-center">
-          <div class="text-3xl font-bold text-green-600">-27%</div>
-          <div class="text-sm text-gray-600">Con recordatorios IA</div>
-        </div>
-        <div class="bg-orange-50 p-4 rounded-lg text-center">
-          <div class="text-3xl font-bold text-orange-600">30-80€</div>
-          <div class="text-sm text-gray-600">Costo por no-show</div>
-        </div>
-        <div class="bg-blue-50 p-4 rounded-lg text-center">
-          <div class="text-3xl font-bold text-blue-600">1.200-3.200€</div>
-          <div class="text-sm text-gray-600">Pérdida mensual estimada</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="mb-16">
-      <h2 class="text-2xl font-bold mb-6">Datos del mercado de salón en España</h2>
-      <ul class="space-y-3">
-        <li><strong>1.2 millones</strong> de peluquerías usan herramientas digitales (Market Growth Reports 2026)</li>
-        <li><strong>78%</strong> de peluquerías han adoptado sistemas de reserva online</li>
-        <li><strong>65%</strong> de reservas se hacen desde dispositivos móviles</li>
-        <li>Mercado de software de reserva: <strong>629 millones de dólares</strong> en 2026</li>
-        <li>Crecimiento anual del <strong>6.7%</strong></li>
+      <h2 class="text-2xl font-bold mb-4">Lo que Nexux no promete</h2>
+      <ul class="space-y-3 text-gray-600">
+        <li>No garantiza que cada mensaje acabe en una reserva.</li>
+        <li>No sustituye la atención humana cuando una conversación necesita tu intervención.</li>
+        <li>No atiende llamadas telefónicas: hoy trabaja por WhatsApp, Telegram y web.</li>
       </ul>
     </section>
 
     <section class="bg-gray-50 p-8 rounded-lg">
-      <h2 class="text-2xl font-bold mb-4">¿Listo para dejar de perder clientes?</h2>
-      <p class="mb-6">Cada no-show son euros que dejan de entrar. Nexux Pro se paga solo con evitar 2-3 no-shows al mes.</p>
-      <a href="/paquetes/recepcionista" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Prueba gratuita</a>
+      <h2 class="text-2xl font-bold mb-4">Comprueba si encaja contigo</h2>
+      <p class="mb-6">Puedes ver una conversación de ejemplo antes de decidir.</p>
+      <a href="/demo" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Ver la demo</a>
     </section>
   </main>
 </Layout>
