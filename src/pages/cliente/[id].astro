@@ -454,13 +454,22 @@ function renderAppointmentDate(item: Appointment) {
             <h1 class="crm-view-title">Canales</h1>
           </div>
 
-          <div class="crm-card crm-mb" id="gcal-card">
+          <div class="crm-card crm-mb crm-gcal-card" id="gcal-card">
             <div class="crm-card-head">
               <h2 class="crm-card-title">Google Calendar</h2>
               <span class="crm-chip" id="gcal-chip">Comprobando…</span>
             </div>
+
+            <div class="crm-regalo">
+              <span class="crm-regalo-neon" aria-hidden="true">REGALO</span>
+              <p class="crm-regalo-txt">
+                <strong>Este servicio te lo regalamos</strong> por haber confiado en nosotros.
+                Sin coste adicional, ahora y mientras sigas con nosotros.
+              </p>
+            </div>
+
             <p class="crm-team-help" id="gcal-help">
-              Conecta tu Google Calendar y las citas aparecerán solas en el móvil de todo el equipo.
+              Conéctalo y las citas aparecerán solas en el móvil de todo el equipo.
               Puedes desconectarlo cuando quieras.
             </p>
             <div id="gcal-body"></div>
@@ -3220,6 +3229,70 @@ function renderAppointmentDate(item: Appointment) {
     @media (max-width: 640px) {
       .crm-res-add-row { grid-template-columns: 1fr 80px; }
       .crm-res-add-row .crm-btn-ghost { grid-column: 1 / -1; }
+    }
+
+    /* ── Cartel de regalo, en plan letrero de neón ─────────────────── */
+    .crm-gcal-card { position: relative; overflow: hidden; }
+
+    .crm-regalo {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      flex-wrap: wrap;
+      margin: 0.2rem 0 1.1rem;
+      padding: 1rem 1.2rem;
+      border-radius: 14px;
+      background:
+        radial-gradient(120% 140% at 0% 0%, rgba(255,45,149,0.10), transparent 60%),
+        radial-gradient(120% 140% at 100% 100%, rgba(64,235,241,0.10), transparent 60%),
+        rgba(12, 14, 22, 0.92);
+      border: 1px solid rgba(255,45,149,0.32);
+      box-shadow: 0 0 22px -6px rgba(255,45,149,0.45), inset 0 0 30px -18px rgba(64,235,241,0.6);
+    }
+
+    .crm-regalo-neon {
+      font-family: 'Bricolage Grotesque', 'Helvetica Neue', sans-serif;
+      font-weight: 800;
+      font-size: clamp(24px, 4.4vw, 34px);
+      letter-spacing: 0.16em;
+      line-height: 1;
+      white-space: nowrap;
+      color: #FFF1F8;
+      text-shadow:
+        0 0 4px #FFF1F8,
+        0 0 11px #FF2D95,
+        0 0 24px #FF2D95,
+        0 0 46px rgba(255,45,149,0.75),
+        0 0 78px rgba(64,235,241,0.35);
+      animation: neon-parpadeo 4.2s infinite;
+    }
+
+    /* Un tubo de neón real no brilla plano: tiembla y a veces se engancha. */
+    @keyframes neon-parpadeo {
+      0%, 17%, 20%, 51%, 54%, 100% { opacity: 1; }
+      18%, 52% { opacity: 0.55; }
+      19%, 53% { opacity: 0.85; }
+    }
+
+    .crm-regalo-txt {
+      margin: 0;
+      flex: 1 1 240px;
+      min-width: 0;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: rgba(255, 241, 248, 0.82);
+    }
+    .crm-regalo-txt strong { color: #FFF1F8; }
+
+    /* A quien le moleste el movimiento, se le deja el letrero encendido y fijo. */
+    @media (prefers-reduced-motion: reduce) {
+      .crm-regalo-neon { animation: none; }
+    }
+
+    @media (max-width: 520px) {
+      .crm-regalo { gap: 0.7rem; padding: 0.9rem 1rem; }
+      .crm-regalo-neon { font-size: 22px; letter-spacing: 0.12em; }
+      .crm-regalo-txt { font-size: 12.5px; }
     }
 
     .crm-gcal-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; }
