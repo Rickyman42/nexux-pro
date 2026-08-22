@@ -559,6 +559,24 @@ function renderAppointmentDate(item: Appointment) {
             <p class="crm-team-msg" id="team-msg" role="status"></p>
           </div>
 
+          <div class="crm-card crm-mb" id="res-card">
+            <h2 class="crm-card-title">Cabinas y equipamiento</h2>
+            <p class="crm-team-help">
+              Si un servicio necesita algo de lo que no tienes infinito —una cabina, un lavabo, una
+              silla— dilo aquí. Aunque haya dos personas libres, no se darán dos citas que necesiten
+              la misma cabina a la vez.
+            </p>
+            <div id="res-list-wrap"></div>
+            <div class="crm-res-add-row">
+              <input type="text" id="res-name" placeholder="Cabina 1, Lavabo…" class="crm-input" />
+              <input type="number" id="res-capacity" value="1" min="1" step="1" class="crm-input" aria-label="Cuántas caben a la vez" />
+              <button type="button" id="res-add" class="crm-btn-ghost">+ Añadir</button>
+            </div>
+            <div id="res-requirements-wrap"></div>
+            <button type="button" id="res-save" class="crm-btn-primary">Guardar cabinas</button>
+            <p class="crm-team-msg" id="res-msg" role="status"></p>
+          </div>
+
           <div class="crm-card">
             <h2 class="crm-card-title">Horario</h2>
             <form id="schedule-form" class="crm-schedule-form">
@@ -1112,6 +1130,131 @@ function renderAppointmentDate(item: Appointment) {
     }
 
     cargarEquipo();
+
+    // ── Cabinas y equipamiento ────────────────────────────────────────
+    // Un recurso es algo limitado que la cita ocupa. Dos personas pueden
+    // atender a la vez, pero si solo hay una cabina no caben dos citas de
+    // cabina a la misma hora aunque las den profesionales distintos.
+    var recursos = [];
+    var requisitos = {}; // nombre de servicio -> { resource_id, units } | null
+
+    function renderRecursos() {
+      var wrap = document.getElementById('res-list-wrap');
+      if (!wrap) return;
+      if (!recursos.length) {
+        wrap.innerHTML = '<p class="crm-empty">Sin cabinas ni equipamiento limitado.</p>';
+      } else {
+        wrap.innerHTML = '<div class="crm-table-wrap"><table class="crm-table"><thead><tr>'
+          + '<th>Nombre</th><th>A la vez</th><th></th></tr></thead><tbody>'
+          + recursos.map(function (recurso, i) {
+            return '<tr><td>' + esc(recurso.name) + '</td>'
+              + '<td>' + esc(recurso.capacity) + '</td>'
+              + '<td><button type="button" class="crm-btn-del" data-i="' + i + '">🗑</button></td></tr>';
+          }).join('') + '</tbody></table></div>';
+        wrap.querySelectorAll('.crm-btn-del').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var fuera = recursos.splice(parseInt(btn.dataset.i, 10), 1)[0];
+            // Si un servicio dependia de esa cabina, deja de depender.
+            Object.keys(requisitos).forEach(function (servicio) {
+              if (requisitos[servicio] && fuera && requisitos[servicio].resource_id === fuera.id) {
+                requisitos[servicio] = null;
+              }
+            });
+            renderRecursos();
+          });
+        });
+      }
+      renderRequisitos();
+    }
+
+    function renderRequisitos() {
+      var wrap = document.getElementById('res-requirements-wrap');
+      if (!wrap) return;
+      if (!recursos.length || !services.length) { wrap.innerHTML = ''; return; }
+      wrap.innerHTML = '<p class="crm-res-sub">Qué necesita cada servicio</p>'
+        + '<div class="crm-table-wrap"><table class="crm-table"><tbody>'
+        + services.map(function (servicio) {
+          var actual = requisitos[servicio.name];
+          var opciones = '<option value="">No necesita nada</option>'
+            + recursos.map(function (recurso) {
+              var sel = actual && actual.resource_id === recurso.id ? ' selected' : '';
+              return '<option value="' + esc(recurso.id || recurso.name) + '"' + sel + '>'
+                + esc(recurso.name) + '</option>';
+            }).join('');
+          return '<tr><td>' + esc(servicio.name) + '</td>'
+            + '<td><select class="crm-input crm-res-sel" data-svc="' + esc(servicio.name) + '">'
+            + opciones + '</select></td></tr>';
+        }).join('') + '</tbody></table></div>';
+
+      wrap.querySelectorAll('.crm-res-sel').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+          var servicio = sel.dataset.svc;
+          requisitos[servicio] = sel.value ? { resource_id: sel.value, units: 1 } : null;
+        });
+      });
+    }
+
+    async function cargarRecursos() {
+      try {
+        var res = await fetch('/portal-api/resources?clientId=' + clientId);
+        if (!res.ok) return;
+        var data = await res.json();
+        recursos = data.resources || [];
+        requisitos = {};
+        (data.services || []).forEach(function (servicio) {
+          var req = (servicio.resource_requirements || [])[0];
+          requisitos[servicio.name] = req && req.eligible_resource_ids && req.eligible_resource_ids[0]
+            ? { resource_id: req.eligible_resource_ids[0], units: req.units || 1 }
+            : null;
+        });
+        renderRecursos();
+      } catch (_) { /* el portal sigue funcionando sin esto */ }
+    }
+
+    var resAdd = document.getElementById('res-add');
+    if (resAdd) {
+      resAdd.addEventListener('click', function () {
+        var nameInput = document.getElementById('res-name');
+        var capInput = document.getElementById('res-capacity');
+        var nombre = nameInput ? nameInput.value.trim() : '';
+        var capacidad = parseInt(capInput ? capInput.value : '1', 10);
+        if (!nombre) { showToast('Escribe un nombre'); return; }
+        if (!capacidad || capacidad < 1) { showToast('¿Cuántas caben a la vez?'); return; }
+        recursos.push({ name: nombre, capacity: capacidad, active: true });
+        renderRecursos();
+        if (nameInput) nameInput.value = '';
+        if (capInput) capInput.value = '1';
+      });
+    }
+
+    var resSave = document.getElementById('res-save');
+    if (resSave) {
+      resSave.addEventListener('click', async function () {
+        var msg = document.getElementById('res-msg');
+        if (msg) msg.textContent = '';
+        resSave.disabled = true;
+        var res = await fetch('/portal-api/resources', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId: clientId, resources: recursos, requirements: requisitos }),
+        }).catch(function () { return null; });
+        resSave.disabled = false;
+
+        if (res && res.ok) {
+          await cargarRecursos();
+          showToast('Guardado ✅');
+          return;
+        }
+        var detalle = res ? await res.json().catch(function () { return {}; }) : {};
+        if (msg) {
+          msg.textContent = detalle.message
+            || 'No se pudo guardar. Revisa las citas ya existentes.';
+        }
+        showToast('No se pudo guardar');
+      });
+    }
+
+    cargarRecursos();
 
     // ── Telegram copy ─────────────────────────────────────────────────
     // ── Telegram QR ───────────────────────────────────────────────────────────
@@ -2844,6 +2987,28 @@ function renderAppointmentDate(item: Appointment) {
       color: var(--crm-danger, #B4342E);
       min-height: 1em;
     }
+    .crm-res-add-row {
+      display: grid;
+      grid-template-columns: 1fr 90px auto;
+      gap: 0.5rem;
+      align-items: center;
+      margin: 0.9rem 0;
+    }
+    .crm-res-sub {
+      margin: 1.1rem 0 0.5rem;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--crm-muted);
+    }
+    .crm-res-sel { padding: 0.35rem 0.5rem; font-size: 13px; }
+
+    @media (max-width: 640px) {
+      .crm-res-add-row { grid-template-columns: 1fr 80px; }
+      .crm-res-add-row .crm-btn-ghost { grid-column: 1 / -1; }
+    }
+
     .crm-apt-error {
       margin: 0.2rem 0 0;
       font-size: 13px;

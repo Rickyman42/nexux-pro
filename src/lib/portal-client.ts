@@ -216,6 +216,46 @@ export interface Professional {
   priority?: number;
 }
 
+export interface Resource {
+  id?: string;
+  name: string;
+  capacity: number;
+  active?: boolean;
+}
+
+export async function fetchResources(
+  clientId: string,
+  token: string,
+): Promise<{ ok: boolean; resources?: Resource[]; services?: any[]; error?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/resources`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const payload = await response.json().catch(() => ({}));
+    return response.ok ? payload : { ok: false, error: payload?.error || 'request_failed' };
+  } catch {
+    return { ok: false, error: 'connection_error' };
+  }
+}
+
+export async function saveResources(
+  clientId: string,
+  token: string,
+  data: { resources?: Resource[]; requirements?: Record<string, { resource_id: string; units?: number } | null> },
+): Promise<{ ok: boolean; status: number; resources?: Resource[]; error?: string; message?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/resources`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+    const payload = await response.json().catch(() => ({}));
+    return { ...payload, ok: response.ok, status: response.status };
+  } catch {
+    return { ok: false, status: 502, error: 'connection_error' };
+  }
+}
+
 export async function fetchProfessionals(
   clientId: string,
   token: string,
