@@ -1,8 +1,8 @@
 # Arquitectura multiagenda — Nexux Recepcionista IA
 
 > Diseñada por Sol y revisada contra el código real el 21-08-2026.
-> **Estado: Fases 1, 2, 3 y 4 (backend) CERRADAS y verificadas en producción.**
-> **Falta el front del portal: gestionar profesionales y ver el calendario por persona.**
+> **Estado: Fases 1 a 5 CERRADAS y verificadas en producción, front incluido.**
+> Queda solo la migración física de las citas antiguas y el horario propio por persona.
 > **Modo `single` (una agenda, sin solapes) es el producto actual y es intencionado.** El modo `team`
 > es una capacidad distinta, no un arreglo del actual: se activa por configuración, no sustituye nada.
 > Reparto: Sol diseña y refuta, Luna implementa. Ver "Estado real" al final.
@@ -329,43 +329,56 @@ En producción, tres reservas **a la misma hora** con el cliente en `team`:
 
 43/43 tests. Cliente de prueba restaurado a `single` y citas de prueba borradas.
 
+### Fase 4 (front) — ✅ CERRADA y verificada en navegador
+
+- **Configuración → "Mi equipo"**: interruptor de modo, alta y baja de personas, un color por cada una
+  (cada nueva coge el siguiente de la paleta: si no, salían todas iguales y el color dejaba de servir).
+  No deja activar el equipo con menos de dos personas.
+- **Calendario**: las citas a la misma hora **se reparten el ancho de la columna** en vez de pintarse una
+  encima de otra — antes la de debajo era invisible. Cada bloque lleva el color y el nombre de quien
+  atiende. Al partirse la columna quedan ~60px y los botones se comían 38, así que en bloques
+  compartidos se esconden hasta pasar por encima.
+- **Nueva cita**: selector "Quién atiende" y el motivo real cuando la hora choca (antes se perdía).
+
+### Fase 5 — ✅ CERRADA y verificada en producción
+
+#### Recursos (cabinas, lavabos, sillas)
+
+El motor ya los soportaba pero **nadie podía configurarlos**: ningún cliente tenía un solo recurso.
+Rutas `GET`/`POST /client/:id/resources` y tarjeta **"Cabinas y equipamiento"** en el portal, con
+capacidad por recurso y una tabla de qué servicio necesita cuál.
+
+Prueba en producción, que es justo para lo que sirven:
+
+```
+Dos profesionales libres · UNA sola cabina · dos citas a la misma hora
+  1ª → 200  Ana, cabina asignada
+  2ª → 409  resource_unavailable
+```
+
+#### Calendario externo — dos fallos, uno viejísimo
+
+1. **Todos los eventos de Google decían "undefined — undefined".** `calendar.js` leía
+   `appointment.nombre` / `.servicio` / `.phone` / `.duracion`, pero las citas se guardan como
+   `client_name` / `service` / `client_phone` / `duration_min`. **Solo coincidían `id` y `datetime`.**
+   Además la duración salía la de por defecto, no la real. Corregido con un lector que entiende las dos
+   formas, para no romper citas antiguas. 4 tests de regresión.
+2. **No existía `updateCalendarEvent`.** Al mover una cita desde el CRM, el calendario del negocio se
+   quedaba con la hora vieja y nadie avisaba. Y las citas creadas *desde* el CRM **nunca llegaban al
+   calendario** — solo las creaba Lara. Ahora crear, mover y cancelar desde el CRM sincronizan.
+
+#### Editar cita: un cabo suelto de la Fase 2
+
+La ruta de edición tenía **su propia comprobación de solapes escrita a mano que ignoraba al
+profesional**: en modo equipo, mover una cita chocaba falsamente con la de otra persona a la misma hora.
+La Fase 2 migró la creación pero no la edición. Ya pasa por el mismo motor.
+
 ### Lo que falta
 
-- **Front del portal**: pantalla para dar de alta profesionales y asignarles servicios. La API existe;
-  el CRM (`nexux-pro`) todavía **no menciona la palabra profesional** en ninguna parte.
-- **Calendario por persona**: columnas o colores, filtro, y que se vean dos citas a la misma hora.
-  Al arrastrar una cita debe conservarse su profesional salvo que se cambie a propósito.
-- **Fase 5**: recursos (cabinas, sillones) y calendario externo.
-- **Migración física** de citas antiguas (hoy se interpretan como `pro_default` al vuelo, sin tocar el
-  fichero).
-- **Gestión de profesionales en el portal** — en el front del CRM (`nexux-pro`) hay **cero**
-  referencias a profesional.
-- **Conversación de Lara** para elegir profesional («¿con Ana, con Marta o te da igual?»).
-- **Recursos** (cabinas, sillones) y calendario externo.
-
-**Traducido: con la Fase 2 el sistema ya no se pisa las citas. Para que dos personas puedan atender a
-la misma hora hacen falta las fases 3 y 4.**
-
-### ✅ Bloqueo de la Fase 2: LEVANTADO (21-ago-2026, 22:15)
-
-El diseño condicionaba la Fase 2 a *"resolver el versionado"* de `nexux-clients`. **Resuelto.**
-
-`~/nexux-clients` es ya un repositorio git independiente (commit inicial `578bc52`). Los seis ficheros
-del núcleo están versionados y se puede revertir cualquier cambio. `git status` pasó de colgarse a
-0,009 s porque antes escaneaba los 11.183 ficheros de la carpeta personal.
-
-Se versiona **solo código y documentación** (89 ficheros). Quedan fuera, verificado uno a uno antes del
-commit: `.env`, `**/creds.json`, `**/auth/`, `.wwebjs_auth/` (sesiones de WhatsApp Web), `clients/`
-(conversaciones, citas y teléfonos reales — RGPD), `data/`, los `.jsonl` de correo y visitas,
-`*-log.json` y `node_modules`. Auditoría: sin claves `sk_live`/`sk_test`, sin tokens de bot, sin cadenas
-de conexión.
-
-⚠️ **`/home/nexux` sigue siendo zona prohibida.** Es otro repo git, con la carpeta personal entera
-dentro (incluidas `.ssh/authorized_keys` y varios `.credentials.json`) y remote `nexux-clients.git`.
-Un `pull` o `rebase` allí puede dejarte sin acceso SSH a la Pi. Trabaja siempre desde
-`~/nexux-clients`. Sus 91 commits locales con secretos no han llegado a GitHub.
-
-**La Fase 2 ya se puede abordar.** Sigue tocando los bots vivos (`whatsapp.js`, `telegram.js`,
-`provision-http.js`), pero ahora con posibilidad de revertir. Recomendación: conectar el motor primero
-en `mode: single` —comportamiento idéntico al de hoy, pero pasando por las comprobaciones del motor— y
-validar con una cuenta interna antes de que lo toque un cliente.
+- **Migración física de las citas antiguas.** Hoy se interpretan como `pro_default` al vuelo, sin tocar
+  el fichero. Funciona, pero conviene un script con copia previa y `--dry-run`, como decía el diseño.
+- **Horario propio por persona.** El motor lo soporta (`professional.schedule`) y el normalizador lo
+  respeta, pero el portal no deja fijarlo: hoy todas heredan el horario del negocio.
+- **Horario propio por recurso.** Mismo caso (`resource.schedule`).
+- **Login por profesional, roles y permisos.** Fuera del MVP por diseño, y sigue fuera.
+- **Calendarios de Google separados por persona.** Fuera del MVP por diseño.
