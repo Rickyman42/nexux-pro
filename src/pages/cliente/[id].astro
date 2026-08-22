@@ -454,6 +454,18 @@ function renderAppointmentDate(item: Appointment) {
             <h1 class="crm-view-title">Canales</h1>
           </div>
 
+          <div class="crm-card crm-mb" id="gcal-card">
+            <div class="crm-card-head">
+              <h2 class="crm-card-title">Google Calendar</h2>
+              <span class="crm-chip" id="gcal-chip">Comprobando…</span>
+            </div>
+            <p class="crm-team-help" id="gcal-help">
+              Conecta tu Google Calendar y las citas aparecerán solas en el móvil de todo el equipo.
+              Puedes desconectarlo cuando quieras.
+            </p>
+            <div id="gcal-body"></div>
+          </div>
+
           {showWhatsApp && (
             <div class="crm-card crm-mb">
               <div class="crm-card-head">
@@ -1256,6 +1268,116 @@ function renderAppointmentDate(item: Appointment) {
     }
 
     cargarRecursos();
+
+    // ── Google Calendar ───────────────────────────────────────────────
+    // El cliente pincha, acepta en Google y elige calendario. Antes habia que
+    // pedirle que compartiera el suyo a mano con un correo nuestro.
+    function gcalPintar(estado) {
+      var chip = document.getElementById('gcal-chip');
+      var cuerpo = document.getElementById('gcal-body');
+      if (!chip || !cuerpo) return;
+
+      if (!estado || !estado.ok) {
+        chip.textContent = 'No disponible';
+        chip.className = 'crm-chip chip-red';
+        cuerpo.innerHTML = '<p class="crm-empty">No se pudo comprobar la conexión.</p>';
+        return;
+      }
+      if (!estado.disponible) {
+        chip.textContent = 'Próximamente';
+        chip.className = 'crm-chip';
+        cuerpo.innerHTML = '<p class="crm-empty">Esta integración aún no está activada. Escríbenos y te la abrimos.</p>';
+        return;
+      }
+      if (!estado.conectado || estado.revocado) {
+        chip.textContent = estado.revocado ? 'Permiso retirado' : 'Sin conectar';
+        chip.className = 'crm-chip ' + (estado.revocado ? 'chip-yellow' : 'chip-red');
+        cuerpo.innerHTML = (estado.revocado
+          ? '<p class="crm-empty">Se retiró el permiso desde Google. Vuelve a conectarlo para seguir sincronizando.</p>'
+          : '')
+          + '<button type="button" class="crm-btn-primary" id="gcal-connect">Conectar mi Google Calendar</button>';
+        var btn = document.getElementById('gcal-connect');
+        if (btn) btn.addEventListener('click', gcalConectar);
+        return;
+      }
+
+      chip.textContent = estado.calendarId ? 'Conectado' : 'Falta elegir calendario';
+      chip.className = 'crm-chip ' + (estado.calendarId ? 'chip-green' : 'chip-yellow');
+
+      var opciones = (estado.calendarios || []).map(function (cal) {
+        var sel = cal.id === estado.calendarId ? ' selected' : '';
+        return '<option value="' + esc(cal.id) + '"' + sel + '>' + esc(cal.nombre)
+          + (cal.principal ? ' (principal)' : '') + '</option>';
+      }).join('');
+
+      cuerpo.innerHTML =
+        (estado.cuenta ? '<p class="crm-muted-p">Conectado como <strong>' + esc(estado.cuenta) + '</strong></p>' : '')
+        + '<label class="crm-form-lbl">¿En qué calendario se apuntan las citas?'
+        + '<select class="crm-input" id="gcal-select">'
+        + '<option value="">— Elige uno —</option>' + opciones + '</select></label>'
+        + '<div class="crm-gcal-actions">'
+        + '<button type="button" class="crm-btn-ghost" id="gcal-off">Desconectar</button>'
+        + '</div>'
+        + '<p class="crm-team-msg" id="gcal-msg" role="status"></p>';
+
+      var sel = document.getElementById('gcal-select');
+      if (sel) {
+        sel.addEventListener('change', async function () {
+          var msg = document.getElementById('gcal-msg');
+          var r = await fetch('/portal-api/google', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: clientId, calendarId: sel.value, activo: !!sel.value }),
+          }).catch(function () { return null; });
+          if (r && r.ok) { showToast('Calendario guardado ✅'); gcalCargar(); }
+          else if (msg) msg.textContent = 'No se pudo guardar el calendario.';
+        });
+      }
+      var off = document.getElementById('gcal-off');
+      if (off) {
+        off.addEventListener('click', async function () {
+          if (!window.confirm('¿Desconectar Google Calendar? Las citas dejarán de aparecer en tu calendario.')) return;
+          off.disabled = true;
+          var r = await fetch('/portal-api/google', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: clientId, action: 'disconnect' }),
+          }).catch(function () { return null; });
+          off.disabled = false;
+          if (r && r.ok) { showToast('Desconectado'); gcalCargar(); }
+          else showToast('No se pudo desconectar');
+        });
+      }
+    }
+
+    async function gcalConectar() {
+      var r = await fetch('/portal-api/google?action=connect&clientId=' + clientId).catch(function () { return null; });
+      if (!r || !r.ok) { showToast('No se pudo iniciar la conexión'); return; }
+      var d = await r.json().catch(function () { return {}; });
+      if (d.url) window.location.href = d.url;
+      else showToast('No se pudo iniciar la conexión');
+    }
+
+    async function gcalCargar() {
+      try {
+        var r = await fetch('/portal-api/google?clientId=' + clientId);
+        gcalPintar(await r.json());
+      } catch (_) { gcalPintar(null); }
+    }
+
+    // Al volver de Google se avisa de como fue.
+    (function () {
+      var p = new URLSearchParams(location.search).get('google');
+      if (!p) return;
+      var mensajes = {
+        conectado: 'Google Calendar conectado ✅ Elige en qué calendario se apuntan las citas.',
+        cancelado: 'Conexión cancelada.',
+        sin_permiso_duradero: 'Google no dio permiso permanente. Vuelve a intentarlo y acepta todos los pasos.',
+      };
+      if (mensajes[p]) setTimeout(function () { showToast(mensajes[p]); }, 700);
+      // Se quita de la barra de direcciones para que no se repita al recargar.
+      history.replaceState(null, '', location.pathname);
+    })();
+
+    gcalCargar();
 
     // ── Telegram copy ─────────────────────────────────────────────────
     // ── Telegram QR ───────────────────────────────────────────────────────────
@@ -3099,6 +3221,8 @@ function renderAppointmentDate(item: Appointment) {
       .crm-res-add-row { grid-template-columns: 1fr 80px; }
       .crm-res-add-row .crm-btn-ghost { grid-column: 1 / -1; }
     }
+
+    .crm-gcal-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; }
 
     .crm-apt-error {
       margin: 0.2rem 0 0;

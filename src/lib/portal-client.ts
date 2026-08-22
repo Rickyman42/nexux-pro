@@ -216,6 +216,77 @@ export interface Professional {
   priority?: number;
 }
 
+export interface GoogleCalendarStatus {
+  ok: boolean;
+  disponible?: boolean;
+  conectado?: boolean;
+  revocado?: boolean;
+  cuenta?: string | null;
+  calendarId?: string | null;
+  activo?: boolean;
+  calendarios?: Array<{ id: string; nombre: string; principal: boolean }>;
+  motivo?: string;
+  error?: string;
+}
+
+export async function googleStatus(clientId: string, token: string): Promise<GoogleCalendarStatus> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/google/status`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const payload = await response.json().catch(() => ({}));
+    return response.ok ? payload : { ok: false, error: payload?.error || 'request_failed' };
+  } catch {
+    return { ok: false, error: 'connection_error' };
+  }
+}
+
+export async function googleConnectUrl(
+  clientId: string,
+  token: string,
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/google/connect`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const payload = await response.json().catch(() => ({}));
+    return response.ok ? payload : { ok: false, error: payload?.error || 'request_failed' };
+  } catch {
+    return { ok: false, error: 'connection_error' };
+  }
+}
+
+export async function googleSetCalendar(
+  clientId: string,
+  token: string,
+  data: { calendarId?: string | null; activo?: boolean },
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/google/calendar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+    const payload = await response.json().catch(() => ({}));
+    return response.ok ? payload : { ok: false, error: payload?.error || 'request_failed' };
+  } catch {
+    return { ok: false, error: 'connection_error' };
+  }
+}
+
+export async function googleDisconnect(clientId: string, token: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/google/disconnect`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const payload = await response.json().catch(() => ({}));
+    return response.ok ? payload : { ok: false, error: payload?.error || 'request_failed' };
+  } catch {
+    return { ok: false, error: 'connection_error' };
+  }
+}
+
 export interface Resource {
   id?: string;
   name: string;
