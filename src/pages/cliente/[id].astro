@@ -411,6 +411,7 @@ function renderAppointmentDate(item: Appointment) {
             <div class="crm-cal-nav">
               <button id="cal-prev" class="crm-btn-ghost">← Anterior</button>
               <span id="cal-week-label" class="crm-cal-label"></span>
+              <button id="cal-week-back" class="crm-btn-ghost crm-hidden">Ver semana</button>
               <button id="cal-next" class="crm-btn-ghost">Siguiente →</button>
             </div>
             <div class="crm-cal-grid" id="cal-grid">
@@ -1371,6 +1372,10 @@ function renderAppointmentDate(item: Appointment) {
     // ── Calendar ──────────────────────────────────────────────────────
     (function () {
       var currentWeekOffset = 0;
+      // Si vistaDia tiene una fecha, el calendario muestra SOLO ese dia a ancho
+      // completo. En la semana cada dia ocupa un septimo del ancho y con tres o
+      // cuatro citas solapadas no hay quien las lea; en el dia hay sitio.
+      var vistaDia = null;
       var DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
       var HIDE_ON_MOBILE = [3, 4, 5, 6];
 
@@ -1451,7 +1456,7 @@ function renderAppointmentDate(item: Appointment) {
         await loadCalendar();
       });
 
-      function enableAppointmentDrag(block, apt, columns, monday, minH, maxH, slotHeight) {
+      function enableAppointmentDrag(block, apt, columns, monday, minH, maxH, slotHeight, numDias) {
         if (!window.PointerEvent || (apt.status || 'confirmed').toLowerCase() === 'cancelled') return;
         var pointerId = null;
         var startX = 0;
@@ -1488,8 +1493,9 @@ function renderAppointmentDate(item: Appointment) {
           block.style.transform = '';
 
           var rect = columns.getBoundingClientRect();
-          var dayWidth = rect.width / 7;
-          var dayIndex = Math.max(0, Math.min(6, Math.floor((event.clientX - rect.left) / dayWidth)));
+          var totalDias = numDias || 7;
+          var dayWidth = rect.width / totalDias;
+          var dayIndex = Math.max(0, Math.min(totalDias - 1, Math.floor((event.clientX - rect.left) / dayWidth)));
           var duration = parseInt(apt.duration_min || 60, 10) || 60;
           var minute = minH * 60 + Math.round((((event.clientY - rect.top - grabOffsetY) / slotHeight) * 60) / 15) * 15;
           minute = Math.max(minH * 60, Math.min(maxH * 60 - duration, minute));
@@ -1564,11 +1570,26 @@ function renderAppointmentDate(item: Appointment) {
           grid.innerHTML = '<p class="crm-empty">Error al cargar citas</p>';
           return;
         }
+        var esDia = !!vistaDia;
         var monday = getMondayOfWeek(currentWeekOffset);
-        var mStr = (monday.getMonth() + 1);
-        var sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-        if (label) label.textContent = monday.getDate() + '/' + mStr + ' – ' + sunday.getDate() + '/' + (sunday.getMonth() + 1) + '/' + sunday.getFullYear();
+        var diaBase = esDia ? new Date(vistaDia) : monday;
+        var numDias = esDia ? 1 : 7;
+
+        if (label) {
+          if (esDia) {
+            label.textContent = diaBase.toLocaleDateString('es-ES', {
+              weekday: 'long', day: 'numeric', month: 'long',
+            });
+          } else {
+            var sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            label.textContent = monday.getDate() + '/' + (monday.getMonth() + 1) + ' – '
+              + sunday.getDate() + '/' + (sunday.getMonth() + 1) + '/' + sunday.getFullYear();
+          }
+        }
+        // El boton de volver solo tiene sentido dentro de un dia.
+        var btnSemana = document.getElementById('cal-week-back');
+        if (btnSemana) btnSemana.classList.toggle('crm-hidden', !esDia);
 
         var schedObj = {};
         try { schedObj = JSON.parse(scheduleJson || '{}'); } catch (_) {}
@@ -1586,19 +1607,37 @@ function renderAppointmentDate(item: Appointment) {
         var totalH = (maxH - minH) * SLOT_H;
 
         grid.innerHTML = '';
-        grid.className = 'crm-tac';
+        grid.className = 'crm-tac' + (esDia ? ' crm-tac--dia' : '');
 
         var hdrEl = document.createElement('div');
         hdrEl.className = 'crm-tac-header';
+        hdrEl.style.gridTemplateColumns = '52px repeat(' + numDias + ', 1fr)';
         var corner = document.createElement('div');
         corner.className = 'crm-tac-corner';
         hdrEl.appendChild(corner);
-        for (var di = 0; di < 7; di++) {
-          var dDay = new Date(monday);
-          dDay.setDate(monday.getDate() + di);
+        for (var di = 0; di < numDias; di++) {
+          var dDay = new Date(diaBase);
+          dDay.setDate(diaBase.getDate() + di);
           var dh2 = document.createElement('div');
-          dh2.className = 'crm-tac-day-hdr' + (isToday(dDay) ? ' today' : '');
-          dh2.innerHTML = '<span class="crm-tac-dn">' + DAY_NAMES[di] + '</span><span class="crm-tac-dd">' + dDay.getDate() + '</span>';
+          dh2.className = 'crm-tac-day-hdr' + (isToday(dDay) ? ' today' : '') + (esDia ? '' : ' pinchable');
+          var nombreDia = esDia
+            ? dDay.toLocaleDateString('es-ES', { weekday: 'long' })
+            : DAY_NAMES[di];
+          dh2.innerHTML = '<span class="crm-tac-dn">' + nombreDia + '</span>'
+            + '<span class="crm-tac-dd">' + dDay.getDate() + '</span>';
+          if (!esDia) {
+            // Pinchar el dia lo abre a solas: es donde caben las citas solapadas.
+            dh2.setAttribute('role', 'button');
+            dh2.setAttribute('tabindex', '0');
+            dh2.title = 'Ver solo este día';
+            (function (fecha) {
+              function abrir() { vistaDia = fecha; loadCalendar(); }
+              dh2.addEventListener('click', abrir);
+              dh2.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); }
+              });
+            })(new Date(dDay));
+          }
           hdrEl.appendChild(dh2);
         }
         grid.appendChild(hdrEl);
@@ -1627,9 +1666,10 @@ function renderAppointmentDate(item: Appointment) {
         colsEl.style.height = totalH + 'px';
         colsEl.style.position = 'relative';
 
-        for (var ci = 0; ci < 7; ci++) {
-          var cDay = new Date(monday);
-          cDay.setDate(monday.getDate() + ci);
+        colsEl.style.gridTemplateColumns = 'repeat(' + numDias + ', 1fr)';
+        for (var ci = 0; ci < numDias; ci++) {
+          var cDay = new Date(diaBase);
+          cDay.setDate(diaBase.getDate() + ci);
           var cStr = fmtDate(cDay);
           var cApts = apts.filter(function(a) { return fmtDate(new Date(a.datetime)) === cStr; });
           // Con varias agendas puede haber dos citas a la misma hora. Antes se
@@ -1715,7 +1755,7 @@ function renderAppointmentDate(item: Appointment) {
               actions.appendChild(eb);
               actions.appendChild(cb);
               blk.appendChild(actions);
-              enableAppointmentDrag(blk, apt, colsEl, monday, minH, maxH, SLOT_H);
+              enableAppointmentDrag(blk, apt, colsEl, diaBase, minH, maxH, SLOT_H, numDias);
             }
             col.appendChild(blk);
           });
@@ -1736,8 +1776,33 @@ function renderAppointmentDate(item: Appointment) {
 
       var calPrev = document.getElementById('cal-prev');
       var calNext = document.getElementById('cal-next');
-      if (calPrev) calPrev.addEventListener('click', function () { currentWeekOffset--; loadCalendar(); });
-      if (calNext) calNext.addEventListener('click', function () { currentWeekOffset++; loadCalendar(); });
+      function moverCalendario(pasos) {
+        if (vistaDia) {
+          var d = new Date(vistaDia);
+          d.setDate(d.getDate() + pasos);
+          vistaDia = d;
+        } else {
+          currentWeekOffset += pasos;
+        }
+        loadCalendar();
+      }
+      if (calPrev) calPrev.addEventListener('click', function () { moverCalendario(-1); });
+      if (calNext) calNext.addEventListener('click', function () { moverCalendario(1); });
+
+      var calBack = document.getElementById('cal-week-back');
+      if (calBack) {
+        calBack.addEventListener('click', function () {
+          // Volver a la semana del dia que se estaba mirando, no a la de hoy.
+          if (vistaDia) {
+            var lunesHoy = getMondayOfWeek(0);
+            var lunesDia = new Date(vistaDia);
+            lunesDia.setDate(lunesDia.getDate() - ((lunesDia.getDay() + 6) % 7));
+            currentWeekOffset = Math.round((lunesDia - lunesHoy) / (7 * 86400000));
+          }
+          vistaDia = null;
+          loadCalendar();
+        });
+      }
 
       var aptModal = document.getElementById('new-apt-modal');
       var openBtn = document.getElementById('open-apt-modal');
@@ -2894,6 +2959,32 @@ function renderAppointmentDate(item: Appointment) {
     .crm-tac-apt-main span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 600; }
     .crm-tac-apt-s { font-size: 9.5px; color: var(--crm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .crm-tac-apt-actions { position: absolute; top: 3px; right: 3px; display: flex; gap: 2px; }
+
+    /* Cabecera de día pinchable: abre ese día a solas */
+    .crm-tac-day-hdr.pinchable {
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      transition: background 0.14s ease;
+    }
+    .crm-tac-day-hdr.pinchable:hover,
+    .crm-tac-day-hdr.pinchable:focus-visible {
+      background: var(--crm-accent-soft, rgba(42,157,151,0.1));
+      outline: none;
+    }
+    .crm-tac-day-hdr.pinchable:focus-visible { box-shadow: inset 0 0 0 2px var(--crm-accent); }
+
+    /* Vista de un solo día: hay ancho de sobra, así que se enseña todo */
+    .crm-tac--dia .crm-tac-day-hdr .crm-tac-dn { text-transform: capitalize; font-size: 13px; }
+    .crm-tac--dia .crm-tac-day-hdr .crm-tac-dd { font-size: 20px; }
+    .crm-tac--dia .crm-tac-apt.compartido { font-size: 10px; padding-left: 0.55rem; }
+    .crm-tac--dia .crm-tac-apt.compartido .crm-tac-apt-s { display: block; }
+    .crm-tac--dia .crm-tac-apt.compartido .crm-tac-apt-main strong,
+    .crm-tac--dia .crm-tac-apt.compartido .crm-tac-apt-main span { font-size: 10px; }
+    /* Los botones no se esconden aquí: no compiten por el espacio */
+    .crm-tac--dia .crm-tac-apt.compartido .crm-tac-apt-actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
     /* Quién atiende, dentro del bloque de la cita */
     .crm-tac-apt-pro {
