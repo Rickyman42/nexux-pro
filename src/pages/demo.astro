@@ -224,7 +224,7 @@ const API = 'https://pi.nexux.pro';
       <div class="ch-avatar" id="ch-avatar">&#x2702;</div>
       <div style="flex:1">
         <div class="ch-name" id="ch-name">Salon Elite &middot; Lara</div>
-        <div class="ch-status"><span class="dot-on"></span><span id="ch-sub">En linea &middot; Asistente IA</span></div>
+        <div class="ch-status"><span class="dot-on"></span><span id="ch-sub">En línea &middot; Asistente IA</span></div>
       </div>
       <span class="badge-demo">DEMO</span>
     </div>
@@ -245,10 +245,10 @@ const API = 'https://pi.nexux.pro';
     </div>
 
     <div class="suggestions" id="suggestions">
-      <button class="sug" >Que servicios teneis?</button>
+      <button class="sug" >¿Qué servicios tenéis?</button>
       <button class="sug" >Quiero reservar cita</button>
-      <button class="sug" >Cuanto cuesta un tinte?</button>
-      <button class="sug" >Teneis hueco manana?</button>
+      <button class="sug" >¿Cuánto cuesta un tinte?</button>
+      <button class="sug" >¿Tenéis hueco mañana?</button>
     </div>
 
     <div class="crm-mobile" id="crmMobile">
@@ -291,12 +291,12 @@ const API = 'https://pi.nexux.pro';
       <div class="stat-card">
         <div class="sc-label">Mensajes a revisar</div>
         <div class="sc-val" id="sc-msgs">0</div>
-        <div class="sc-sub">Sin intervencion pendiente</div>
+        <div class="sc-sub">Sin intervención pendiente</div>
       </div>
       <div class="stat-card">
         <div class="sc-label">Huecos libres</div>
         <div class="sc-val" style="font-size:16px;margin-top:2px" id="sc-slots">8 disponibles</div>
-        <div class="sc-sub">Estimado segun horario</div>
+        <div class="sc-sub">Estimado según horario</div>
       </div>
     </div>
 
@@ -402,10 +402,10 @@ const API = 'https://pi.nexux.pro';
     var fecha=new Date(iso).toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
     var hora=hhmm(new Date(iso));
     bubble.innerHTML =
-      '<div style="margin-bottom:6px">Te he confirmado la cita. Anadela a tu calendario para no olvidarla:</div>'
+      '<div style="margin-bottom:6px">Te he confirmado la cita. Añádela a tu calendario para no olvidarla:</div>'
       + '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:capitalize">' + apt.service + ' &middot; ' + fecha + ' &middot; ' + hora + '</div>'
       + '<div style="display:flex;flex-direction:column;gap:6px">'
-      +   '<a href="' + gcalLink(apt,iso) + '" target="_blank" rel="noopener" style="background:#4285F4;color:#fff;text-decoration:none;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:700;text-align:center">Anadir a Google Calendar</a>'
+      +   '<a href="' + gcalLink(apt,iso) + '" target="_blank" rel="noopener" style="background:#4285F4;color:#fff;text-decoration:none;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:700;text-align:center">Añadir a Google Calendar</a>'
       +   '<button type="button" class="ics-btn" style="background:#fff;border:1px solid #ccc;color:#1a1a2e;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Apple / Outlook (.ics)</button>'
       + '</div>'
       + '<span class="ts">' + hhmm(new Date()) + '</span>';
@@ -446,7 +446,7 @@ const API = 'https://pi.nexux.pro';
     var scTotal = document.getElementById('sc-total');
     var scSub   = document.getElementById('sc-sub');
     if (scTotal) scTotal.textContent = todayApts.length;
-    if (scSub)   scSub.textContent   = todayApts.length > 0 ? todayApts.length + ' citas programadas' : 'Sin proximas citas';
+    if (scSub)   scSub.textContent   = todayApts.length > 0 ? todayApts.length + ' citas programadas' : 'Sin próximas citas';
   }
 
   // ── Week Calendar ─────────────────────────────────────
@@ -577,7 +577,7 @@ const API = 'https://pi.nexux.pro';
     if (ch === 'wa') {
       avatar.textContent = '✂️';
       name.textContent   = 'Salon Elite · Lara';
-      sub.textContent    = 'En linea · Asistente IA';
+      sub.textContent    = 'En línea · Asistente IA';
     } else {
       avatar.textContent = 'L';
       name.textContent   = 'Lara — Salon Elite';
@@ -599,7 +599,7 @@ const API = 'https://pi.nexux.pro';
     bubble.className = 'bubble';
 
     var span = document.createElement('span');
-    span.innerHTML = text.replace(/\n/g, '<br>');
+    span.innerHTML = fmtMsg(text);
 
     var ts = document.createElement('span');
     ts.className = 'ts';
@@ -665,7 +665,6 @@ const API = 'https://pi.nexux.pro';
             apts = apts.concat([newApt]);
             weekOffset = weekOffsetFor(new Date(iso));
             renderAll(newApt.id);
-            addCalendarCard(apt, iso);
             var tabCrm = document.getElementById('tab-crm');
             if (tabCrm) { var o=tabCrm.textContent; tabCrm.style.color='#4ade80'; tabCrm.textContent='Nueva cita!'; setTimeout(function(){ tabCrm.style.color=''; tabCrm.textContent=o; }, 3000); }
           } else {
@@ -683,6 +682,18 @@ const API = 'https://pi.nexux.pro';
       sending = false;
       document.getElementById('send-btn').disabled = false;
     });
+  }
+
+  // Escapa el HTML (el texto viene del modelo) y luego aplica el formato de WhatsApp.
+  function fmtMsg(t) {
+    var esc = String(t == null ? '' : t)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return esc
+      .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[\s(\u00a1\u00bf])\*([^*\n]+)\*(?=$|[\s.,;:!?)])/g, '$1<strong>$2</strong>')
+      .replace(/(^|[\s(\u00a1\u00bf])_([^_\n]+)_(?=$|[\s.,;:!?)])/g, '$1<em>$2</em>')
+      .replace(/\n/g, '<br>');
   }
 
   function useSug(btn) { document.getElementById('msg-input').value = btn.textContent; sendMsg(); }
