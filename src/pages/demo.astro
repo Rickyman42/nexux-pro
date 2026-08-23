@@ -193,6 +193,51 @@ const API = 'https://pi.nexux.pro';
       .chat-panel { flex: 1; }
     }
   </style>
+
+  <!-- Umami (cookieless, sin consentimiento) — mismo sitio que en Layout.astro.
+       Esta pagina no usa ese layout, asi que la medicion hay que ponerla aqui: sin
+       ella no se registra ni una visita, y el QR de los flyers apunta justo aqui.
+       Solo Umami: no lleva cookies, asi que no obliga a sacar el banner de consentimiento
+       en medio de la demo. GA4 y Meta se quedan fuera a proposito. -->
+  <script is:inline>
+    (function () {
+      var s = document.createElement('script');
+      s.id = 'umami-script';
+      s.defer = true;
+      s.src = '/stats/script.js';
+      s.dataset.websiteId = '682a2c1c-85be-41eb-b8a1-95d575e30545';
+      s.dataset.hostUrl = 'https://nexux.pro/stats';
+      document.head.appendChild(s);
+
+      // De donde viene la visita. El QR ya esta impreso y no se le puede anadir
+      // etiqueta, asi que se deduce por la huella que deja: quien llega escaneando
+      // un codigo entra sin venir de ningun enlace y casi siempre desde el movil.
+      function origenProbable() {
+        var hayEnlace = !!document.referrer;
+        var esMovil = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (!hayEnlace && esMovil) return 'qr-flyer';
+        if (!hayEnlace) return 'directo';
+        try {
+          var host = new URL(document.referrer).hostname.replace(/^www\./, '');
+          if (host === location.hostname) return 'interno';
+          return 'enlace-' + host;
+        } catch (e) { return 'enlace'; }
+      }
+
+      // Se espera a que Umami cargue para poder mandarle el evento.
+      var intentos = 0;
+      var t = setInterval(function () {
+        intentos++;
+        if (window.umami && typeof window.umami.track === 'function') {
+          clearInterval(t);
+          window.umami.track('demo-llegada', { origen: origenProbable() });
+        } else if (intentos > 40) {
+          clearInterval(t);   // 20s sin cargar: bloqueador o red; la visita se cuenta igual
+        }
+      }, 500);
+    })();
+  </script>
+
 </head>
 <body>
 
