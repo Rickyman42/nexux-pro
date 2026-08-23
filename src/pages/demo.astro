@@ -73,6 +73,9 @@ const API = 'https://pi.nexux.pro';
 
     /* MOBILE TABS */
     .tab-bar { display: none; }
+    .tab-hint { display: none; }
+    .tab-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; margin-left: 5px; vertical-align: middle; }
+    .tab-dot[hidden] { display: none; }   /* sin esto el punto se ve siempre: la regla de clase gana al atributo */
     .tab-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,.65); padding: 8px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
     .tab-btn.active { color: #fff; border-bottom: 2px solid #4ade80; }
     .wa .tab-bar { background: var(--wa-header); }
@@ -186,6 +189,9 @@ const API = 'https://pi.nexux.pro';
     }
     /* ── MOBILE ───────────────────────────────────────── */
     @media (max-width: 1023px) {
+      .tab-hint { display: block; padding: 8px 12px; font-size: 12px; line-height: 1.4; font-weight: 500;
+                  color: #fff; background: rgba(0,0,0,.30); text-align: center; }
+      .tab-btn { font-size: 11.5px; padding: 9px 2px; }
       .tab-bar { display: flex; }
       .crm-panel { display: none !important; }
       .msg { max-width: 86%; }
@@ -274,9 +280,10 @@ const API = 'https://pi.nexux.pro';
       <span class="badge-demo">DEMO</span>
     </div>
 
+    <div class="tab-hint" id="tabHint">Escribe como si fueras un cliente &mdash; lo que reserves aparece en tu agenda</div>
     <div class="tab-bar" id="tabBar">
-      <button class="tab-btn active" id="tab-chat" >&#x1F4AC; Chat</button>
-      <button class="tab-btn" id="tab-crm" >&#x1F4C5; Agenda</button>
+      <button class="tab-btn active" id="tab-chat" >&#x1F4AC; Lo que ve tu cliente</button>
+      <button class="tab-btn" id="tab-crm" >&#x1F4C5; Lo que ves t&uacute; <span class="tab-dot" id="tabDot" hidden></span></button>
     </div>
 
     <div class="messages" id="messages">
@@ -721,8 +728,10 @@ const API = 'https://pi.nexux.pro';
             apts = apts.concat([newApt]);
             weekOffset = weekOffsetFor(new Date(iso));
             renderAll(newApt.id);
-            var tabCrm = document.getElementById('tab-crm');
-            if (tabCrm) { var o=tabCrm.textContent; tabCrm.style.color='#4ade80'; tabCrm.textContent='Nueva cita!'; setTimeout(function(){ tabCrm.style.color=''; tabCrm.textContent=o; }, 3000); }
+            // Punto de aviso que NO se va solo: se apaga cuando el visitante abre la
+            // agenda y ve su cita. Es el momento en que entiende para que sirve esto.
+            var punto = document.getElementById('tabDot');
+            if (punto && document.getElementById('tabBar')) punto.hidden = false;
           } else {
             renderAll();
           }
@@ -781,7 +790,7 @@ const API = 'https://pi.nexux.pro';
   document.getElementById('btn-tg').addEventListener('click', function(){ setChannel('tg'); });
   document.getElementById('send-btn').addEventListener('click', sendMsg);
   document.getElementById('tab-chat').addEventListener('click', function(){ showTab('chat'); });
-  document.getElementById('tab-crm').addEventListener('click',  function(){ showTab('crm'); });
+  document.getElementById('tab-crm').addEventListener('click',  function(){ var p=document.getElementById('tabDot'); if (p) p.hidden = true; showTab('crm'); });
 
   document.querySelectorAll('.sug').forEach(function(btn){
     btn.addEventListener('click', function(){ useSug(this); });
