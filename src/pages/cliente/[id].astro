@@ -12,6 +12,43 @@ if (!clientId || !token) {
 }
 
 const data = await getClientData(clientId, token);
+
+// Senales de confianza: que el dueno vea de un vistazo que el sistema esta vivo,
+// sin tener que preguntarselo a nadie. Si el dato no llega, se dice; no se maquilla.
+const _conf = (data as any).confianza || {};
+const _lara = _conf.lara || null;
+const _backup = _conf.backup || null;
+const _tzCrm = data.timezone || 'Europe/Madrid';
+
+function _haceCuanto(iso: string | null): string {
+  if (!iso) return '';
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 1) return 'ahora mismo';
+  if (min < 60) return `hace ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `hace ${h} h`;
+  return `hace ${Math.round(h / 24)} d`;
+}
+function _horaCorta(iso: string | null): string {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('es-ES', {
+    timeZone: _tzCrm, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+  });
+}
+
+const laraHoy = _lara?.conversacionesHoy ?? null;
+const laraUltima = _lara?.ultimaRespuesta ?? null;
+// Verde solo si ha contestado en las ultimas 24 h: un verde permanente no informa de nada.
+const laraViva = !!laraUltima && (Date.now() - new Date(laraUltima).getTime()) < 86400000;
+const laraTexto = !_lara
+  ? 'Sin datos'
+  : laraHoy > 0
+    ? `${laraHoy} conversacion${laraHoy === 1 ? '' : 'es'} hoy`
+    : laraUltima ? `Ultima ${_haceCuanto(laraUltima)}` : 'Sin conversaciones aun';
+
+// La copia se hace cada noche: si la ultima tiene mas de 36 h, algo va mal.
+const backupAlDia = !!_backup && (Date.now() - new Date(_backup.fecha).getTime()) < 129600000;
+const backupTexto = _backup ? _horaCorta(_backup.fecha) : 'Sin copia';
 if (!data) {
   return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
 }
@@ -264,7 +301,7 @@ function renderAppointmentDate(item: Appointment) {
                     <span class="crm-status-lbl">WhatsApp</span>
                     <span class="crm-status-val">
                       <span class={`crm-dot ${data.channels.whatsapp.connected ? 'dot-green' : data.botStatus === 'pending_qr' ? 'dot-yellow' : 'dot-red'}`}></span>
-                      {data.channels.whatsapp.connected ? `Conectado` : data.botStatus === 'pending_qr' ? 'Pendiente QR' : 'Desconectado'}
+                      {data.channels.whatsapp.connected ? `Conectado` : data.botStatus === 'pending_qr' ? 'Pendiente QR' : data.botStatus === 'reconnecting' ? 'Reconectando' : 'Desconectado'}
                     </span>
                   </div>
                 )}
@@ -280,6 +317,20 @@ function renderAppointmentDate(item: Appointment) {
                   <span class="crm-status-val">
                     <span class={`crm-dot ${data.active ? 'dot-green' : 'dot-red'}`}></span>
                     {data.active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+                <div class="crm-status-item">
+                  <span class="crm-status-lbl">Lara</span>
+                  <span class="crm-status-val">
+                    <span class={`crm-dot ${laraViva ? 'dot-green' : 'dot-yellow'}`}></span>
+                    {laraTexto}
+                  </span>
+                </div>
+                <div class="crm-status-item">
+                  <span class="crm-status-lbl">Copia de seguridad</span>
+                  <span class="crm-status-val">
+                    <span class={`crm-dot ${backupAlDia ? 'dot-green' : 'dot-red'}`}></span>
+                    {backupTexto}
                   </span>
                 </div>
               </div>
