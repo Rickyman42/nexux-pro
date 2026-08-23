@@ -80,6 +80,13 @@ const API = 'https://pi.nexux.pro';
        del panel. Que cambie el envoltorio es lo que hace entender que has cambiado de sitio. */
     .tab-hint.lado-cliente { background: rgba(0,0,0,.34); }
     .tab-hint.lado-tuyo    { background: #14746c; }
+    /* En el lado del negocio, la cabecera deja de ser un chat: fuera el selector de
+       canal y el estado del bot, y el verde de WhatsApp pasa al teal del panel. Es lo
+       que hace que se note de verdad que son dos sitios distintos y no dos pestanas. */
+    .chat-panel.modo-negocio .channel-toggle { display: none; }
+    .chat-panel.modo-negocio .chat-header { background: #14746c; }
+    .chat-panel.modo-negocio .ch-avatar { background: #0d5b55; }
+    .chat-panel.modo-negocio .dot-on { display: none; }
     #tab-crm.active { border-bottom-color: #5eead4; }
     .tab-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,.65); padding: 8px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
     .tab-btn.active { color: #fff; border-bottom: 2px solid #4ade80; }
@@ -781,6 +788,9 @@ const API = 'https://pi.nexux.pro';
         bar=document.getElementById('inputBar'), mob=document.getElementById('crmMobile'),
         tc=document.getElementById('tab-chat'), tk=document.getElementById('tab-crm');
     var hint = document.getElementById('tabHint');
+    var panel = document.getElementById('chatPanel');
+    var av = document.getElementById('ch-avatar'), nm = document.getElementById('ch-name'), sb = document.getElementById('ch-sub');
+
     if (tab==='chat') {
       msgs.style.display=''; sugs.style.display=''; bar.style.display=''; mob.style.display='none';
       tc.classList.add('active'); tk.classList.remove('active');
@@ -788,12 +798,30 @@ const API = 'https://pi.nexux.pro';
         hint.className = 'tab-hint lado-cliente';
         hint.innerHTML = '\uD83D\uDC64 Lo que ve tu cliente &mdash; escr\u00edbele como si fueras \u00e9l';
       }
+      if (panel) panel.classList.remove('modo-negocio');
+      if (av && window._identidadChat) {
+        av.textContent = window._identidadChat.av;
+        nm.textContent = window._identidadChat.nm;
+        sb.textContent = window._identidadChat.sb;
+      }
     } else {
       msgs.style.display='none'; sugs.style.display='none'; bar.style.display='none'; mob.style.display='flex';
       tk.classList.add('active'); tc.classList.remove('active');
       if (hint) {
         hint.className = 'tab-hint lado-tuyo';
         hint.innerHTML = '\uD83C\uDFEA Lo que ves t\u00fa &mdash; aqu\u00ed caen las citas que Lara reserva';
+      }
+      // Se guarda la identidad VIGENTE justo antes de taparla, cada vez que se entra al
+      // panel: el nombre y el subtitulo cambian al alternar WhatsApp/Telegram, y guardarlos
+      // una sola vez dejaba una copia vieja que devolvia el canal equivocado.
+      if (panel && !panel.classList.contains('modo-negocio') && av) {
+        window._identidadChat = { av: av.textContent, nm: nm.textContent, sb: sb.textContent };
+      }
+      if (panel) panel.classList.add('modo-negocio');
+      if (av) {
+        av.textContent = '\uD83C\uDFEA';
+        nm.textContent = 'Sal\u00f3n \u00c9lite';
+        sb.textContent = 'Tu agenda';
       }
       renderMobile(lastNewId);
     }
