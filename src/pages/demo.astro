@@ -76,6 +76,11 @@ const API = 'https://pi.nexux.pro';
     .tab-hint { display: none; }
     .tab-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; margin-left: 5px; vertical-align: middle; }
     .tab-dot[hidden] { display: none; }   /* sin esto el punto se ve siempre: la regla de clase gana al atributo */
+    /* Cada lado con su color: el del cliente oscuro como su movil, el tuyo en el teal
+       del panel. Que cambie el envoltorio es lo que hace entender que has cambiado de sitio. */
+    .tab-hint.lado-cliente { background: rgba(0,0,0,.34); }
+    .tab-hint.lado-tuyo    { background: #14746c; }
+    #tab-crm.active { border-bottom-color: #5eead4; }
     .tab-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,.65); padding: 8px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
     .tab-btn.active { color: #fff; border-bottom: 2px solid #4ade80; }
     .wa .tab-bar { background: var(--wa-header); }
@@ -280,7 +285,7 @@ const API = 'https://pi.nexux.pro';
       <span class="badge-demo">DEMO</span>
     </div>
 
-    <div class="tab-hint" id="tabHint">Escribe como si fueras un cliente &mdash; lo que reserves aparece en tu agenda</div>
+    <div class="tab-hint lado-cliente" id="tabHint">&#128100; Lo que ve tu cliente &mdash; escr&iacute;bele como si fueras &eacute;l</div>
     <div class="tab-bar" id="tabBar">
       <button class="tab-btn active" id="tab-chat" >&#x1F4AC; Lo que ve tu cliente</button>
       <button class="tab-btn" id="tab-crm" >&#x1F4C5; Lo que ves t&uacute; <span class="tab-dot" id="tabDot" hidden></span></button>
@@ -775,12 +780,21 @@ const API = 'https://pi.nexux.pro';
     var msgs=document.getElementById('messages'), sugs=document.getElementById('suggestions'),
         bar=document.getElementById('inputBar'), mob=document.getElementById('crmMobile'),
         tc=document.getElementById('tab-chat'), tk=document.getElementById('tab-crm');
+    var hint = document.getElementById('tabHint');
     if (tab==='chat') {
       msgs.style.display=''; sugs.style.display=''; bar.style.display=''; mob.style.display='none';
       tc.classList.add('active'); tk.classList.remove('active');
+      if (hint) {
+        hint.className = 'tab-hint lado-cliente';
+        hint.innerHTML = '\uD83D\uDC64 Lo que ve tu cliente &mdash; escr\u00edbele como si fueras \u00e9l';
+      }
     } else {
       msgs.style.display='none'; sugs.style.display='none'; bar.style.display='none'; mob.style.display='flex';
       tk.classList.add('active'); tc.classList.remove('active');
+      if (hint) {
+        hint.className = 'tab-hint lado-tuyo';
+        hint.innerHTML = '\uD83C\uDFEA Lo que ves t\u00fa &mdash; aqu\u00ed caen las citas que Lara reserva';
+      }
       renderMobile(lastNewId);
     }
   }
