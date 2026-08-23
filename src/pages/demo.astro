@@ -651,6 +651,17 @@ const API = 'https://pi.nexux.pro';
         addMsg(data.reply, 'assistant');
         history.push({ role: 'assistant', content: data.reply });
 
+        // Cancelacion sin reserva nueva: hay que quitarla del calendario igual, o Lara
+        // dice 'cancelada con exito' y el hueco sigue ocupado a la vista del cliente.
+        if (data.cancelled && !data.appointmentBooked) {
+          var habia = apts.length;
+          apts = apts.filter(function(a){ return a.status !== 'new'; });
+          if (apts.length !== habia) {
+            renderAll();
+            var tabC = document.getElementById('tab-crm');
+            if (tabC) { var o2=tabC.textContent; tabC.style.color='#f87171'; tabC.textContent='Cita anulada'; setTimeout(function(){ tabC.style.color=''; tabC.textContent=o2; }, 3000); }
+          }
+        }
         if (data.appointmentBooked) {
           track('booking');
           var apt = data.appointmentBooked;
