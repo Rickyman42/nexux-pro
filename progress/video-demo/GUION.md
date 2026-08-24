@@ -97,7 +97,9 @@ Zoom lento a la agenda. La cita aparece.
    comunican seguridad; repartidas por el vídeo suenan a excusas.
 4. **Nada de voz en off ni avatar.** El producto se explica viéndolo. Una voz genérica de IA
    leyendo ventajas envejece mal y suena a anuncio.
-5. **Ambiente generado, producto grabado.** Regla innegociable: todo lo que sea la interfaz de
+5. **Termina obligándole a mirar el móvil.** Es la pregunta que exige respuesta del playbook:
+   no puede no contestarla, y la respuesta es el argumento de venta.
+6. **Ambiente generado, producto grabado.** Regla innegociable: todo lo que sea la interfaz de
    Nexux sale de una **captura real**, nunca de una interfaz inventada por IA.
 
 ---
@@ -160,3 +162,59 @@ el 24-ago para que no se pierdan: `progress/video-demo/pipeline/`.
 | `montar-acto3.py` | Monta el acto 3 con la demo real |
 
 Todo se ejecuta **en la Pi**, no en Windows.
+
+
+---
+
+## 7. TEXTO EXACTO YA MONTADO (`pipeline/montar-actos.py`)
+
+Lo que hay renderizado en los mp4 difiere en matices del guion escrito. Si se rehacen los actos en
+paleta clara, decidir cuál manda — **el guion de §2 es el bueno**, esto es sólo el registro de lo
+que se montó.
+
+**Acto 2:** entra línea a línea, las anteriores se quedan en gris suave, remate en teal a 132 px.
+`Cuando termines, mirarás.` / `Habrá cuatro mensajes.` / `Dos ya no contestarán.` /
+**`Y nunca sabrás quiénes eran.`**
+
+**Acto 4:** pregunta en Geist gris 62 px arriba, respuesta en dos tiempos debajo (108 px, la
+segunda en teal).
+- *"¿Y si contesta cualquier cosa?"* → `Pruébala tú mismo.` / `Sin registrarte.`
+- *"¿Otro programa que aprender?"* → `Es tu WhatsApp.` / `El de siempre.`
+- *"¿Y si no me sirve?"* → `Te devolvemos el dinero.` / `30 días.`
+- *"¿Cuánto?"* → `29 € al mes.` / `Sin comisiones por cita.`
+
+**Acto 5:** `Una cosa antes` / `de que sigas:` → `¿Cuántos mensajes` / `tienes ahora mismo` /
+`sin abrir?` (última línea en teal) → QR + `nexux.pro` + `Recepcionista IA · 29 €/mes` +
+`Escanea y pruébala sin registrarte`.
+
+### Dos trampas del montaje, ya resueltas — no volver a pisarlas
+1. **`zoompan` de ffmpeg ancla la ampliación en la esquina superior izquierda** si no se le pasan
+   `x`/`y`. El texto se iba hacia arriba y dejaba medio encuadre vacío abajo, y parecía un error de
+   coordenadas que no lo era. Se corrige con `x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`.
+2. **Coordenadas a mano = texto descentrado.** La función `bloque()` calcula el alto total de las
+   líneas y las centra sola. Antes el centrado vertical estaba perfecto (50 %) y el horizontal al
+   28 % — justo lo contrario de lo que parecía a ojo. Medir, no mirar.
+
+---
+
+## 8. PROMPTS DE FLOW (planos de ambiente)
+
+**Plano mano + móvil apagado** — el hueco donde se encaja la conversación real. Pantalla apagada a
+propósito: si Flow pinta una pantalla, hay que taparla y se nota el parche. Cámara y móvil quietos,
+porque sin tracking la pantalla insertada no puede seguir el movimiento.
+
+```
+Close-up over-the-shoulder shot of a hand holding a smartphone inside a small
+appointment-based business. The phone screen is completely OFF: black, blank,
+no interface, no text, no reflections. Behind the hand, softly out of focus, the
+business interior with someone working. Warm natural light, shallow depth of field,
+photorealistic. STATIC camera and STATIC phone — no movement, no pan, no zoom.
+6 seconds. No logos, no text anywhere.
+```
+
+**Zoom lento sobre la agenda** (acto 3, animando una captura real con fotograma de inicio):
+
+```
+Very slow zoom toward the calendar area. Everything static and unchanged:
+do not alter any text, numbers or interface element. Cinematic, calm, 5 seconds
+```

@@ -24,15 +24,39 @@ segno.make("https://nexux.pro/demo", error="h").save(
 QR = "data:image/png;base64," + base64.b64encode(_b.getvalue()).decode()
 
 
+X = 210
+
+
 def svg(cuerpo):
     return ('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
             'width="%d" height="%d" viewBox="0 0 %d %d">'
             '<rect width="%d" height="%d" fill="%s"/>%s</svg>' % (W, H, W, H, W, H, FONDO, cuerpo))
 
 
-def linea(x, y, txt, tam=64, color=None, fuente="Instrument Serif", peso="normal"):
-    return ('<text x="%d" y="%d" font-family="%s" font-size="%d" font-weight="%s" fill="%s">%s</text>'
-            % (x, y, fuente, tam, peso, color or TEXTO, txt))
+def linea(x, y, txt, tam=64, color=None, fuente="Instrument Serif", peso="normal", centrado=True):
+    anchor = ' text-anchor="middle"' if centrado else ''
+    px = W // 2 if centrado else x
+    return ('<text x="%d" y="%d"%s font-family="%s" font-size="%d" font-weight="%s" fill="%s">%s</text>'
+            % (px, y, anchor, fuente, tam, peso, color or TEXTO, txt))
+
+
+def bloque(lineas, centro=None):
+    """Coloca N lineas centradas verticalmente en el encuadre.
+    lineas = [(texto, tam, color, fuente, peso, separacion_extra), ...]
+    Antes se ponian coordenadas a mano y el texto quedaba en el tercio superior
+    izquierdo con media pantalla vacia: en video eso se lee como un error."""
+    alturas = [l[1] * 1.32 + (l[5] if len(l) > 5 else 0) for l in lineas]
+    total = sum(alturas)
+    y = (centro or H // 2) - total / 2 + alturas[0] * 0.78
+    out = ""
+    for i, l in enumerate(lineas):
+        txt, tam = l[0], l[1]
+        color = l[2] if len(l) > 2 and l[2] else TEXTO
+        fuente = l[3] if len(l) > 3 and l[3] else "Instrument Serif"
+        peso = l[4] if len(l) > 4 and l[4] else "normal"
+        out += linea(X, int(y), txt, tam, color, fuente, peso)
+        y += alturas[i]
+    return out
 
 
 def clip(nombre, cuerpo, dur, zoom=True):
@@ -46,7 +70,10 @@ def clip(nombre, cuerpo, dur, zoom=True):
     fps = 25
     frames = int(dur * fps)
     # Zoom del 100% al 103%: no se percibe como movimiento, pero evita la sensacion de foto fija
-    vf = ("zoompan=z='min(zoom+0.00035,1.03)':d=%d:s=%dx%d:fps=%d," % (frames, W, H, fps)) if zoom else "null,"
+    # zoompan ancla la ampliacion en la esquina superior izquierda si no se le dan x/y:
+    # el texto se iba hacia arriba y dejaba medio encuadre vacio abajo. Se centra.
+    vf = (("zoompan=z='min(zoom+0.00035,1.03)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
+           ":d=%d:s=%dx%d:fps=%d," % (frames, W, H, fps)) if zoom else "null,")
     vf += "fade=t=in:st=0:d=0.45,fade=t=out:st=%.2f:d=0.45,format=yuv420p" % max(dur - 0.45, 0.1)
     subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", p_png, "-t", str(dur),
                     "-vf", vf, "-r", str(fps), "-c:v", "libx264", "-preset", "medium",
@@ -69,26 +96,24 @@ def acto(nombre, estados):
     return final
 
 
-# ══ ACTO 2 — La pérdida ═════════════════════════════════════════════
-X = 200
+# == ACTO 2 — La pérdida ═════════════════════════════════════════════
 a2 = [
-    (linea(X, 520, "Cuando termines, mirar&#225;s.", 76), 2.6),
-    (linea(X, 460, "Cuando termines, mirar&#225;s.", 76, SUAVE) +
-     linea(X, 570, "Habr&#225; cuatro mensajes.", 76), 2.6),
-    (linea(X, 400, "Cuando termines, mirar&#225;s.", 76, SUAVE) +
-     linea(X, 510, "Habr&#225; cuatro mensajes.", 76, SUAVE) +
-     linea(X, 620, "Dos ya no contestar&#225;n.", 76), 2.8),
-    (linea(X, 500, "Y nunca sabr&#225;s", 104, TEAL) +
-     linea(X, 620, "qui&#233;nes eran.", 104, TEAL), 4.0),
+    (bloque([("Cuando termines, mirar&#225;s.", 92)]), 2.6),
+    (bloque([("Cuando termines, mirar&#225;s.", 92, SUAVE),
+             ("Habr&#225; cuatro mensajes.", 92)]), 2.6),
+    (bloque([("Cuando termines, mirar&#225;s.", 92, SUAVE),
+             ("Habr&#225; cuatro mensajes.", 92, SUAVE),
+             ("Dos ya no contestar&#225;n.", 92)]), 2.8),
+    (bloque([("Y nunca sabr&#225;s", 132, TEAL),
+             ("qui&#233;nes eran.", 132, TEAL)]), 4.0),
 ]
 
-# ══ ACTO 4 — Las objeciones ═════════════════════════════════════════
-def objecion(pregunta, respuesta, respuesta2=None):
-    c = linea(X, 460, "&#8220;" + pregunta + "&#8221;", 58, SUAVE, "Geist")
-    c += linea(X, 600, respuesta, 82, TEXTO)
-    if respuesta2:
-        c += linea(X, 700, respuesta2, 82, TEAL)
-    return c
+
+def objecion(pregunta, respuesta, respuesta2):
+    return bloque([("&#8220;" + pregunta + "&#8221;", 62, SUAVE, "Geist", "500", 40),
+                   (respuesta, 108),
+                   (respuesta2, 108, TEAL)])
+
 
 a4 = [
     (objecion("&#191;Y si contesta cualquier cosa?", "Pru&#233;bala t&#250; mismo.", "Sin registrarte."), 4.2),
@@ -97,17 +122,15 @@ a4 = [
     (objecion("&#191;Cu&#225;nto?", "29 &#8364; al mes.", "Sin comisiones por cita."), 4.6),
 ]
 
-# ══ ACTO 5 — La pregunta ════════════════════════════════════════════
 a5 = [
-    (linea(X, 470, "Una cosa antes", 64, SUAVE) +
-     linea(X, 560, "de que sigas:", 64, SUAVE), 2.6),
-    (linea(X, 430, "&#191;Cu&#225;ntos mensajes", 96) +
-     linea(X, 545, "tienes ahora mismo", 96) +
-     linea(X, 660, "sin abrir?", 96, TEAL), 4.4),
-    ('<image href="%s" x="%d" y="380" width="240" height="240"/>' % (QR, X) +
-     linea(X + 300, 470, "nexux.pro", 86, TEXTO, "Geist", "700") +
-     linea(X + 300, 545, "Recepcionista IA &#183; 29 &#8364;/mes", 40, SUAVE, "Geist") +
-     linea(X + 300, 600, "Escanea y pru&#233;bala sin registrarte", 34, TEAL, "Geist"), 5.0),
+    (bloque([("Una cosa antes", 76, SUAVE), ("de que sigas:", 76, SUAVE)]), 2.6),
+    (bloque([("&#191;Cu&#225;ntos mensajes", 124),
+             ("tienes ahora mismo", 124),
+             ("sin abrir?", 124, TEAL)]), 4.4),
+    ('<image href="%s" x="%d" y="%d" width="300" height="300"/>' % (QR, W // 2 - 430, H // 2 - 150) +
+     linea(0, H // 2 - 40, "nexux.pro", 104, TEXTO, "Geist", "700", False).replace('x="0"', 'x="%d"' % (W // 2 - 80)) +
+     linea(0, H // 2 + 30, "Recepcionista IA &#183; 29 &#8364;/mes", 46, SUAVE, "Geist", "normal", False).replace('x="0"', 'x="%d"' % (W // 2 - 80)) +
+     linea(0, H // 2 + 100, "Escanea y pru&#233;bala sin registrarte", 40, TEAL, "Geist", "normal", False).replace('x="0"', 'x="%d"' % (W // 2 - 80)), 5.0),
 ]
 
 print("montando...")
