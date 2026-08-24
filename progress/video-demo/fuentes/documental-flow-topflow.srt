@@ -1,0 +1,6975 @@
+1
+00:00:00,080 --> 00:00:01,790
+
+Hola a todos y bienvenidos a un nuevo
+
+2
+00:00:01,790 --> 00:00:01,800
+Hola a todos y bienvenidos a un nuevo
+ 
+
+3
+00:00:01,800 --> 00:00:05,030
+Hola a todos y bienvenidos a un nuevo
+vídeo de Topflow. AI. Hoy vamos a hablar
+
+4
+00:00:05,030 --> 00:00:05,040
+vídeo de Topflow. AI. Hoy vamos a hablar
+ 
+
+5
+00:00:05,040 --> 00:00:08,549
+vídeo de Topflow. AI. Hoy vamos a hablar
+de cómo crear documentales estilo box de
+
+6
+00:00:08,549 --> 00:00:08,559
+de cómo crear documentales estilo box de
+ 
+
+7
+00:00:08,559 --> 00:00:10,190
+de cómo crear documentales estilo box de
+manera gratuita. Supongo que ya habéis
+
+8
+00:00:10,190 --> 00:00:10,200
+manera gratuita. Supongo que ya habéis
+ 
+
+9
+00:00:10,200 --> 00:00:12,549
+manera gratuita. Supongo que ya habéis
+visto muchos vídeos últimamente de cómo
+
+10
+00:00:12,549 --> 00:00:12,559
+visto muchos vídeos últimamente de cómo
+ 
+
+11
+00:00:12,559 --> 00:00:14,910
+visto muchos vídeos últimamente de cómo
+la gente lo hace con Cloud, con Higfiel
+
+12
+00:00:14,910 --> 00:00:14,920
+la gente lo hace con Cloud, con Higfiel
+ 
+
+13
+00:00:14,920 --> 00:00:16,150
+la gente lo hace con Cloud, con Higfiel
+y ese es el problema que tenemos que
+
+14
+00:00:16,150 --> 00:00:16,160
+y ese es el problema que tenemos que
+ 
+
+15
+00:00:16,160 --> 00:00:18,189
+y ese es el problema que tenemos que
+pagar una suscripción de Higxfield o una
+
+16
+00:00:18,189 --> 00:00:18,199
+pagar una suscripción de Higxfield o una
+ 
+
+17
+00:00:18,199 --> 00:00:20,295
+pagar una suscripción de Higxfield o una
+suscripción, algún servicio de API
+
+18
+00:00:20,295 --> 00:00:20,305
+suscripción, algún servicio de API
+ 
+
+19
+00:00:20,305 --> 00:00:22,509
+suscripción, algún servicio de API
+[música] con diferentes modelos, pero yo
+
+20
+00:00:22,509 --> 00:00:22,519
+[música] con diferentes modelos, pero yo
+ 
+
+21
+00:00:22,519 --> 00:00:23,870
+[música] con diferentes modelos, pero yo
+te voy a enseñar hoy una manera de
+
+22
+00:00:23,870 --> 00:00:23,880
+te voy a enseñar hoy una manera de
+ 
+
+23
+00:00:23,880 --> 00:00:26,109
+te voy a enseñar hoy una manera de
+hacerlo completamente gratis [música]
+
+24
+00:00:26,109 --> 00:00:26,119
+hacerlo completamente gratis [música]
+ 
+
+25
+00:00:26,119 --> 00:00:28,950
+hacerlo completamente gratis [música]
+utilizando el nuevo Gemini Notebook
+
+26
+00:00:28,950 --> 00:00:28,960
+utilizando el nuevo Gemini Notebook
+ 
+
+27
+00:00:28,960 --> 00:00:32,510
+utilizando el nuevo Gemini Notebook
+junto con Flow o si no muy barato en
+
+28
+00:00:32,510 --> 00:00:32,520
+junto con Flow o si no muy barato en
+ 
+
+29
+00:00:32,520 --> 00:00:34,990
+junto con Flow o si no muy barato en
+función de la cuenta que tengas. Así que
+
+30
+00:00:34,990 --> 00:00:35,000
+función de la cuenta que tengas. Así que
+ 
+
+31
+00:00:35,000 --> 00:00:39,790
+función de la cuenta que tengas. Así que
+empezamos.
+
+32
+00:00:39,790 --> 00:00:39,800
+
+ 
+
+33
+00:00:39,800 --> 00:00:42,150
+
+Mira este vídeo.
+
+34
+00:00:42,150 --> 00:00:42,160
+Mira este vídeo.
+ 
+
+35
+00:00:42,160 --> 00:00:45,029
+Mira este vídeo.
+Toda nuestra economía moderna nació
+
+36
+00:00:45,029 --> 00:00:45,039
+Toda nuestra economía moderna nació
+ 
+
+37
+00:00:45,039 --> 00:00:47,790
+Toda nuestra economía moderna nació
+gracias a un secreto.
+
+38
+00:00:47,790 --> 00:00:47,800
+gracias a un secreto.
+ 
+
+39
+00:00:47,800 --> 00:00:51,110
+gracias a un secreto.
+Se guardaba bajo pena de muerte, el hilo
+
+40
+00:00:51,110 --> 00:00:51,120
+Se guardaba bajo pena de muerte, el hilo
+ 
+
+41
+00:00:51,120 --> 00:00:53,869
+Se guardaba bajo pena de muerte, el hilo
+de un gusano. En el año uno antes de
+
+42
+00:00:53,869 --> 00:00:53,879
+de un gusano. En el año uno antes de
+ 
+
+43
+00:00:53,879 --> 00:00:56,950
+de un gusano. En el año uno antes de
+nuestra era Roma descubrió la seda. Se
+
+44
+00:00:56,950 --> 00:00:56,960
+nuestra era Roma descubrió la seda. Se
+ 
+
+45
+00:00:56,960 --> 00:00:58,990
+nuestra era Roma descubrió la seda. Se
+desató una obsesión comercial sin
+
+46
+00:00:58,990 --> 00:00:59,000
+desató una obsesión comercial sin
+ 
+
+47
+00:00:59,000 --> 00:01:01,910
+desató una obsesión comercial sin
+precedentes, pero cruzar hacia central
+
+48
+00:01:01,910 --> 00:01:01,920
+precedentes, pero cruzar hacia central
+ 
+
+49
+00:01:01,920 --> 00:01:05,390
+precedentes, pero cruzar hacia central
+era una pesadilla. Había desiertos
+
+50
+00:01:05,390 --> 00:01:05,400
+era una pesadilla. Había desiertos
+ 
+
+51
+00:01:05,400 --> 00:01:07,710
+era una pesadilla. Había desiertos
+helados, montañas intransitables y
+
+52
+00:01:07,710 --> 00:01:07,720
+helados, montañas intransitables y
+ 
+
+53
+00:01:07,720 --> 00:01:10,190
+helados, montañas intransitables y
+bandas armadas listas para saltar cada
+
+54
+00:01:10,190 --> 00:01:10,200
+bandas armadas listas para saltar cada
+ 
+
+55
+00:01:10,200 --> 00:01:14,190
+bandas armadas listas para saltar cada
+caravana. La solución fue una red de
+
+56
+00:01:14,190 --> 00:01:14,200
+caravana. La solución fue una red de
+ 
+
+57
+00:01:14,200 --> 00:01:18,190
+caravana. La solución fue una red de
+Carabazares. Eran fortalezas espaciadas
+
+58
+00:01:18,190 --> 00:01:18,200
+Carabazares. Eran fortalezas espaciadas
+ 
+
+59
+00:01:18,200 --> 00:01:22,149
+Carabazares. Eran fortalezas espaciadas
+a un día de viaje con comida y refugio.
+
+60
+00:01:22,149 --> 00:01:22,159
+a un día de viaje con comida y refugio.
+ 
+
+61
+00:01:22,159 --> 00:01:24,670
+a un día de viaje con comida y refugio.
+Por estas rutas no solo viajó [música]
+
+62
+00:01:24,670 --> 00:01:24,680
+Por estas rutas no solo viajó [música]
+ 
+
+63
+00:01:24,680 --> 00:01:27,710
+Por estas rutas no solo viajó [música]
+tela, el papel, la pólvora y hasta la
+
+64
+00:01:27,710 --> 00:01:27,720
+tela, el papel, la pólvora y hasta la
+ 
+
+65
+00:01:27,720 --> 00:01:30,950
+tela, el papel, la pólvora y hasta la
+peste negra rediseñaron el mundo entero.
+
+66
+00:01:30,950 --> 00:01:30,960
+peste negra rediseñaron el mundo entero.
+ 
+
+67
+00:01:30,960 --> 00:01:33,830
+peste negra rediseñaron el mundo entero.
+Aquel hilo de gusano demostró una
+
+68
+00:01:33,830 --> 00:01:33,840
+Aquel hilo de gusano demostró una
+ 
+
+69
+00:01:33,840 --> 00:01:37,789
+Aquel hilo de gusano demostró una
+verdad. La codicia humana siempre
+
+70
+00:01:37,789 --> 00:01:37,799
+verdad. La codicia humana siempre
+ 
+
+71
+00:01:37,799 --> 00:01:39,270
+verdad. La codicia humana siempre
+encuentra un camino [música] para
+
+72
+00:01:39,270 --> 00:01:39,280
+encuentra un camino [música] para
+ 
+
+73
+00:01:39,280 --> 00:01:40,630
+encuentra un camino [música] para
+conectar el mundo.
+
+74
+00:01:40,630 --> 00:01:40,640
+conectar el mundo.
+ 
+
+75
+00:01:40,640 --> 00:01:42,069
+conectar el mundo.
+Y esto lo hemos hecho de manera
+
+76
+00:01:42,069 --> 00:01:42,079
+Y esto lo hemos hecho de manera
+ 
+
+77
+00:01:42,079 --> 00:01:44,789
+Y esto lo hemos hecho de manera
+completamente gratuita con el Wflow que
+
+78
+00:01:44,789 --> 00:01:44,799
+completamente gratuita con el Wflow que
+ 
+
+79
+00:01:44,799 --> 00:01:46,749
+completamente gratuita con el Wflow que
+te voy a enseñar hoy utilizando todo el
+
+80
+00:01:46,749 --> 00:01:46,759
+te voy a enseñar hoy utilizando todo el
+ 
+
+81
+00:01:46,759 --> 00:01:49,870
+te voy a enseñar hoy utilizando todo el
+ecosistema de Google. Eh, y os voy a
+
+82
+00:01:49,870 --> 00:01:49,880
+ecosistema de Google. Eh, y os voy a
+ 
+
+83
+00:01:49,880 --> 00:01:51,550
+ecosistema de Google. Eh, y os voy a
+explicar cómo podéis hacerlos tanto si
+
+84
+00:01:51,550 --> 00:01:51,560
+explicar cómo podéis hacerlos tanto si
+ 
+
+85
+00:01:51,560 --> 00:01:53,190
+explicar cómo podéis hacerlos tanto si
+tenéis cuenta gratuita como si tenéis la
+
+86
+00:01:53,190 --> 00:01:53,200
+tenéis cuenta gratuita como si tenéis la
+ 
+
+87
+00:01:53,200 --> 00:01:55,670
+tenéis cuenta gratuita como si tenéis la
+cuenta de pago. Eh, vamos a empezar.
+
+88
+00:01:55,670 --> 00:01:55,680
+cuenta de pago. Eh, vamos a empezar.
+ 
+
+89
+00:01:55,680 --> 00:01:58,630
+cuenta de pago. Eh, vamos a empezar.
+Vamos a empezar yéndonos a nuestro eh
+
+90
+00:01:58,630 --> 00:01:58,640
+Vamos a empezar yéndonos a nuestro eh
+ 
+
+91
+00:01:58,640 --> 00:02:00,230
+Vamos a empezar yéndonos a nuestro eh
+Notebook LM, que ahora ya no se llama
+
+92
+00:02:00,230 --> 00:02:00,240
+Notebook LM, que ahora ya no se llama
+ 
+
+93
+00:02:00,240 --> 00:02:02,630
+Notebook LM, que ahora ya no se llama
+Notebook LM, se llama Gemini Notebook.
+
+94
+00:02:02,630 --> 00:02:02,640
+Notebook LM, se llama Gemini Notebook.
+ 
+
+95
+00:02:02,640 --> 00:02:04,830
+Notebook LM, se llama Gemini Notebook.
+Entonces, simplemente nos vamos a Yemini
+
+96
+00:02:04,830 --> 00:02:04,840
+Entonces, simplemente nos vamos a Yemini
+ 
+
+97
+00:02:04,840 --> 00:02:06,670
+Entonces, simplemente nos vamos a Yemini
+Notebook y le vamos a dar a crear un
+
+98
+00:02:06,670 --> 00:02:06,680
+Notebook y le vamos a dar a crear un
+ 
+
+99
+00:02:06,680 --> 00:02:08,990
+Notebook y le vamos a dar a crear un
+nuevo cuaderno. Una vez aquí le voy a
+
+100
+00:02:08,990 --> 00:02:09,000
+nuevo cuaderno. Una vez aquí le voy a
+ 
+
+101
+00:02:09,000 --> 00:02:11,830
+nuevo cuaderno. Una vez aquí le voy a
+cambiar el título, por ejemplo, a Box
+
+102
+00:02:11,830 --> 00:02:11,840
+cambiar el título, por ejemplo, a Box
+ 
+
+103
+00:02:11,840 --> 00:02:14,990
+cambiar el título, por ejemplo, a Box
+Style, ¿vale? Que es este estilo que
+
+104
+00:02:14,990 --> 00:02:15,000
+Style, ¿vale? Que es este estilo que
+ 
+
+105
+00:02:15,000 --> 00:02:17,309
+Style, ¿vale? Que es este estilo que
+acabamos de ver en el vídeo, muy famoso
+
+106
+00:02:17,309 --> 00:02:17,319
+acabamos de ver en el vídeo, muy famoso
+ 
+
+107
+00:02:17,319 --> 00:02:20,550
+acabamos de ver en el vídeo, muy famoso
+últimamente, tanto en vídeos largos y
+
+108
+00:02:20,550 --> 00:02:20,560
+últimamente, tanto en vídeos largos y
+ 
+
+109
+00:02:20,560 --> 00:02:22,350
+últimamente, tanto en vídeos largos y
+paisados de YouTube como en shorts, en
+
+110
+00:02:22,350 --> 00:02:22,360
+paisados de YouTube como en shorts, en
+ 
+
+111
+00:02:22,360 --> 00:02:24,030
+paisados de YouTube como en shorts, en
+formato vertical, que es estilo un poco
+
+112
+00:02:24,030 --> 00:02:24,040
+formato vertical, que es estilo un poco
+ 
+
+113
+00:02:24,040 --> 00:02:26,869
+formato vertical, que es estilo un poco
+de newspaper, ¿verdad? de periódico que
+
+114
+00:02:26,869 --> 00:02:26,879
+de newspaper, ¿verdad? de periódico que
+ 
+
+115
+00:02:26,879 --> 00:02:28,910
+de newspaper, ¿verdad? de periódico que
+se va que va cambiando con capas
+
+116
+00:02:28,910 --> 00:02:28,920
+se va que va cambiando con capas
+ 
+
+117
+00:02:28,920 --> 00:02:30,910
+se va que va cambiando con capas
+superpuestas encima y que llama tanto la
+
+118
+00:02:30,910 --> 00:02:30,920
+superpuestas encima y que llama tanto la
+ 
+
+119
+00:02:30,920 --> 00:02:33,270
+superpuestas encima y que llama tanto la
+atención. Como decíamos hasta ahora,
+
+120
+00:02:33,270 --> 00:02:33,280
+atención. Como decíamos hasta ahora,
+ 
+
+121
+00:02:33,280 --> 00:02:35,990
+atención. Como decíamos hasta ahora,
+pues eh una de las maneras más fáciles
+
+122
+00:02:35,990 --> 00:02:36,000
+pues eh una de las maneras más fáciles
+ 
+
+123
+00:02:36,000 --> 00:02:38,309
+pues eh una de las maneras más fáciles
+de hacer y sigue siendo es, por ejemplo,
+
+124
+00:02:38,309 --> 00:02:38,319
+de hacer y sigue siendo es, por ejemplo,
+ 
+
+125
+00:02:38,319 --> 00:02:41,830
+de hacer y sigue siendo es, por ejemplo,
+pues utilizar el MCP de Hickfield junto
+
+126
+00:02:41,830 --> 00:02:41,840
+pues utilizar el MCP de Hickfield junto
+ 
+
+127
+00:02:41,840 --> 00:02:43,949
+pues utilizar el MCP de Hickfield junto
+con Cloud. Eh, ¿cuál es el problema de
+
+128
+00:02:43,949 --> 00:02:43,959
+con Cloud. Eh, ¿cuál es el problema de
+ 
+
+129
+00:02:43,959 --> 00:02:46,190
+con Cloud. Eh, ¿cuál es el problema de
+eso? pues que es bastante caro porque
+
+130
+00:02:46,190 --> 00:02:46,200
+eso? pues que es bastante caro porque
+ 
+
+131
+00:02:46,200 --> 00:02:47,589
+eso? pues que es bastante caro porque
+los vídeos van a consumir bastantes
+
+132
+00:02:47,589 --> 00:02:47,599
+los vídeos van a consumir bastantes
+ 
+
+133
+00:02:47,599 --> 00:02:50,030
+los vídeos van a consumir bastantes
+créditos y tenemos que tener un plan de
+
+134
+00:02:50,030 --> 00:02:50,040
+créditos y tenemos que tener un plan de
+ 
+
+135
+00:02:50,040 --> 00:02:54,710
+créditos y tenemos que tener un plan de
+Hickfield pues de 30, 40, 50 al mes para
+
+136
+00:02:54,710 --> 00:02:54,720
+Hickfield pues de 30, 40, 50 al mes para
+ 
+
+137
+00:02:54,720 --> 00:02:56,430
+Hickfield pues de 30, 40, 50 al mes para
+poder crear unos cuantos vídeos.
+
+138
+00:02:56,430 --> 00:02:56,440
+poder crear unos cuantos vídeos.
+ 
+
+139
+00:02:56,440 --> 00:02:57,309
+poder crear unos cuantos vídeos.
+Entonces, hoy vamos a ver una
+
+140
+00:02:57,309 --> 00:02:57,319
+Entonces, hoy vamos a ver una
+ 
+
+141
+00:02:57,319 --> 00:03:00,430
+Entonces, hoy vamos a ver una
+alternativa donde el resultado es muy
+
+142
+00:03:00,430 --> 00:03:00,440
+alternativa donde el resultado es muy
+ 
+
+143
+00:03:00,440 --> 00:03:02,390
+alternativa donde el resultado es muy
+muy bueno también, igual no llega a ser
+
+144
+00:03:02,390 --> 00:03:02,400
+muy bueno también, igual no llega a ser
+ 
+
+145
+00:03:02,400 --> 00:03:04,949
+muy bueno también, igual no llega a ser
+igual de bueno, pero es bastante bueno,
+
+146
+00:03:04,949 --> 00:03:04,959
+igual de bueno, pero es bastante bueno,
+ 
+
+147
+00:03:04,959 --> 00:03:06,910
+igual de bueno, pero es bastante bueno,
+como habéis visto en el vídeo de antes y
+
+148
+00:03:06,910 --> 00:03:06,920
+como habéis visto en el vídeo de antes y
+ 
+
+149
+00:03:06,920 --> 00:03:08,430
+como habéis visto en el vídeo de antes y
+sobre todo que nos lo permite hacer de
+
+150
+00:03:08,430 --> 00:03:08,440
+sobre todo que nos lo permite hacer de
+ 
+
+151
+00:03:08,440 --> 00:03:10,509
+sobre todo que nos lo permite hacer de
+manera completamente gratuita. ¿De
+
+152
+00:03:10,509 --> 00:03:10,519
+manera completamente gratuita. ¿De
+ 
+
+153
+00:03:10,519 --> 00:03:12,750
+manera completamente gratuita. ¿De
+acuerdo? Entonces, toda esta primera
+
+154
+00:03:12,750 --> 00:03:12,760
+acuerdo? Entonces, toda esta primera
+ 
+
+155
+00:03:12,760 --> 00:03:14,509
+acuerdo? Entonces, toda esta primera
+parte, por ejemplo, nos vamos a Gemini
+
+156
+00:03:14,509 --> 00:03:14,519
+parte, por ejemplo, nos vamos a Gemini
+ 
+
+157
+00:03:14,519 --> 00:03:16,589
+parte, por ejemplo, nos vamos a Gemini
+Notebook, como hemos dicho, y nos vamos
+
+158
+00:03:16,589 --> 00:03:16,599
+Notebook, como hemos dicho, y nos vamos
+ 
+
+159
+00:03:16,599 --> 00:03:19,750
+Notebook, como hemos dicho, y nos vamos
+a ir a añadir fuentes. ¿Vale? Primera
+
+160
+00:03:19,750 --> 00:03:19,760
+a ir a añadir fuentes. ¿Vale? Primera
+ 
+
+161
+00:03:19,760 --> 00:03:22,270
+a ir a añadir fuentes. ¿Vale? Primera
+parte, vamos a darle a texto copiado. Y
+
+162
+00:03:22,270 --> 00:03:22,280
+parte, vamos a darle a texto copiado. Y
+ 
+
+163
+00:03:22,280 --> 00:03:24,149
+parte, vamos a darle a texto copiado. Y
+ahora lo que vamos a hacer, eh, os vais
+
+164
+00:03:24,149 --> 00:03:24,159
+ahora lo que vamos a hacer, eh, os vais
+ 
+
+165
+00:03:24,159 --> 00:03:25,869
+ahora lo que vamos a hacer, eh, os vais
+a ir a la descripción y allí tendréis un
+
+166
+00:03:25,869 --> 00:03:25,879
+a ir a la descripción y allí tendréis un
+ 
+
+167
+00:03:25,879 --> 00:03:28,750
+a ir a la descripción y allí tendréis un
+enlace a todo el tutorial con todos los
+
+168
+00:03:28,750 --> 00:03:28,760
+enlace a todo el tutorial con todos los
+ 
+
+169
+00:03:28,760 --> 00:03:30,949
+enlace a todo el tutorial con todos los
+promps que vamos a utilizar hoy y todos
+
+170
+00:03:30,949 --> 00:03:30,959
+promps que vamos a utilizar hoy y todos
+ 
+
+171
+00:03:30,959 --> 00:03:33,270
+promps que vamos a utilizar hoy y todos
+los pasos uno a uno. Entonces,
+
+172
+00:03:33,270 --> 00:03:33,280
+los pasos uno a uno. Entonces,
+ 
+
+173
+00:03:33,280 --> 00:03:35,070
+los pasos uno a uno. Entonces,
+siguiente. Una vez le deis al link de la
+
+174
+00:03:35,070 --> 00:03:35,080
+siguiente. Una vez le deis al link de la
+ 
+
+175
+00:03:35,080 --> 00:03:36,229
+siguiente. Una vez le deis al link de la
+descripción del tutorial, os
+
+176
+00:03:36,229 --> 00:03:36,239
+descripción del tutorial, os
+ 
+
+177
+00:03:36,239 --> 00:03:38,670
+descripción del tutorial, os
+encontraréis con este tutorial donde
+
+178
+00:03:38,670 --> 00:03:38,680
+encontraréis con este tutorial donde
+ 
+
+179
+00:03:38,680 --> 00:03:41,509
+encontraréis con este tutorial donde
+explica paso por paso todo lo que tenéis
+
+180
+00:03:41,509 --> 00:03:41,519
+explica paso por paso todo lo que tenéis
+ 
+
+181
+00:03:41,519 --> 00:03:43,429
+explica paso por paso todo lo que tenéis
+que hacer y cómo tenéis que hacerlo,
+
+182
+00:03:43,429 --> 00:03:43,439
+que hacer y cómo tenéis que hacerlo,
+ 
+
+183
+00:03:43,439 --> 00:03:45,670
+que hacer y cómo tenéis que hacerlo,
+¿vale? Y aquí, como veis, pues ya te
+
+184
+00:03:45,670 --> 00:03:45,680
+¿vale? Y aquí, como veis, pues ya te
+ 
+
+185
+00:03:45,680 --> 00:03:48,830
+¿vale? Y aquí, como veis, pues ya te
+dice que el primer paso es eh copiar
+
+186
+00:03:48,830 --> 00:03:48,840
+dice que el primer paso es eh copiar
+ 
+
+187
+00:03:48,840 --> 00:03:50,750
+dice que el primer paso es eh copiar
+este promuentes, que es lo que estamos
+
+188
+00:03:50,750 --> 00:03:50,760
+este promuentes, que es lo que estamos
+ 
+
+189
+00:03:50,760 --> 00:03:52,350
+este promuentes, que es lo que estamos
+haciendo ahora. Y como es tan largo, os
+
+190
+00:03:52,350 --> 00:03:52,360
+haciendo ahora. Y como es tan largo, os
+ 
+
+191
+00:03:52,360 --> 00:03:54,190
+haciendo ahora. Y como es tan largo, os
+lo he dejado en un link de Google Drive.
+
+192
+00:03:54,190 --> 00:03:54,200
+lo he dejado en un link de Google Drive.
+ 
+
+193
+00:03:54,200 --> 00:03:55,470
+lo he dejado en un link de Google Drive.
+Entonces, simplemente, pues le vamos a
+
+194
+00:03:55,470 --> 00:03:55,480
+Entonces, simplemente, pues le vamos a
+ 
+
+195
+00:03:55,480 --> 00:03:58,830
+Entonces, simplemente, pues le vamos a
+dar OK al link, click y nos aparece todo
+
+196
+00:03:58,830 --> 00:03:58,840
+dar OK al link, click y nos aparece todo
+ 
+
+197
+00:03:58,840 --> 00:04:01,190
+dar OK al link, click y nos aparece todo
+este prom que como veis son varias
+
+198
+00:04:01,190 --> 00:04:01,200
+este prom que como veis son varias
+ 
+
+199
+00:04:01,200 --> 00:04:03,509
+este prom que como veis son varias
+páginas, es muy largo. Simplemente lo
+
+200
+00:04:03,509 --> 00:04:03,519
+páginas, es muy largo. Simplemente lo
+ 
+
+201
+00:04:03,519 --> 00:04:06,550
+páginas, es muy largo. Simplemente lo
+vamos a copiar todo, lo marco todo, lo
+
+202
+00:04:06,550 --> 00:04:06,560
+vamos a copiar todo, lo marco todo, lo
+ 
+
+203
+00:04:06,560 --> 00:04:09,309
+vamos a copiar todo, lo marco todo, lo
+copio todo y nos volvemos a donde
+
+204
+00:04:09,309 --> 00:04:09,319
+copio todo y nos volvemos a donde
+ 
+
+205
+00:04:09,319 --> 00:04:12,550
+copio todo y nos volvemos a donde
+estábamos, a nuestro Gemini Notebook y
+
+206
+00:04:12,550 --> 00:04:12,560
+estábamos, a nuestro Gemini Notebook y
+ 
+
+207
+00:04:12,560 --> 00:04:14,830
+estábamos, a nuestro Gemini Notebook y
+lo copiamos aquí en fuentes. Le damos a
+
+208
+00:04:14,830 --> 00:04:14,840
+lo copiamos aquí en fuentes. Le damos a
+ 
+
+209
+00:04:14,840 --> 00:04:17,110
+lo copiamos aquí en fuentes. Le damos a
+insertar y ahora la siguiente cosa que
+
+210
+00:04:17,110 --> 00:04:17,120
+insertar y ahora la siguiente cosa que
+ 
+
+211
+00:04:17,120 --> 00:04:20,030
+insertar y ahora la siguiente cosa que
+tenemos que hacer es irnos a la parte de
+
+212
+00:04:20,030 --> 00:04:20,040
+tenemos que hacer es irnos a la parte de
+ 
+
+213
+00:04:20,040 --> 00:04:22,310
+tenemos que hacer es irnos a la parte de
+arriba, esta que veis aquí en configurar
+
+214
+00:04:22,310 --> 00:04:22,320
+arriba, esta que veis aquí en configurar
+ 
+
+215
+00:04:22,320 --> 00:04:24,670
+arriba, esta que veis aquí en configurar
+cuaderno. Nos vamos aquí, le damos a
+
+216
+00:04:24,670 --> 00:04:24,680
+cuaderno. Nos vamos aquí, le damos a
+ 
+
+217
+00:04:24,680 --> 00:04:26,469
+cuaderno. Nos vamos aquí, le damos a
+donde dice define el objetivo, el estilo
+
+218
+00:04:26,469 --> 00:04:26,479
+donde dice define el objetivo, el estilo
+ 
+
+219
+00:04:26,479 --> 00:04:28,070
+donde dice define el objetivo, el estilo
+o el rol de la conversación, le doy a
+
+220
+00:04:28,070 --> 00:04:28,080
+o el rol de la conversación, le doy a
+ 
+
+221
+00:04:28,080 --> 00:04:30,270
+o el rol de la conversación, le doy a
+personalizado y aquí vamos a poner el
+
+222
+00:04:30,270 --> 00:04:30,280
+personalizado y aquí vamos a poner el
+ 
+
+223
+00:04:30,280 --> 00:04:32,230
+personalizado y aquí vamos a poner el
+siguiente prom que también nos lo indica
+
+224
+00:04:32,230 --> 00:04:32,240
+siguiente prom que también nos lo indica
+ 
+
+225
+00:04:32,240 --> 00:04:34,550
+siguiente prom que también nos lo indica
+en el tutorial. Os fijáis aquí, paso
+
+226
+00:04:34,550 --> 00:04:34,560
+en el tutorial. Os fijáis aquí, paso
+ 
+
+227
+00:04:34,560 --> 00:04:36,270
+en el tutorial. Os fijáis aquí, paso
+tres, pega la versión corta en
+
+228
+00:04:36,270 --> 00:04:36,280
+tres, pega la versión corta en
+ 
+
+229
+00:04:36,280 --> 00:04:37,870
+tres, pega la versión corta en
+personalización, justo lo que estamos
+
+230
+00:04:37,870 --> 00:04:37,880
+personalización, justo lo que estamos
+ 
+
+231
+00:04:37,880 --> 00:04:39,110
+personalización, justo lo que estamos
+haciendo, ¿de acuerdo? Entonces, yo
+
+232
+00:04:39,110 --> 00:04:39,120
+haciendo, ¿de acuerdo? Entonces, yo
+ 
+
+233
+00:04:39,120 --> 00:04:42,390
+haciendo, ¿de acuerdo? Entonces, yo
+copio esto y lo voy a pegar exactamente
+
+234
+00:04:42,390 --> 00:04:42,400
+copio esto y lo voy a pegar exactamente
+ 
+
+235
+00:04:42,400 --> 00:04:45,150
+copio esto y lo voy a pegar exactamente
+ahí lo pego aquí y le doy a guardar.
+
+236
+00:04:45,150 --> 00:04:45,160
+ahí lo pego aquí y le doy a guardar.
+ 
+
+237
+00:04:45,160 --> 00:04:46,710
+ahí lo pego aquí y le doy a guardar.
+Vale, lo que hemos hecho con esto ahora
+
+238
+00:04:46,710 --> 00:04:46,720
+Vale, lo que hemos hecho con esto ahora
+ 
+
+239
+00:04:46,720 --> 00:04:49,029
+Vale, lo que hemos hecho con esto ahora
+mismo, hemos creado un master promp. es
+
+240
+00:04:49,029 --> 00:04:49,039
+mismo, hemos creado un master promp. es
+ 
+
+241
+00:04:49,039 --> 00:04:51,390
+mismo, hemos creado un master promp. es
+un super promás
+
+242
+00:04:51,390 --> 00:04:51,400
+un super promás
+ 
+
+243
+00:04:51,400 --> 00:04:52,830
+un super promás
+eh le estamos diciendo que queremos
+
+244
+00:04:52,830 --> 00:04:52,840
+eh le estamos diciendo que queremos
+ 
+
+245
+00:04:52,840 --> 00:04:56,110
+eh le estamos diciendo que queremos
+crear este estilo de vídeos y él nos va
+
+246
+00:04:56,110 --> 00:04:56,120
+crear este estilo de vídeos y él nos va
+ 
+
+247
+00:04:56,120 --> 00:04:58,150
+crear este estilo de vídeos y él nos va
+a hacer una serie de preguntas sobre
+
+248
+00:04:58,150 --> 00:04:58,160
+a hacer una serie de preguntas sobre
+ 
+
+249
+00:04:58,160 --> 00:05:00,310
+a hacer una serie de preguntas sobre
+cómo queremos la salida, que puede ser
+
+250
+00:05:00,310 --> 00:05:00,320
+cómo queremos la salida, que puede ser
+ 
+
+251
+00:05:00,320 --> 00:05:02,110
+cómo queremos la salida, que puede ser
+qué tema queremos, de qué tema queremos
+
+252
+00:05:02,110 --> 00:05:02,120
+qué tema queremos, de qué tema queremos
+ 
+
+253
+00:05:02,120 --> 00:05:05,310
+qué tema queremos, de qué tema queremos
+hacer el vídeo, de cuánta duración, si
+
+254
+00:05:05,310 --> 00:05:05,320
+hacer el vídeo, de cuánta duración, si
+ 
+
+255
+00:05:05,320 --> 00:05:07,230
+hacer el vídeo, de cuánta duración, si
+lo queremos con sonido o sin sonido, con
+
+256
+00:05:07,230 --> 00:05:07,240
+lo queremos con sonido o sin sonido, con
+ 
+
+257
+00:05:07,240 --> 00:05:09,189
+lo queremos con sonido o sin sonido, con
+música o sin música, con narración de
+
+258
+00:05:09,189 --> 00:05:09,199
+música o sin música, con narración de
+ 
+
+259
+00:05:09,199 --> 00:05:11,189
+música o sin música, con narración de
+voz o sin narración de voz y un montón
+
+260
+00:05:11,189 --> 00:05:11,199
+voz o sin narración de voz y un montón
+ 
+
+261
+00:05:11,199 --> 00:05:13,590
+voz o sin narración de voz y un montón
+de cosas más. Y cuando le contestemos a
+
+262
+00:05:13,590 --> 00:05:13,600
+de cosas más. Y cuando le contestemos a
+ 
+
+263
+00:05:13,600 --> 00:05:15,990
+de cosas más. Y cuando le contestemos a
+todas esas preguntas, él nos va a
+
+264
+00:05:15,990 --> 00:05:16,000
+todas esas preguntas, él nos va a
+ 
+
+265
+00:05:16,000 --> 00:05:19,309
+todas esas preguntas, él nos va a
+generar diferentes proms eh para poder
+
+266
+00:05:19,309 --> 00:05:19,319
+generar diferentes proms eh para poder
+ 
+
+267
+00:05:19,319 --> 00:05:21,870
+generar diferentes proms eh para poder
+generar el vídeo final en Google Flow y
+
+268
+00:05:21,870 --> 00:05:21,880
+generar el vídeo final en Google Flow y
+ 
+
+269
+00:05:21,880 --> 00:05:23,390
+generar el vídeo final en Google Flow y
+en otras plataformas, por ejemplo, si
+
+270
+00:05:23,390 --> 00:05:23,400
+en otras plataformas, por ejemplo, si
+ 
+
+271
+00:05:23,400 --> 00:05:25,830
+en otras plataformas, por ejemplo, si
+queremos añadir voz, etcétera. ¿De
+
+272
+00:05:25,830 --> 00:05:25,840
+queremos añadir voz, etcétera. ¿De
+ 
+
+273
+00:05:25,840 --> 00:05:28,110
+queremos añadir voz, etcétera. ¿De
+acuerdo? Entonces, aquí una vez está
+
+274
+00:05:28,110 --> 00:05:28,120
+acuerdo? Entonces, aquí una vez está
+ 
+
+275
+00:05:28,120 --> 00:05:30,110
+acuerdo? Entonces, aquí una vez está
+hecho esto, no tenemos que hacer nada
+
+276
+00:05:30,110 --> 00:05:30,120
+hecho esto, no tenemos que hacer nada
+ 
+
+277
+00:05:30,120 --> 00:05:32,469
+hecho esto, no tenemos que hacer nada
+más. Y esto funciona completamente igual
+
+278
+00:05:32,469 --> 00:05:32,479
+más. Y esto funciona completamente igual
+ 
+
+279
+00:05:32,479 --> 00:05:35,350
+más. Y esto funciona completamente igual
+con la cuenta gratuita de Gemini
+
+280
+00:05:35,350 --> 00:05:35,360
+con la cuenta gratuita de Gemini
+ 
+
+281
+00:05:35,360 --> 00:05:37,390
+con la cuenta gratuita de Gemini
+Notebook, el antiguo Notebook LM. ¿De
+
+282
+00:05:37,390 --> 00:05:37,400
+Notebook, el antiguo Notebook LM. ¿De
+ 
+
+283
+00:05:37,400 --> 00:05:40,110
+Notebook, el antiguo Notebook LM. ¿De
+acuerdo? Aquí le voy a poner hola. No
+
+284
+00:05:40,110 --> 00:05:40,120
+acuerdo? Aquí le voy a poner hola. No
+ 
+
+285
+00:05:40,120 --> 00:05:41,350
+acuerdo? Aquí le voy a poner hola. No
+hace falta que le pongáis hola, ¿eh?
+
+286
+00:05:41,350 --> 00:05:41,360
+hace falta que le pongáis hola, ¿eh?
+ 
+
+287
+00:05:41,360 --> 00:05:43,029
+hace falta que le pongáis hola, ¿eh?
+Podéis decir cualquier cosa, pero bueno,
+
+288
+00:05:43,029 --> 00:05:43,039
+Podéis decir cualquier cosa, pero bueno,
+ 
+
+289
+00:05:43,039 --> 00:05:45,710
+Podéis decir cualquier cosa, pero bueno,
+con hola ya funciona. Él está leyendo el
+
+290
+00:05:45,710 --> 00:05:45,720
+con hola ya funciona. Él está leyendo el
+ 
+
+291
+00:05:45,720 --> 00:05:47,510
+con hola ya funciona. Él está leyendo el
+prom que tienen personalización y en el
+
+292
+00:05:47,510 --> 00:05:47,520
+prom que tienen personalización y en el
+ 
+
+293
+00:05:47,520 --> 00:05:50,150
+prom que tienen personalización y en el
+que tienen las fuentes y automáticamente
+
+294
+00:05:50,150 --> 00:05:50,160
+que tienen las fuentes y automáticamente
+ 
+
+295
+00:05:50,160 --> 00:05:52,510
+que tienen las fuentes y automáticamente
+nos va a empezar a hacer preguntas sobre
+
+296
+00:05:52,510 --> 00:05:52,520
+nos va a empezar a hacer preguntas sobre
+ 
+
+297
+00:05:52,520 --> 00:05:54,230
+nos va a empezar a hacer preguntas sobre
+el tipo de vídeo que queremos para
+
+298
+00:05:54,230 --> 00:05:54,240
+el tipo de vídeo que queremos para
+ 
+
+299
+00:05:54,240 --> 00:05:56,950
+el tipo de vídeo que queremos para
+darnos unos promps concretos. ¿Vale? Y
+
+300
+00:05:56,950 --> 00:05:56,960
+darnos unos promps concretos. ¿Vale? Y
+ 
+
+301
+00:05:56,960 --> 00:05:59,430
+darnos unos promps concretos. ¿Vale? Y
+fijaros, ya me ha respondido y me dice,
+
+302
+00:05:59,430 --> 00:05:59,440
+fijaros, ya me ha respondido y me dice,
+ 
+
+303
+00:05:59,440 --> 00:06:00,749
+fijaros, ya me ha respondido y me dice,
+"Hola, como director creativo y
+
+304
+00:06:00,749 --> 00:06:00,759
+"Hola, como director creativo y
+ 
+
+305
+00:06:00,759 --> 00:06:02,390
+"Hola, como director creativo y
+guionista de documentos explicativos
+
+306
+00:06:02,390 --> 00:06:02,400
+guionista de documentos explicativos
+ 
+
+307
+00:06:02,400 --> 00:06:04,749
+guionista de documentos explicativos
+animados al estilo Vox, estoy listo para
+
+308
+00:06:04,749 --> 00:06:04,759
+animados al estilo Vox, estoy listo para
+ 
+
+309
+00:06:04,759 --> 00:06:07,110
+animados al estilo Vox, estoy listo para
+dar forma a tu proyecto y me hace una
+
+310
+00:06:07,110 --> 00:06:07,120
+dar forma a tu proyecto y me hace una
+ 
+
+311
+00:06:07,120 --> 00:06:08,430
+dar forma a tu proyecto y me hace una
+serie de preguntas que es la que las que
+
+312
+00:06:08,430 --> 00:06:08,440
+serie de preguntas que es la que las que
+ 
+
+313
+00:06:08,440 --> 00:06:10,270
+serie de preguntas que es la que las que
+os decía, que vamos a irlas respondiendo
+
+314
+00:06:10,270 --> 00:06:10,280
+os decía, que vamos a irlas respondiendo
+ 
+
+315
+00:06:10,280 --> 00:06:12,790
+os decía, que vamos a irlas respondiendo
+ahora mismo. Entonces, ¿cuál es el tema
+
+316
+00:06:12,790 --> 00:06:12,800
+ahora mismo. Entonces, ¿cuál es el tema
+ 
+
+317
+00:06:12,800 --> 00:06:15,110
+ahora mismo. Entonces, ¿cuál es el tema
+principal del documental animado?" Pues
+
+318
+00:06:15,110 --> 00:06:15,120
+principal del documental animado?" Pues
+ 
+
+319
+00:06:15,120 --> 00:06:16,110
+principal del documental animado?" Pues
+en el ejemplo de antes [carraspeo]
+
+320
+00:06:16,110 --> 00:06:16,120
+en el ejemplo de antes [carraspeo]
+ 
+
+321
+00:06:16,120 --> 00:06:18,309
+en el ejemplo de antes [carraspeo]
+habíamos puesto eh la ruta de la
+
+322
+00:06:18,309 --> 00:06:18,319
+habíamos puesto eh la ruta de la
+ 
+
+323
+00:06:18,319 --> 00:06:20,150
+habíamos puesto eh la ruta de la
+historia de la seda, el que habéis visto
+
+324
+00:06:20,150 --> 00:06:20,160
+historia de la seda, el que habéis visto
+ 
+
+325
+00:06:20,160 --> 00:06:22,350
+historia de la seda, el que habéis visto
+en horizontal. Aquí le voy a poner, por
+
+326
+00:06:22,350 --> 00:06:22,360
+en horizontal. Aquí le voy a poner, por
+ 
+
+327
+00:06:22,360 --> 00:06:25,909
+en horizontal. Aquí le voy a poner, por
+ejemplo, yo que sé, historia de Bitcoin,
+
+328
+00:06:25,909 --> 00:06:25,919
+ejemplo, yo que sé, historia de Bitcoin,
+ 
+
+329
+00:06:25,919 --> 00:06:28,110
+ejemplo, yo que sé, historia de Bitcoin,
+¿vale? o el que queráis vosotros o de
+
+330
+00:06:28,110 --> 00:06:28,120
+¿vale? o el que queráis vosotros o de
+ 
+
+331
+00:06:28,120 --> 00:06:29,830
+¿vale? o el que queráis vosotros o de
+cualquier personaje o de de cualquier
+
+332
+00:06:29,830 --> 00:06:29,840
+cualquier personaje o de de cualquier
+ 
+
+333
+00:06:29,840 --> 00:06:32,350
+cualquier personaje o de de cualquier
+tema, lo que sea. Eh, ¿qué formato de
+
+334
+00:06:32,350 --> 00:06:32,360
+tema, lo que sea. Eh, ¿qué formato de
+ 
+
+335
+00:06:32,360 --> 00:06:34,430
+tema, lo que sea. Eh, ¿qué formato de
+pantalla prefieres? Pues en este caso,
+
+336
+00:06:34,430 --> 00:06:34,440
+pantalla prefieres? Pues en este caso,
+ 
+
+337
+00:06:34,440 --> 00:06:36,029
+pantalla prefieres? Pues en este caso,
+para cambiar un poco el que hemos visto
+
+338
+00:06:36,029 --> 00:06:36,039
+para cambiar un poco el que hemos visto
+ 
+
+339
+00:06:36,039 --> 00:06:37,710
+para cambiar un poco el que hemos visto
+antes, en este caso le voy a poner
+
+340
+00:06:37,710 --> 00:06:37,720
+antes, en este caso le voy a poner
+ 
+
+341
+00:06:37,720 --> 00:06:39,909
+antes, en este caso le voy a poner
+vertical. ¿Cuál es la duración que
+
+342
+00:06:39,909 --> 00:06:39,919
+vertical. ¿Cuál es la duración que
+ 
+
+343
+00:06:39,919 --> 00:06:41,550
+vertical. ¿Cuál es la duración que
+deseas para la pieza? Bueno, para no
+
+344
+00:06:41,550 --> 00:06:41,560
+deseas para la pieza? Bueno, para no
+ 
+
+345
+00:06:41,560 --> 00:06:43,270
+deseas para la pieza? Bueno, para no
+hacer el vídeo muy largo, le voy a poner
+
+346
+00:06:43,270 --> 00:06:43,280
+hacer el vídeo muy largo, le voy a poner
+ 
+
+347
+00:06:43,280 --> 00:06:46,070
+hacer el vídeo muy largo, le voy a poner
+60 segundos.
+
+348
+00:06:46,070 --> 00:06:46,080
+60 segundos.
+ 
+
+349
+00:06:46,080 --> 00:06:48,629
+60 segundos.
+Vale, aquí, como veis, eh, tenéis 30,
+
+350
+00:06:48,629 --> 00:06:48,639
+Vale, aquí, como veis, eh, tenéis 30,
+ 
+
+351
+00:06:48,639 --> 00:06:51,830
+Vale, aquí, como veis, eh, tenéis 30,
+45, 60, 90, 120, 180. Podéis hacer más
+
+352
+00:06:51,830 --> 00:06:51,840
+45, 60, 90, 120, 180. Podéis hacer más
+ 
+
+353
+00:06:51,840 --> 00:06:54,870
+45, 60, 90, 120, 180. Podéis hacer más
+también, ¿de acuerdo? E tema importante
+
+354
+00:06:54,870 --> 00:06:54,880
+también, ¿de acuerdo? E tema importante
+ 
+
+355
+00:06:54,880 --> 00:06:56,550
+también, ¿de acuerdo? E tema importante
+aquí, que aquí es donde entramos en la
+
+356
+00:06:56,550 --> 00:06:56,560
+aquí, que aquí es donde entramos en la
+ 
+
+357
+00:06:56,560 --> 00:06:58,629
+aquí, que aquí es donde entramos en la
+parte gratuita o de pago. Si tenéis un
+
+358
+00:06:58,629 --> 00:06:58,639
+parte gratuita o de pago. Si tenéis un
+ 
+
+359
+00:06:58,639 --> 00:07:02,070
+parte gratuita o de pago. Si tenéis un
+plan eh un plan de pago de Google, de
+
+360
+00:07:02,070 --> 00:07:02,080
+plan eh un plan de pago de Google, de
+ 
+
+361
+00:07:02,080 --> 00:07:04,670
+plan eh un plan de pago de Google, de
+Gemini, eh podéis hacer eh o sea, el
+
+362
+00:07:04,670 --> 00:07:04,680
+Gemini, eh podéis hacer eh o sea, el
+ 
+
+363
+00:07:04,680 --> 00:07:06,670
+Gemini, eh podéis hacer eh o sea, el
+límite en que podéis hacer vídeos es
+
+364
+00:07:06,670 --> 00:07:06,680
+límite en que podéis hacer vídeos es
+ 
+
+365
+00:07:06,680 --> 00:07:08,230
+límite en que podéis hacer vídeos es
+mucho más alto en Google Flow para
+
+366
+00:07:08,230 --> 00:07:08,240
+mucho más alto en Google Flow para
+ 
+
+367
+00:07:08,240 --> 00:07:11,589
+mucho más alto en Google Flow para
+luego. Si no, aquí os voy a dejar el
+
+368
+00:07:11,589 --> 00:07:11,599
+luego. Si no, aquí os voy a dejar el
+ 
+
+369
+00:07:11,599 --> 00:07:14,909
+luego. Si no, aquí os voy a dejar el
+pricing, ¿vale? Fijaros que en el plan
+
+370
+00:07:14,909 --> 00:07:14,919
+pricing, ¿vale? Fijaros que en el plan
+ 
+
+371
+00:07:14,919 --> 00:07:17,350
+pricing, ¿vale? Fijaros que en el plan
+free el que no cuesta nada, tenéis 50
+
+372
+00:07:17,350 --> 00:07:17,360
+free el que no cuesta nada, tenéis 50
+ 
+
+373
+00:07:17,360 --> 00:07:19,469
+free el que no cuesta nada, tenéis 50
+créditos por día. en el siguiente, que
+
+374
+00:07:19,469 --> 00:07:19,479
+créditos por día. en el siguiente, que
+ 
+
+375
+00:07:19,479 --> 00:07:21,270
+créditos por día. en el siguiente, que
+cuesta $52
+
+376
+00:07:21,270 --> 00:07:21,280
+cuesta $52
+ 
+
+377
+00:07:21,280 --> 00:07:23,189
+cuesta $52
+y en el ipro por ejemplo que es el que
+
+378
+00:07:23,189 --> 00:07:23,199
+y en el ipro por ejemplo que es el que
+ 
+
+379
+00:07:23,199 --> 00:07:25,629
+y en el ipro por ejemplo que es el que
+yo tengo, que vale 20,000 créditos.
+
+380
+00:07:25,629 --> 00:07:25,639
+yo tengo, que vale 20,000 créditos.
+ 
+
+381
+00:07:25,639 --> 00:07:27,230
+yo tengo, que vale 20,000 créditos.
+¿Vale? Por ejemplo, si tenéis el
+
+382
+00:07:27,230 --> 00:07:27,240
+¿Vale? Por ejemplo, si tenéis el
+ 
+
+383
+00:07:27,240 --> 00:07:30,150
+¿Vale? Por ejemplo, si tenéis el
+gratuito, el de 50 créditos al día, cada
+
+384
+00:07:30,150 --> 00:07:30,160
+gratuito, el de 50 créditos al día, cada
+ 
+
+385
+00:07:30,160 --> 00:07:33,230
+gratuito, el de 50 créditos al día, cada
+vídeo de Google Flow eh, son 10 segundos
+
+386
+00:07:33,230 --> 00:07:33,240
+vídeo de Google Flow eh, son 10 segundos
+ 
+
+387
+00:07:33,240 --> 00:07:35,749
+vídeo de Google Flow eh, son 10 segundos
+y cada vídeo son 15 créditos. Esto
+
+388
+00:07:35,749 --> 00:07:35,759
+y cada vídeo son 15 créditos. Esto
+ 
+
+389
+00:07:35,759 --> 00:07:37,710
+y cada vídeo son 15 créditos. Esto
+significa que si, por ejemplo, eh, si
+
+390
+00:07:37,710 --> 00:07:37,720
+significa que si, por ejemplo, eh, si
+ 
+
+391
+00:07:37,720 --> 00:07:39,990
+significa que si, por ejemplo, eh, si
+queréis hacer de una sola tirada, pues
+
+392
+00:07:39,990 --> 00:07:40,000
+queréis hacer de una sola tirada, pues
+ 
+
+393
+00:07:40,000 --> 00:07:42,110
+queréis hacer de una sola tirada, pues
+os va a dar para vídeos de 30 segundos,
+
+394
+00:07:42,110 --> 00:07:42,120
+os va a dar para vídeos de 30 segundos,
+ 
+
+395
+00:07:42,120 --> 00:07:43,430
+os va a dar para vídeos de 30 segundos,
+porque como hemos dicho, cada vídeo son
+
+396
+00:07:43,430 --> 00:07:43,440
+porque como hemos dicho, cada vídeo son
+ 
+
+397
+00:07:43,440 --> 00:07:45,990
+porque como hemos dicho, cada vídeo son
+10 segundos, pues 10 y 10, 30 segundos y
+
+398
+00:07:45,990 --> 00:07:46,000
+10 segundos, pues 10 y 10, 30 segundos y
+ 
+
+399
+00:07:46,000 --> 00:07:48,189
+10 segundos, pues 10 y 10, 30 segundos y
+estos son 45 créditos. si tenéis un
+
+400
+00:07:48,189 --> 00:07:48,199
+estos son 45 créditos. si tenéis un
+ 
+
+401
+00:07:48,199 --> 00:07:51,070
+estos son 45 créditos. si tenéis un
+límite de 50 por día, ¿de acuerdo?
+
+402
+00:07:51,070 --> 00:07:51,080
+límite de 50 por día, ¿de acuerdo?
+ 
+
+403
+00:07:51,080 --> 00:07:53,110
+límite de 50 por día, ¿de acuerdo?
+Entonces, eh esto es una opción o la
+
+404
+00:07:53,110 --> 00:07:53,120
+Entonces, eh esto es una opción o la
+ 
+
+405
+00:07:53,120 --> 00:07:55,469
+Entonces, eh esto es una opción o la
+opción es que hagáis vídeos más largos y
+
+406
+00:07:55,469 --> 00:07:55,479
+opción es que hagáis vídeos más largos y
+ 
+
+407
+00:07:55,479 --> 00:07:57,309
+opción es que hagáis vídeos más largos y
+el sistema automáticamente lo va a
+
+408
+00:07:57,309 --> 00:07:57,319
+el sistema automáticamente lo va a
+ 
+
+409
+00:07:57,319 --> 00:07:58,950
+el sistema automáticamente lo va a
+detectar que no tenéis créditos y os lo
+
+410
+00:07:58,950 --> 00:07:58,960
+detectar que no tenéis créditos y os lo
+ 
+
+411
+00:07:58,960 --> 00:08:00,909
+detectar que no tenéis créditos y os lo
+va a decir y entonces os va a dar los
+
+412
+00:08:00,909 --> 00:08:00,919
+va a decir y entonces os va a dar los
+ 
+
+413
+00:08:00,919 --> 00:08:03,230
+va a decir y entonces os va a dar los
+promps que tenéis que poner en flow por
+
+414
+00:08:03,230 --> 00:08:03,240
+promps que tenéis que poner en flow por
+ 
+
+415
+00:08:03,240 --> 00:08:05,550
+promps que tenéis que poner en flow por
+partes para que un día hagáis una tres
+
+416
+00:08:05,550 --> 00:08:05,560
+partes para que un día hagáis una tres
+ 
+
+417
+00:08:05,560 --> 00:08:07,350
+partes para que un día hagáis una tres
+vídeos, otro día hagáis otros tres
+
+418
+00:08:07,350 --> 00:08:07,360
+vídeos, otro día hagáis otros tres
+ 
+
+419
+00:08:07,360 --> 00:08:09,390
+vídeos, otro día hagáis otros tres
+vídeos, etcétera. ¿De acuerdo? Esta es
+
+420
+00:08:09,390 --> 00:08:09,400
+vídeos, etcétera. ¿De acuerdo? Esta es
+ 
+
+421
+00:08:09,400 --> 00:08:11,149
+vídeos, etcétera. ¿De acuerdo? Esta es
+la segunda opción. Si tenéis el plan
+
+422
+00:08:11,149 --> 00:08:11,159
+la segunda opción. Si tenéis el plan
+ 
+
+423
+00:08:11,159 --> 00:08:12,990
+la segunda opción. Si tenéis el plan
+pro, el plan de pago, pues no tendréis
+
+424
+00:08:12,990 --> 00:08:13,000
+pro, el plan de pago, pues no tendréis
+ 
+
+425
+00:08:13,000 --> 00:08:15,710
+pro, el plan de pago, pues no tendréis
+este problema. ¿Vale? Una vez eh
+
+426
+00:08:15,710 --> 00:08:15,720
+este problema. ¿Vale? Una vez eh
+ 
+
+427
+00:08:15,720 --> 00:08:17,950
+este problema. ¿Vale? Una vez eh
+sabiendo esto, vamos a continuar.
+
+428
+00:08:17,950 --> 00:08:17,960
+sabiendo esto, vamos a continuar.
+ 
+
+429
+00:08:17,960 --> 00:08:20,710
+sabiendo esto, vamos a continuar.
+Entonces, lo hacemos aquí. Eh, ¿qué tono
+
+430
+00:08:20,710 --> 00:08:20,720
+Entonces, lo hacemos aquí. Eh, ¿qué tono
+ 
+
+431
+00:08:20,720 --> 00:08:23,430
+Entonces, lo hacemos aquí. Eh, ¿qué tono
+prefieres para la edad narrativa? Y me
+
+432
+00:08:23,430 --> 00:08:23,440
+prefieres para la edad narrativa? Y me
+ 
+
+433
+00:08:23,440 --> 00:08:25,550
+prefieres para la edad narrativa? Y me
+dice eh periodístico, sobrio,
+
+434
+00:08:25,550 --> 00:08:25,560
+dice eh periodístico, sobrio,
+ 
+
+435
+00:08:25,560 --> 00:08:27,469
+dice eh periodístico, sobrio,
+divulgativo, tensión informativa. Voy a
+
+436
+00:08:27,469 --> 00:08:27,479
+divulgativo, tensión informativa. Voy a
+ 
+
+437
+00:08:27,479 --> 00:08:31,270
+divulgativo, tensión informativa. Voy a
+ponerle tensión informativa. ¿Vale? Eh,
+
+438
+00:08:31,270 --> 00:08:31,280
+ponerle tensión informativa. ¿Vale? Eh,
+ 
+
+439
+00:08:31,280 --> 00:08:33,550
+ponerle tensión informativa. ¿Vale? Eh,
+cinco. ¿Algún dato factual, cifra o
+
+440
+00:08:33,550 --> 00:08:33,560
+cinco. ¿Algún dato factual, cifra o
+ 
+
+441
+00:08:33,560 --> 00:08:35,350
+cinco. ¿Algún dato factual, cifra o
+hecho que deba aparecer? Pues le voy a
+
+442
+00:08:35,350 --> 00:08:35,360
+hecho que deba aparecer? Pues le voy a
+ 
+
+443
+00:08:35,360 --> 00:08:37,949
+hecho que deba aparecer? Pues le voy a
+decir nada en especial, lo que él
+
+444
+00:08:37,949 --> 00:08:37,959
+decir nada en especial, lo que él
+ 
+
+445
+00:08:37,959 --> 00:08:40,790
+decir nada en especial, lo que él
+quiera. ¿Vale? Eh, seis. ¿Quieres
+
+446
+00:08:40,790 --> 00:08:40,800
+quiera. ¿Vale? Eh, seis. ¿Quieres
+ 
+
+447
+00:08:40,800 --> 00:08:43,469
+quiera. ¿Vale? Eh, seis. ¿Quieres
+incluir música de fondo eh continua en
+
+448
+00:08:43,469 --> 00:08:43,479
+incluir música de fondo eh continua en
+ 
+
+449
+00:08:43,479 --> 00:08:45,630
+incluir música de fondo eh continua en
+la producción? Eh, esto es porque luego
+
+450
+00:08:45,630 --> 00:08:45,640
+la producción? Eh, esto es porque luego
+ 
+
+451
+00:08:45,640 --> 00:08:47,030
+la producción? Eh, esto es porque luego
+vamos a utilizar el modelo OVNI de
+
+452
+00:08:47,030 --> 00:08:47,040
+vamos a utilizar el modelo OVNI de
+ 
+
+453
+00:08:47,040 --> 00:08:48,910
+vamos a utilizar el modelo OVNI de
+Welflow, que sabéis que puede poner
+
+454
+00:08:48,910 --> 00:08:48,920
+Welflow, que sabéis que puede poner
+ 
+
+455
+00:08:48,920 --> 00:08:51,790
+Welflow, que sabéis que puede poner
+música automáticamente, eh, y también
+
+456
+00:08:51,790 --> 00:08:51,800
+música automáticamente, eh, y también
+ 
+
+457
+00:08:51,800 --> 00:08:54,070
+música automáticamente, eh, y también
+puede poner voz. En este caso, yo le voy
+
+458
+00:08:54,070 --> 00:08:54,080
+puede poner voz. En este caso, yo le voy
+ 
+
+459
+00:08:54,080 --> 00:08:56,030
+puede poner voz. En este caso, yo le voy
+a poner que no quiero música y que no
+
+460
+00:08:56,030 --> 00:08:56,040
+a poner que no quiero música y que no
+ 
+
+461
+00:08:56,040 --> 00:08:57,509
+a poner que no quiero música y que no
+quiero voz porque os voy a enseñar cómo
+
+462
+00:08:57,509 --> 00:08:57,519
+quiero voz porque os voy a enseñar cómo
+ 
+
+463
+00:08:57,519 --> 00:08:59,750
+quiero voz porque os voy a enseñar cómo
+hacerlo también aparte con otros
+
+464
+00:08:59,750 --> 00:08:59,760
+hacerlo también aparte con otros
+ 
+
+465
+00:08:59,760 --> 00:09:01,949
+hacerlo también aparte con otros
+programas gratuitos, pero vosotros le
+
+466
+00:09:01,949 --> 00:09:01,959
+programas gratuitos, pero vosotros le
+ 
+
+467
+00:09:01,959 --> 00:09:03,870
+programas gratuitos, pero vosotros le
+podéis poner que sí y probar qué tal os
+
+468
+00:09:03,870 --> 00:09:03,880
+podéis poner que sí y probar qué tal os
+ 
+
+469
+00:09:03,880 --> 00:09:06,310
+podéis poner que sí y probar qué tal os
+funciona y podéis probar de las dos
+
+470
+00:09:06,310 --> 00:09:06,320
+funciona y podéis probar de las dos
+ 
+
+471
+00:09:06,320 --> 00:09:09,110
+funciona y podéis probar de las dos
+maneras, ¿de acuerdo? E le voy a poner
+
+472
+00:09:09,110 --> 00:09:09,120
+maneras, ¿de acuerdo? E le voy a poner
+ 
+
+473
+00:09:09,120 --> 00:09:12,030
+maneras, ¿de acuerdo? E le voy a poner
+no. Y luego siete, ¿cómo prefieres
+
+474
+00:09:12,030 --> 00:09:12,040
+no. Y luego siete, ¿cómo prefieres
+ 
+
+475
+00:09:12,040 --> 00:09:14,829
+no. Y luego siete, ¿cómo prefieres
+gestionar la locución? La voz. Elige
+
+476
+00:09:14,829 --> 00:09:14,839
+gestionar la locución? La voz. Elige
+ 
+
+477
+00:09:14,839 --> 00:09:16,670
+gestionar la locución? La voz. Elige
+entre voz generada directamente por el
+
+478
+00:09:16,670 --> 00:09:16,680
+entre voz generada directamente por el
+ 
+
+479
+00:09:16,680 --> 00:09:19,630
+entre voz generada directamente por el
+modelo o tu propia voz TTS externo.
+
+480
+00:09:19,630 --> 00:09:19,640
+modelo o tu propia voz TTS externo.
+ 
+
+481
+00:09:19,640 --> 00:09:22,150
+modelo o tu propia voz TTS externo.
+Vale, pues yo le voy a decir
+
+482
+00:09:22,150 --> 00:09:22,160
+Vale, pues yo le voy a decir
+ 
+
+483
+00:09:22,160 --> 00:09:25,310
+Vale, pues yo le voy a decir
+TTS externo, que significa que yo voy a
+
+484
+00:09:25,310 --> 00:09:25,320
+TTS externo, que significa que yo voy a
+ 
+
+485
+00:09:25,320 --> 00:09:27,590
+TTS externo, que significa que yo voy a
+generar la voz aparte con otro programa,
+
+486
+00:09:27,590 --> 00:09:27,600
+generar la voz aparte con otro programa,
+ 
+
+487
+00:09:27,600 --> 00:09:30,030
+generar la voz aparte con otro programa,
+¿de acuerdo? Y ya está. Si vosotros le
+
+488
+00:09:30,030 --> 00:09:30,040
+¿de acuerdo? Y ya está. Si vosotros le
+ 
+
+489
+00:09:30,040 --> 00:09:31,829
+¿de acuerdo? Y ya está. Si vosotros le
+hubieseis puesto que sí, que queréis la
+
+490
+00:09:31,829 --> 00:09:31,839
+hubieseis puesto que sí, que queréis la
+ 
+
+491
+00:09:31,839 --> 00:09:34,190
+hubieseis puesto que sí, que queréis la
+música de fondo y sí que queréis vuestra
+
+492
+00:09:34,190 --> 00:09:34,200
+música de fondo y sí que queréis vuestra
+ 
+
+493
+00:09:34,200 --> 00:09:36,310
+música de fondo y sí que queréis vuestra
+voz, pues luego ovni os lo va a generar
+
+494
+00:09:36,310 --> 00:09:36,320
+voz, pues luego ovni os lo va a generar
+ 
+
+495
+00:09:36,320 --> 00:09:38,949
+voz, pues luego ovni os lo va a generar
+todo en el mismo clip. Eh, lo que va a
+
+496
+00:09:38,949 --> 00:09:38,959
+todo en el mismo clip. Eh, lo que va a
+ 
+
+497
+00:09:38,959 --> 00:09:40,910
+todo en el mismo clip. Eh, lo que va a
+hacer, aunque yo le haya puesto que no a
+
+498
+00:09:40,910 --> 00:09:40,920
+hacer, aunque yo le haya puesto que no a
+ 
+
+499
+00:09:40,920 --> 00:09:42,269
+hacer, aunque yo le haya puesto que no a
+la voz y a la música, lo que sí que va a
+
+500
+00:09:42,269 --> 00:09:42,279
+la voz y a la música, lo que sí que va a
+ 
+
+501
+00:09:42,279 --> 00:09:44,069
+la voz y a la música, lo que sí que va a
+hacer es generar los efectos de sonido,
+
+502
+00:09:44,069 --> 00:09:44,079
+hacer es generar los efectos de sonido,
+ 
+
+503
+00:09:44,079 --> 00:09:46,470
+hacer es generar los efectos de sonido,
+por ejemplo, del papel rompiéndose y
+
+504
+00:09:46,470 --> 00:09:46,480
+por ejemplo, del papel rompiéndose y
+ 
+
+505
+00:09:46,480 --> 00:09:48,630
+por ejemplo, del papel rompiéndose y
+todo esto. Y ya está. Básicamente, le
+
+506
+00:09:48,630 --> 00:09:48,640
+todo esto. Y ya está. Básicamente, le
+ 
+
+507
+00:09:48,640 --> 00:09:51,190
+todo esto. Y ya está. Básicamente, le
+damos a esto y con esto ya sabe qué tipo
+
+508
+00:09:51,190 --> 00:09:51,200
+damos a esto y con esto ya sabe qué tipo
+ 
+
+509
+00:09:51,200 --> 00:09:52,990
+damos a esto y con esto ya sabe qué tipo
+de proms nos tiene que generar para que
+
+510
+00:09:52,990 --> 00:09:53,000
+de proms nos tiene que generar para que
+ 
+
+511
+00:09:53,000 --> 00:09:54,949
+de proms nos tiene que generar para que
+le peguemos en Google Flow y en los
+
+512
+00:09:54,949 --> 00:09:54,959
+le peguemos en Google Flow y en los
+ 
+
+513
+00:09:54,959 --> 00:09:56,470
+le peguemos en Google Flow y en los
+diferentes programas que vamos a
+
+514
+00:09:56,470 --> 00:09:56,480
+diferentes programas que vamos a
+ 
+
+515
+00:09:56,480 --> 00:09:58,670
+diferentes programas que vamos a
+utilizar. Ahora lo que está haciendo es
+
+516
+00:09:58,670 --> 00:09:58,680
+utilizar. Ahora lo que está haciendo es
+ 
+
+517
+00:09:58,680 --> 00:10:00,389
+utilizar. Ahora lo que está haciendo es
+siguiendo las instrucciones exactas del
+
+518
+00:10:00,389 --> 00:10:00,399
+siguiendo las instrucciones exactas del
+ 
+
+519
+00:10:00,399 --> 00:10:02,710
+siguiendo las instrucciones exactas del
+prom s super largo que hemos copiado
+
+520
+00:10:02,710 --> 00:10:02,720
+prom s super largo que hemos copiado
+ 
+
+521
+00:10:02,720 --> 00:10:04,710
+prom s super largo que hemos copiado
+antes en las fuentes. Y una de las cosas
+
+522
+00:10:04,710 --> 00:10:04,720
+antes en las fuentes. Y una de las cosas
+ 
+
+523
+00:10:04,720 --> 00:10:06,990
+antes en las fuentes. Y una de las cosas
+que le dice el prom además de eh generar
+
+524
+00:10:06,990 --> 00:10:07,000
+que le dice el prom además de eh generar
+ 
+
+525
+00:10:07,000 --> 00:10:09,910
+que le dice el prom además de eh generar
+los diferentes proms, el guion, todo, es
+
+526
+00:10:09,910 --> 00:10:09,920
+los diferentes proms, el guion, todo, es
+ 
+
+527
+00:10:09,920 --> 00:10:11,990
+los diferentes proms, el guion, todo, es
+que luego nos va a pedir un prom, nos va
+
+528
+00:10:11,990 --> 00:10:12,000
+que luego nos va a pedir un prom, nos va
+ 
+
+529
+00:10:12,000 --> 00:10:13,470
+que luego nos va a pedir un prom, nos va
+a dar un prom para que le pidamos al
+
+530
+00:10:13,470 --> 00:10:13,480
+a dar un prom para que le pidamos al
+ 
+
+531
+00:10:13,480 --> 00:10:15,870
+a dar un prom para que le pidamos al
+mismo Gemini Notebook para que nos
+
+532
+00:10:15,870 --> 00:10:15,880
+mismo Gemini Notebook para que nos
+ 
+
+533
+00:10:15,880 --> 00:10:18,870
+mismo Gemini Notebook para que nos
+genere un storyboard, es decir, todas
+
+534
+00:10:18,870 --> 00:10:18,880
+genere un storyboard, es decir, todas
+ 
+
+535
+00:10:18,880 --> 00:10:21,069
+genere un storyboard, es decir, todas
+las escenas que tienen que salir en el
+
+536
+00:10:21,069 --> 00:10:21,079
+las escenas que tienen que salir en el
+ 
+
+537
+00:10:21,079 --> 00:10:22,550
+las escenas que tienen que salir en el
+vídeo y eso es lo que le vamos a pasar a
+
+538
+00:10:22,550 --> 00:10:22,560
+vídeo y eso es lo que le vamos a pasar a
+ 
+
+539
+00:10:22,560 --> 00:10:24,430
+vídeo y eso es lo que le vamos a pasar a
+Google Flow. Entonces, ya he terminado.
+
+540
+00:10:24,430 --> 00:10:24,440
+Google Flow. Entonces, ya he terminado.
+ 
+
+541
+00:10:24,440 --> 00:10:26,150
+Google Flow. Entonces, ya he terminado.
+Mirar, tema, historia de Bitcoin,
+
+542
+00:10:26,150 --> 00:10:26,160
+Mirar, tema, historia de Bitcoin,
+ 
+
+543
+00:10:26,160 --> 00:10:28,870
+Mirar, tema, historia de Bitcoin,
+formato 916, duración de 60 segundos,
+
+544
+00:10:28,870 --> 00:10:28,880
+formato 916, duración de 60 segundos,
+ 
+
+545
+00:10:28,880 --> 00:10:31,509
+formato 916, duración de 60 segundos,
+seis escenas, porque recordad que cada
+
+546
+00:10:31,509 --> 00:10:31,519
+seis escenas, porque recordad que cada
+ 
+
+547
+00:10:31,519 --> 00:10:33,910
+seis escenas, porque recordad que cada
+vídeo de Google Flow son 10 segundos,
+
+548
+00:10:33,910 --> 00:10:33,920
+vídeo de Google Flow son 10 segundos,
+ 
+
+549
+00:10:33,920 --> 00:10:35,590
+vídeo de Google Flow son 10 segundos,
+por lo tanto un minuto. Aquí tenemos
+
+550
+00:10:35,590 --> 00:10:35,600
+por lo tanto un minuto. Aquí tenemos
+ 
+
+551
+00:10:35,600 --> 00:10:38,190
+por lo tanto un minuto. Aquí tenemos
+seis escenas, seis vídeos, 132 palabras,
+
+552
+00:10:38,190 --> 00:10:38,200
+seis escenas, seis vídeos, 132 palabras,
+ 
+
+553
+00:10:38,200 --> 00:10:40,670
+seis escenas, seis vídeos, 132 palabras,
+música, no, voz propia y te dice lo que
+
+554
+00:10:40,670 --> 00:10:40,680
+música, no, voz propia y te dice lo que
+ 
+
+555
+00:10:40,680 --> 00:10:43,750
+música, no, voz propia y te dice lo que
+va a consumir, 90 créditos. ¿De acuerdo?
+
+556
+00:10:43,750 --> 00:10:43,760
+va a consumir, 90 créditos. ¿De acuerdo?
+ 
+
+557
+00:10:43,760 --> 00:10:45,350
+va a consumir, 90 créditos. ¿De acuerdo?
+Entonces, aquí tenemos el guion y la
+
+558
+00:10:45,350 --> 00:10:45,360
+Entonces, aquí tenemos el guion y la
+ 
+
+559
+00:10:45,360 --> 00:10:48,350
+Entonces, aquí tenemos el guion y la
+escaleta. Fijaros que me lo da todo todo
+
+560
+00:10:48,350 --> 00:10:48,360
+escaleta. Fijaros que me lo da todo todo
+ 
+
+561
+00:10:48,360 --> 00:10:51,870
+escaleta. Fijaros que me lo da todo todo
+por tiempos, eh, la locución, el rótulo,
+
+562
+00:10:51,870 --> 00:10:51,880
+por tiempos, eh, la locución, el rótulo,
+ 
+
+563
+00:10:51,880 --> 00:10:54,870
+por tiempos, eh, la locución, el rótulo,
+lo que se ve, el recurso, todo. Vale, el
+
+564
+00:10:54,870 --> 00:10:54,880
+lo que se ve, el recurso, todo. Vale, el
+ 
+
+565
+00:10:54,880 --> 00:10:57,470
+lo que se ve, el recurso, todo. Vale, el
+prom está preparado para eso. Y luego el
+
+566
+00:10:57,470 --> 00:10:57,480
+prom está preparado para eso. Y luego el
+ 
+
+567
+00:10:57,480 --> 00:10:59,389
+prom está preparado para eso. Y luego el
+prom de storybard, que ya te dice aquí
+
+568
+00:10:59,389 --> 00:10:59,399
+prom de storybard, que ya te dice aquí
+ 
+
+569
+00:10:59,399 --> 00:11:01,990
+prom de storybard, que ya te dice aquí
+que es para notebook LM o como se llama
+
+570
+00:11:01,990 --> 00:11:02,000
+que es para notebook LM o como se llama
+ 
+
+571
+00:11:02,000 --> 00:11:03,910
+que es para notebook LM o como se llama
+ahora Gemini Notebook. Entonces,
+
+572
+00:11:03,910 --> 00:11:03,920
+ahora Gemini Notebook. Entonces,
+ 
+
+573
+00:11:03,920 --> 00:11:05,829
+ahora Gemini Notebook. Entonces,
+simplemente lo que tenemos que hacer al
+
+574
+00:11:05,829 --> 00:11:05,839
+simplemente lo que tenemos que hacer al
+ 
+
+575
+00:11:05,839 --> 00:11:08,030
+simplemente lo que tenemos que hacer al
+siguiente paso, pues es copiar esto.
+
+576
+00:11:08,030 --> 00:11:08,040
+siguiente paso, pues es copiar esto.
+ 
+
+577
+00:11:08,040 --> 00:11:09,269
+siguiente paso, pues es copiar esto.
+Ahora estamos en el paso dos, hemos de
+
+578
+00:11:09,269 --> 00:11:09,279
+Ahora estamos en el paso dos, hemos de
+ 
+
+579
+00:11:09,279 --> 00:11:11,230
+Ahora estamos en el paso dos, hemos de
+ir siguiendo paso por paso, ¿vale? Paso
+
+580
+00:11:11,230 --> 00:11:11,240
+ir siguiendo paso por paso, ¿vale? Paso
+ 
+
+581
+00:11:11,240 --> 00:11:14,470
+ir siguiendo paso por paso, ¿vale? Paso
+dos, copiamos todo esto y lo pegamos.
+
+582
+00:11:14,470 --> 00:11:14,480
+dos, copiamos todo esto y lo pegamos.
+ 
+
+583
+00:11:14,480 --> 00:11:16,910
+dos, copiamos todo esto y lo pegamos.
+Entonces, como veis, pues eso, eh, paso
+
+584
+00:11:16,910 --> 00:11:16,920
+Entonces, como veis, pues eso, eh, paso
+ 
+
+585
+00:11:16,920 --> 00:11:19,509
+Entonces, como veis, pues eso, eh, paso
+dos, copia este prom, notebook LM, pues
+
+586
+00:11:19,509 --> 00:11:19,519
+dos, copia este prom, notebook LM, pues
+ 
+
+587
+00:11:19,519 --> 00:11:20,990
+dos, copia este prom, notebook LM, pues
+copio el prom, lo tenéis aquí en
+
+588
+00:11:20,990 --> 00:11:21,000
+copio el prom, lo tenéis aquí en
+ 
+
+589
+00:11:21,000 --> 00:11:23,230
+copio el prom, lo tenéis aquí en
+Notebook LM, ¿vale? Y este es el prom
+
+590
+00:11:23,230 --> 00:11:23,240
+Notebook LM, ¿vale? Y este es el prom
+ 
+
+591
+00:11:23,240 --> 00:11:25,750
+Notebook LM, ¿vale? Y este es el prom
+que le está diciendo de crear el
+
+592
+00:11:25,750 --> 00:11:25,760
+que le está diciendo de crear el
+ 
+
+593
+00:11:25,760 --> 00:11:27,790
+que le está diciendo de crear el
+storyboard, el papel con todas las
+
+594
+00:11:27,790 --> 00:11:27,800
+storyboard, el papel con todas las
+ 
+
+595
+00:11:27,800 --> 00:11:30,269
+storyboard, el papel con todas las
+escenas y todas las imágenes, que es lo
+
+596
+00:11:30,269 --> 00:11:30,279
+escenas y todas las imágenes, que es lo
+ 
+
+597
+00:11:30,279 --> 00:11:32,310
+escenas y todas las imágenes, que es lo
+que vamos a utilizar de referencia en
+
+598
+00:11:32,310 --> 00:11:32,320
+que vamos a utilizar de referencia en
+ 
+
+599
+00:11:32,320 --> 00:11:34,629
+que vamos a utilizar de referencia en
+luego en Google Flow, ¿vale? Y ahora ya
+
+600
+00:11:34,629 --> 00:11:34,639
+luego en Google Flow, ¿vale? Y ahora ya
+ 
+
+601
+00:11:34,639 --> 00:11:36,430
+luego en Google Flow, ¿vale? Y ahora ya
+está creando la imagen. Aquí pueden
+
+602
+00:11:36,430 --> 00:11:36,440
+está creando la imagen. Aquí pueden
+ 
+
+603
+00:11:36,440 --> 00:11:39,190
+está creando la imagen. Aquí pueden
+pasar dos cosas. Si tenéis la versión eh
+
+604
+00:11:39,190 --> 00:11:39,200
+pasar dos cosas. Si tenéis la versión eh
+ 
+
+605
+00:11:39,200 --> 00:11:41,310
+pasar dos cosas. Si tenéis la versión eh
+porque eh Notebook LM, que como hemos
+
+606
+00:11:41,310 --> 00:11:41,320
+porque eh Notebook LM, que como hemos
+ 
+
+607
+00:11:41,320 --> 00:11:42,870
+porque eh Notebook LM, que como hemos
+dicho ahora se llama Gemini Notebook, se
+
+608
+00:11:42,870 --> 00:11:42,880
+dicho ahora se llama Gemini Notebook, se
+ 
+
+609
+00:11:42,880 --> 00:11:44,470
+dicho ahora se llama Gemini Notebook, se
+está actualizando. Se ha actualizado con
+
+610
+00:11:44,470 --> 00:11:44,480
+está actualizando. Se ha actualizado con
+ 
+
+611
+00:11:44,480 --> 00:11:47,030
+está actualizando. Se ha actualizado con
+3.7 Flash y con varias funciones y se
+
+612
+00:11:47,030 --> 00:11:47,040
+3.7 Flash y con varias funciones y se
+ 
+
+613
+00:11:47,040 --> 00:11:48,949
+3.7 Flash y con varias funciones y se
+está desplegando poco a poco. Hoy nos
+
+614
+00:11:48,949 --> 00:11:48,959
+está desplegando poco a poco. Hoy nos
+ 
+
+615
+00:11:48,959 --> 00:11:51,509
+está desplegando poco a poco. Hoy nos
+vamos a enfocar en la creación de estos
+
+616
+00:11:51,509 --> 00:11:51,519
+vamos a enfocar en la creación de estos
+ 
+
+617
+00:11:51,519 --> 00:11:53,790
+vamos a enfocar en la creación de estos
+proms para los vídeos. El próximo vídeo
+
+618
+00:11:53,790 --> 00:11:53,800
+proms para los vídeos. El próximo vídeo
+ 
+
+619
+00:11:53,800 --> 00:11:55,750
+proms para los vídeos. El próximo vídeo
+vamos a hacer un repaso de los cambios,
+
+620
+00:11:55,750 --> 00:11:55,760
+vamos a hacer un repaso de los cambios,
+ 
+
+621
+00:11:55,760 --> 00:11:57,750
+vamos a hacer un repaso de los cambios,
+las actualizaciones que han venido con
+
+622
+00:11:57,750 --> 00:11:57,760
+las actualizaciones que han venido con
+ 
+
+623
+00:11:57,760 --> 00:11:59,670
+las actualizaciones que han venido con
+el nuevo Gemini Notebook y las nuevas
+
+624
+00:11:59,670 --> 00:11:59,680
+el nuevo Gemini Notebook y las nuevas
+ 
+
+625
+00:11:59,680 --> 00:12:01,550
+el nuevo Gemini Notebook y las nuevas
+cosas que podemos hacer con su modo
+
+626
+00:12:01,550 --> 00:12:01,560
+cosas que podemos hacer con su modo
+ 
+
+627
+00:12:01,560 --> 00:12:04,230
+cosas que podemos hacer con su modo
+agéntico. Una de las novedades que
+
+628
+00:12:04,230 --> 00:12:04,240
+agéntico. Una de las novedades que
+ 
+
+629
+00:12:04,240 --> 00:12:06,110
+agéntico. Una de las novedades que
+tiene, que veremos en el próximo vídeo,
+
+630
+00:12:06,110 --> 00:12:06,120
+tiene, que veremos en el próximo vídeo,
+ 
+
+631
+00:12:06,120 --> 00:12:08,150
+tiene, que veremos en el próximo vídeo,
+es que nos permite crear directamente
+
+632
+00:12:08,150 --> 00:12:08,160
+es que nos permite crear directamente
+ 
+
+633
+00:12:08,160 --> 00:12:12,790
+es que nos permite crear directamente
+documentos Excel, PDF, imágenes e cuando
+
+634
+00:12:12,790 --> 00:12:12,800
+documentos Excel, PDF, imágenes e cuando
+ 
+
+635
+00:12:12,800 --> 00:12:14,350
+documentos Excel, PDF, imágenes e cuando
+antes no podíamos, ¿de acuerdo?
+
+636
+00:12:14,350 --> 00:12:14,360
+antes no podíamos, ¿de acuerdo?
+ 
+
+637
+00:12:14,360 --> 00:12:15,750
+antes no podíamos, ¿de acuerdo?
+Entonces, una manera de saber si lo
+
+638
+00:12:15,750 --> 00:12:15,760
+Entonces, una manera de saber si lo
+ 
+
+639
+00:12:15,760 --> 00:12:17,550
+Entonces, una manera de saber si lo
+tenéis activado es que cuando pongáis
+
+640
+00:12:17,550 --> 00:12:17,560
+tenéis activado es que cuando pongáis
+ 
+
+641
+00:12:17,560 --> 00:12:21,269
+tenéis activado es que cuando pongáis
+este prom aquí veréis que os os genera
+
+642
+00:12:21,269 --> 00:12:21,279
+este prom aquí veréis que os os genera
+ 
+
+643
+00:12:21,279 --> 00:12:23,870
+este prom aquí veréis que os os genera
+la imagen automáticamente. Si por lo que
+
+644
+00:12:23,870 --> 00:12:23,880
+la imagen automáticamente. Si por lo que
+ 
+
+645
+00:12:23,880 --> 00:12:26,350
+la imagen automáticamente. Si por lo que
+sea no os genera la imagen, tenéis una
+
+646
+00:12:26,350 --> 00:12:26,360
+sea no os genera la imagen, tenéis una
+ 
+
+647
+00:12:26,360 --> 00:12:27,710
+sea no os genera la imagen, tenéis una
+opción también que es porque no lo
+
+648
+00:12:27,710 --> 00:12:27,720
+opción también que es porque no lo
+ 
+
+649
+00:12:27,720 --> 00:12:29,310
+opción también que es porque no lo
+tenéis actualizado todavía y os llegará
+
+650
+00:12:29,310 --> 00:12:29,320
+tenéis actualizado todavía y os llegará
+ 
+
+651
+00:12:29,320 --> 00:12:32,350
+tenéis actualizado todavía y os llegará
+pronto. Le damos a infografía con este
+
+652
+00:12:32,350 --> 00:12:32,360
+pronto. Le damos a infografía con este
+ 
+
+653
+00:12:32,360 --> 00:12:33,470
+pronto. Le damos a infografía con este
+prom que hemos creado. Le damos a
+
+654
+00:12:33,470 --> 00:12:33,480
+prom que hemos creado. Le damos a
+ 
+
+655
+00:12:33,480 --> 00:12:35,470
+prom que hemos creado. Le damos a
+infografía y os creará la infografía que
+
+656
+00:12:35,470 --> 00:12:35,480
+infografía y os creará la infografía que
+ 
+
+657
+00:12:35,480 --> 00:12:37,269
+infografía y os creará la infografía que
+es la que teníamos hasta ahora, la
+
+658
+00:12:37,269 --> 00:12:37,279
+es la que teníamos hasta ahora, la
+ 
+
+659
+00:12:37,279 --> 00:12:38,870
+es la que teníamos hasta ahora, la
+clásica, pero también nos sirve. ¿De
+
+660
+00:12:38,870 --> 00:12:38,880
+clásica, pero también nos sirve. ¿De
+ 
+
+661
+00:12:38,880 --> 00:12:40,670
+clásica, pero también nos sirve. ¿De
+acuerdo? Entonces, ya me lo ha creado.
+
+662
+00:12:40,670 --> 00:12:40,680
+acuerdo? Entonces, ya me lo ha creado.
+ 
+
+663
+00:12:40,680 --> 00:12:42,790
+acuerdo? Entonces, ya me lo ha creado.
+Vale, ya me lo ha creado. Pues yo tengo
+
+664
+00:12:42,790 --> 00:12:42,800
+Vale, ya me lo ha creado. Pues yo tengo
+ 
+
+665
+00:12:42,800 --> 00:12:45,590
+Vale, ya me lo ha creado. Pues yo tengo
+aquí todo el storyboard, como veis, y me
+
+666
+00:12:45,590 --> 00:12:45,600
+aquí todo el storyboard, como veis, y me
+ 
+
+667
+00:12:45,600 --> 00:12:48,389
+aquí todo el storyboard, como veis, y me
+lo voy a descargar. Lo descargo y esto
+
+668
+00:12:48,389 --> 00:12:48,399
+lo voy a descargar. Lo descargo y esto
+ 
+
+669
+00:12:48,399 --> 00:12:50,389
+lo voy a descargar. Lo descargo y esto
+es lo que le vamos a pasar a Google
+
+670
+00:12:50,389 --> 00:12:50,399
+es lo que le vamos a pasar a Google
+ 
+
+671
+00:12:50,399 --> 00:12:53,189
+es lo que le vamos a pasar a Google
+Flow. Vale, ahora nos vamos a Google
+
+672
+00:12:53,189 --> 00:12:53,199
+Flow. Vale, ahora nos vamos a Google
+ 
+
+673
+00:12:53,199 --> 00:12:55,670
+Flow. Vale, ahora nos vamos a Google
+Flow. Todo esto, tutorial, proms, todos
+
+674
+00:12:55,670 --> 00:12:55,680
+Flow. Todo esto, tutorial, proms, todos
+ 
+
+675
+00:12:55,680 --> 00:12:56,710
+Flow. Todo esto, tutorial, proms, todos
+los enlaces de lo que estamos
+
+676
+00:12:56,710 --> 00:12:56,720
+los enlaces de lo que estamos
+ 
+
+677
+00:12:56,720 --> 00:12:58,269
+los enlaces de lo que estamos
+utilizando, como siempre estarán en la
+
+678
+00:12:58,269 --> 00:12:58,279
+utilizando, como siempre estarán en la
+ 
+
+679
+00:12:58,279 --> 00:13:00,590
+utilizando, como siempre estarán en la
+descripción. Nos vamos a Google Flow y
+
+680
+00:13:00,590 --> 00:13:00,600
+descripción. Nos vamos a Google Flow y
+ 
+
+681
+00:13:00,600 --> 00:13:01,990
+descripción. Nos vamos a Google Flow y
+fijaros, aquí aparece un mensaje
+
+682
+00:13:01,990 --> 00:13:02,000
+fijaros, aquí aparece un mensaje
+ 
+
+683
+00:13:02,000 --> 00:13:04,030
+fijaros, aquí aparece un mensaje
+importante, ¿vale? Hoy estoy grabando
+
+684
+00:13:04,030 --> 00:13:04,040
+importante, ¿vale? Hoy estoy grabando
+ 
+
+685
+00:13:04,040 --> 00:13:06,710
+importante, ¿vale? Hoy estoy grabando
+esto que es 18 de agosto. Entonces, aquí
+
+686
+00:13:06,710 --> 00:13:06,720
+esto que es 18 de agosto. Entonces, aquí
+ 
+
+687
+00:13:06,720 --> 00:13:09,829
+esto que es 18 de agosto. Entonces, aquí
+dice que disfruta cada día de 50 extra
+
+688
+00:13:09,829 --> 00:13:09,839
+dice que disfruta cada día de 50 extra
+ 
+
+689
+00:13:09,839 --> 00:13:12,470
+dice que disfruta cada día de 50 extra
+créditos eh gratis hasta el 31 de
+
+690
+00:13:12,470 --> 00:13:12,480
+créditos eh gratis hasta el 31 de
+ 
+
+691
+00:13:12,480 --> 00:13:14,629
+créditos eh gratis hasta el 31 de
+agosto. ¿Vale? Entonces, lo de los 50
+
+692
+00:13:14,629 --> 00:13:14,639
+agosto. ¿Vale? Entonces, lo de los 50
+ 
+
+693
+00:13:14,639 --> 00:13:17,269
+agosto. ¿Vale? Entonces, lo de los 50
+créditos eh diarios gratis ha estado
+
+694
+00:13:17,269 --> 00:13:17,279
+créditos eh diarios gratis ha estado
+ 
+
+695
+00:13:17,279 --> 00:13:18,790
+créditos eh diarios gratis ha estado
+desde principio en Google Flow para los
+
+696
+00:13:18,790 --> 00:13:18,800
+desde principio en Google Flow para los
+ 
+
+697
+00:13:18,800 --> 00:13:21,430
+desde principio en Google Flow para los
+usuarios gratuitos, me refiero. Con este
+
+698
+00:13:21,430 --> 00:13:21,440
+usuarios gratuitos, me refiero. Con este
+ 
+
+699
+00:13:21,440 --> 00:13:24,189
+usuarios gratuitos, me refiero. Con este
+mensaje no sé si quieren decir que
+
+700
+00:13:24,189 --> 00:13:24,199
+mensaje no sé si quieren decir que
+ 
+
+701
+00:13:24,199 --> 00:13:26,829
+mensaje no sé si quieren decir que
+después del 31 de agosto ya van a dejar
+
+702
+00:13:26,829 --> 00:13:26,839
+después del 31 de agosto ya van a dejar
+ 
+
+703
+00:13:26,839 --> 00:13:29,030
+después del 31 de agosto ya van a dejar
+de estar o van a dejar de ofrecer esos
+
+704
+00:13:29,030 --> 00:13:29,040
+de estar o van a dejar de ofrecer esos
+ 
+
+705
+00:13:29,040 --> 00:13:31,230
+de estar o van a dejar de ofrecer esos
+50 créditos gratis. No lo sé, lo
+
+706
+00:13:31,230 --> 00:13:31,240
+50 créditos gratis. No lo sé, lo
+ 
+
+707
+00:13:31,240 --> 00:13:33,750
+50 créditos gratis. No lo sé, lo
+desconozco, ¿vale? Eh, pero bueno, eh,
+
+708
+00:13:33,750 --> 00:13:33,760
+desconozco, ¿vale? Eh, pero bueno, eh,
+ 
+
+709
+00:13:33,760 --> 00:13:36,949
+desconozco, ¿vale? Eh, pero bueno, eh,
+en cualquier caso, probarlo ahora, eh, y
+
+710
+00:13:36,949 --> 00:13:36,959
+en cualquier caso, probarlo ahora, eh, y
+ 
+
+711
+00:13:36,959 --> 00:13:38,350
+en cualquier caso, probarlo ahora, eh, y
+si tenéis el plan de pago, por supuesto,
+
+712
+00:13:38,350 --> 00:13:38,360
+si tenéis el plan de pago, por supuesto,
+ 
+
+713
+00:13:38,360 --> 00:13:40,030
+si tenéis el plan de pago, por supuesto,
+pues no tenéis ningún problema, ¿de
+
+714
+00:13:40,030 --> 00:13:40,040
+pues no tenéis ningún problema, ¿de
+ 
+
+715
+00:13:40,040 --> 00:13:42,629
+pues no tenéis ningún problema, ¿de
+acuerdo? Entonces, nos vamos aquí y
+
+716
+00:13:42,629 --> 00:13:42,639
+acuerdo? Entonces, nos vamos aquí y
+ 
+
+717
+00:13:42,639 --> 00:13:44,790
+acuerdo? Entonces, nos vamos aquí y
+simplemente, pues vamos a crear un nuevo
+
+718
+00:13:44,790 --> 00:13:44,800
+simplemente, pues vamos a crear un nuevo
+ 
+
+719
+00:13:44,800 --> 00:13:47,590
+simplemente, pues vamos a crear un nuevo
+proyecto. Le damos aquí a nuevo proyecto
+
+720
+00:13:47,590 --> 00:13:47,600
+proyecto. Le damos aquí a nuevo proyecto
+ 
+
+721
+00:13:47,600 --> 00:13:50,150
+proyecto. Le damos aquí a nuevo proyecto
+y aquí vamos a hacer lo siguiente. Hemos
+
+722
+00:13:50,150 --> 00:13:50,160
+y aquí vamos a hacer lo siguiente. Hemos
+ 
+
+723
+00:13:50,160 --> 00:13:52,670
+y aquí vamos a hacer lo siguiente. Hemos
+de asegurarnos que tenemos el modo
+
+724
+00:13:52,670 --> 00:13:52,680
+de asegurarnos que tenemos el modo
+ 
+
+725
+00:13:52,680 --> 00:13:55,949
+de asegurarnos que tenemos el modo
+agente activado, ¿vale? Lo activamos y
+
+726
+00:13:55,949 --> 00:13:55,959
+agente activado, ¿vale? Lo activamos y
+ 
+
+727
+00:13:55,959 --> 00:13:58,590
+agente activado, ¿vale? Lo activamos y
+aquí nos vamos a los ajustes y nos
+
+728
+00:13:58,590 --> 00:13:58,600
+aquí nos vamos a los ajustes y nos
+ 
+
+729
+00:13:58,600 --> 00:14:02,110
+aquí nos vamos a los ajustes y nos
+aseguramos que tenemos flash y ninguno
+
+730
+00:14:02,110 --> 00:14:02,120
+aseguramos que tenemos flash y ninguno
+ 
+
+731
+00:14:02,120 --> 00:14:04,230
+aseguramos que tenemos flash y ninguno
+de los de Veo. Nos interesa el de
+
+732
+00:14:04,230 --> 00:14:04,240
+de los de Veo. Nos interesa el de
+ 
+
+733
+00:14:04,240 --> 00:14:08,030
+de los de Veo. Nos interesa el de
+Opniflash en modo 169 o 916 en función
+
+734
+00:14:08,030 --> 00:14:08,040
+Opniflash en modo 169 o 916 en función
+ 
+
+735
+00:14:08,040 --> 00:14:09,670
+Opniflash en modo 169 o 916 en función
+del vídeo que queramos. Eh, yo el
+
+736
+00:14:09,670 --> 00:14:09,680
+del vídeo que queramos. Eh, yo el
+ 
+
+737
+00:14:09,680 --> 00:14:11,030
+del vídeo que queramos. Eh, yo el
+anterior, como ya visteis, lo hice en
+
+738
+00:14:11,030 --> 00:14:11,040
+anterior, como ya visteis, lo hice en
+ 
+
+739
+00:14:11,040 --> 00:14:14,430
+anterior, como ya visteis, lo hice en
+169. Este pues en 916. Le doy a guardar.
+
+740
+00:14:14,430 --> 00:14:14,440
+169. Este pues en 916. Le doy a guardar.
+ 
+
+741
+00:14:14,440 --> 00:14:16,189
+169. Este pues en 916. Le doy a guardar.
+Y ahora lo que vamos a hacer es lo
+
+742
+00:14:16,189 --> 00:14:16,199
+Y ahora lo que vamos a hacer es lo
+ 
+
+743
+00:14:16,199 --> 00:14:18,550
+Y ahora lo que vamos a hacer es lo
+siguiente. Le vamos a copiar eh el
+
+744
+00:14:18,550 --> 00:14:18,560
+siguiente. Le vamos a copiar eh el
+ 
+
+745
+00:14:18,560 --> 00:14:20,910
+siguiente. Le vamos a copiar eh el
+storyboard, la imagen que nos ha creado
+
+746
+00:14:20,910 --> 00:14:20,920
+storyboard, la imagen que nos ha creado
+ 
+
+747
+00:14:20,920 --> 00:14:23,710
+storyboard, la imagen que nos ha creado
+antes Notebook LM. Se la pegamos aquí y
+
+748
+00:14:23,710 --> 00:14:23,720
+antes Notebook LM. Se la pegamos aquí y
+ 
+
+749
+00:14:23,720 --> 00:14:26,069
+antes Notebook LM. Se la pegamos aquí y
+nos volvemos a nuestro notebook. LM y
+
+750
+00:14:26,069 --> 00:14:26,079
+nos volvemos a nuestro notebook. LM y
+ 
+
+751
+00:14:26,079 --> 00:14:28,030
+nos volvemos a nuestro notebook. LM y
+seguimos con el paso tres. El paso dos
+
+752
+00:14:28,030 --> 00:14:28,040
+seguimos con el paso tres. El paso dos
+ 
+
+753
+00:14:28,040 --> 00:14:29,949
+seguimos con el paso tres. El paso dos
+era el prom del storyboard, este de
+
+754
+00:14:29,949 --> 00:14:29,959
+era el prom del storyboard, este de
+ 
+
+755
+00:14:29,959 --> 00:14:33,069
+era el prom del storyboard, este de
+aquí. Paso tres ya lo dice aquí para el
+
+756
+00:14:33,069 --> 00:14:33,079
+aquí. Paso tres ya lo dice aquí para el
+ 
+
+757
+00:14:33,079 --> 00:14:35,230
+aquí. Paso tres ya lo dice aquí para el
+agente de Google Flow. ¿De acuerdo? Pues
+
+758
+00:14:35,230 --> 00:14:35,240
+agente de Google Flow. ¿De acuerdo? Pues
+ 
+
+759
+00:14:35,240 --> 00:14:38,870
+agente de Google Flow. ¿De acuerdo? Pues
+simplemente copio esto y se lo pego,
+
+760
+00:14:38,870 --> 00:14:38,880
+simplemente copio esto y se lo pego,
+ 
+
+761
+00:14:38,880 --> 00:14:41,509
+simplemente copio esto y se lo pego,
+¿vale? Se lo voy a pegar todo aquí.
+
+762
+00:14:41,509 --> 00:14:41,519
+¿vale? Se lo voy a pegar todo aquí.
+ 
+
+763
+00:14:41,519 --> 00:14:44,910
+¿vale? Se lo voy a pegar todo aquí.
+¿Vale? Ahora aquí ya veis que pone eh os
+
+764
+00:14:44,910 --> 00:14:44,920
+¿Vale? Ahora aquí ya veis que pone eh os
+ 
+
+765
+00:14:44,920 --> 00:14:46,790
+¿Vale? Ahora aquí ya veis que pone eh os
+da información también, ¿vale? Avisos de
+
+766
+00:14:46,790 --> 00:14:46,800
+da información también, ¿vale? Avisos de
+ 
+
+767
+00:14:46,800 --> 00:14:48,749
+da información también, ¿vale? Avisos de
+producción y de audio sin música, clips
+
+768
+00:14:48,749 --> 00:14:48,759
+producción y de audio sin música, clips
+ 
+
+769
+00:14:48,759 --> 00:14:52,030
+producción y de audio sin música, clips
+mudos, pa pa pa pa. Coste estimado. El
+
+770
+00:14:52,030 --> 00:14:52,040
+mudos, pa pa pa pa. Coste estimado. El
+ 
+
+771
+00:14:52,040 --> 00:14:53,949
+mudos, pa pa pa pa. Coste estimado. El
+proceso consumirá, lo que os decía, ¿no?
+
+772
+00:14:53,949 --> 00:14:53,959
+proceso consumirá, lo que os decía, ¿no?
+ 
+
+773
+00:14:53,959 --> 00:14:56,310
+proceso consumirá, lo que os decía, ¿no?
+Aproximadamente seis escenas por 15
+
+774
+00:14:56,310 --> 00:14:56,320
+Aproximadamente seis escenas por 15
+ 
+
+775
+00:14:56,320 --> 00:14:58,710
+Aproximadamente seis escenas por 15
+créditos, 90 créditos. Y fijaros en
+
+776
+00:14:58,710 --> 00:14:58,720
+créditos, 90 créditos. Y fijaros en
+ 
+
+777
+00:14:58,720 --> 00:15:00,310
+créditos, 90 créditos. Y fijaros en
+esto, que esto es importante para los
+
+778
+00:15:00,310 --> 00:15:00,320
+esto, que esto es importante para los
+ 
+
+779
+00:15:00,320 --> 00:15:02,310
+esto, que esto es importante para los
+que tenéis el plan gratuito. Teniendo en
+
+780
+00:15:02,310 --> 00:15:02,320
+que tenéis el plan gratuito. Teniendo en
+ 
+
+781
+00:15:02,320 --> 00:15:04,189
+que tenéis el plan gratuito. Teniendo en
+cuenta que la cuenta gratuita de Google
+
+782
+00:15:04,189 --> 00:15:04,199
+cuenta que la cuenta gratuita de Google
+ 
+
+783
+00:15:04,199 --> 00:15:06,870
+cuenta que la cuenta gratuita de Google
+ofrece un límite de 50 créditos diarios,
+
+784
+00:15:06,870 --> 00:15:06,880
+ofrece un límite de 50 créditos diarios,
+ 
+
+785
+00:15:06,880 --> 00:15:08,710
+ofrece un límite de 50 créditos diarios,
+eh si necesitas dividir el renderizado,
+
+786
+00:15:08,710 --> 00:15:08,720
+eh si necesitas dividir el renderizado,
+ 
+
+787
+00:15:08,720 --> 00:15:10,870
+eh si necesitas dividir el renderizado,
+puedes procesar hoy las escenas de la 1
+
+788
+00:15:10,870 --> 00:15:10,880
+puedes procesar hoy las escenas de la 1
+ 
+
+789
+00:15:10,880 --> 00:15:14,150
+puedes procesar hoy las escenas de la 1
+a la 3 y mañana de la 4 a la 6, pegando
+
+790
+00:15:14,150 --> 00:15:14,160
+a la 3 y mañana de la 4 a la 6, pegando
+ 
+
+791
+00:15:14,160 --> 00:15:16,710
+a la 3 y mañana de la 4 a la 6, pegando
+exactamente el mismo eh bloque global en
+
+792
+00:15:16,710 --> 00:15:16,720
+exactamente el mismo eh bloque global en
+ 
+
+793
+00:15:16,720 --> 00:15:18,949
+exactamente el mismo eh bloque global en
+ambas tandas. Eh, y aquí os lo explica.
+
+794
+00:15:18,949 --> 00:15:18,959
+ambas tandas. Eh, y aquí os lo explica.
+ 
+
+795
+00:15:18,959 --> 00:15:21,430
+ambas tandas. Eh, y aquí os lo explica.
+O sea, yo, por ejemplo, eh, si le
+
+796
+00:15:21,430 --> 00:15:21,440
+O sea, yo, por ejemplo, eh, si le
+ 
+
+797
+00:15:21,440 --> 00:15:23,269
+O sea, yo, por ejemplo, eh, si le
+hubiese dicho que tenía el plan gratuito
+
+798
+00:15:23,269 --> 00:15:23,279
+hubiese dicho que tenía el plan gratuito
+ 
+
+799
+00:15:23,279 --> 00:15:25,069
+hubiese dicho que tenía el plan gratuito
+eh él me hubiese detectado
+
+800
+00:15:25,069 --> 00:15:25,079
+eh él me hubiese detectado
+ 
+
+801
+00:15:25,079 --> 00:15:26,870
+eh él me hubiese detectado
+automáticamente que no me iba a caber en
+
+802
+00:15:26,870 --> 00:15:26,880
+automáticamente que no me iba a caber en
+ 
+
+803
+00:15:26,880 --> 00:15:29,110
+automáticamente que no me iba a caber en
+el plan gratuito. Entonces, os dividirá
+
+804
+00:15:29,110 --> 00:15:29,120
+el plan gratuito. Entonces, os dividirá
+ 
+
+805
+00:15:29,120 --> 00:15:31,710
+el plan gratuito. Entonces, os dividirá
+el mismo promp os dividirá en dos partes
+
+806
+00:15:31,710 --> 00:15:31,720
+el mismo promp os dividirá en dos partes
+ 
+
+807
+00:15:31,720 --> 00:15:33,550
+el mismo promp os dividirá en dos partes
+los proms para un día y para el día
+
+808
+00:15:33,550 --> 00:15:33,560
+los proms para un día y para el día
+ 
+
+809
+00:15:33,560 --> 00:15:35,030
+los proms para un día y para el día
+siguiente. Y así lo podéis hacer sin
+
+810
+00:15:35,030 --> 00:15:35,040
+siguiente. Y así lo podéis hacer sin
+ 
+
+811
+00:15:35,040 --> 00:15:38,069
+siguiente. Y así lo podéis hacer sin
+ningún problema. Vale, sigamos. Nos
+
+812
+00:15:38,069 --> 00:15:38,079
+ningún problema. Vale, sigamos. Nos
+ 
+
+813
+00:15:38,079 --> 00:15:40,629
+ningún problema. Vale, sigamos. Nos
+volvemos aquí a Google Flow. Hemos
+
+814
+00:15:40,629 --> 00:15:40,639
+volvemos aquí a Google Flow. Hemos
+ 
+
+815
+00:15:40,639 --> 00:15:42,990
+volvemos aquí a Google Flow. Hemos
+pegado la imagen y le pego el prompt de
+
+816
+00:15:42,990 --> 00:15:43,000
+pegado la imagen y le pego el prompt de
+ 
+
+817
+00:15:43,000 --> 00:15:45,269
+pegado la imagen y le pego el prompt de
+antes. Voy a borrar esta última parte
+
+818
+00:15:45,269 --> 00:15:45,279
+antes. Voy a borrar esta última parte
+ 
+
+819
+00:15:45,279 --> 00:15:47,590
+antes. Voy a borrar esta última parte
+que esto no toca. Y simplemente la
+
+820
+00:15:47,590 --> 00:15:47,600
+que esto no toca. Y simplemente la
+ 
+
+821
+00:15:47,600 --> 00:15:50,710
+que esto no toca. Y simplemente la
+maravilla del modo agente es que el prom
+
+822
+00:15:50,710 --> 00:15:50,720
+maravilla del modo agente es que el prom
+ 
+
+823
+00:15:50,720 --> 00:15:52,509
+maravilla del modo agente es que el prom
+es tan específico, le dice lo que
+
+824
+00:15:52,509 --> 00:15:52,519
+es tan específico, le dice lo que
+ 
+
+825
+00:15:52,519 --> 00:15:54,350
+es tan específico, le dice lo que
+queremos, el estilo, la imagen, lo que
+
+826
+00:15:54,350 --> 00:15:54,360
+queremos, el estilo, la imagen, lo que
+ 
+
+827
+00:15:54,360 --> 00:15:56,269
+queremos, el estilo, la imagen, lo que
+tiene que hacer, los cortes, le dice
+
+828
+00:15:56,269 --> 00:15:56,279
+tiene que hacer, los cortes, le dice
+ 
+
+829
+00:15:56,279 --> 00:15:58,470
+tiene que hacer, los cortes, le dice
+todo automáticamente. Y en el modo
+
+830
+00:15:58,470 --> 00:15:58,480
+todo automáticamente. Y en el modo
+ 
+
+831
+00:15:58,480 --> 00:16:00,189
+todo automáticamente. Y en el modo
+agente nos va a hacer dos cosas, nos va
+
+832
+00:16:00,189 --> 00:16:00,199
+agente nos va a hacer dos cosas, nos va
+ 
+
+833
+00:16:00,199 --> 00:16:02,350
+agente nos va a hacer dos cosas, nos va
+a generar todas las imágenes primero y
+
+834
+00:16:02,350 --> 00:16:02,360
+a generar todas las imágenes primero y
+ 
+
+835
+00:16:02,360 --> 00:16:03,910
+a generar todas las imágenes primero y
+nos va a generar todos los vídeos
+
+836
+00:16:03,910 --> 00:16:03,920
+nos va a generar todos los vídeos
+ 
+
+837
+00:16:03,920 --> 00:16:06,350
+nos va a generar todos los vídeos
+primero a la vez, sin extensiones raras,
+
+838
+00:16:06,350 --> 00:16:06,360
+primero a la vez, sin extensiones raras,
+ 
+
+839
+00:16:06,360 --> 00:16:08,069
+primero a la vez, sin extensiones raras,
+sin tener que hacer nada raro. No
+
+840
+00:16:08,069 --> 00:16:08,079
+sin tener que hacer nada raro. No
+ 
+
+841
+00:16:08,079 --> 00:16:09,710
+sin tener que hacer nada raro. No
+tenemos que hacer nada, ni generar
+
+842
+00:16:09,710 --> 00:16:09,720
+tenemos que hacer nada, ni generar
+ 
+
+843
+00:16:09,720 --> 00:16:11,550
+tenemos que hacer nada, ni generar
+imágenes una por una, ni generar vídeos
+
+844
+00:16:11,550 --> 00:16:11,560
+imágenes una por una, ni generar vídeos
+ 
+
+845
+00:16:11,560 --> 00:16:13,990
+imágenes una por una, ni generar vídeos
+uno por uno. Fijaros que yo le doy aquí
+
+846
+00:16:13,990 --> 00:16:14,000
+uno por uno. Fijaros que yo le doy aquí
+ 
+
+847
+00:16:14,000 --> 00:16:15,910
+uno por uno. Fijaros que yo le doy aquí
+al agente. Le podéis dar a estas
+
+848
+00:16:15,910 --> 00:16:15,920
+al agente. Le podéis dar a estas
+ 
+
+849
+00:16:15,920 --> 00:16:17,590
+al agente. Le podéis dar a estas
+flechitas de aquí para que se abra la
+
+850
+00:16:17,590 --> 00:16:17,600
+flechitas de aquí para que se abra la
+ 
+
+851
+00:16:17,600 --> 00:16:19,550
+flechitas de aquí para que se abra la
+conversación con el agente y veréis que
+
+852
+00:16:19,550 --> 00:16:19,560
+conversación con el agente y veréis que
+ 
+
+853
+00:16:19,560 --> 00:16:21,749
+conversación con el agente y veréis que
+la gente os va a preguntar cosas.
+
+854
+00:16:21,749 --> 00:16:21,759
+la gente os va a preguntar cosas.
+ 
+
+855
+00:16:21,759 --> 00:16:23,949
+la gente os va a preguntar cosas.
+Entonces, simplemente pues yo le voy a
+
+856
+00:16:23,949 --> 00:16:23,959
+Entonces, simplemente pues yo le voy a
+ 
+
+857
+00:16:23,959 --> 00:16:26,309
+Entonces, simplemente pues yo le voy a
+decir que okay, que sigue adelante y ya
+
+858
+00:16:26,309 --> 00:16:26,319
+decir que okay, que sigue adelante y ya
+ 
+
+859
+00:16:26,319 --> 00:16:27,790
+decir que okay, que sigue adelante y ya
+está. ¿Veis? Fijaros, aquí me dice,
+
+860
+00:16:27,790 --> 00:16:27,800
+está. ¿Veis? Fijaros, aquí me dice,
+ 
+
+861
+00:16:27,800 --> 00:16:30,990
+está. ¿Veis? Fijaros, aquí me dice,
+"Vale, voy a generar eh los 6 916
+
+862
+00:16:30,990 --> 00:16:31,000
+"Vale, voy a generar eh los 6 916
+ 
+
+863
+00:16:31,000 --> 00:16:33,269
+"Vale, voy a generar eh los 6 916
+storyboard, bla bla bla, cuesta tanto,
+
+864
+00:16:33,269 --> 00:16:33,279
+storyboard, bla bla bla, cuesta tanto,
+ 
+
+865
+00:16:33,279 --> 00:16:35,590
+storyboard, bla bla bla, cuesta tanto,
+te dice lo que cuesta y le digo, pues a
+
+866
+00:16:35,590 --> 00:16:35,600
+te dice lo que cuesta y le digo, pues a
+ 
+
+867
+00:16:35,600 --> 00:16:37,949
+te dice lo que cuesta y le digo, pues a
+probar." Y ahora ya, como veréis, me va
+
+868
+00:16:37,949 --> 00:16:37,959
+probar." Y ahora ya, como veréis, me va
+ 
+
+869
+00:16:37,959 --> 00:16:40,189
+probar." Y ahora ya, como veréis, me va
+a empezar a generar eh todo. Primero las
+
+870
+00:16:40,189 --> 00:16:40,199
+a empezar a generar eh todo. Primero las
+ 
+
+871
+00:16:40,199 --> 00:16:43,309
+a empezar a generar eh todo. Primero las
+imágenes y luego, fijaros, los vídeos.
+
+872
+00:16:43,309 --> 00:16:43,319
+imágenes y luego, fijaros, los vídeos.
+ 
+
+873
+00:16:43,319 --> 00:16:44,590
+imágenes y luego, fijaros, los vídeos.
+Ahora está generando los vídeos y
+
+874
+00:16:44,590 --> 00:16:44,600
+Ahora está generando los vídeos y
+ 
+
+875
+00:16:44,600 --> 00:16:45,949
+Ahora está generando los vídeos y
+fijaros que en cada vídeo le ha puesto
+
+876
+00:16:45,949 --> 00:16:45,959
+fijaros que en cada vídeo le ha puesto
+ 
+
+877
+00:16:45,959 --> 00:16:48,710
+fijaros que en cada vídeo le ha puesto
+un nombre, ¿vale? Eh, Hangrasping, Red
+
+878
+00:16:48,710 --> 00:16:48,720
+un nombre, ¿vale? Eh, Hangrasping, Red
+ 
+
+879
+00:16:48,720 --> 00:16:52,150
+un nombre, ¿vale? Eh, Hangrasping, Red
+Line Char, eh, no sé qué. Y aquí me dice
+
+880
+00:16:52,150 --> 00:16:52,160
+Line Char, eh, no sé qué. Y aquí me dice
+ 
+
+881
+00:16:52,160 --> 00:16:54,829
+Line Char, eh, no sé qué. Y aquí me dice
+el el detalle de las escenas, o sea, el
+
+882
+00:16:54,829 --> 00:16:54,839
+el el detalle de las escenas, o sea, el
+ 
+
+883
+00:16:54,839 --> 00:16:56,509
+el el detalle de las escenas, o sea, el
+orden, que esto es importante porque si
+
+884
+00:16:56,509 --> 00:16:56,519
+orden, que esto es importante porque si
+ 
+
+885
+00:16:56,519 --> 00:16:58,550
+orden, que esto es importante porque si
+luego, por ejemplo, lo queremos editar
+
+886
+00:16:58,550 --> 00:16:58,560
+luego, por ejemplo, lo queremos editar
+ 
+
+887
+00:16:58,560 --> 00:17:00,269
+luego, por ejemplo, lo queremos editar
+aquí mismo, que hay un un editor de
+
+888
+00:17:00,269 --> 00:17:00,279
+aquí mismo, que hay un un editor de
+ 
+
+889
+00:17:00,279 --> 00:17:02,189
+aquí mismo, que hay un un editor de
+escenas muy simple, o por ejemplo en
+
+890
+00:17:02,189 --> 00:17:02,199
+escenas muy simple, o por ejemplo en
+ 
+
+891
+00:17:02,199 --> 00:17:04,429
+escenas muy simple, o por ejemplo en
+CapC, donde queráis, para saber el orden
+
+892
+00:17:04,429 --> 00:17:04,439
+CapC, donde queráis, para saber el orden
+ 
+
+893
+00:17:04,439 --> 00:17:06,110
+CapC, donde queráis, para saber el orden
+correcto, pues aquí tenéis, ¿no?, escena
+
+894
+00:17:06,110 --> 00:17:06,120
+correcto, pues aquí tenéis, ¿no?, escena
+ 
+
+895
+00:17:06,120 --> 00:17:08,150
+correcto, pues aquí tenéis, ¿no?, escena
+uno, escena dos, escena tres con el
+
+896
+00:17:08,150 --> 00:17:08,160
+uno, escena dos, escena tres con el
+ 
+
+897
+00:17:08,160 --> 00:17:10,270
+uno, escena dos, escena tres con el
+nombre de cada una, que es el nombre que
+
+898
+00:17:10,270 --> 00:17:10,280
+nombre de cada una, que es el nombre que
+ 
+
+899
+00:17:10,280 --> 00:17:12,750
+nombre de cada una, que es el nombre que
+tenéis aquí en cada archivo, ¿vale? Y ya
+
+900
+00:17:12,750 --> 00:17:12,760
+tenéis aquí en cada archivo, ¿vale? Y ya
+ 
+
+901
+00:17:12,760 --> 00:17:14,590
+tenéis aquí en cada archivo, ¿vale? Y ya
+los tenemos todos, cosas que podemos
+
+902
+00:17:14,590 --> 00:17:14,600
+los tenemos todos, cosas que podemos
+ 
+
+903
+00:17:14,600 --> 00:17:16,470
+los tenemos todos, cosas que podemos
+hacer aquí, ¿vale? Yo os voy a decir
+
+904
+00:17:16,470 --> 00:17:16,480
+hacer aquí, ¿vale? Yo os voy a decir
+ 
+
+905
+00:17:16,480 --> 00:17:18,789
+hacer aquí, ¿vale? Yo os voy a decir
+como opciones y vosotros decidís y os
+
+906
+00:17:18,789 --> 00:17:18,799
+como opciones y vosotros decidís y os
+ 
+
+907
+00:17:18,799 --> 00:17:20,510
+como opciones y vosotros decidís y os
+digo la que a mí me gusta más. Eh, el
+
+908
+00:17:20,510 --> 00:17:20,520
+digo la que a mí me gusta más. Eh, el
+ 
+
+909
+00:17:20,520 --> 00:17:22,189
+digo la que a mí me gusta más. Eh, el
+que a mí me gusta más es descargar todo
+
+910
+00:17:22,189 --> 00:17:22,199
+que a mí me gusta más es descargar todo
+ 
+
+911
+00:17:22,199 --> 00:17:24,110
+que a mí me gusta más es descargar todo
+esto y luego ponerlo en un editor porque
+
+912
+00:17:24,110 --> 00:17:24,120
+esto y luego ponerlo en un editor porque
+ 
+
+913
+00:17:24,120 --> 00:17:25,750
+esto y luego ponerlo en un editor porque
+considero que es un poco más sencillo.
+
+914
+00:17:25,750 --> 00:17:25,760
+considero que es un poco más sencillo.
+ 
+
+915
+00:17:25,760 --> 00:17:27,189
+considero que es un poco más sencillo.
+Entonces, yo le doy aquí los dos
+
+916
+00:17:27,189 --> 00:17:27,199
+Entonces, yo le doy aquí los dos
+ 
+
+917
+00:17:27,199 --> 00:17:29,630
+Entonces, yo le doy aquí los dos
+puntitos y pongo descargar proyecto y me
+
+918
+00:17:29,630 --> 00:17:29,640
+puntitos y pongo descargar proyecto y me
+ 
+
+919
+00:17:29,640 --> 00:17:32,710
+puntitos y pongo descargar proyecto y me
+descarga todos los vídeos de una. Eh, si
+
+920
+00:17:32,710 --> 00:17:32,720
+descarga todos los vídeos de una. Eh, si
+ 
+
+921
+00:17:32,720 --> 00:17:35,270
+descarga todos los vídeos de una. Eh, si
+no, lo que podéis hacer también es le
+
+922
+00:17:35,270 --> 00:17:35,280
+no, lo que podéis hacer también es le
+ 
+
+923
+00:17:35,280 --> 00:17:37,590
+no, lo que podéis hacer también es le
+dais aquí a, por ejemplo, esta sería la
+
+924
+00:17:37,590 --> 00:17:37,600
+dais aquí a, por ejemplo, esta sería la
+ 
+
+925
+00:17:37,600 --> 00:17:39,870
+dais aquí a, por ejemplo, esta sería la
+primera escena, el primer vídeo. Le doy
+
+926
+00:17:39,870 --> 00:17:39,880
+primera escena, el primer vídeo. Le doy
+ 
+
+927
+00:17:39,880 --> 00:17:42,510
+primera escena, el primer vídeo. Le doy
+aquí y pongo añadir a la escena, crear
+
+928
+00:17:42,510 --> 00:17:42,520
+aquí y pongo añadir a la escena, crear
+ 
+
+929
+00:17:42,520 --> 00:17:44,909
+aquí y pongo añadir a la escena, crear
+escena, y automáticamente me la añade
+
+930
+00:17:44,909 --> 00:17:44,919
+escena, y automáticamente me la añade
+ 
+
+931
+00:17:44,919 --> 00:17:46,990
+escena, y automáticamente me la añade
+como una especie de una una especie de
+
+932
+00:17:46,990 --> 00:17:47,000
+como una especie de una una especie de
+ 
+
+933
+00:17:47,000 --> 00:17:49,430
+como una especie de una una especie de
+línea nueva, ¿vale? Yo me vengo aquí a
+
+934
+00:17:49,430 --> 00:17:49,440
+línea nueva, ¿vale? Yo me vengo aquí a
+ 
+
+935
+00:17:49,440 --> 00:17:52,270
+línea nueva, ¿vale? Yo me vengo aquí a
+escena y aquí me está añadiendo, ¿vale?
+
+936
+00:17:52,270 --> 00:17:52,280
+escena y aquí me está añadiendo, ¿vale?
+ 
+
+937
+00:17:52,280 --> 00:17:54,470
+escena y aquí me está añadiendo, ¿vale?
+Entonces, si yo le doy aquí, pues aquí
+
+938
+00:17:54,470 --> 00:17:54,480
+Entonces, si yo le doy aquí, pues aquí
+ 
+
+939
+00:17:54,480 --> 00:17:56,669
+Entonces, si yo le doy aquí, pues aquí
+me aparece automáticamente el primer
+
+940
+00:17:56,669 --> 00:17:56,679
+me aparece automáticamente el primer
+ 
+
+941
+00:17:56,679 --> 00:17:58,590
+me aparece automáticamente el primer
+clip. Ahora, como veis, yo le puedo dar
+
+942
+00:17:58,590 --> 00:17:58,600
+clip. Ahora, como veis, yo le puedo dar
+ 
+
+943
+00:17:58,600 --> 00:18:02,470
+clip. Ahora, como veis, yo le puedo dar
+aquí añadir clip y añado el siguiente
+
+944
+00:18:02,470 --> 00:18:02,480
+aquí añadir clip y añado el siguiente
+ 
+
+945
+00:18:02,480 --> 00:18:04,149
+aquí añadir clip y añado el siguiente
+clip, por ejemplo. No sé si es este,
+
+946
+00:18:04,149 --> 00:18:04,159
+clip, por ejemplo. No sé si es este,
+ 
+
+947
+00:18:04,159 --> 00:18:05,630
+clip, por ejemplo. No sé si es este,
+pero digamos que es este, añadir a la
+
+948
+00:18:05,630 --> 00:18:05,640
+pero digamos que es este, añadir a la
+ 
+
+949
+00:18:05,640 --> 00:18:09,630
+pero digamos que es este, añadir a la
+escena. Le doy luego a al siguiente aquí
+
+950
+00:18:09,630 --> 00:18:09,640
+escena. Le doy luego a al siguiente aquí
+ 
+
+951
+00:18:09,640 --> 00:18:12,789
+escena. Le doy luego a al siguiente aquí
+y añado el tercer clip. ¿Vale? Y así
+
+952
+00:18:12,789 --> 00:18:12,799
+y añado el tercer clip. ¿Vale? Y así
+ 
+
+953
+00:18:12,799 --> 00:18:14,830
+y añado el tercer clip. ¿Vale? Y así
+pues todos uno por uno. Esta es una
+
+954
+00:18:14,830 --> 00:18:14,840
+pues todos uno por uno. Esta es una
+ 
+
+955
+00:18:14,840 --> 00:18:17,830
+pues todos uno por uno. Esta es una
+especie de editor de escenas que tiene
+
+956
+00:18:17,830 --> 00:18:17,840
+especie de editor de escenas que tiene
+ 
+
+957
+00:18:17,840 --> 00:18:21,149
+especie de editor de escenas que tiene
+integrado eh eh Google Flow, pero como
+
+958
+00:18:21,149 --> 00:18:21,159
+integrado eh eh Google Flow, pero como
+ 
+
+959
+00:18:21,159 --> 00:18:23,750
+integrado eh eh Google Flow, pero como
+veis no es el como el más rápido del
+
+960
+00:18:23,750 --> 00:18:23,760
+veis no es el como el más rápido del
+ 
+
+961
+00:18:23,760 --> 00:18:24,830
+veis no es el como el más rápido del
+mundo, por eso yo prefiero hacerlo en
+
+962
+00:18:24,830 --> 00:18:24,840
+mundo, por eso yo prefiero hacerlo en
+ 
+
+963
+00:18:24,840 --> 00:18:26,350
+mundo, por eso yo prefiero hacerlo en
+CapC. Pero lo podéis hacer aquí. Por
+
+964
+00:18:26,350 --> 00:18:26,360
+CapC. Pero lo podéis hacer aquí. Por
+ 
+
+965
+00:18:26,360 --> 00:18:28,870
+CapC. Pero lo podéis hacer aquí. Por
+ejemplo, si si no tenéis ni CAPCAT ni
+
+966
+00:18:28,870 --> 00:18:28,880
+ejemplo, si si no tenéis ni CAPCAT ni
+ 
+
+967
+00:18:28,880 --> 00:18:31,870
+ejemplo, si si no tenéis ni CAPCAT ni
+ningún editor gratuito, eh, y habéis
+
+968
+00:18:31,870 --> 00:18:31,880
+ningún editor gratuito, eh, y habéis
+ 
+
+969
+00:18:31,880 --> 00:18:34,710
+ningún editor gratuito, eh, y habéis
+editado los vídeos ya con música y con
+
+970
+00:18:34,710 --> 00:18:34,720
+editado los vídeos ya con música y con
+ 
+
+971
+00:18:34,720 --> 00:18:37,350
+editado los vídeos ya con música y con
+voz, todo directamente desde aquí, pues
+
+972
+00:18:37,350 --> 00:18:37,360
+voz, todo directamente desde aquí, pues
+ 
+
+973
+00:18:37,360 --> 00:18:38,750
+voz, todo directamente desde aquí, pues
+entonces lo podéis hacer así y os
+
+974
+00:18:38,750 --> 00:18:38,760
+entonces lo podéis hacer así y os
+ 
+
+975
+00:18:38,760 --> 00:18:40,669
+entonces lo podéis hacer así y os
+descargáis el vídeo completo. ¿Vale?
+
+976
+00:18:40,669 --> 00:18:40,679
+descargáis el vídeo completo. ¿Vale?
+ 
+
+977
+00:18:40,679 --> 00:18:42,510
+descargáis el vídeo completo. ¿Vale?
+Aquí podéis ver con los efectos de
+
+978
+00:18:42,510 --> 00:18:42,520
+Aquí podéis ver con los efectos de
+ 
+
+979
+00:18:42,520 --> 00:18:45,029
+Aquí podéis ver con los efectos de
+sonido. Y como veis, como yo le he
+
+980
+00:18:45,029 --> 00:18:45,039
+sonido. Y como veis, como yo le he
+ 
+
+981
+00:18:45,039 --> 00:18:47,270
+sonido. Y como veis, como yo le he
+pedido que sin narración y sin música,
+
+982
+00:18:47,270 --> 00:18:47,280
+pedido que sin narración y sin música,
+ 
+
+983
+00:18:47,280 --> 00:18:48,470
+pedido que sin narración y sin música,
+pues me lo he hecho sin narración y sin
+
+984
+00:18:48,470 --> 00:18:48,480
+pues me lo he hecho sin narración y sin
+ 
+
+985
+00:18:48,480 --> 00:18:50,750
+pues me lo he hecho sin narración y sin
+música, ¿vale? Pero si lo hubieseis
+
+986
+00:18:50,750 --> 00:18:50,760
+música, ¿vale? Pero si lo hubieseis
+ 
+
+987
+00:18:50,760 --> 00:18:51,990
+música, ¿vale? Pero si lo hubieseis
+puesto con narración y con música, os lo
+
+988
+00:18:51,990 --> 00:18:52,000
+puesto con narración y con música, os lo
+ 
+
+989
+00:18:52,000 --> 00:18:54,830
+puesto con narración y con música, os lo
+hubiese hecho aquí. ¿Vale? Pues una vez
+
+990
+00:18:54,830 --> 00:18:54,840
+hubiese hecho aquí. ¿Vale? Pues una vez
+ 
+
+991
+00:18:54,840 --> 00:18:57,470
+hubiese hecho aquí. ¿Vale? Pues una vez
+teniendo esto, ya tenemos todos los
+
+992
+00:18:57,470 --> 00:18:57,480
+teniendo esto, ya tenemos todos los
+ 
+
+993
+00:18:57,480 --> 00:19:00,430
+teniendo esto, ya tenemos todos los
+vídeos descargados. Ahora, en mi caso,
+
+994
+00:19:00,430 --> 00:19:00,440
+vídeos descargados. Ahora, en mi caso,
+ 
+
+995
+00:19:00,440 --> 00:19:02,230
+vídeos descargados. Ahora, en mi caso,
+que yo he preferido hacerlo por
+
+996
+00:19:02,230 --> 00:19:02,240
+que yo he preferido hacerlo por
+ 
+
+997
+00:19:02,240 --> 00:19:04,750
+que yo he preferido hacerlo por
+separado, vamos a generar la música y
+
+998
+00:19:04,750 --> 00:19:04,760
+separado, vamos a generar la música y
+ 
+
+999
+00:19:04,760 --> 00:19:07,549
+separado, vamos a generar la música y
+vamos a generar eh la imagen, o sea,
+
+1000
+00:19:07,549 --> 00:19:07,559
+vamos a generar eh la imagen, o sea,
+ 
+
+1001
+00:19:07,559 --> 00:19:10,110
+vamos a generar eh la imagen, o sea,
+perdón, el texto, la locución. Vamos con
+
+1002
+00:19:10,110 --> 00:19:10,120
+perdón, el texto, la locución. Vamos con
+ 
+
+1003
+00:19:10,120 --> 00:19:12,789
+perdón, el texto, la locución. Vamos con
+el de música, ¿vale? Y aquí me dice prom
+
+1004
+00:19:12,789 --> 00:19:12,799
+el de música, ¿vale? Y aquí me dice prom
+ 
+
+1005
+00:19:12,799 --> 00:19:16,029
+el de música, ¿vale? Y aquí me dice prom
+de música para Suno, audio, Flow Music,
+
+1006
+00:19:16,029 --> 00:19:16,039
+de música para Suno, audio, Flow Music,
+ 
+
+1007
+00:19:16,039 --> 00:19:17,789
+de música para Suno, audio, Flow Music,
+que es el que vamos a utilizar. Eh, aquí
+
+1008
+00:19:17,789 --> 00:19:17,799
+que es el que vamos a utilizar. Eh, aquí
+ 
+
+1009
+00:19:17,799 --> 00:19:19,430
+que es el que vamos a utilizar. Eh, aquí
+tienes el prom de música diseñado
+
+1010
+00:19:19,430 --> 00:19:19,440
+tienes el prom de música diseñado
+ 
+
+1011
+00:19:19,440 --> 00:19:21,190
+tienes el prom de música diseñado
+específicamente en inglés para mantener
+
+1012
+00:19:21,190 --> 00:19:21,200
+específicamente en inglés para mantener
+ 
+
+1013
+00:19:21,200 --> 00:19:22,750
+específicamente en inglés para mantener
+el tono de tensión informativa del
+
+1014
+00:19:22,750 --> 00:19:22,760
+el tono de tensión informativa del
+ 
+
+1015
+00:19:22,760 --> 00:19:25,310
+el tono de tensión informativa del
+documental sobre Bitcoin. Es decir, todo
+
+1016
+00:19:25,310 --> 00:19:25,320
+documental sobre Bitcoin. Es decir, todo
+ 
+
+1017
+00:19:25,320 --> 00:19:28,070
+documental sobre Bitcoin. Es decir, todo
+todos los proms que me da es por las
+
+1018
+00:19:28,070 --> 00:19:28,080
+todos los proms que me da es por las
+ 
+
+1019
+00:19:28,080 --> 00:19:29,750
+todos los proms que me da es por las
+preguntas que hemos respondido antes. Si
+
+1020
+00:19:29,750 --> 00:19:29,760
+preguntas que hemos respondido antes. Si
+ 
+
+1021
+00:19:29,760 --> 00:19:31,070
+preguntas que hemos respondido antes. Si
+hubiese respondido otras cosas, me
+
+1022
+00:19:31,070 --> 00:19:31,080
+hubiese respondido otras cosas, me
+ 
+
+1023
+00:19:31,080 --> 00:19:33,110
+hubiese respondido otras cosas, me
+hubiese dado promps diferentes para
+
+1024
+00:19:33,110 --> 00:19:33,120
+hubiese dado promps diferentes para
+ 
+
+1025
+00:19:33,120 --> 00:19:34,990
+hubiese dado promps diferentes para
+música, para audio, para todo. ¿De
+
+1026
+00:19:34,990 --> 00:19:35,000
+música, para audio, para todo. ¿De
+ 
+
+1027
+00:19:35,000 --> 00:19:37,110
+música, para audio, para todo. ¿De
+acuerdo? Entonces, pues simplemente voy
+
+1028
+00:19:37,110 --> 00:19:37,120
+acuerdo? Entonces, pues simplemente voy
+ 
+
+1029
+00:19:37,120 --> 00:19:41,029
+acuerdo? Entonces, pues simplemente voy
+a copiar aquí todo esto y me vengo a
+
+1030
+00:19:41,029 --> 00:19:41,039
+a copiar aquí todo esto y me vengo a
+ 
+
+1031
+00:19:41,039 --> 00:19:44,350
+a copiar aquí todo esto y me vengo a
+Google Flow Music, eh, antiguamente
+
+1032
+00:19:44,350 --> 00:19:44,360
+Google Flow Music, eh, antiguamente
+ 
+
+1033
+00:19:44,360 --> 00:19:46,830
+Google Flow Music, eh, antiguamente
+producer AI, del que ya hicimos un vídeo
+
+1034
+00:19:46,830 --> 00:19:46,840
+producer AI, del que ya hicimos un vídeo
+ 
+
+1035
+00:19:46,840 --> 00:19:48,470
+producer AI, del que ya hicimos un vídeo
+en el canal. Podéis probarlo con la
+
+1036
+00:19:48,470 --> 00:19:48,480
+en el canal. Podéis probarlo con la
+ 
+
+1037
+00:19:48,480 --> 00:19:50,430
+en el canal. Podéis probarlo con la
+versión gratuita que tenéis créditos de
+
+1038
+00:19:50,430 --> 00:19:50,440
+versión gratuita que tenéis créditos de
+ 
+
+1039
+00:19:50,440 --> 00:19:52,510
+versión gratuita que tenéis créditos de
+sobra para poder probarlo. Y simplemente
+
+1040
+00:19:52,510 --> 00:19:52,520
+sobra para poder probarlo. Y simplemente
+ 
+
+1041
+00:19:52,520 --> 00:19:55,310
+sobra para poder probarlo. Y simplemente
+le voy a pegar el prom que me ha dado
+
+1042
+00:19:55,310 --> 00:19:55,320
+le voy a pegar el prom que me ha dado
+ 
+
+1043
+00:19:55,320 --> 00:19:57,789
+le voy a pegar el prom que me ha dado
+pues que me había dado antes, notebook
+
+1044
+00:19:57,789 --> 00:19:57,799
+pues que me había dado antes, notebook
+ 
+
+1045
+00:19:57,799 --> 00:19:59,789
+pues que me había dado antes, notebook
+LM. Aquí lo tenemos. Y ya me va a
+
+1046
+00:19:59,789 --> 00:19:59,799
+LM. Aquí lo tenemos. Y ya me va a
+ 
+
+1047
+00:19:59,799 --> 00:20:03,029
+LM. Aquí lo tenemos. Y ya me va a
+empezar a generar. Y aquí tenemos dos
+
+1048
+00:20:03,029 --> 00:20:03,039
+empezar a generar. Y aquí tenemos dos
+ 
+
+1049
+00:20:03,039 --> 00:20:14,373
+empezar a generar. Y aquí tenemos dos
+canciones. [música]
+
+1050
+00:20:14,373 --> 00:20:14,383
+
+ 
+
+1051
+00:20:14,383 --> 00:20:18,950
+
+[música]
+
+1052
+00:20:18,950 --> 00:20:18,960
+
+ 
+
+1053
+00:20:18,960 --> 00:20:21,310
+
+Vale,
+
+1054
+00:20:21,310 --> 00:20:21,320
+Vale,
+ 
+
+1055
+00:20:21,320 --> 00:20:23,789
+Vale,
+me gusta esta, la segunda, así que la
+
+1056
+00:20:23,789 --> 00:20:23,799
+me gusta esta, la segunda, así que la
+ 
+
+1057
+00:20:23,799 --> 00:20:27,029
+me gusta esta, la segunda, así que la
+voy a descargar como MP3, por ejemplo, o
+
+1058
+00:20:27,029 --> 00:20:27,039
+voy a descargar como MP3, por ejemplo, o
+ 
+
+1059
+00:20:27,039 --> 00:20:29,310
+voy a descargar como MP3, por ejemplo, o
+como WAF, lo que queráis. Y ya tengo
+
+1060
+00:20:29,310 --> 00:20:29,320
+como WAF, lo que queráis. Y ya tengo
+ 
+
+1061
+00:20:29,320 --> 00:20:30,909
+como WAF, lo que queráis. Y ya tengo
+descargados todos los vídeos. tengo
+
+1062
+00:20:30,909 --> 00:20:30,919
+descargados todos los vídeos. tengo
+ 
+
+1063
+00:20:30,919 --> 00:20:32,549
+descargados todos los vídeos. tengo
+descargada la música que va a ir en el
+
+1064
+00:20:32,549 --> 00:20:32,559
+descargada la música que va a ir en el
+ 
+
+1065
+00:20:32,559 --> 00:20:34,990
+descargada la música que va a ir en el
+fondo, que repito, esto lo podía haber
+
+1066
+00:20:34,990 --> 00:20:35,000
+fondo, que repito, esto lo podía haber
+ 
+
+1067
+00:20:35,000 --> 00:20:37,270
+fondo, que repito, esto lo podía haber
+hecho directamente Google Flow, ¿vale?
+
+1068
+00:20:37,270 --> 00:20:37,280
+hecho directamente Google Flow, ¿vale?
+ 
+
+1069
+00:20:37,280 --> 00:20:38,830
+hecho directamente Google Flow, ¿vale?
+Pero a mí creo que me da mejor resultado
+
+1070
+00:20:38,830 --> 00:20:38,840
+Pero a mí creo que me da mejor resultado
+ 
+
+1071
+00:20:38,840 --> 00:20:41,149
+Pero a mí creo que me da mejor resultado
+así, me gusta más así. Y ahora vamos a
+
+1072
+00:20:41,149 --> 00:20:41,159
+así, me gusta más así. Y ahora vamos a
+ 
+
+1073
+00:20:41,159 --> 00:20:44,070
+así, me gusta más así. Y ahora vamos a
+eh grabar la voz. Para ello tenemos
+
+1074
+00:20:44,070 --> 00:20:44,080
+eh grabar la voz. Para ello tenemos
+ 
+
+1075
+00:20:44,080 --> 00:20:46,870
+eh grabar la voz. Para ello tenemos
+varias opciones, eh pero una gratuita
+
+1076
+00:20:46,870 --> 00:20:46,880
+varias opciones, eh pero una gratuita
+ 
+
+1077
+00:20:46,880 --> 00:20:48,430
+varias opciones, eh pero una gratuita
+que funciona bien, que tenéis varios
+
+1078
+00:20:48,430 --> 00:20:48,440
+que funciona bien, que tenéis varios
+ 
+
+1079
+00:20:48,440 --> 00:20:49,990
+que funciona bien, que tenéis varios
+créditos desde el principio para para
+
+1080
+00:20:49,990 --> 00:20:50,000
+créditos desde el principio para para
+ 
+
+1081
+00:20:50,000 --> 00:20:51,950
+créditos desde el principio para para
+probar, perdón, es esta, que es la de
+
+1082
+00:20:51,950 --> 00:20:51,960
+probar, perdón, es esta, que es la de
+ 
+
+1083
+00:20:51,960 --> 00:20:54,830
+probar, perdón, es esta, que es la de
+Minimax Audio. ¿Vale? Entonces, nos
+
+1084
+00:20:54,830 --> 00:20:54,840
+Minimax Audio. ¿Vale? Entonces, nos
+ 
+
+1085
+00:20:54,840 --> 00:20:57,470
+Minimax Audio. ¿Vale? Entonces, nos
+vamos a textus speech, que es esta de
+
+1086
+00:20:57,470 --> 00:20:57,480
+vamos a textus speech, que es esta de
+ 
+
+1087
+00:20:57,480 --> 00:20:59,590
+vamos a textus speech, que es esta de
+aquí, y pues le vamos a pegar
+
+1088
+00:20:59,590 --> 00:20:59,600
+aquí, y pues le vamos a pegar
+ 
+
+1089
+00:20:59,600 --> 00:21:02,950
+aquí, y pues le vamos a pegar
+simplemente el promp que nos da eh
+
+1090
+00:21:02,950 --> 00:21:02,960
+simplemente el promp que nos da eh
+ 
+
+1091
+00:21:02,960 --> 00:21:04,789
+simplemente el promp que nos da eh
+notebook, que como veis aquí pues me lo
+
+1092
+00:21:04,789 --> 00:21:04,799
+notebook, que como veis aquí pues me lo
+ 
+
+1093
+00:21:04,799 --> 00:21:07,870
+notebook, que como veis aquí pues me lo
+da en formato de time stamps de líneas
+
+1094
+00:21:07,870 --> 00:21:07,880
+da en formato de time stamps de líneas
+ 
+
+1095
+00:21:07,880 --> 00:21:10,310
+da en formato de time stamps de líneas
+de tiempo o directamente para copiar y
+
+1096
+00:21:10,310 --> 00:21:10,320
+de tiempo o directamente para copiar y
+ 
+
+1097
+00:21:10,320 --> 00:21:11,789
+de tiempo o directamente para copiar y
+pegar, que es lo que voy a hacer yo.
+
+1098
+00:21:11,789 --> 00:21:11,799
+pegar, que es lo que voy a hacer yo.
+ 
+
+1099
+00:21:11,799 --> 00:21:14,390
+pegar, que es lo que voy a hacer yo.
+Vale, lo copio todo aquí, me vengo a
+
+1100
+00:21:14,390 --> 00:21:14,400
+Vale, lo copio todo aquí, me vengo a
+ 
+
+1101
+00:21:14,400 --> 00:21:18,029
+Vale, lo copio todo aquí, me vengo a
+Minimax y le copio todo el texto. Aquí
+
+1102
+00:21:18,029 --> 00:21:18,039
+Minimax y le copio todo el texto. Aquí
+ 
+
+1103
+00:21:18,039 --> 00:21:19,789
+Minimax y le copio todo el texto. Aquí
+vamos a hacerlo rápido, ¿vale? Pero si
+
+1104
+00:21:19,789 --> 00:21:19,799
+vamos a hacerlo rápido, ¿vale? Pero si
+ 
+
+1105
+00:21:19,799 --> 00:21:21,950
+vamos a hacerlo rápido, ¿vale? Pero si
+queréis pulirlo, pulirlo bien, pues aquí
+
+1106
+00:21:21,950 --> 00:21:21,960
+queréis pulirlo, pulirlo bien, pues aquí
+ 
+
+1107
+00:21:21,960 --> 00:21:25,549
+queréis pulirlo, pulirlo bien, pues aquí
+tenéis pausas, emociones, un montón de
+
+1108
+00:21:25,549 --> 00:21:25,559
+tenéis pausas, emociones, un montón de
+ 
+
+1109
+00:21:25,559 --> 00:21:27,669
+tenéis pausas, emociones, un montón de
+cosas. Vale, ya me ha detectado que el
+
+1110
+00:21:27,669 --> 00:21:27,679
+cosas. Vale, ya me ha detectado que el
+ 
+
+1111
+00:21:27,679 --> 00:21:29,830
+cosas. Vale, ya me ha detectado que el
+texto es en español y yo simplemente
+
+1112
+00:21:29,830 --> 00:21:29,840
+texto es en español y yo simplemente
+ 
+
+1113
+00:21:29,840 --> 00:21:32,830
+texto es en español y yo simplemente
+pues voy a escoger aquí una alguna voz
+
+1114
+00:21:32,830 --> 00:21:32,840
+pues voy a escoger aquí una alguna voz
+ 
+
+1115
+00:21:32,840 --> 00:21:35,110
+pues voy a escoger aquí una alguna voz
+que me guste. Aquí podemos seleccionar
+
+1116
+00:21:35,110 --> 00:21:35,120
+que me guste. Aquí podemos seleccionar
+ 
+
+1117
+00:21:35,120 --> 00:21:38,190
+que me guste. Aquí podemos seleccionar
+filtros, por ejemplo, idioma. Pues le
+
+1118
+00:21:38,190 --> 00:21:38,200
+filtros, por ejemplo, idioma. Pues le
+ 
+
+1119
+00:21:38,200 --> 00:21:41,630
+filtros, por ejemplo, idioma. Pues le
+voy a poner español. Y luego podemos
+
+1120
+00:21:41,630 --> 00:21:41,640
+voy a poner español. Y luego podemos
+ 
+
+1121
+00:21:41,640 --> 00:21:43,870
+voy a poner español. Y luego podemos
+seleccionar también si queremos pues
+
+1122
+00:21:43,870 --> 00:21:43,880
+seleccionar también si queremos pues
+ 
+
+1123
+00:21:43,880 --> 00:21:46,110
+seleccionar también si queremos pues
+hombre, mujer, etcétera. Vale, voy a
+
+1124
+00:21:46,110 --> 00:21:46,120
+hombre, mujer, etcétera. Vale, voy a
+ 
+
+1125
+00:21:46,120 --> 00:21:48,350
+hombre, mujer, etcétera. Vale, voy a
+poner hombre en este caso y le voy a
+
+1126
+00:21:48,350 --> 00:21:48,360
+poner hombre en este caso y le voy a
+ 
+
+1127
+00:21:48,360 --> 00:21:51,070
+poner hombre en este caso y le voy a
+poner pues que sea mid o más mayor.
+
+1128
+00:21:51,070 --> 00:21:51,080
+poner pues que sea mid o más mayor.
+ 
+
+1129
+00:21:51,080 --> 00:21:53,549
+poner pues que sea mid o más mayor.
+Aplico los filters y voy a escoger, por
+
+1130
+00:21:53,549 --> 00:21:53,559
+Aplico los filters y voy a escoger, por
+ 
+
+1131
+00:21:53,559 --> 00:21:55,190
+Aplico los filters y voy a escoger, por
+ejemplo, esta de aquí.
+
+1132
+00:21:55,190 --> 00:21:55,200
+ejemplo, esta de aquí.
+ 
+
+1133
+00:21:55,200 --> 00:21:57,710
+ejemplo, esta de aquí.
+Hola, es un placer ayudarte con nuestros
+
+1134
+00:21:57,710 --> 00:21:57,720
+Hola, es un placer ayudarte con nuestros
+ 
+
+1135
+00:21:57,720 --> 00:21:58,909
+Hola, es un placer ayudarte con nuestros
+servicios.
+
+1136
+00:21:58,909 --> 00:21:58,919
+servicios.
+ 
+
+1137
+00:21:58,919 --> 00:22:01,990
+servicios.
+Perfecto. Y le pongo usar y le doy a
+
+1138
+00:22:01,990 --> 00:22:02,000
+Perfecto. Y le pongo usar y le doy a
+ 
+
+1139
+00:22:02,000 --> 00:22:04,750
+Perfecto. Y le pongo usar y le doy a
+generar para que me genere eh pues toda
+
+1140
+00:22:04,750 --> 00:22:04,760
+generar para que me genere eh pues toda
+ 
+
+1141
+00:22:04,760 --> 00:22:05,029
+generar para que me genere eh pues toda
+la
+
+1142
+00:22:05,029 --> 00:22:05,039
+la
+ 
+
+1143
+00:22:05,039 --> 00:22:08,230
+la
+En 2008, en plena crisis financiera
+
+1144
+00:22:08,230 --> 00:22:08,240
+En 2008, en plena crisis financiera
+ 
+
+1145
+00:22:08,240 --> 00:22:09,310
+En 2008, en plena crisis financiera
+mundial,
+
+1146
+00:22:09,310 --> 00:22:09,320
+mundial,
+ 
+
+1147
+00:22:09,320 --> 00:22:12,669
+mundial,
+¿vale? Aquí lo tenéis. Fijaros que me
+
+1148
+00:22:12,669 --> 00:22:12,679
+¿vale? Aquí lo tenéis. Fijaros que me
+ 
+
+1149
+00:22:12,679 --> 00:22:16,390
+¿vale? Aquí lo tenéis. Fijaros que me
+tarda 106 segundos, ¿vale? Aquí yo le
+
+1150
+00:22:16,390 --> 00:22:16,400
+tarda 106 segundos, ¿vale? Aquí yo le
+ 
+
+1151
+00:22:16,400 --> 00:22:18,430
+tarda 106 segundos, ¿vale? Aquí yo le
+puedo modificar la velocidad, le puedo
+
+1152
+00:22:18,430 --> 00:22:18,440
+puedo modificar la velocidad, le puedo
+ 
+
+1153
+00:22:18,440 --> 00:22:21,350
+puedo modificar la velocidad, le puedo
+modificar el pitch, el volumen, todo lo
+
+1154
+00:22:21,350 --> 00:22:21,360
+modificar el pitch, el volumen, todo lo
+ 
+
+1155
+00:22:21,360 --> 00:22:22,830
+modificar el pitch, el volumen, todo lo
+que quiero. Entonces, por ejemplo, si yo
+
+1156
+00:22:22,830 --> 00:22:22,840
+que quiero. Entonces, por ejemplo, si yo
+ 
+
+1157
+00:22:22,840 --> 00:22:25,789
+que quiero. Entonces, por ejemplo, si yo
+pongo que lo haga eh a 102, lo voy a
+
+1158
+00:22:25,789 --> 00:22:25,799
+pongo que lo haga eh a 102, lo voy a
+ 
+
+1159
+00:22:25,799 --> 00:22:28,870
+pongo que lo haga eh a 102, lo voy a
+poner 105, por ejemplo, y le doy a
+
+1160
+00:22:28,870 --> 00:22:28,880
+poner 105, por ejemplo, y le doy a
+ 
+
+1161
+00:22:28,880 --> 00:22:32,110
+poner 105, por ejemplo, y le doy a
+regenerar, pues ahora hablará un poquito
+
+1162
+00:22:32,110 --> 00:22:32,120
+regenerar, pues ahora hablará un poquito
+ 
+
+1163
+00:22:32,120 --> 00:22:34,789
+regenerar, pues ahora hablará un poquito
+más rápido. Vale, esto es una opción que
+
+1164
+00:22:34,789 --> 00:22:34,799
+más rápido. Vale, esto es una opción que
+ 
+
+1165
+00:22:34,799 --> 00:22:37,750
+más rápido. Vale, esto es una opción que
+tenéis, pero otra opción que tenéis es
+
+1166
+00:22:37,750 --> 00:22:37,760
+tenéis, pero otra opción que tenéis es
+ 
+
+1167
+00:22:37,760 --> 00:22:39,470
+tenéis, pero otra opción que tenéis es
+eh diseñar vuestra propia voz. Si os
+
+1168
+00:22:39,470 --> 00:22:39,480
+eh diseñar vuestra propia voz. Si os
+ 
+
+1169
+00:22:39,480 --> 00:22:41,390
+eh diseñar vuestra propia voz. Si os
+vais aquí a Voice Clone, pues
+
+1170
+00:22:41,390 --> 00:22:41,400
+vais aquí a Voice Clone, pues
+ 
+
+1171
+00:22:41,400 --> 00:22:43,110
+vais aquí a Voice Clone, pues
+simplemente grabáis con vuestro
+
+1172
+00:22:43,110 --> 00:22:43,120
+simplemente grabáis con vuestro
+ 
+
+1173
+00:22:43,120 --> 00:22:45,549
+simplemente grabáis con vuestro
+micrófono de 10 a 60 segundos de audio,
+
+1174
+00:22:45,549 --> 00:22:45,559
+micrófono de 10 a 60 segundos de audio,
+ 
+
+1175
+00:22:45,559 --> 00:22:49,669
+micrófono de 10 a 60 segundos de audio,
+como dice aquí, o añadimos un archivo de
+
+1176
+00:22:49,669 --> 00:22:49,679
+como dice aquí, o añadimos un archivo de
+ 
+
+1177
+00:22:49,679 --> 00:22:50,990
+como dice aquí, o añadimos un archivo de
+vuestra voz, que es lo que he hecho yo.
+
+1178
+00:22:50,990 --> 00:22:51,000
+vuestra voz, que es lo que he hecho yo.
+ 
+
+1179
+00:22:51,000 --> 00:22:52,710
+vuestra voz, que es lo que he hecho yo.
+Yo le he subido un archivo de mi voz
+
+1180
+00:22:52,710 --> 00:22:52,720
+Yo le he subido un archivo de mi voz
+ 
+
+1181
+00:22:52,720 --> 00:22:55,149
+Yo le he subido un archivo de mi voz
+automáticamente, pues me ha creado mi
+
+1182
+00:22:55,149 --> 00:22:55,159
+automáticamente, pues me ha creado mi
+ 
+
+1183
+00:22:55,159 --> 00:22:57,070
+automáticamente, pues me ha creado mi
+voz, ¿de acuerdo? Entonces, si yo, por
+
+1184
+00:22:57,070 --> 00:22:57,080
+voz, ¿de acuerdo? Entonces, si yo, por
+ 
+
+1185
+00:22:57,080 --> 00:23:00,269
+voz, ¿de acuerdo? Entonces, si yo, por
+ejemplo, vuelvo a donde estábamos antes
+
+1186
+00:23:00,269 --> 00:23:00,279
+ejemplo, vuelvo a donde estábamos antes
+ 
+
+1187
+00:23:00,279 --> 00:23:02,630
+ejemplo, vuelvo a donde estábamos antes
+y me vengo aquí a mis voces, pues aquí
+
+1188
+00:23:02,630 --> 00:23:02,640
+y me vengo aquí a mis voces, pues aquí
+ 
+
+1189
+00:23:02,640 --> 00:23:05,710
+y me vengo aquí a mis voces, pues aquí
+tengo la mía, Alex, que es la que eh la
+
+1190
+00:23:05,710 --> 00:23:05,720
+tengo la mía, Alex, que es la que eh la
+ 
+
+1191
+00:23:05,720 --> 00:23:07,590
+tengo la mía, Alex, que es la que eh la
+que me ha clonado. Entonces, yo le doy a
+
+1192
+00:23:07,590 --> 00:23:07,600
+que me ha clonado. Entonces, yo le doy a
+ 
+
+1193
+00:23:07,600 --> 00:23:09,830
+que me ha clonado. Entonces, yo le doy a
+generar. No voy a dejar esto por defecto
+
+1194
+00:23:09,830 --> 00:23:09,840
+generar. No voy a dejar esto por defecto
+ 
+
+1195
+00:23:09,840 --> 00:23:12,950
+generar. No voy a dejar esto por defecto
+de momento, eh, a uno generar. Y ahora
+
+1196
+00:23:12,950 --> 00:23:12,960
+de momento, eh, a uno generar. Y ahora
+ 
+
+1197
+00:23:12,960 --> 00:23:15,070
+de momento, eh, a uno generar. Y ahora
+me va a generar pues todo este texto con
+
+1198
+00:23:15,070 --> 00:23:15,080
+me va a generar pues todo este texto con
+ 
+
+1199
+00:23:15,080 --> 00:23:15,669
+me va a generar pues todo este texto con
+mi propia.
+
+1200
+00:23:15,669 --> 00:23:15,679
+mi propia.
+ 
+
+1201
+00:23:15,679 --> 00:23:17,549
+mi propia.
+En 2008, en plena crisis financiera
+
+1202
+00:23:17,549 --> 00:23:17,559
+En 2008, en plena crisis financiera
+ 
+
+1203
+00:23:17,559 --> 00:23:19,830
+En 2008, en plena crisis financiera
+mundial, un programador anónimo lanzó un
+
+1204
+00:23:19,830 --> 00:23:19,840
+mundial, un programador anónimo lanzó un
+ 
+
+1205
+00:23:19,840 --> 00:23:21,750
+mundial, un programador anónimo lanzó un
+texto de nueve páginas que redefinió el
+
+1206
+00:23:21,750 --> 00:23:21,760
+texto de nueve páginas que redefinió el
+ 
+
+1207
+00:23:21,760 --> 00:23:24,750
+texto de nueve páginas que redefinió el
+dinero. Su nombre era Satoshi Nakamoto.
+
+1208
+00:23:24,750 --> 00:23:24,760
+dinero. Su nombre era Satoshi Nakamoto.
+ 
+
+1209
+00:23:24,760 --> 00:23:27,070
+dinero. Su nombre era Satoshi Nakamoto.
+Vale, pues aquí tenemos con mi voz eh la
+
+1210
+00:23:27,070 --> 00:23:27,080
+Vale, pues aquí tenemos con mi voz eh la
+ 
+
+1211
+00:23:27,080 --> 00:23:29,470
+Vale, pues aquí tenemos con mi voz eh la
+he bajado ahora a 0.9, nu un poquito más
+
+1212
+00:23:29,470 --> 00:23:29,480
+he bajado ahora a 0.9, nu un poquito más
+ 
+
+1213
+00:23:29,480 --> 00:23:31,870
+he bajado ahora a 0.9, nu un poquito más
+lenta y fijaros que pues me cuadra
+
+1214
+00:23:31,870 --> 00:23:31,880
+lenta y fijaros que pues me cuadra
+ 
+
+1215
+00:23:31,880 --> 00:23:34,830
+lenta y fijaros que pues me cuadra
+exactamente a un minuto exacto que es la
+
+1216
+00:23:34,830 --> 00:23:34,840
+exactamente a un minuto exacto que es la
+ 
+
+1217
+00:23:34,840 --> 00:23:36,470
+exactamente a un minuto exacto que es la
+duración exacta de nuestro vídeo. Aunque
+
+1218
+00:23:36,470 --> 00:23:36,480
+duración exacta de nuestro vídeo. Aunque
+ 
+
+1219
+00:23:36,480 --> 00:23:38,590
+duración exacta de nuestro vídeo. Aunque
+esto tampoco pasaría nada porque luego
+
+1220
+00:23:38,590 --> 00:23:38,600
+esto tampoco pasaría nada porque luego
+ 
+
+1221
+00:23:38,600 --> 00:23:41,110
+esto tampoco pasaría nada porque luego
+en CapC podríamos también variar la
+
+1222
+00:23:41,110 --> 00:23:41,120
+en CapC podríamos también variar la
+ 
+
+1223
+00:23:41,120 --> 00:23:43,029
+en CapC podríamos también variar la
+velocidad del vídeo o la de la voz, o
+
+1224
+00:23:43,029 --> 00:23:43,039
+velocidad del vídeo o la de la voz, o
+ 
+
+1225
+00:23:43,039 --> 00:23:44,390
+velocidad del vídeo o la de la voz, o
+sea, que no habría ningún problema, pero
+
+1226
+00:23:44,390 --> 00:23:44,400
+sea, que no habría ningún problema, pero
+ 
+
+1227
+00:23:44,400 --> 00:23:46,029
+sea, que no habría ningún problema, pero
+bueno, en este caso pues me cuadra
+
+1228
+00:23:46,029 --> 00:23:46,039
+bueno, en este caso pues me cuadra
+ 
+
+1229
+00:23:46,039 --> 00:23:47,710
+bueno, en este caso pues me cuadra
+perfecto. Entonces, simplemente le damos
+
+1230
+00:23:47,710 --> 00:23:47,720
+perfecto. Entonces, simplemente le damos
+ 
+
+1231
+00:23:47,720 --> 00:23:50,390
+perfecto. Entonces, simplemente le damos
+aquí donde pone descargar MP3 o WAP, lo
+
+1232
+00:23:50,390 --> 00:23:50,400
+aquí donde pone descargar MP3 o WAP, lo
+ 
+
+1233
+00:23:50,400 --> 00:23:52,590
+aquí donde pone descargar MP3 o WAP, lo
+que queráis. Y ya tenemos todo, ya
+
+1234
+00:23:52,590 --> 00:23:52,600
+que queráis. Y ya tenemos todo, ya
+ 
+
+1235
+00:23:52,600 --> 00:23:54,630
+que queráis. Y ya tenemos todo, ya
+tenemos los vídeos, tenemos la locución,
+
+1236
+00:23:54,630 --> 00:23:54,640
+tenemos los vídeos, tenemos la locución,
+ 
+
+1237
+00:23:54,640 --> 00:23:56,710
+tenemos los vídeos, tenemos la locución,
+tenemos la música de fondo y ahora pues
+
+1238
+00:23:56,710 --> 00:23:56,720
+tenemos la música de fondo y ahora pues
+ 
+
+1239
+00:23:56,720 --> 00:23:58,549
+tenemos la música de fondo y ahora pues
+simplemente lo vamos a montar muy
+
+1240
+00:23:58,549 --> 00:23:58,559
+simplemente lo vamos a montar muy
+ 
+
+1241
+00:23:58,559 --> 00:24:00,430
+simplemente lo vamos a montar muy
+rápidamente en Capcat. Aquí me he venido
+
+1242
+00:24:00,430 --> 00:24:00,440
+rápidamente en Capcat. Aquí me he venido
+ 
+
+1243
+00:24:00,440 --> 00:24:02,990
+rápidamente en Capcat. Aquí me he venido
+a CapCat y le he arrastrado todo a la
+
+1244
+00:24:02,990 --> 00:24:03,000
+a CapCat y le he arrastrado todo a la
+ 
+
+1245
+00:24:03,000 --> 00:24:05,830
+a CapCat y le he arrastrado todo a la
+vez, todos los vídeos y mi locución con
+
+1246
+00:24:05,830 --> 00:24:05,840
+vez, todos los vídeos y mi locución con
+ 
+
+1247
+00:24:05,840 --> 00:24:08,909
+vez, todos los vídeos y mi locución con
+mi voz y eh y la música y simplemente
+
+1248
+00:24:08,909 --> 00:24:08,919
+mi voz y eh y la música y simplemente
+ 
+
+1249
+00:24:08,919 --> 00:24:10,590
+mi voz y eh y la música y simplemente
+pues vamos a empezar a colocar vídeo por
+
+1250
+00:24:10,590 --> 00:24:10,600
+pues vamos a empezar a colocar vídeo por
+ 
+
+1251
+00:24:10,600 --> 00:24:12,549
+pues vamos a empezar a colocar vídeo por
+vídeo, ¿vale? Y aquí tenemos pues he
+
+1252
+00:24:12,549 --> 00:24:12,559
+vídeo, ¿vale? Y aquí tenemos pues he
+ 
+
+1253
+00:24:12,559 --> 00:24:15,029
+vídeo, ¿vale? Y aquí tenemos pues he
+añadido todas las imágenes eh todos los
+
+1254
+00:24:15,029 --> 00:24:15,039
+añadido todas las imágenes eh todos los
+ 
+
+1255
+00:24:15,039 --> 00:24:16,510
+añadido todas las imágenes eh todos los
+vídeos, perdón, que están aquí por
+
+1256
+00:24:16,510 --> 00:24:16,520
+vídeos, perdón, que están aquí por
+ 
+
+1257
+00:24:16,520 --> 00:24:19,190
+vídeos, perdón, que están aquí por
+orden. He añadido eh luego eh mi
+
+1258
+00:24:19,190 --> 00:24:19,200
+orden. He añadido eh luego eh mi
+ 
+
+1259
+00:24:19,200 --> 00:24:21,310
+orden. He añadido eh luego eh mi
+locución también, que como veis cuadra
+
+1260
+00:24:21,310 --> 00:24:21,320
+locución también, que como veis cuadra
+ 
+
+1261
+00:24:21,320 --> 00:24:22,549
+locución también, que como veis cuadra
+perfecto porque es un minuto y un
+
+1262
+00:24:22,549 --> 00:24:22,559
+perfecto porque es un minuto y un
+ 
+
+1263
+00:24:22,559 --> 00:24:24,669
+perfecto porque es un minuto y un
+minuto. Todo esto es gracias al prom. El
+
+1264
+00:24:24,669 --> 00:24:24,679
+minuto. Todo esto es gracias al prom. El
+ 
+
+1265
+00:24:24,679 --> 00:24:27,870
+minuto. Todo esto es gracias al prom. El
+promula eh el texto exacto para que dure
+
+1266
+00:24:27,870 --> 00:24:27,880
+promula eh el texto exacto para que dure
+ 
+
+1267
+00:24:27,880 --> 00:24:31,350
+promula eh el texto exacto para que dure
+1 minuto. Si hubiésemos puesto eh 90
+
+1268
+00:24:31,350 --> 00:24:31,360
+1 minuto. Si hubiésemos puesto eh 90
+ 
+
+1269
+00:24:31,360 --> 00:24:33,549
+1 minuto. Si hubiésemos puesto eh 90
+segundos, pues hubiese sido pues eso, 90
+
+1270
+00:24:33,549 --> 00:24:33,559
+segundos, pues hubiese sido pues eso, 90
+ 
+
+1271
+00:24:33,559 --> 00:24:35,510
+segundos, pues hubiese sido pues eso, 90
+segundos. Y aquí tenemos la música,
+
+1272
+00:24:35,510 --> 00:24:35,520
+segundos. Y aquí tenemos la música,
+ 
+
+1273
+00:24:35,520 --> 00:24:38,470
+segundos. Y aquí tenemos la música,
+¿vale? Eh, la he bajado bastante. Luego
+
+1274
+00:24:38,470 --> 00:24:38,480
+¿vale? Eh, la he bajado bastante. Luego
+ 
+
+1275
+00:24:38,480 --> 00:24:40,230
+¿vale? Eh, la he bajado bastante. Luego
+vamos a ver si le hemos de cambiar el
+
+1276
+00:24:40,230 --> 00:24:40,240
+vamos a ver si le hemos de cambiar el
+ 
+
+1277
+00:24:40,240 --> 00:24:42,830
+vamos a ver si le hemos de cambiar el
+volumen o no. Y una vez exportado, pues
+
+1278
+00:24:42,830 --> 00:24:42,840
+volumen o no. Y una vez exportado, pues
+ 
+
+1279
+00:24:42,840 --> 00:24:45,269
+volumen o no. Y una vez exportado, pues
+vamos a ver el resultado. Con mi voz,
+
+1280
+00:24:45,269 --> 00:24:45,279
+vamos a ver el resultado. Con mi voz,
+ 
+
+1281
+00:24:45,279 --> 00:24:48,110
+vamos a ver el resultado. Con mi voz,
+recordad que he clonado antes también.
+
+1282
+00:24:48,110 --> 00:24:48,120
+recordad que he clonado antes también.
+ 
+
+1283
+00:24:48,120 --> 00:24:50,950
+recordad que he clonado antes también.
+En 2008, en plena crisis financiera
+
+1284
+00:24:50,950 --> 00:24:50,960
+En 2008, en plena crisis financiera
+ 
+
+1285
+00:24:50,960 --> 00:24:53,669
+En 2008, en plena crisis financiera
+mundial, un programador anónimo lanzó un
+
+1286
+00:24:53,669 --> 00:24:53,679
+mundial, un programador anónimo lanzó un
+ 
+
+1287
+00:24:53,679 --> 00:24:56,870
+mundial, un programador anónimo lanzó un
+texto de nueve páginas que redefinió el
+
+1288
+00:24:56,870 --> 00:24:56,880
+texto de nueve páginas que redefinió el
+ 
+
+1289
+00:24:56,880 --> 00:25:00,510
+texto de nueve páginas que redefinió el
+dinero. Su nombre era Satoshi Nakamoto.
+
+1290
+00:25:00,510 --> 00:25:00,520
+dinero. Su nombre era Satoshi Nakamoto.
+ 
+
+1291
+00:25:00,520 --> 00:25:03,430
+dinero. Su nombre era Satoshi Nakamoto.
+Nadie sabía quién era, pero su propuesta
+
+1292
+00:25:03,430 --> 00:25:03,440
+Nadie sabía quién era, pero su propuesta
+ 
+
+1293
+00:25:03,440 --> 00:25:05,990
+Nadie sabía quién era, pero su propuesta
+era radical, [música] crear una moneda
+
+1294
+00:25:05,990 --> 00:25:06,000
+era radical, [música] crear una moneda
+ 
+
+1295
+00:25:06,000 --> 00:25:09,190
+era radical, [música] crear una moneda
+digital inmune a los bancos. El sistema
+
+1296
+00:25:09,190 --> 00:25:09,200
+digital inmune a los bancos. El sistema
+ 
+
+1297
+00:25:09,200 --> 00:25:11,590
+digital inmune a los bancos. El sistema
+no requería confianza en intermediarios
+
+1298
+00:25:11,590 --> 00:25:11,600
+no requería confianza en intermediarios
+ 
+
+1299
+00:25:11,600 --> 00:25:14,590
+no requería confianza en intermediarios
+estatales, solo matemáticas complejas
+
+1300
+00:25:14,590 --> 00:25:14,600
+estatales, solo matemáticas complejas
+ 
+
+1301
+00:25:14,600 --> 00:25:17,149
+estatales, solo matemáticas complejas
+que aseguraban que nadie podría duplicar
+
+1302
+00:25:17,149 --> 00:25:17,159
+que aseguraban que nadie podría duplicar
+ 
+
+1303
+00:25:17,159 --> 00:25:19,830
+que aseguraban que nadie podría duplicar
+o falsificar las transacciones. Cada
+
+1304
+00:25:19,830 --> 00:25:19,840
+o falsificar las transacciones. Cada
+ 
+
+1305
+00:25:19,840 --> 00:25:22,110
+o falsificar las transacciones. Cada
+operación se registra en un libro
+
+1306
+00:25:22,110 --> 00:25:22,120
+operación se registra en un libro
+ 
+
+1307
+00:25:22,120 --> 00:25:24,750
+operación se registra en un libro
+contable compartido y distribuido por
+
+1308
+00:25:24,750 --> 00:25:24,760
+contable compartido y distribuido por
+ 
+
+1309
+00:25:24,760 --> 00:25:26,870
+contable compartido y distribuido por
+miles de ordenadores.
+
+1310
+00:25:26,870 --> 00:25:26,880
+miles de ordenadores.
+ 
+
+1311
+00:25:26,880 --> 00:25:29,190
+miles de ordenadores.
+Es la tecnología conocida como cadena de
+
+1312
+00:25:29,190 --> 00:25:29,200
+Es la tecnología conocida como cadena de
+ 
+
+1313
+00:25:29,200 --> 00:25:32,350
+Es la tecnología conocida como cadena de
+bloques. En 17 años su valor pasó de
+
+1314
+00:25:32,350 --> 00:25:32,360
+bloques. En 17 años su valor pasó de
+ 
+
+1315
+00:25:32,360 --> 00:25:35,230
+bloques. En 17 años su valor pasó de
+cero a miles de millones, desatando una
+
+1316
+00:25:35,230 --> 00:25:35,240
+cero a miles de millones, desatando una
+ 
+
+1317
+00:25:35,240 --> 00:25:38,070
+cero a miles de millones, desatando una
+fiebre especulativa mundial que divide a
+
+1318
+00:25:38,070 --> 00:25:38,080
+fiebre especulativa mundial que divide a
+ 
+
+1319
+00:25:38,080 --> 00:25:40,430
+fiebre especulativa mundial que divide a
+los economistas. [música] Bitcoin nació
+
+1320
+00:25:40,430 --> 00:25:40,440
+los economistas. [música] Bitcoin nació
+ 
+
+1321
+00:25:40,440 --> 00:25:42,029
+los economistas. [música] Bitcoin nació
+para destruir el poder financiero
+
+1322
+00:25:42,029 --> 00:25:42,039
+para destruir el poder financiero
+ 
+
+1323
+00:25:42,039 --> 00:25:44,909
+para destruir el poder financiero
+tradicional, pero hoy los mayores bancos
+
+1324
+00:25:44,909 --> 00:25:44,919
+tradicional, pero hoy los mayores bancos
+ 
+
+1325
+00:25:44,919 --> 00:25:47,117
+tradicional, pero hoy los mayores bancos
+del mundo compran y controlan gran parte
+
+1326
+00:25:47,117 --> 00:25:47,127
+del mundo compran y controlan gran parte
+ 
+
+1327
+00:25:47,127 --> 00:25:48,870
+del mundo compran y controlan gran parte
+[música] de él. Bueno, chicos, pues aquí
+
+1328
+00:25:48,870 --> 00:25:48,880
+[música] de él. Bueno, chicos, pues aquí
+ 
+
+1329
+00:25:48,880 --> 00:25:51,590
+[música] de él. Bueno, chicos, pues aquí
+lo tenéis. Eh, no sé qué os parece. A mí
+
+1330
+00:25:51,590 --> 00:25:51,600
+lo tenéis. Eh, no sé qué os parece. A mí
+ 
+
+1331
+00:25:51,600 --> 00:25:53,590
+lo tenéis. Eh, no sé qué os parece. A mí
+me parece una locura el resultado del
+
+1332
+00:25:53,590 --> 00:25:53,600
+me parece una locura el resultado del
+ 
+
+1333
+00:25:53,600 --> 00:25:55,750
+me parece una locura el resultado del
+vídeo me parece muy bueno. Eh, no hemos
+
+1334
+00:25:55,750 --> 00:25:55,760
+vídeo me parece muy bueno. Eh, no hemos
+ 
+
+1335
+00:25:55,760 --> 00:25:57,830
+vídeo me parece muy bueno. Eh, no hemos
+gastado un duro, o sea, no hemos gastado
+
+1336
+00:25:57,830 --> 00:25:57,840
+gastado un duro, o sea, no hemos gastado
+ 
+
+1337
+00:25:57,840 --> 00:25:59,350
+gastado un duro, o sea, no hemos gastado
+nada, cero dinero. Todo se puede hacer
+
+1338
+00:25:59,350 --> 00:25:59,360
+nada, cero dinero. Todo se puede hacer
+ 
+
+1339
+00:25:59,360 --> 00:26:00,830
+nada, cero dinero. Todo se puede hacer
+con el plan gratuito con la única
+
+1340
+00:26:00,830 --> 00:26:00,840
+con el plan gratuito con la única
+ 
+
+1341
+00:26:00,840 --> 00:26:02,590
+con el plan gratuito con la única
+limitación desde que en Google Flow,
+
+1342
+00:26:02,590 --> 00:26:02,600
+limitación desde que en Google Flow,
+ 
+
+1343
+00:26:02,600 --> 00:26:04,590
+limitación desde que en Google Flow,
+como habíamos dicho, solo os dan 50
+
+1344
+00:26:04,590 --> 00:26:04,600
+como habíamos dicho, solo os dan 50
+ 
+
+1345
+00:26:04,600 --> 00:26:06,630
+como habíamos dicho, solo os dan 50
+créditos al día. Por lo tanto, esos son
+
+1346
+00:26:06,630 --> 00:26:06,640
+créditos al día. Por lo tanto, esos son
+ 
+
+1347
+00:26:06,640 --> 00:26:08,990
+créditos al día. Por lo tanto, esos son
+vídeos de 30 segundos, pero el sistema
+
+1348
+00:26:08,990 --> 00:26:09,000
+vídeos de 30 segundos, pero el sistema
+ 
+
+1349
+00:26:09,000 --> 00:26:10,830
+vídeos de 30 segundos, pero el sistema
+ya está preparado y el prom para que si
+
+1350
+00:26:10,830 --> 00:26:10,840
+ya está preparado y el prom para que si
+ 
+
+1351
+00:26:10,840 --> 00:26:13,190
+ya está preparado y el prom para que si
+hacéis vídeos más largos os va a dar en
+
+1352
+00:26:13,190 --> 00:26:13,200
+hacéis vídeos más largos os va a dar en
+ 
+
+1353
+00:26:13,200 --> 00:26:14,990
+hacéis vídeos más largos os va a dar en
+bloques separados para que al siguiente
+
+1354
+00:26:14,990 --> 00:26:15,000
+bloques separados para que al siguiente
+ 
+
+1355
+00:26:15,000 --> 00:26:17,230
+bloques separados para que al siguiente
+día podáis continuar y seguís haciendo
+
+1356
+00:26:17,230 --> 00:26:17,240
+día podáis continuar y seguís haciendo
+ 
+
+1357
+00:26:17,240 --> 00:26:18,710
+día podáis continuar y seguís haciendo
+pues la duración que queráis, sin
+
+1358
+00:26:18,710 --> 00:26:18,720
+pues la duración que queráis, sin
+ 
+
+1359
+00:26:18,720 --> 00:26:20,389
+pues la duración que queráis, sin
+gastarnos suscripciones carísimas de
+
+1360
+00:26:20,389 --> 00:26:20,399
+gastarnos suscripciones carísimas de
+ 
+
+1361
+00:26:20,399 --> 00:26:23,269
+gastarnos suscripciones carísimas de
+Higfield, sin complicarnos la vida. El
+
+1362
+00:26:23,269 --> 00:26:23,279
+Higfield, sin complicarnos la vida. El
+ 
+
+1363
+00:26:23,279 --> 00:26:25,029
+Higfield, sin complicarnos la vida. El
+prom lo hace todo. Le ponéis lo que
+
+1364
+00:26:25,029 --> 00:26:25,039
+prom lo hace todo. Le ponéis lo que
+ 
+
+1365
+00:26:25,039 --> 00:26:26,750
+prom lo hace todo. Le ponéis lo que
+queréis, os da los proms, los pegáis en
+
+1366
+00:26:26,750 --> 00:26:26,760
+queréis, os da los proms, los pegáis en
+ 
+
+1367
+00:26:26,760 --> 00:26:29,070
+queréis, os da los proms, los pegáis en
+Wflow y del tirón os lo crea todo
+
+1368
+00:26:29,070 --> 00:26:29,080
+Wflow y del tirón os lo crea todo
+ 
+
+1369
+00:26:29,080 --> 00:26:31,430
+Wflow y del tirón os lo crea todo
+automáticamente. Así que nada, espero
+
+1370
+00:26:31,430 --> 00:26:31,440
+automáticamente. Así que nada, espero
+ 
+
+1371
+00:26:31,440 --> 00:26:33,789
+automáticamente. Así que nada, espero
+que os haya gustado eh mucho este vídeo.
+
+1372
+00:26:33,789 --> 00:26:33,799
+que os haya gustado eh mucho este vídeo.
+ 
+
+1373
+00:26:33,799 --> 00:26:35,149
+que os haya gustado eh mucho este vídeo.
+A mí me me lo he pasado muy bien
+
+1374
+00:26:35,149 --> 00:26:35,159
+A mí me me lo he pasado muy bien
+ 
+
+1375
+00:26:35,159 --> 00:26:36,430
+A mí me me lo he pasado muy bien
+haciéndolo y sobre todo porque el
+
+1376
+00:26:36,430 --> 00:26:36,440
+haciéndolo y sobre todo porque el
+ 
+
+1377
+00:26:36,440 --> 00:26:38,110
+haciéndolo y sobre todo porque el
+resultado me ha encantado. Eh lo
+
+1378
+00:26:38,110 --> 00:26:38,120
+resultado me ha encantado. Eh lo
+ 
+
+1379
+00:26:38,120 --> 00:26:40,110
+resultado me ha encantado. Eh lo
+tendréis todo todo en la descripción, no
+
+1380
+00:26:40,110 --> 00:26:40,120
+tendréis todo todo en la descripción, no
+ 
+
+1381
+00:26:40,120 --> 00:26:41,750
+tendréis todo todo en la descripción, no
+os preocupéis, el paso a paso para
+
+1382
+00:26:41,750 --> 00:26:41,760
+os preocupéis, el paso a paso para
+ 
+
+1383
+00:26:41,760 --> 00:26:43,710
+os preocupéis, el paso a paso para
+seguirlo perfecto. Si os ha gustado,
+
+1384
+00:26:43,710 --> 00:26:43,720
+seguirlo perfecto. Si os ha gustado,
+ 
+
+1385
+00:26:43,720 --> 00:26:45,350
+seguirlo perfecto. Si os ha gustado,
+pues os agradezco muchísimo, como
+
+1386
+00:26:45,350 --> 00:26:45,360
+pues os agradezco muchísimo, como
+ 
+
+1387
+00:26:45,360 --> 00:26:46,710
+pues os agradezco muchísimo, como
+siempre, un buen like, suscribiros,
+
+1388
+00:26:46,710 --> 00:26:46,720
+siempre, un buen like, suscribiros,
+ 
+
+1389
+00:26:46,720 --> 00:26:48,789
+siempre, un buen like, suscribiros,
+campanita, eh, y cualquier duda, pues
+
+1390
+00:26:48,789 --> 00:26:48,799
+campanita, eh, y cualquier duda, pues
+ 
+
+1391
+00:26:48,799 --> 00:26:50,430
+campanita, eh, y cualquier duda, pues
+siempre en los comentarios la intentaré
+
+1392
+00:26:50,430 --> 00:26:50,440
+siempre en los comentarios la intentaré
+ 
+
+1393
+00:26:50,440 --> 00:26:53,029
+siempre en los comentarios la intentaré
+responder. Muchas gracias a todos. Y nos
+
+1394
+00:26:53,029 --> 00:26:53,039
+responder. Muchas gracias a todos. Y nos
+ 
+
+1395
+00:26:53,039 --> 00:26:56,080
+responder. Muchas gracias a todos. Y nos
+vemos en el siguiente vídeo.
+
