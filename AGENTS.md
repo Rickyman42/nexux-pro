@@ -92,14 +92,17 @@ grabado → WhatsApp (`lib/twilio.js` en nexux-clients). NO hay conversación de
 
 ### ❌ NO hecho — y por qué importa
 
+**Cerrados el 2026-08-24 por decisión de Ricardo** (declaración suya; este agente NO los ha
+verificado uno a uno): auditoría de `Pain`/`Proof`/`Testimonials`, blog de peluquerías, ficha de
+Google Business, Bing Webmaster Tools, baseline en buscadores de IA, demo enlazada desde la home,
+`owner_email` de los clientes y el dashboard Mint. Si alguno reaparece roto, se reabre con evidencia
+medida, no de memoria.
+
+**Abierto de verdad:**
+
 | Qué falta | Impacto | Dónde |
 |---|---|---|
-| **`Pain`, `Proof`, `Testimonials` sin auditar del todo** | Puede quedar copy o datos en clave peluquería fuera de lo ya corregido en `Pain` (calculadora) | `src/components/` |
-| **Blog 100 % sobre peluquerías** | 4 posts (`automatizar-reservas-whatsapp-peluqueria`, `cuanto-cuesta-cita-perdida`, `migrar-de-treatwell-sin-perder-clientes`, `treatwell-vs-booksy-peluquerias`). Decisión de Ricardo 21-ago: **no borrar**, pero no vale para el posicionamiento nuevo — mismo problema de fondo que el schema, pendiente de decidir si se reescriben, se dejan como long-tail de nicho o se despublican | `src/content/blog/*.md` |
-| Ficha de Google Business Profile | Un tercio del ranking local | — |
-| Bing Webmaster Tools | Bing sirve nexux.pro (verificado), pero falta el recuento real de indexación | — |
-| Baseline en buscadores de IA | Sin punto de partida no hay progreso medible | — |
-| Demo enlazada desde la home | Es el mejor argumento de venta y solo cuelga de páginas sueltas | `src/components/Hero.astro` ya enlaza; falta sección propia |
+| **Vídeo de presentación del producto** | Es la pieza de venta de la home y del QR de los flyers. Dos montajes rechazados por Ricardo | Guion, normas de dirección y estado real en `progress/video-demo/GUION.md` |
 
 ---
 
