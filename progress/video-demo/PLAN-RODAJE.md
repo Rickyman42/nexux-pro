@@ -153,3 +153,61 @@ prompt describe también el **ambiente sonoro** — Ricardo pidió sonidos de ve
 Antes de grabar, la agenda se rellena con citas creíbles: nombres y servicios variados, horas
 repartidas por el día, pinta de negocio con trabajo. Ahora hay citas de prueba repetidas que en
 pantalla cantan.
+
+
+---
+
+## 7. HALLAZGO QUE CAMBIA EL PLANO 8 (24-ago)
+
+**El CRM no tiene agenda.** El panel del cliente (`/client/:id/inbox`) es sólo la bandeja de
+conversaciones. Verificado en `provision-http.js`: las únicas rutas del portal son `inbox`,
+`conversations`, `professionals`, `resources`, `invoices`, `billing-portal` y las de Google. No
+existe ninguna vista de calendario.
+
+**Dónde vive la agenda de verdad: en Google Calendar del negocio.** `lib/calendar.js` crea el evento
+con `createCalendarEvent()` y así lo ve el dueño.
+
+**Y eso mejora el guion.** «Y la puso en tu agenda. Sola.» pega mucho más si la agenda es el Google
+Calendar de siempre que si es un panel propio que nadie conoce. Es el mismo argumento del acto 4:
+*"Es tu WhatsApp. El de siempre."* La pieza gana coherencia, no la pierde.
+
+### Cómo se lee un evento en pantalla
+| Dónde | Qué se ve |
+|---|---|
+| Rejilla del calendario | `[Ana] Corte — Nuria Vega` |
+| Al abrir el evento | Cliente, Servicio, Atiende, ID cita y **`Reservado por: Lara (Nexux)`** |
+
+Esa última línea es la prueba en pantalla de que lo hizo el bot: **merece un plano propio**.
+
+⛔ Las citas del rodaje van **sin teléfono**. El campo sale en la descripción del evento, y no se
+pone en un anuncio público un número que pueda ser de alguien. La única cita con teléfono será la
+que cree Lara en directo, y ésa arrastra el `@lid` de WhatsApp — no se abre en cámara.
+
+---
+
+## 8. DECISIONES DE RICARDO (24-ago, segunda tanda)
+
+| Decisión | Elegido |
+|---|---|
+| Voz | **Las dos versiones**: sin voz para la web, con la voz de Ricardo clonada (MiniMax) para redes. Mismo material, dos montajes |
+| Calendario | **Calendario aparte** dentro de la cuenta de Ricardo. Se descartó filtrar la vista del personal: no funciona, porque las citas de Lara se crean en el calendario principal, el mismo donde están las privadas — no hay filtro que separe unas de otras |
+| Nombre del negocio | **Centro Lena** (comprobado: no existe ningún negocio con ese nombre exacto en España) |
+| Método | **Gemini Notebook + Flow modo agente** — ver `METODO.md` |
+
+## 9. LISTO PARA DISPARAR
+
+`seed-agenda.mjs` (en `~/nexux-clients/`) deja el cliente preparado en un solo comando:
+renombra el negocio, apunta el calendario nuevo, siembra 11 citas creíbles y las sube a Google
+**con la misma función que usa el producto** — lo que se graba es lo que hace el sistema de verdad,
+no un decorado.
+
+```bash
+cd ~/nexux-clients && node seed-agenda.mjs <CALENDAR_ID>
+```
+
+- `--dry` enseña qué haría sin tocar nada. Probado: 23 citas → 11, con parón de comida.
+- `--revert` restaura las copias `.rodaje-bak`. Todo reversible.
+- Deja **el hueco de las 18:00** libre a propósito: ahí aterriza la cita que reserva Lara durante
+  el plano 8.
+
+**Bloqueado por Ricardo:** falta que cree el calendario y me pase su ID.
