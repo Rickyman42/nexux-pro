@@ -62,7 +62,8 @@ const DIA = [
   ['13:00', 'Corte',                 'pro_lucia',   'Lucia',  'Marina Cuesta',    30],
   ['16:00', 'Tinte',                 'pro_ana',     'Ana',    'Paula Nogales',    90],
   ['16:30', 'Corte y barba',         'pro_noelia',  'Noelia', 'Diego Rueda',      45],
-  ['17:30', 'Mechas',                'pro_marta',   'Marta',  'Lorena Bas',      120],
+  ['17:00', 'Corte',                 'pro_lucia',   'Lucia',  'Hugo Ramos',       30],
+  ['17:15', 'Corte',                 'pro_marta',   'Marta',  'Lorena Bas',       30],
 ];
 
 const slug = (s) => 'svc_' + s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_');
