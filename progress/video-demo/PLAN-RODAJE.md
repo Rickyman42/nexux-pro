@@ -78,7 +78,7 @@ sueltas en una marca. Crear personajes e imágenes **no gasta créditos**, así 
 primero y se itera hasta que esté bien.
 
 - Perfil: dueño o dueña de un negocio pequeño con cita previa, 30-45 años, español, ropa de
-  trabajo neutra (delantal oscuro liso, sin logos). Nada de peluquería explícita: el producto es
+  trabajo neutra (delantal oscuro liso, sin logos). El oficio no se nombra nunca: el producto es
   horizontal, el oficio se insinúa por las manos y el mobiliario, no por un uniforme.
 - Se le generan las tres perspectivas de cuerpo que pide Flow, se le pone nombre y se invoca con
   `@` en todos los planos donde salga.
@@ -157,31 +157,32 @@ pantalla cantan.
 
 ---
 
-## 7. HALLAZGO QUE CAMBIA EL PLANO 8 (24-ago)
+## 7. EL PLANO 8 SE GRABA DEL CRM — corregido el 25-ago
 
-**El CRM no tiene agenda.** El panel del cliente (`/client/:id/inbox`) es sólo la bandeja de
-conversaciones. Verificado en `provision-http.js`: las únicas rutas del portal son `inbox`,
-`conversations`, `professionals`, `resources`, `invoices`, `billing-portal` y las de Google. No
-existe ninguna vista de calendario.
+⚠️ **Este apartado decía lo contrario y era FALSO.** Decía que «el CRM no tiene agenda» y que
+por eso el plano 8 había que grabarlo del Google Calendar. Vino de buscar las rutas en
+`nexux-clients`, que es el motor del bot y sólo tiene la bandeja de chats. **El CRM es otra
+aplicación**: vive en `nexux-pro`, se sirve en `/cliente/<clientId>` y tiene calendario
+semanal completo, con «+ Nueva cita», Clientes, Canales y Facturación.
 
-**Dónde vive la agenda de verdad: en Google Calendar del negocio.** `lib/calendar.js` crea el evento
-con `createCalendarEvent()` y así lo ve el dueño.
+**El plano 8 se graba del CRM.** Es lo que el anuncio tiene que enseñar: nuestro sistema.
+Google Calendar es donde el producto guarda las citas por dentro — un detalle de
+implementación, no algo que deba salir en pantalla.
 
-**Y eso mejora el guion.** «Y la puso en tu agenda. Sola.» pega mucho más si la agenda es el Google
-Calendar de siempre que si es un panel propio que nadie conoce. Es el mismo argumento del acto 4:
-*"Es tu WhatsApp. El de siempre."* La pieza gana coherencia, no la pierde.
+La toma que se hizo contra Google Calendar **se descarta**.
 
-### Cómo se lee un evento en pantalla
-| Dónde | Qué se ve |
+| Qué | Dónde |
 |---|---|
-| Rejilla del calendario | `[Ana] Corte — Nuria Vega` |
-| Al abrir el evento | Cliente, Servicio, Atiende, ID cita y **`Reservado por: Lara (Nexux)`** |
+| CRM del cliente | `nexux.pro/cliente/<clientId>`, pantalla **Citas** |
+| Código | `~/nexux-pro/src/pages/cliente/[id].astro` |
+| Datos | `portal-api/appointments.ts` → misma fuente que el bot |
+| Acceso | pide sesión: la abre Ricardo, no se entra con contraseñas |
 
-Esa última línea es la prueba en pantalla de que lo hizo el bot: **merece un plano propio**.
+**Regla que sale de aquí:** antes de planificar un plano, abrir la pantalla que ese plano va a
+enseñar. Si no se ha visto, no se planifica. Un `grep` no sustituye a mirar el producto.
 
-⛔ Las citas del rodaje van **sin teléfono**. El campo sale en la descripción del evento, y no se
-pone en un anuncio público un número que pueda ser de alguien. La única cita con teléfono será la
-que cree Lara en directo, y ésa arrastra el `@lid` de WhatsApp — no se abre en cámara.
+⛔ Las citas del rodaje van **sin teléfono**: el campo sale en el evento y no se pone en un
+anuncio público un número que pueda ser de alguien.
 
 ---
 

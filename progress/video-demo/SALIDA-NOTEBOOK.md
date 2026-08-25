@@ -1,6 +1,11 @@
 # Salida del motor de Gemini Notebook
 
-> Cuaderno  - conversacion  - 2026-08-24
+> ⚠️ **Salida en bruto del 25-ago, con dos cosas ya superadas.** No seguir a ciegas:
+> - Dice que el plano 8 es «el Google Calendar de Ricardo». **Es el CRM** (`nexux.pro/cliente/<id>`, pantalla Citas).
+>   Ver PLAN-RODAJE.md §7.
+> - El negocio es un centro de estetica, no una peluqueria. Ver NEGOCIO.md.
+>
+> Cuaderno `4e46a5fc-37bf-44e1-b27c-65666047069c` · conversacion `21b2e721` · 2026-08-24
 > Fuentes: MASTER PROMPT, GUION, PLAN DE RODAJE.
 > Esta es la salida en bruto del motor. Lo que mande sigue siendo GUION.md.
 

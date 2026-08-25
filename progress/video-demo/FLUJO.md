@@ -36,7 +36,8 @@ los planos directamente, sin copiar, sin subir a ninguna nube.
 - **P7** — la conversación con Lara: `conversa-rodaje.mjs` lanza una conversación contra el motor
   real y `grabar-inbox.cjs` graba el panel del CRM mientras entra (se refresca cada 2 s, así que
   los mensajes aparecen en directo). Sin teléfonos.
-- **P8** — el calendario: pendiente de que el calendario de Centro Lena sea público.
+- **P8** — la agenda: se graba **el CRM** (`nexux.pro/cliente/<id>`, pantalla Citas),
+  no Google Calendar. El anuncio enseña nuestro sistema. Requiere la sesión de Ricardo.
 
 ### El de composición
 - **P14** — el cierre: `cierre.py` compone la tarjeta y `p14.sh` la anima. **0 créditos.**

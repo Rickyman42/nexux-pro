@@ -30,7 +30,8 @@ const NOMBRE = 'Centro Lena';
 const args = process.argv.slice(2);
 const REVERT = args.includes('--revert');
 const DRY = args.includes('--dry');
-const CALENDAR_ID = args.find((a) => !a.startsWith('--'));
+const iDia = args.indexOf('--dia');
+const CALENDAR_ID = args.find((a, n) => !a.startsWith('--') && n !== iDia + 1);
 
 function backup(f) {
   const b = f + '.rodaje-bak';
@@ -52,24 +53,35 @@ if (!CALENDAR_ID) { console.error('Falta el CALENDAR_ID. Uso: node seed-agenda.m
 const config = JSON.parse(fs.readFileSync(CFG, 'utf8'));
 
 // El día del rodaje: hoy, en horario del negocio (Madrid = UTC+2 en agosto)
-const HOY = new Date().toISOString().slice(0, 10);
+// El dia de la agenda. Por defecto hoy, pero se puede pedir otro con --dia:
+// grabar el plano 8 al final de la tarde exige sembrar el dia siguiente,
+// porque a las 19:00 ya no quedan huecos que Lara pueda ofrecer.
+const HOY = (() => {
+  const i = process.argv.indexOf('--dia');
+  return i > -1 && process.argv[i + 1]
+    ? process.argv[i + 1]
+    : new Date().toISOString().slice(0, 10);
+})();
 const z = (hhmm) => `${HOY}T${String(Number(hhmm.slice(0, 2)) - 2).padStart(2, '0')}:${hhmm.slice(3)}:00.000Z`;
 
 // Un lunes con trabajo, no imposible: 11 citas, parón de comida,
 // y un hueco a las 18:00 — ahí es donde aterriza la cita que reserva Lara en el plano.
 const DIA = [
-  ['09:00', 'Corte',                 'pro_ana',     'Ana',    'Nuria Vega',       30],
-  ['09:30', 'Tinte',                 'pro_marta',   'Marta',  'Carmen Solís',     90],
-  ['10:00', 'Mechas',                'pro_lucia',   'Lucia',  'Beatriz Alarcón', 120],
-  ['10:30', 'Corte y barba',         'pro_ana',     'Ana',    'Javier Peña',      45],
-  ['11:30', 'Corte',                 'pro_ana',     'Ana',    'Rocío Ferrer',     30],
-  ['12:00', 'Tratamiento de cabina', 'pro_noelia',  'Noelia', 'Silvia Herrán',    60],
-  ['12:30', 'Corte',                 'pro_marta',   'Marta',  'Álvaro Sanz',      30],
-  ['13:00', 'Corte',                 'pro_lucia',   'Lucia',  'Marina Cuesta',    30],
-  ['16:00', 'Tinte',                 'pro_ana',     'Ana',    'Paula Nogales',    90],
-  ['16:30', 'Corte y barba',         'pro_noelia',  'Noelia', 'Diego Rueda',      45],
-  ['17:00', 'Corte',                 'pro_lucia',   'Lucia',  'Hugo Ramos',       30],
-  ['17:15', 'Corte',                 'pro_marta',   'Marta',  'Lorena Bas',       30],
+  // Un dia de centro de estetica: cara, manos, cuerpo y depilacion mezclados,
+  // para que la agenda no se lea como "sitio de masajes". Con su paron de comida
+  // y el hueco de las 18:00 libre, que es donde entra la cita del plano.
+  ['09:00', 'Manicura',                 'pro_ana',    'Ana',    'Nuria Vega',       45],
+  ['09:30', 'Tratamiento facial',       'pro_marta',  'Marta',  'Carmen Solís',     60],
+  ['10:00', 'Tratamiento corporal',     'pro_lucia',  'Lucia',  'Beatriz Alarcón',  75],
+  ['10:30', 'Depilación',               'pro_noelia', 'Noelia', 'Javier Peña',      30],
+  ['11:00', 'Manicura',                 'pro_ana',    'Ana',    'Rocío Ferrer',     45],
+  ['11:30', 'Masaje descontracturante', 'pro_marta',  'Marta',  'Silvia Herrán',    60],
+  ['12:30', 'Primera consulta',         'pro_noelia', 'Noelia', 'Álvaro Sanz',      30],
+  ['13:00', 'Depilación',               'pro_lucia',  'Lucia',  'Marina Cuesta',    30],
+  ['16:00', 'Tratamiento facial',       'pro_ana',    'Ana',    'Paula Nogales',    60],
+  ['16:30', 'Manicura',                 'pro_noelia', 'Noelia', 'Diego Rueda',      45],
+  ['17:00', 'Primera consulta',         'pro_lucia',  'Lucia',  'Hugo Ramos',       30],
+  ['17:15', 'Depilación',               'pro_marta',  'Marta',  'Lorena Bas',       30],
 ];
 
 const slug = (s) => 'svc_' + s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_');
