@@ -53,6 +53,7 @@ Flow no siempre da lo que hace falta, y regenerar cuesta puntos. Esto se resuelv
 | Pantalla del móvil encendiéndose | `glow-movil.py` + `pulso-movil.sh` | Los mensajes entrantes del P3 |
 | Zumbido de los mensajes | `zumbido.sh` | Cuadrado al fotograma con la luz |
 | Medir que un efecto ha entrado | `mide_audio.py` | Un filtro puede correr sin error y no aplicar nada |
+| Acercamiento sobre la cita del P8 | `p8-movimiento.py` | En plano general la cita ocupa el 7% del ancho: no se lee |
 
 **El audio que genera Flow es casi mudo** (picos de 0,004 sobre 1). El sonido de todos los planos
 hay que ponerlo nosotros. No cuesta créditos, pero hay que contarlo en el tiempo de trabajo.
@@ -97,6 +98,15 @@ deja de ver la aplicación.
 
 **CapCut web no sirve:** el plan gratuito da **1 byte** de almacenamiento en la nube. Se trabaja
 con el CapCut de escritorio, que usa ficheros locales.
+
+**Los fotogramas clave de CapCut, a mano, cuestan mas de lo que valen.** Poner la escala escribiendo
+en el campo lo concatena con lo que ya hay (100 + 150 = 9999%), y `ctrl+a` no selecciona el texto
+del campo: selecciona **todos los clips de la linea de tiempo**. El movimiento de camara se genera
+en la Pi y llega a CapCut ya resuelto; CapCut se queda para ordenar planos, rotulos y sonido.
+
+**El + de la miniatura inserta donde este el cabezal, no al final.** Si el cabezal esta en medio,
+parte el clip que haya debajo. Antes de anadir: cabezal al punto exacto y comprobar el contador
+(sale en 8:08 con un clic en la regla; se afina con las flechas).
 
 ---
 
