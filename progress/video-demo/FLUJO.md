@@ -69,6 +69,11 @@ hay que ponerlo nosotros. No cuesta créditos, pero hay que contarlo en el tiemp
 4. **Antes de dar un plano por bueno:** duración, resolución, fotogramas, y una mirada al
    fotograma. Los cuatro. Un número correcto no salva una toma fea, y una toma bonita no salva
    un fichero roto.
+5. **Nada del rodaje se queda abierto al público.** Para grabar el plano 8 se compartió el
+   calendario de Centro Lena; eso lo deja además indexable en Google. Se cierra el mismo día,
+   y la prueba no es la casilla: el feed `.../public/basic.ics` tiene que devolver **404**.
+   Cerrado y comprobado el 25-ago (antes daba 200 con 38 eventos). Por lo mismo, las citas de
+   prueba se siembran **sin teléfono**: ese campo se ve en el evento.
 
 ---
 

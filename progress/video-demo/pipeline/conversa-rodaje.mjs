@@ -40,10 +40,11 @@ const config = JSON.parse(
 
 // Lo que dice el cliente. Corto y natural: es lo que se ve en pantalla.
 const GUION = [
-  'Hola, quería pedir cita para un corte',
+  'Hola, quería pedir cita para una manicura',
   '¿Te queda algo mañana por la tarde?',
   'Las seis me viene bien',
   NOMBRE,
+  'Me da igual quién, la que tenga hueco',
   'Sí',
 ];
 
