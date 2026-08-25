@@ -13,6 +13,12 @@
  */
 import fs from 'fs';
 import path from 'path';
+// Carga el .env. Sin esto, `process.env.GOOGLE_OAUTH_CLIENT_ID` vale undefined,
+// Google contesta `invalid_client` y lib/google-oauth.js lo tomaba por una
+// revocacion del cliente: dejo un cliente REAL sin calendario dos dias
+// (24-ago-2026). El blindaje ya esta en google-oauth.js, pero un script que
+// toca Google carga su entorno; no se apoya en que otro le tape el fallo.
+import 'dotenv/config';
 import { createCalendarEvent, isCalendarConfigured } from './lib/calendar.js';
 
 const CLIENT = 'estudio-ricardo-demo-mostoles-946279';
