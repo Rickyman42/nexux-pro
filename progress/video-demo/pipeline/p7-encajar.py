@@ -266,6 +266,39 @@ def integrar(pantalla, escena):
     return ImageChops.add(con_luz, ruido, scale=1, offset=-128)
 
 
+# Cuanto se suaviza la trayectoria de las esquinas, en fotogramas. La pantalla se
+# busca en cada fotograma por separado y la medida tiene un error de uno o dos
+# pixeles que cambia en cada uno: la mano se mueve suave, pero el cuadrilatero da
+# saltitos y la conversacion tiembla dentro del movil. El movimiento de verdad
+# recorre 50-60 px en 8 s, o sea lentisimo, asi que se puede filtrar fuerte sin
+# comerse nada real.
+SUAVIZADO_TRAYECTORIA = 3.5
+
+
+def suavizar_trayectoria(todas):
+    """Filtro gaussiano en el tiempo sobre las ocho coordenadas del cuadrilatero."""
+    n = len(todas)
+    radio = int(SUAVIZADO_TRAYECTORIA * 3)
+    pesos = [2.718281828 ** (-(d * d) / (2 * SUAVIZADO_TRAYECTORIA ** 2))
+             for d in range(-radio, radio + 1)]
+    total = sum(pesos)
+
+    suave = []
+    for i in range(n):
+        esquinas_i = []
+        for e in range(4):
+            punto = []
+            for eje in (0, 1):
+                acum = 0.0
+                for k, p in enumerate(pesos):
+                    j = min(max(i + k - radio, 0), n - 1)   # se replica en los extremos
+                    acum += todas[j][e][eje] * p
+                punto.append(acum / total)
+            esquinas_i.append(tuple(punto))
+        suave.append(esquinas_i)
+    return suave
+
+
 def vaiven(cuantos):
     """Indices del plano 6 para durar lo que dure la conversacion.
 
@@ -283,7 +316,7 @@ def vaiven(cuantos):
 
 
 def componer():
-    todas = json.loads(ESQUINAS.read_text(encoding='utf-8'))
+    todas = suavizar_trayectoria(json.loads(ESQUINAS.read_text(encoding='utf-8')))
     SALIDA.mkdir(parents=True, exist_ok=True)
     chats = sorted(FRAMES_P7.glob('f*.png'))
     if not chats:
