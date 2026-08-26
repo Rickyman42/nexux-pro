@@ -25,11 +25,14 @@
 
 ## Orden de disparo — 12 creditos el clip, 50 al dia = 4 clips
 
-| Dia | Planos | Por que en este orden |
+| Dia | Planos | Estado |
 |---|---|---|
-| 1 | **P6**, P2, P1, P13 | P6 es el critico: si sale con pantalla o con camara movida, no hay acto 3. Se dispara primero para tener margen de repetirlo |
-| 2 | P4, P5, P10, P12 | Cierran el acto 2 y el 4 |
-| 3 | P9 + repeticiones | El menos comprometido; deja hueco para rehacer lo que haya salido mal |
+| 1 — 26-ago | **P6**, P2, P1, P13 | ✅ **hechos y descargados**. 48 de los 50 puntos |
+| 2 | P4, P5, P10, P12 | pendiente. Cierran el acto 2 y el 4 |
+| 3 | P9 + repeticiones | pendiente. Deja hueco para rehacer lo que haya salido mal |
+
+El P6 fue primero porque es el critico: si sale con la pantalla encendida o con la camara
+movida, no hay acto 3, y convenia tener margen para repetirlo. Salio a la primera.
 
 ---
 
@@ -137,3 +140,20 @@ balanceo natural de la mano.
 
 Y hay un reflejo de cara en la pantalla, pese a pedir `no reflections`. No importa: al pegar la
 conversacion encima, la pantalla entera queda tapada.
+
+### P2 — hecho · `P02-movil-mostrador.mp4`
+El movil apagado sobre el mostrador de madera, alguien trabajando detras y desenfocado. Quieto,
+como se pidio. La luz de los mensajes y el zumbido van en post.
+
+### P1 — hecho · `P01-manos-manicura.mp4`
+Manos limando las unas de una clienta, primerisimo plano, ninguna cara en cuadro. Es el plano
+mas neutro del vidrio y el que mejor dice «esto va de cualquier negocio con cita previa».
+
+### P13 — hecho · `P13-lena-mirando-movil.mp4`
+Lena mirando su movil, seria, la cara iluminada por la pantalla. El personaje se mantiene: es
+reconociblemente la misma persona que en el P11.
+
+> **Como se referencia el personaje:** escribir `@Lena` de una tirada NO funciona. La arroba abre
+> un selector que se traga el resto del texto y lo mete en su buscador. Hay que teclear `@` solo,
+> elegir **Lena · Personaje** en la lista, pulsar **Anadir a la peticion**, y escribir el resto del
+> prompt detras del chip.
