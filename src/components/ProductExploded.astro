@@ -1,0 +1,489 @@
+---
+const pieces = [
+  {
+    title: 'Llega el mensaje',
+    text: 'Una persona escribe al WhatsApp o Telegram del negocio. No tiene que instalar nada ni aprender otra forma de pedir cita.',
+    proof: 'El mismo canal que ya usan tus clientes.',
+    visual: 'agenda',
+  },
+  {
+    title: 'Lara entiende qué necesita',
+    text: 'Lee la conversación, pregunta solo lo que falta y conduce la reserva hasta una propuesta clara.',
+    proof: 'Servicio, día, hora y nombre antes de confirmar.',
+    visual: 'agenda',
+  },
+  {
+    title: 'Comprueba los huecos reales',
+    text: 'Antes de ofrecer una hora, consulta la agenda. Si trabajan varias personas, también sabe quién puede atender.',
+    proof: 'La disponibilidad sale de la agenda, no de una respuesta inventada.',
+    visual: 'agenda',
+  },
+  {
+    title: 'La cita entra sola',
+    text: 'Cuando el cliente confirma, la reserva aparece en el calendario del negocio con su hora, servicio y profesional.',
+    proof: 'La captura es del CRM real de Nexux.',
+    visual: 'agenda',
+  },
+  {
+    title: 'También aparece en tu calendario',
+    text: 'Si conectas Google Calendar, ves la cita en el móvil como cualquier otra cita y el equipo trabaja sobre la misma agenda.',
+    proof: 'Tú eliges en qué calendario se apuntan.',
+    visual: 'agenda',
+  },
+  {
+    title: 'Puedes revisar la conversación',
+    text: 'Desde Chats ves qué preguntó el cliente y qué respondió Lara. Cuando quieras, puedes pasar la conversación a modo manual.',
+    proof: 'Lara o tú: el control sigue siendo del negocio.',
+    visual: 'agenda',
+  },
+  {
+    title: 'Ves el resultado',
+    text: 'El Dashboard reúne las reservas y calcula una estimación de los ingresos generados y el tiempo que has ahorrado.',
+    proof: 'Ejemplo real del panel: 18 citas, unos 600 € y 90 minutos.',
+    visual: 'roi',
+  },
+] as const;
+---
+
+<section class="exploded" id="que-incluye" aria-labelledby="exploded-title">
+  <div class="container-nx">
+    <header class="exploded-heading">
+      <p>Lo que recibes</p>
+      <h2 id="exploded-title">Un mensaje por fuera. <em>Todo esto por dentro.</em></h2>
+      <div class="exploded-intro">
+        <p>Abre el sistema pieza por pieza. Las pantallas que ves son capturas del CRM real.</p>
+        <span aria-hidden="true">Pulsa una pieza</span>
+      </div>
+    </header>
+
+    <div class="exploded-app" data-exploded>
+      <div class="exploded-stage" aria-label="Despiece del recorrido de una reserva">
+        <div class="core" aria-live="polite">
+          <figure class="core-shot is-visible" data-shot="agenda">
+            <a href="/img/crm-agenda-real.png" target="_blank" rel="noopener" aria-label="Abrir la captura completa de la agenda">
+              <img
+                src="/img/crm-agenda-real.png"
+                alt="Agenda real de Nexux con citas distribuidas por día y profesional"
+                width="3200"
+                height="1800"
+                loading="lazy"
+              />
+            </a>
+            <figcaption><span>Agenda real de Centro Lena</span><span>Abrir captura ↗</span></figcaption>
+          </figure>
+          <figure class="core-shot core-shot-roi" data-shot="roi" hidden>
+            <a href="/img/crm-roi-card-real.png" target="_blank" rel="noopener" aria-label="Abrir la captura completa del ROI">
+              <img
+                src="/img/crm-roi-card-real.png"
+                alt="Tarjeta real del CRM que estima unos 600 euros generados y 90 minutos ahorrados"
+                width="800"
+                height="300"
+                loading="lazy"
+              />
+            </a>
+            <figcaption><span>Estimación mostrada por el Dashboard real</span><span>Abrir captura ↗</span></figcaption>
+          </figure>
+        </div>
+
+        <div class="parts" role="list" aria-label="Siete piezas del sistema">
+          {pieces.map((piece, index) => (
+            <button
+              class:list={['part', index === 0 && 'is-active']}
+              type="button"
+              role="listitem"
+              data-index={index}
+              data-visual={piece.visual}
+              aria-pressed={index === 0 ? 'true' : 'false'}
+              style={`--part-index:${index}; --x:${[-410, -430, -405, 405, 435, 420, 350][index]}px; --y:${[-220, -65, 105, -220, -65, 105, 245][index]}px`}
+            >
+              <span class="part-number">{String(index + 1).padStart(2, '0')}</span>
+              <span class="part-title">{piece.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="exploded-detail" aria-live="polite">
+        <div class="detail-count"><span data-current>01</span> / 07</div>
+        <div class="detail-copy">
+          <h3 data-title>{pieces[0].title}</h3>
+          <p data-text>{pieces[0].text}</p>
+        </div>
+        <p class="detail-proof" data-proof>{pieces[0].proof}</p>
+      </div>
+
+      <noscript>
+        <ol class="exploded-fallback">
+          {pieces.map((piece) => <li><strong>{piece.title}.</strong> {piece.text}</li>)}
+        </ol>
+      </noscript>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ pieces }}>
+  const roots = document.querySelectorAll('[data-exploded]');
+
+  roots.forEach((root) => {
+    const buttons = Array.from(root.querySelectorAll('.part'));
+    const shots = Array.from(root.querySelectorAll('[data-shot]'));
+    const current = root.querySelector('[data-current]');
+    const title = root.querySelector('[data-title]');
+    const text = root.querySelector('[data-text]');
+    const proof = root.querySelector('[data-proof]');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let active = 0;
+    let timer;
+
+    const selectPiece = (index, moveFocus = false) => {
+      active = (index + pieces.length) % pieces.length;
+      const piece = pieces[active];
+
+      buttons.forEach((button, buttonIndex) => {
+        const selected = buttonIndex === active;
+        button.classList.toggle('is-active', selected);
+        button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      });
+
+      shots.forEach((shot) => {
+        const selected = shot.dataset.shot === piece.visual;
+        shot.hidden = !selected;
+        shot.classList.toggle('is-visible', selected);
+      });
+
+      current.textContent = String(active + 1).padStart(2, '0');
+      title.textContent = piece.title;
+      text.textContent = piece.text;
+      proof.textContent = piece.proof;
+      if (moveFocus) buttons[active].focus();
+    };
+
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => selectPiece(index));
+      button.addEventListener('focus', () => selectPiece(index));
+      button.addEventListener('keydown', (event) => {
+        if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        if (event.key === 'Home') selectPiece(0, true);
+        else if (event.key === 'End') selectPiece(pieces.length - 1, true);
+        else selectPiece(index + (event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1), true);
+      });
+    });
+
+    if (reducedMotion) root.classList.add('is-open');
+    else {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        root.classList.add('is-open');
+        observer.disconnect();
+      }, { threshold: 0.25 });
+      observer.observe(root);
+    }
+
+    const autoMode = new URLSearchParams(window.location.search).get('despiece') === 'auto';
+    if (autoMode && !reducedMotion) {
+      timer = window.setInterval(() => selectPiece(active + 1), 2600);
+      root.addEventListener('pointerdown', () => window.clearInterval(timer), { once: true });
+      root.addEventListener('focusin', () => window.clearInterval(timer), { once: true });
+    }
+  });
+</script>
+
+<style>
+  .exploded {
+    padding: 7rem 0;
+    overflow: hidden;
+    scroll-margin-top: 82px;
+    background: var(--nx-deep);
+    border-block: 1px solid var(--nx-line);
+  }
+
+  .exploded-heading {
+    max-width: 860px;
+    margin-bottom: 2rem;
+  }
+
+  .exploded-heading > p {
+    margin-bottom: 0.9rem;
+    color: var(--nx-magnet-deep);
+    font-family: var(--nx-font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .exploded-heading h2 {
+    font-family: var(--nx-font-serif);
+    font-size: clamp(2.5rem, 5.4vw, 4.8rem);
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+  }
+
+  .exploded-heading h2 em {
+    color: var(--nx-magnet-deep);
+    font-weight: 400;
+  }
+
+  .exploded-intro {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: end;
+    margin-top: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--nx-line-hover);
+  }
+
+  .exploded-intro p {
+    max-width: 620px;
+    color: var(--nx-ink-muted);
+    font-size: 1.02rem;
+  }
+
+  .exploded-intro span {
+    color: var(--nx-ink-faint);
+    font-family: var(--nx-font-mono);
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .exploded-stage {
+    position: relative;
+    min-height: 700px;
+  }
+
+  .core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(58%, 680px);
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  .core-shot {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(20, 22, 26, 0.16);
+    box-shadow: 0 8px 28px rgba(20, 22, 26, 0.10);
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .core-shot.is-visible { opacity: 1; }
+
+  .core-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .core-shot-roi { padding: 1.4rem; }
+
+  .core-shot figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.8rem;
+    border-top: 1px solid var(--nx-line);
+    color: var(--nx-ink-muted);
+    font-family: var(--nx-font-mono);
+    font-size: 0.66rem;
+  }
+
+  .parts { position: absolute; inset: 0; z-index: 2; }
+
+  .part {
+    --closed-scale: 0.8;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.65rem;
+    align-items: center;
+    width: 238px;
+    min-height: 58px;
+    padding: 0.65rem 0.8rem;
+    color: var(--nx-ink);
+    text-align: left;
+    background: rgba(247, 246, 243, 0.96);
+    border: 1px solid var(--nx-line-hover);
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(var(--closed-scale));
+    transition:
+      transform 620ms var(--nx-ease),
+      opacity 300ms ease,
+      border-color 150ms ease,
+      background-color 150ms ease;
+    transition-delay: calc(var(--part-index) * 55ms);
+  }
+
+  .is-open .part {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)));
+  }
+
+  .part::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 74px;
+    height: 1px;
+    background: var(--nx-line-hover);
+  }
+
+  .part:nth-child(-n+3)::after { left: 100%; }
+  .part:nth-child(n+4)::after { right: 100%; }
+
+  .part:hover,
+  .part.is-active {
+    border-color: var(--nx-magnet-deep);
+    background: #fff;
+  }
+
+  .part:focus-visible {
+    outline: 3px solid rgba(42, 139, 132, 0.28);
+    outline-offset: 3px;
+  }
+
+  .part-number {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-right: 1px solid var(--nx-line-hover);
+    color: var(--nx-ink-faint);
+    font-family: var(--nx-font-mono);
+    font-size: 0.72rem;
+  }
+
+  .part.is-active .part-number { color: var(--nx-magnet-deep); }
+
+  .part-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .exploded-detail {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr) minmax(260px, 0.62fr);
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.5rem 0 0;
+    border-top: 1px solid var(--nx-line-hover);
+  }
+
+  .detail-count {
+    color: var(--nx-ink-faint);
+    font-family: var(--nx-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .detail-count span {
+    color: var(--nx-magnet-deep);
+    font-size: 1.4rem;
+  }
+
+  .detail-copy h3 {
+    margin-bottom: 0.45rem;
+    font-size: 1.2rem;
+    line-height: 1.25;
+  }
+
+  .detail-copy p,
+  .detail-proof {
+    color: var(--nx-ink-muted);
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .detail-proof {
+    padding-left: 1rem;
+    border-left: 2px solid var(--nx-magnet);
+  }
+
+  .exploded-fallback { margin-top: 2rem; padding-left: 1.25rem; }
+  .exploded-fallback li + li { margin-top: 0.75rem; }
+
+  @media (max-width: 1080px) {
+    .exploded-stage {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 2rem 0;
+    }
+
+    .parts {
+      position: relative;
+      inset: auto;
+      order: 1;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(160px, 1fr));
+      gap: 0.6rem;
+      overflow-x: auto;
+      padding: 0.25rem 0.25rem 1rem;
+      scrollbar-width: thin;
+      scroll-snap-type: x proximity;
+    }
+
+    .part,
+    .is-open .part {
+      position: relative;
+      inset: auto;
+      width: auto;
+      min-height: 64px;
+      opacity: 1;
+      transform: none;
+      transition: border-color 150ms ease, background-color 150ms ease;
+      scroll-snap-align: start;
+    }
+
+    .part::after { display: none; }
+
+    .core {
+      position: relative;
+      inset: auto;
+      order: 2;
+      width: 100%;
+      transform: none;
+    }
+
+  }
+
+  @media (max-width: 720px) {
+    .exploded { padding: 4.5rem 0; }
+    .exploded-heading h2 { font-size: clamp(2.35rem, 12vw, 3.4rem); }
+    .exploded-intro { display: block; }
+    .exploded-intro span { display: block; margin-top: 0.75rem; }
+    .parts { margin-inline: -1.5rem; padding-inline: 1.5rem; }
+    .core { margin-inline: -0.6rem; width: calc(100% + 1.2rem); }
+    .core-shot { box-shadow: 0 4px 14px rgba(20, 22, 26, 0.08); }
+    .core-shot[data-shot='agenda'] img {
+      height: 260px;
+      object-fit: cover;
+      object-position: 58% 38%;
+    }
+    .core-shot figcaption { font-size: 0.6rem; }
+    .core-shot-roi { padding: 0.65rem; }
+    .exploded-detail {
+      grid-template-columns: 54px 1fr;
+      gap: 1rem;
+      padding-right: 4rem;
+    }
+    .detail-proof {
+      grid-column: 2;
+      padding-left: 0.8rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .part,
+    .core-shot { transition: none; }
+    .part { opacity: 1; }
+  }
+</style>

@@ -2,6 +2,7 @@
 import CheckoutModal from '../../components/CheckoutModal.astro';
 import LaraWidget from '../../components/LaraWidget.astro';
 import PlanDetail from '../../components/PlanDetail.astro';
+import ProductExploded from '../../components/ProductExploded.astro';
 import { planEntries, type PlanData, type PlanSlug } from '../../data/plans';
 import Layout from '../../layouts/Layout.astro';
 
@@ -55,6 +56,7 @@ const productSchema = {
     <script type="application/ld+json" is:inline set:html={JSON.stringify(productSchema)}></script>
   </Fragment>
   <PlanDetail plan={plan} slug={slug} />
+  <ProductExploded />
   <LaraWidget />
   <CheckoutModal />
   <script>
