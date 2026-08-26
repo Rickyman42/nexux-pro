@@ -210,7 +210,12 @@ def encoger(q):
 #     zona perfectamente limpia dentro de una imagen con grano se ve pegada.
 TECHO_BLANCO = 232
 GRANO = 1.3
-SUAVIZADO = 2.2   # en pixeles del chat; la pantalla se ve a un tercio de ese tamano
+SUAVIZADO = 3.2   # en pixeles del chat; la pantalla se ve a un tercio de ese tamano
+
+# El reflejo del cristal. En el plano apagado la pantalla marca 10-30: lo que pasa
+# de 14 es luz reflejada de la habitacion, y es lo unico que se suma.
+UMBRAL_REFLEJO = 14
+FUERZA_REFLEJO = 0.55
 
 
 def mascara_pantalla(tam):
@@ -237,7 +242,16 @@ def integrar(pantalla, escena):
     # Los blancos del chat no pueden brillar mas que lo mas brillante del plano.
     techo = pantalla.point(lambda v: int(v * TECHO_BLANCO / 255))
 
-    mezcla = Image.blend(techo, escena, 0.06)
+    mezcla = Image.blend(techo, escena, 0.04)
+
+    # El reflejo del cristal. Un cristal SUMA luz, nunca oscurece: por eso el
+    # primer intento -- mezclar la escena entera al 14% -- salio sucio, metia la
+    # cara reflejada como una mancha gris. Aqui se coge solo lo CLARO del reflejo
+    # original (la ventana, la piel iluminada) y se suma. Sin esto la pantalla
+    # queda mate, y una pantalla mate dentro de una escena con cristales delata
+    # el montaje aunque el borde este perfecto.
+    brillo = escena.point(lambda v: max(0, int((v - UMBRAL_REFLEJO) * FUERZA_REFLEJO)))
+    mezcla = ImageChops.add(mezcla, brillo.filter(ImageFilter.GaussianBlur(3)))
 
     # Degradado claro arriba, que es de donde entra la luz de la ventana.
     # linear_gradient va de 0 arriba a 255 abajo, asi que se le da la vuelta.
