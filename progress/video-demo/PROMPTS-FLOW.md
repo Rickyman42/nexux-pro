@@ -15,6 +15,9 @@
    que de verdad estamos midiendo (73 % de 1.458 salones sin reserva online).
 3. **Sin texto en ninguna parte.** Ni rotulos, ni marcas, ni pantallas legibles. Los rotulos van
    en CapCut.
+5. **El personaje fijo ya existe y se llama `Lena`.** Esta creado en el proyecto de Flow y se
+   invoca con `@Lena`. Sale en P5, P11 y P13. En P1 y P2 no: ahi solo se ven manos.
+
 4. **Flow entrega 8 s.** La escaleta pide 4-6 s por plano: se recorta en el montaje. No se pide
    una duracion corta, porque el clip cuesta lo mismo y sobrar es mejor que faltar.
 
@@ -64,7 +67,7 @@ itself. Static camera.
 
 ### P13 — la persona mirando su movil (64-70 s)
 ```
-Close-up of @personaje looking down at their phone, serious, thoughtful, no smile. Face lit
+Close-up of @Lena looking down at their phone, serious, thoughtful, no smile. Face lit
 softly by the screen. The screen itself is not visible to camera. Neutral dark interior.
 Ambient sound: silence, distant room tone. Static camera.
 ```
@@ -78,7 +81,7 @@ Static camera.
 
 ### P5 — el final del dia (19-24 s)
 ```
-@personaje at the end of the day in the now-empty beauty studio, seen from behind, finally
+@Lena at the end of the day in the now-empty beauty studio, seen from behind, finally
 picking up the phone from the counter. Warm low light, chairs empty, everything tidied.
 Ambient sound: an empty room, a single set of footsteps. Static camera.
 ```
@@ -113,3 +116,24 @@ room tone. Static camera.
 2. Guardarlo en `~/brand-assets/video/anuncio-75s/` con el nombre del plano.
 3. Comprobar los cuatro numeros: duracion, resolucion, fotogramas **contados** y una mirada al
    fotograma. Un numero correcto no salva una toma fea.
+
+---
+
+## Lo que ya se ha rodado
+
+### P6 — hecho el 26-ago · `P06-mano-movil-apagado.mp4`
+Salio bien al primer intento con Omni Flash: 1280x720, 24 fps, 192 fotogramas contados, 8,000 s.
+Pantalla **negra** de principio a fin, sin interfaz ni texto, y la camara no se mueve: el fondo
+--la ventana, la planta, el marco-- se queda clavado los 8 segundos.
+
+**Lo que si se mueve es el movil.** Medido fotograma a fotograma: el borde superior de la
+pantalla oscila entre -10 y +24 px en vertical, unos 30 px de recorrido sobre 720 de alto. Es el
+balanceo natural de la mano.
+
+> **Consecuencia para el P7:** la conversacion de WhatsApp **no se puede pegar fija** en la
+> pantalla; se le nota el deslizamiento. Hay que medir el rectangulo de la pantalla en los 192
+> fotogramas y componer la captura siguiendo esa trayectoria, igual que se hizo el movimiento
+> del P8. El metodo ya existe, es `p8-movimiento.py`.
+
+Y hay un reflejo de cara en la pantalla, pese a pedir `no reflections`. No importa: al pegar la
+conversacion encima, la pantalla entera queda tapada.
