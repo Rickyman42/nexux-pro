@@ -20,7 +20,7 @@ import json
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageEnhance
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 FRAMES_P6 = Path('/tmp/p6f')
 FRAMES_P7 = Path('/tmp/p7/frames')
@@ -146,7 +146,10 @@ def ver(indice):
     q = esquinas(ruta)
     im = Image.open(ruta).convert('RGB')
     d = ImageDraw.Draw(im)
+    # rojo: lo que encuentra el buscador (el movil entero)
     d.polygon([(round(x), round(y)) for x, y in q], outline=(255, 40, 40))
+    # verde: donde acaba pegandose la conversacion (el cristal)
+    d.polygon([(round(x), round(y)) for x, y in encoger(q)], outline=(60, 255, 120))
     for x, y in q:
         d.ellipse([x - 5, y - 5, x + 5, y + 5], fill=(255, 210, 0))
     destino = Path('/tmp/p7/verificacion-%04d.png' % indice)
@@ -169,16 +172,62 @@ def medir():
           (min(izqs), max(izqs), max(izqs) - min(izqs)))
 
 
+# Cuanto hay que meterse hacia dentro desde lo que detecta el buscador de manchas
+# oscuras. Ese buscador encuentra el MOVIL, no la pantalla: el marco metalico es
+# casi tan oscuro como el cristal apagado. Sin esto, la conversacion se derrama
+# por debajo del telefono y cae sobre los dedos.
+MARGEN_LADO = 0.045
+MARGEN_ARRIBA = 0.028
+MARGEN_ABAJO = 0.055
+
+# Las esquinas del movil son muy redondeadas. Con la conversacion en angulo recto
+# asomaban cuatro picos de color, que era lo que mas delataba el pegote.
+RADIO = 0.085   # del ancho de la pantalla
+
+
+def encoger(q):
+    """Del contorno del movil al rectangulo del cristal."""
+    (aix, aiy), (adx, ady), (bdx, bdy), (bix, biy) = q
+
+    def punto(u, v):
+        # bilineal: u de izquierda a derecha, v de arriba a abajo
+        xa = aix + (adx - aix) * u
+        ya = aiy + (ady - aiy) * u
+        xb = bix + (bdx - bix) * u
+        yb = biy + (bdy - biy) * u
+        return (xa + (xb - xa) * v, ya + (yb - ya) * v)
+
+    u0, u1 = MARGEN_LADO, 1 - MARGEN_LADO
+    v0, v1 = MARGEN_ARRIBA, 1 - MARGEN_ABAJO
+    return [punto(u0, v0), punto(u1, v0), punto(u1, v1), punto(u0, v1)]
+
+
+def mascara_pantalla(tam):
+    """Silueta del cristal: rectangulo de esquinas redondeadas, con el borde suave."""
+    w, h = tam
+    m = Image.new('L', tam, 0)
+    ImageDraw.Draw(m).rounded_rectangle([0, 0, w - 1, h - 1], radius=int(w * RADIO), fill=255)
+    return m.filter(ImageFilter.GaussianBlur(1.2))
+
+
 def integrar(pantalla, escena):
     """Que la pantalla parezca encendida ahi, y no una captura pegada encima.
 
-    Una imagen plana y clara al lado de la luz calida de la escena canta al
-    instante. Se le devuelve un 14% del cristal original -- el reflejo de la
-    cara, la sombra de los dedos, el degradado de la ventana -- y se le baja un
-    pelin el brillo, que ningun movil se ve tan luminoso a esa distancia.
+    Antes se mezclaba un 14% de la escena para heredar el reflejo del cristal, y
+    salio mal: el reflejo de este plano es una cara entera, y manchaba el fondo
+    del chat de gris sucio. Un movil encendido apenas refleja. Se deja un 6%,
+    solo para que coja la temperatura calida de la habitacion, y la sensacion de
+    pantalla se consigue con la luz propia: mas clara arriba, donde da la ventana.
     """
-    mezcla = Image.blend(pantalla, escena, 0.14)
-    return ImageEnhance.Brightness(mezcla).enhance(0.94)
+    mezcla = Image.blend(pantalla, escena, 0.06)
+    mezcla = ImageEnhance.Brightness(mezcla).enhance(0.90)
+
+    # Degradado claro arriba, que es de donde entra la luz de la ventana.
+    # linear_gradient va de 0 arriba a 255 abajo, asi que se le da la vuelta.
+    arriba = Image.linear_gradient('L').transpose(Image.FLIP_TOP_BOTTOM).resize(mezcla.size)
+    return Image.composite(ImageEnhance.Brightness(mezcla).enhance(1.07),
+                           ImageEnhance.Brightness(mezcla).enhance(0.95),
+                           arriba)
 
 
 def vaiven(cuantos):
@@ -209,13 +258,13 @@ def componer():
         fondo = Image.open(FRAMES_P6 / ('f%04d.png' % i)).convert('RGB')
         chat = Image.open(chats[k]).convert('RGB')
 
-        q = todas[i - 1]
+        q = encoger(todas[i - 1])
         w, hgt = chat.size
         origen = [(0, 0), (w, 0), (w, hgt), (0, hgt)]
         c = coeficientes(q, origen)
 
         deformado = chat.transform(fondo.size, Image.PERSPECTIVE, c, Image.BICUBIC)
-        mascara = Image.new('L', chat.size, 255).transform(
+        mascara = mascara_pantalla(chat.size).transform(
             fondo.size, Image.PERSPECTIVE, c, Image.BICUBIC)
         fondo.paste(integrar(deformado, fondo), (0, 0), mascara)
         fondo.save(SALIDA / ('f%04d.png' % (k + 1)))
