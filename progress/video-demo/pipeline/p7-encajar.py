@@ -20,7 +20,7 @@ import json
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter
 
 FRAMES_P6 = Path('/tmp/p6f')
 FRAMES_P7 = Path('/tmp/p7/frames')
@@ -202,12 +202,27 @@ def encoger(q):
     return [punto(u0, v0), punto(u1, v0), punto(u1, v1), punto(u0, v1)]
 
 
+# Medido sobre el propio plano 6, no estimado:
+#   - el pixel mas brillante de toda la escena es 241, y el percentil 99,5 es 215.
+#     El chat trae blancos de 255, o sea que la pantalla brillaba mas que nada de
+#     lo que hay en la habitacion. Eso, mas que el borde, es lo que la despegaba.
+#   - el grano de la camara es de 1,3 niveles. La captura no tiene ninguno, y una
+#     zona perfectamente limpia dentro de una imagen con grano se ve pegada.
+TECHO_BLANCO = 232
+GRANO = 1.3
+SUAVIZADO = 2.2   # en pixeles del chat; la pantalla se ve a un tercio de ese tamano
+
+
 def mascara_pantalla(tam):
-    """Silueta del cristal: rectangulo de esquinas redondeadas, con el borde suave."""
+    """Silueta del cristal: rectangulo de esquinas redondeadas, con el borde suave.
+
+    El borde va bastante difuminado a proposito. Un canto duro delata el montaje
+    aunque todo lo demas este bien.
+    """
     w, h = tam
     m = Image.new('L', tam, 0)
     ImageDraw.Draw(m).rounded_rectangle([0, 0, w - 1, h - 1], radius=int(w * RADIO), fill=255)
-    return m.filter(ImageFilter.GaussianBlur(1.2))
+    return m.filter(ImageFilter.GaussianBlur(6))
 
 
 def integrar(pantalla, escena):
@@ -219,15 +234,22 @@ def integrar(pantalla, escena):
     solo para que coja la temperatura calida de la habitacion, y la sensacion de
     pantalla se consigue con la luz propia: mas clara arriba, donde da la ventana.
     """
-    mezcla = Image.blend(pantalla, escena, 0.06)
-    mezcla = ImageEnhance.Brightness(mezcla).enhance(0.90)
+    # Los blancos del chat no pueden brillar mas que lo mas brillante del plano.
+    techo = pantalla.point(lambda v: int(v * TECHO_BLANCO / 255))
+
+    mezcla = Image.blend(techo, escena, 0.06)
 
     # Degradado claro arriba, que es de donde entra la luz de la ventana.
     # linear_gradient va de 0 arriba a 255 abajo, asi que se le da la vuelta.
     arriba = Image.linear_gradient('L').transpose(Image.FLIP_TOP_BOTTOM).resize(mezcla.size)
-    return Image.composite(ImageEnhance.Brightness(mezcla).enhance(1.07),
-                           ImageEnhance.Brightness(mezcla).enhance(0.95),
-                           arriba)
+    con_luz = Image.composite(ImageEnhance.Brightness(mezcla).enhance(1.05),
+                              ImageEnhance.Brightness(mezcla).enhance(0.94),
+                              arriba)
+
+    # Y el grano de la camara, para que la pantalla no sea la unica zona limpia
+    # de un plano que lo tiene por todas partes.
+    ruido = Image.effect_noise(con_luz.size, GRANO).convert('RGB')
+    return ImageChops.add(con_luz, ruido, scale=1, offset=-128)
 
 
 def vaiven(cuantos):
@@ -256,7 +278,11 @@ def componer():
     indices = vaiven(len(chats))
     for k, i in enumerate(indices):
         fondo = Image.open(FRAMES_P6 / ('f%04d.png' % i)).convert('RGB')
-        chat = Image.open(chats[k]).convert('RGB')
+        # El suavizado va antes de deformar: hecho despues, el desenfoque
+        # arrastraria el negro de fuera de la pantalla y dejaria un halo oscuro
+        # justo en el borde, que es lo que se quiere evitar.
+        chat = Image.open(chats[k]).convert('RGB').filter(
+            ImageFilter.GaussianBlur(SUAVIZADO))
 
         q = encoger(todas[i - 1])
         w, hgt = chat.size
