@@ -92,9 +92,21 @@ intento del brillo del móvil terminó "bien" y la diferencia de brillo medida f
 `fade` sobre el canal alfa, que es más aburrido y funciona.
 
 **El permiso de CapCut se rompe en cada actualización.** El menú de inicio apunta a un lanzador,
-pero la ventana la abre `Apps\<VERSION>\CapCut.exe`. Hay un acceso directo llamado **"CapCut 8.5"**
-que apunta al ejecutable real; el día que CapCut pase a la 8.6 hay que rehacerlo o el control
-deja de ver la aplicación.
+pero la ventana la abre `Apps\<VERSION>\CapCut.exe`, y el permiso se concede al ejecutable
+concreto. Pasó el 26-ago: CapCut se actualizó solo de la 8.5.0.3590 a la 9.3.0.3970 y el control
+dejó de funcionar.
+
+**El síntoma engaña.** No da ningún error: la ventana simplemente **no aparece en la captura de
+pantalla**, como si la aplicación no estuviera abierta, aunque el proceso exista. Es que las
+ventanas de programas sin permiso se enmascaran. Diagnóstico en un comando:
+
+```powershell
+Get-Process -Name CapCut | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object Id, Path
+```
+
+Si la ruta no coincide con la del acceso directo, es esto. Se arregla creando un acceso directo
+nuevo a esa ruta en el menú de inicio y pidiendo permiso para él. Y si la ventana está minimizada,
+`ShowWindow(handle, 9)` la restaura sin tocar el ratón.
 
 **CapCut web no sirve:** el plan gratuito da **1 byte** de almacenamiento en la nube. Se trabaja
 con el CapCut de escritorio, que usa ficheros locales.
