@@ -69,7 +69,14 @@ fuera del encuadre.
 
 ## 3. EL MONTAJE
 
-**CapCut de escritorio, proyecto `0825`.** Los 9 planos en orden, 1 minuto 12 segundos.
+**CapCut de escritorio, proyecto `0825`.** Los 13 planos en orden, **1 minuto 47 segundos**.
+El objetivo son 75 s: los 32 de más salen de recortar cada plano de 8 a 4-5 s.
+
+⚠️ **La biblioteca hay que ponerla en orden por Nombre, A-Z** (botón de ordenar, arriba). Por
+defecto ordena por hora de importación y los planos salen revueltos. Con ese orden, los nombres
+llevan el prefijo del guion (`01_`, `02_`…) y se añaden de arriba abajo sin pensar.
+El botón **+** de cada miniatura inserta **donde esté el cabezal**, así que antes de cada uno:
+clic en la línea de tiempo y tecla **Fin**.
 
 - Versión **9.3.0.3970**. El permiso de control se concede al ejecutable concreto, así que
   cada actualización lo rompe. Acceso directo vigente: **"CapCut 9.3"**.
