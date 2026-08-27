@@ -26,7 +26,7 @@ Duraciones y resoluciones **medidas** sobre los ficheros, no estimadas.
 | P5 | El final del día, negocio vacío | ⬜ Flow | — | — | — |
 | P6 | La mano con el móvil apagado | ✅ | `P06-mano-movil-apagado.mp4` | 8,00 s | 1280×720 |
 | P7 | La conversación de WhatsApp | ✅ | `P07-en-movil.mp4` | 11,00 s | 1280×720 |
-| P8 | El CRM y la cita entrando sola | ✅ | `P08-crm-cita-entra.mp4` | 8,00 s | **1920×1080** |
+| P8 | El CRM: la cita entrando **y el ROI del bot** | ✅ | `P08-agenda-y-roi.mp4` | 11,50 s | **1920×1080** |
 | P9 | Alguien probándolo, curioso | ⬜ Flow | — | — | — |
 | P10 | Un pulgar abriendo WhatsApp | ⬜ Flow | — | — | — |
 | P11 | Lena apoyada en el mostrador | ✅ | `P11-lena-mostrador.mp4` | 8,00 s | 1280×720 |
@@ -46,6 +46,22 @@ con una manicura o un facial: mismo bloqueo de manos, 12 créditos.
   pero si se exporta a 1080 el resto sube escalado.
 - **El P7 no tiene pista de audio.** Los planos de Flow sí (AAC), aunque suenan casi mudos.
 - **El P7 dura 11 s** porque la conversación necesita ese tiempo; la escaleta le daba 10.
+- **El P8 pasó de 8 a 11,5 s** al ensancharlo con la segunda pantalla. La versión de una sola
+  pantalla sigue ahí como `P08-crm-cita-entra.mp4` por si se prefiere la corta.
+
+### Por qué el plano 8 enseña dos pantallas y no tres
+Se comprobaron las siete secciones del panel. **Clientes y Chats están vacíos**, incluso después
+de que el bot acabe de reservar una cita: en Clientes pone «los clientes que reserven citas a
+través de tu bot aparecerán aquí» y no aparece nadie. Una pantalla vacía en un anuncio es peor
+que no enseñarla. ⚠️ **Eso es un fallo de producto, no del rodaje**, y hay que mirarlo aparte:
+un cliente que entre a ver su lista se encontrará lo mismo.
+
+Las dos que sí sirven son la agenda y el **ROI del bot** (~633 € generados, 95 min ahorrados).
+La segunda es la que vende.
+
+⛔ El Dashboard tiene detalles que en un anuncio no lucen — «Copia de seguridad: sin copia» en
+rojo y «Telegram: pendiente» en naranja. Por eso el plano se acerca al bloque del ROI y los deja
+fuera del encuadre.
 - `P07-conversacion.mp4` (720×1560, vertical) es la pantalla suelta, **material intermedio**.
   Lo que va al montaje es `P07-en-movil.mp4`.
 
