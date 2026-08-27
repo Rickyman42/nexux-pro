@@ -8,8 +8,8 @@
 
 ## 1. DÓNDE ESTAMOS EN UNA LÍNEA
 
-**9 planos de 14 terminados y montados en CapCut.** Faltan 5 planos de Flow (créditos),
-todos los rótulos, la música y la voz.
+**13 planos de 14 terminados.** Solo falta el P9, que son 12 créditos de mañana. Y después:
+los rótulos, la música y la voz.
 
 ---
 
@@ -22,15 +22,15 @@ Duraciones y resoluciones **medidas** sobre los ficheros, no estimadas.
 | P1 | Manos limando uñas | ✅ | `P01-manos-manicura.mp4` | 8,00 s | 1280×720 |
 | P2 | El móvil quieto en el mostrador | ✅ | `P02-movil-mostrador.mp4` | 8,00 s | 1280×720 |
 | P3 | La cabina, ella trabajando | ✅ ⚠️ | `P03-cabina-mensajes.mp4` | 8,00 s | 1280×720 |
-| P4 | La pantalla que se apaga sola | ⬜ Flow | — | — | — |
-| P5 | El final del día, negocio vacío | ⬜ Flow | — | — | — |
+| P4 | La pantalla que se apaga sola | ✅ | `P04-pantalla-se-apaga.mp4` | 8,00 s | 1280×720 |
+| P5 | El final del día, negocio vacío | ✅ | `P05-lena-final-del-dia.mp4` | 8,00 s | 1280×720 |
 | P6 | La mano con el móvil apagado | ✅ | `P06-mano-movil-apagado.mp4` | 8,00 s | 1280×720 |
 | P7 | La conversación de WhatsApp | ✅ | `P07-en-movil.mp4` | 11,00 s | 1280×720 |
 | P8 | El CRM: la cita entrando **y el ROI del bot** | ✅ | `P08-agenda-y-roi.mp4` | 11,50 s | **1920×1080** |
 | P9 | Alguien probándolo, curioso | ⬜ Flow | — | — | — |
-| P10 | Un pulgar abriendo WhatsApp | ⬜ Flow | — | — | — |
+| P10 | Un pulgar abriendo WhatsApp | ✅ | `P10-pulgar-whatsapp.mp4` | 8,00 s | 1280×720 |
 | P11 | Lena apoyada en el mostrador | ✅ | `P11-lena-mostrador.mp4` | 8,00 s | 1280×720 |
-| P12 | El negocio con clientes, vida | ⬜ Flow | — | — | — |
+| P12 | El negocio con clientes, vida | ✅ | `P12-negocio-con-clientes.mp4` | 8,00 s | 1280×720 |
 | P13 | Lena mirando su móvil, seria | ✅ | `P13-lena-mirando-movil.mp4` | 8,00 s | 1280×720 |
 | P14 | Cierre con el QR | ✅ | `P14-cierre-qr.mp4` | 5,00 s | 1280×720 |
 
@@ -81,8 +81,11 @@ fuera del encuadre.
 
 ## 4. LO QUE FALTA, EN ORDEN
 
-1. **Los 5 planos de Flow** — P4, P5, P10, P12 un día; P9 al siguiente. 12 créditos el clip,
-   50 al día. Prompts listos y probados en `PROMPTS-FLOW.md`, se disparan sin pensar.
+1. **El P9**, el último de Flow. 12 créditos. El prompt está en `PROMPTS-FLOW.md`.
+
+   ⚠️ **Al generar, descargar cada plano nada más salir.** Flow no carga los vídeos si su
+   pestaña está en segundo plano, y encolar cuatro para bajarlos al final dejó los cuatro
+   atrapados. Es la segunda vez que este proyecto tropieza con lo mismo.
 2. **Recortar** cada plano a su duración de escaleta. Decisión de Ricardo, plano a plano.
 3. **Los rótulos**, en CapCut, nunca en Flow. Los textos exactos están en `PLAN-RODAJE.md` §2.
 4. **Música y sonido.** El audio de Flow es casi mudo: los picos miden 0,004 sobre 1.
