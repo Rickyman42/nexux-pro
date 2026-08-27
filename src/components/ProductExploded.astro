@@ -58,7 +58,7 @@ const pieces = [
 
     <div class="exploded-app" data-exploded>
       <div class="exploded-stage" aria-label="Despiece del recorrido de una reserva">
-        <div class="core" aria-live="polite">
+        <div class="core" data-core data-visual="agenda" aria-live="polite">
           <figure class="core-shot is-visible" data-shot="agenda">
             <a href="/img/crm-agenda-real.png" target="_blank" rel="noopener" aria-label="Abrir la captura completa de la agenda">
               <img
@@ -83,17 +83,23 @@ const pieces = [
             </a>
             <figcaption><span>Estimación mostrada por el Dashboard real</span><span>Abrir captura ↗</span></figcaption>
           </figure>
+          <span class="core-hotspot" data-hotspot aria-hidden="true"><span data-hotspot-number>01</span></span>
+          <div class="core-status">
+            <span class="core-status-count">Pieza <b data-stage-current>01</b> de 07</span>
+            <strong data-stage-title>{pieces[0].title}</strong>
+            <span data-stage-proof>{pieces[0].proof}</span>
+          </div>
         </div>
 
-        <div class="parts" role="list" aria-label="Siete piezas del sistema">
+        <div class="parts" role="tablist" aria-label="Siete piezas del sistema">
           {pieces.map((piece, index) => (
             <button
               class:list={['part', index === 0 && 'is-active']}
               type="button"
-              role="listitem"
+              role="tab"
               data-index={index}
               data-visual={piece.visual}
-              aria-pressed={index === 0 ? 'true' : 'false'}
+              aria-selected={index === 0 ? 'true' : 'false'}
               style={`--part-index:${index}; --x:${[-410, -430, -405, 405, 435, 420, 350][index]}px; --y:${[-220, -65, 105, -220, -65, 105, 245][index]}px`}
             >
               <span class="part-number">{String(index + 1).padStart(2, '0')}</span>
@@ -131,7 +137,21 @@ const pieces = [
     const title = root.querySelector('[data-title]');
     const text = root.querySelector('[data-text]');
     const proof = root.querySelector('[data-proof]');
+    const core = root.querySelector('[data-core]');
+    const stageCurrent = root.querySelector('[data-stage-current]');
+    const stageTitle = root.querySelector('[data-stage-title]');
+    const stageProof = root.querySelector('[data-stage-proof]');
+    const hotspotNumber = root.querySelector('[data-hotspot-number]');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const focusPoints = [
+      { x: 18, y: 24, scale: 1.08 },
+      { x: 28, y: 20, scale: 1.12 },
+      { x: 73, y: 20, scale: 1.15 },
+      { x: 53, y: 56, scale: 1.22 },
+      { x: 67, y: 48, scale: 1.18 },
+      { x: 8, y: 32, scale: 1.16 },
+      { x: 50, y: 50, scale: 1 },
+    ];
     let active = 0;
     let timer;
 
@@ -142,7 +162,7 @@ const pieces = [
       buttons.forEach((button, buttonIndex) => {
         const selected = buttonIndex === active;
         button.classList.toggle('is-active', selected);
-        button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        button.setAttribute('aria-selected', selected ? 'true' : 'false');
       });
 
       shots.forEach((shot) => {
@@ -155,6 +175,17 @@ const pieces = [
       title.textContent = piece.title;
       text.textContent = piece.text;
       proof.textContent = piece.proof;
+      stageCurrent.textContent = String(active + 1).padStart(2, '0');
+      stageTitle.textContent = piece.title;
+      stageProof.textContent = piece.proof;
+      hotspotNumber.textContent = String(active + 1).padStart(2, '0');
+      const focus = focusPoints[active];
+      core.dataset.visual = piece.visual;
+      core.style.setProperty('--focus-x', `${focus.x}%`);
+      core.style.setProperty('--focus-y', `${focus.y}%`);
+      core.style.setProperty('--shot-scale', focus.scale);
+      core.classList.remove('is-changing');
+      window.requestAnimationFrame(() => core.classList.add('is-changing'));
       if (moveFocus) buttons[active].focus();
     };
 
@@ -180,11 +211,11 @@ const pieces = [
       observer.observe(root);
     }
 
-    const autoMode = new URLSearchParams(window.location.search).get('despiece') === 'auto';
-    if (autoMode && !reducedMotion) {
-      timer = window.setInterval(() => selectPiece(active + 1), 2600);
-      root.addEventListener('pointerdown', () => window.clearInterval(timer), { once: true });
-      root.addEventListener('focusin', () => window.clearInterval(timer), { once: true });
+    const stopAuto = () => window.clearInterval(timer);
+    if (!reducedMotion) {
+      timer = window.setInterval(() => selectPiece(active + 1), 4200);
+      root.addEventListener('pointerdown', stopAuto, { once: true });
+      root.addEventListener('focusin', stopAuto, { once: true });
     }
   });
 </script>
@@ -254,6 +285,9 @@ const pieces = [
   }
 
   .core {
+    --focus-x: 18%;
+    --focus-y: 24%;
+    --shot-scale: 1.08;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -271,12 +305,22 @@ const pieces = [
     transition: opacity 180ms ease;
   }
 
+  .core-shot[hidden] { display: none !important; }
+
   .core-shot.is-visible { opacity: 1; }
+
+  .core-shot > a {
+    display: block;
+    overflow: hidden;
+  }
 
   .core-shot img {
     display: block;
     width: 100%;
     height: auto;
+    transform: scale(var(--shot-scale));
+    transform-origin: var(--focus-x) var(--focus-y);
+    transition: transform 520ms var(--nx-ease);
   }
 
   .core-shot-roi { padding: 1.4rem; }
@@ -290,6 +334,78 @@ const pieces = [
     color: var(--nx-ink-muted);
     font-family: var(--nx-font-mono);
     font-size: 0.66rem;
+  }
+
+  .core-hotspot {
+    position: absolute;
+    top: var(--focus-y);
+    left: var(--focus-x);
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    color: #fff;
+    background: var(--nx-magnet-deep);
+    border: 4px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 5px 20px rgba(20, 22, 26, 0.22);
+    font-family: var(--nx-font-mono);
+    font-size: 0.68rem;
+    transform: translate(-50%, -50%);
+    transition: top 520ms var(--nx-ease), left 520ms var(--nx-ease);
+    z-index: 4;
+  }
+
+  .core-hotspot::after {
+    content: '';
+    position: absolute;
+    inset: -9px;
+    border: 1px solid var(--nx-magnet-deep);
+    border-radius: inherit;
+    animation: hotspot-pulse 1.8s ease-out infinite;
+  }
+
+  .core[data-visual='roi'] .core-hotspot { display: none; }
+
+  .core-status {
+    position: absolute;
+    right: 0.8rem;
+    bottom: 2.7rem;
+    display: grid;
+    gap: 0.28rem;
+    width: min(310px, calc(100% - 1.6rem));
+    padding: 0.9rem 1rem;
+    background: #fff;
+    border: 1px solid var(--nx-magnet-deep);
+    box-shadow: 0 8px 24px rgba(20, 22, 26, 0.16);
+    z-index: 5;
+  }
+
+  .core-status-count {
+    color: var(--nx-magnet-deep);
+    font-family: var(--nx-font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .core-status strong { font-size: 0.95rem; }
+  .core-status > span:last-child {
+    color: var(--nx-ink-muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .core.is-changing .core-status { animation: status-enter 320ms var(--nx-ease); }
+
+  @keyframes hotspot-pulse {
+    from { opacity: 0.8; transform: scale(0.85); }
+    to { opacity: 0; transform: scale(1.45); }
+  }
+
+  @keyframes status-enter {
+    from { opacity: 0.25; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .parts { position: absolute; inset: 0; z-index: 2; }
@@ -339,8 +455,8 @@ const pieces = [
   .part:nth-child(-n+3)::after { left: 100%; }
   .part:nth-child(n+4)::after { right: 100%; }
 
-  .part:hover,
-  .part.is-active {
+    .part:hover,
+    .part.is-active {
     border-color: var(--nx-magnet-deep);
     background: #fff;
   }
@@ -362,6 +478,19 @@ const pieces = [
   }
 
   .part.is-active .part-number { color: var(--nx-magnet-deep); }
+
+  .part.is-active::before {
+    content: 'ACTIVO';
+    position: absolute;
+    top: -0.5rem;
+    right: 0.6rem;
+    padding: 0.12rem 0.38rem;
+    color: #fff;
+    background: var(--nx-magnet-deep);
+    font-family: var(--nx-font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.08em;
+  }
 
   .part-title {
     font-size: 0.88rem;
@@ -468,6 +597,12 @@ const pieces = [
       object-fit: cover;
       object-position: 58% 38%;
     }
+    .core-status {
+      right: 0.5rem;
+      bottom: 2.4rem;
+      width: calc(100% - 1rem);
+    }
+    .core-hotspot { width: 2.6rem; height: 2.6rem; }
     .core-shot figcaption { font-size: 0.6rem; }
     .core-shot-roi { padding: 0.65rem; }
     .exploded-detail {
@@ -483,7 +618,10 @@ const pieces = [
 
   @media (prefers-reduced-motion: reduce) {
     .part,
-    .core-shot { transition: none; }
+    .core-shot,
+    .core-shot img,
+    .core-hotspot { transition: none; }
     .part { opacity: 1; }
+    .core-hotspot::after { animation: none; }
   }
 </style>
