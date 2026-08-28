@@ -20,7 +20,13 @@ Dos decisiones:
    (la mano balancea), el CRM del P8 (ya lleva su propio zoom) y el P12 (la camara
    deriva sola).
 
-Resultado: 52 s en vez de 75, con los dos planos de producto intactos.
+Resultado: 56 s en vez de 75, con los dos planos de producto intactos.
+
+El acto 4 se midio aparte: sus planos llevan dos frases (la objecion y la
+respuesta) y a 2,5 s salen a 4,4 palabras por segundo. Por encima de 3 el
+espectador no termina de leer antes del corte, asi que se les dio el tiempo
+que pide su texto. Son los planos donde se cierra la venta: ahogarlos ahi
+para ahorrar cuatro segundos es tirar el anuncio.
 """
 import subprocess
 import sys
@@ -43,10 +49,10 @@ PLAN = [
     ('P06-mano-movil-apagado',    0.0,  2.0, 'quieto'),
     ('P07-en-movil',              0.0,  9.0, 'quieto'),   # hay que leerla
     ('P08-agenda-y-roi',          3.5,  7.0, 'quieto'),   # ya lleva su acercamiento
-    ('P09-probando-el-movil',     5.5,  2.5, 'acerca'),   # la sonrisa aparece en el 5
-    ('P10-pulgar-whatsapp',       0.0,  2.5, 'aleja'),
-    ('P11-lena-mostrador',        0.0,  2.5, 'acerca'),
-    ('P12-negocio-con-clientes',  0.0,  3.0, 'quieto'),   # la camara ya deriva
+    ('P09-probando-el-movil',     4.5,  3.5, 'acerca'),   # la sonrisa aparece en el 5
+    ('P10-pulgar-whatsapp',       0.0,  3.5, 'aleja'),
+    ('P11-lena-mostrador',        0.0,  4.0, 'acerca'),
+    ('P12-negocio-con-clientes',  0.0,  3.2, 'quieto'),   # la camara ya deriva
     ('P13-lena-mirando-movil',    0.0,  4.5, 'acerca'),
     ('P14-cierre-qr',             0.0,  5.0, 'quieto'),
 ]

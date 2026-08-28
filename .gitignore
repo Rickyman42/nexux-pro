@@ -12,3 +12,4 @@ leads.jsonl
 # copias de seguridad locales de ediciones puntuales
 *.bak-*
 *.bak
+__pycache__/
