@@ -31,7 +31,7 @@ const args = process.argv.slice(2);
 const REVERT = args.includes('--revert');
 const DRY = args.includes('--dry');
 const iDia = args.indexOf('--dia');
-const CALENDAR_ID = args.find((a, n) => !a.startsWith('--') && n !== iDia + 1);
+const CALENDAR_ID = args.find((a, n) => !a.startsWith('--') && !(iDia > -1 && n === iDia + 1));
 
 function backup(f) {
   const b = f + '.rodaje-bak';
@@ -64,12 +64,23 @@ const HOY = (() => {
 })();
 const z = (hhmm) => `${HOY}T${String(Number(hhmm.slice(0, 2)) - 2).padStart(2, '0')}:${hhmm.slice(3)}:00.000Z`;
 
-// Un lunes con trabajo, no imposible: 11 citas, parón de comida,
-// y un hueco a las 18:00 — ahí es donde aterriza la cita que reserva Lara en el plano.
-const DIA = [
-  // Un dia de centro de estetica: cara, manos, cuerpo y depilacion mezclados,
-  // para que la agenda no se lea como "sitio de masajes". Con su paron de comida
-  // y el hueco de las 18:00 libre, que es donde entra la cita del plano.
+// La agenda se elige segun el horario que tenga el negocio ESE dia. Estaba
+// escrita a mano para una jornada de 09:00 a 19:00 con el hueco a las 18:00;
+// sembrada un sabado --que Centro Lena cierra a las 14:00-- daba citas y un
+// hueco fuera de horario, y Lara no ofreceria nunca las 18:00 de un sabado.
+const DIAS_EN = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+const cierre = (() => {
+  const dia = DIAS_EN[new Date(HOY + 'T12:00:00Z').getUTCDay()];
+  const h = (config.schedule || {})[dia];
+  if (!h) {
+    console.error(`\n  ${HOY} es ${dia}: el negocio CIERRA. Siembra otro dia con --dia AAAA-MM-DD.`);
+    process.exit(1);
+  }
+  return h.close;
+})();
+
+// Jornada completa: 12 citas, paron de comida y el hueco a las 18:00.
+const DIA_LARGO = [
   ['09:00', 'Manicura',                 'pro_ana',    'Ana',    'Nuria Vega',       45],
   ['09:30', 'Tratamiento facial',       'pro_marta',  'Marta',  'Carmen Solís',     60],
   ['10:00', 'Tratamiento corporal',     'pro_lucia',  'Lucia',  'Beatriz Alarcón',  75],
@@ -83,6 +94,23 @@ const DIA = [
   ['17:00', 'Primera consulta',         'pro_lucia',  'Lucia',  'Hugo Ramos',       30],
   ['17:15', 'Depilación',               'pro_marta',  'Marta',  'Lorena Bas',       30],
 ];
+
+// Media jornada (sabado, cierre a las 14:00): 8 citas seguidas y el hueco a las
+// 12:30: una manicura de 45 min acaba a las 13:15, antes del cierre. A las 13:00
+// no valia: Lara ofrecia entonces las 13:30 y la reserva se caia por horario.
+const DIA_CORTO = [
+  ['09:00', 'Manicura',                 'pro_ana',    'Ana',    'Nuria Vega',       45],
+  ['09:30', 'Tratamiento facial',       'pro_marta',  'Marta',  'Carmen Solís',     60],
+  ['10:00', 'Depilación',               'pro_noelia', 'Noelia', 'Javier Peña',      30],
+  ['10:30', 'Tratamiento corporal',     'pro_lucia',  'Lucia',  'Beatriz Alarcón',  75],
+  ['11:00', 'Manicura',                 'pro_ana',    'Ana',    'Rocío Ferrer',     45],
+  ['11:30', 'Masaje descontracturante', 'pro_marta',  'Marta',  'Silvia Herrán',    60],
+  ['12:00', 'Primera consulta',         'pro_noelia', 'Noelia', 'Álvaro Sanz',      30],
+];
+
+const MEDIA = cierre <= '15:00';
+const DIA = MEDIA ? DIA_CORTO : DIA_LARGO;
+const HUECO = MEDIA ? '12:30' : '18:00';
 
 const slug = (s) => 'svc_' + s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_');
 const ahora = new Date().toISOString();
@@ -109,6 +137,7 @@ const citas = DIA.map(([hora, servicio, proId, proNombre, cliente, dur], i) => (
   reminder_1h_sent: false,
 }));
 
+console.log(`Dia:        ${HOY}  (cierra a las ${cierre} -> jornada ${MEDIA ? 'de media manana' : 'completa'})`);
 console.log(`Negocio:   "${config.name}"  ->  "${NOMBRE}"`);
 console.log(`Calendario: ${config.google_calendar?.calendarId}  ->  ${CALENDAR_ID}`);
 console.log(`Citas:      ${JSON.parse(fs.readFileSync(APT, 'utf8')).length}  ->  ${citas.length}`);
@@ -117,7 +146,7 @@ for (const c of citas) {
   const h = new Date(c.datetime).toLocaleTimeString('es-ES', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit' });
   console.log(`  ${h}  [${c.professional_name}] ${c.service} — ${c.client_name}  (${c.duration_min} min)`);
 }
-console.log('\n  18:00  --- HUECO: aquí entra la cita que reserva Lara durante el rodaje ---\n');
+console.log(`\n  ${HUECO}  --- HUECO: aquí entra la cita que reserva Lara durante el rodaje ---\n`);
 
 if (DRY) { console.log('DRY RUN: no se ha tocado nada.'); process.exit(0); }
 

@@ -19,7 +19,7 @@ import json
 import re
 from pathlib import Path
 
-ORIGEN = Path('/tmp/conversa-rodaje.json')
+ORIGEN = Path(__file__).with_name('p7-conversacion.json')
 SALIDA = Path('/tmp/p7/chat.html')
 
 NEGOCIO = 'Centro Lena'
@@ -49,7 +49,7 @@ PLANTILLA = r'''<!doctype html>
 
   .estado { height:44px; background:#0d6b5e; color:#fff; display:flex;
             align-items:center; justify-content:space-between; padding:0 22px;
-            font-size:21px; font-weight:600; }
+            font-size:25px; font-weight:600; }
 
   .cabecera { height:104px; background:#0d6b5e; color:#fff; display:flex;
               align-items:center; gap:18px; padding:0 20px; }
@@ -58,8 +58,8 @@ PLANTILLA = r'''<!doctype html>
             color:#0d6b5e; display:flex; align-items:center; justify-content:center;
             font-size:30px; font-weight:700; }
   .quien { display:flex; flex-direction:column; }
-  .quien .n { font-size:27px; font-weight:600; }
-  .quien .e { font-size:19px; opacity:.85; }
+  .quien .n { font-size:33px; font-weight:600; }
+  .quien .e { font-size:23px; opacity:.85; }
 
   .hilo { flex:1; overflow:hidden; padding:20px 18px 12px; position:relative; }
   /* min-height + flex-end pega los mensajes ABAJO mientras no llenan la pantalla,
@@ -68,12 +68,12 @@ PLANTILLA = r'''<!doctype html>
   .lienzo { display:flex; flex-direction:column; justify-content:flex-end;
             gap:14px; min-height:100%; }
 
-  .b { max-width:78%; padding:14px 16px 10px; border-radius:16px; font-size:23px;
+  .b { max-width:80%; padding:16px 18px 11px; border-radius:16px; font-size:31px;
        line-height:1.42; color:#111b21; position:relative;
        box-shadow:0 1px 1px rgba(0,0,0,.13); }
   .b.suya { background:#fff; align-self:flex-start; border-top-left-radius:4px; }
   .b.mia  { background:#d9fdd3; align-self:flex-end; border-top-right-radius:4px; }
-  .b .pie { font-size:17px; color:#667781; text-align:right; margin-top:4px; }
+  .b .pie { font-size:21px; color:#667781; text-align:right; margin-top:4px; }
   .b .pie .v { color:#53bdeb; font-weight:700; letter-spacing:-3px; margin-left:4px; }
   /* El enlace del calendario que manda Lara son 180 caracteres y ocupaba cinco
      lineas, comiendose la confirmacion, que es lo que el plano tiene que contar.
@@ -92,7 +92,7 @@ PLANTILLA = r'''<!doctype html>
   .barra { height:104px; background:#f0f2f5; display:flex; align-items:center;
            gap:14px; padding:0 18px; }
   .campo { flex:1; height:66px; background:#fff; border-radius:33px; display:flex;
-           align-items:center; padding:0 24px; color:#8696a0; font-size:23px; }
+           align-items:center; padding:0 24px; color:#8696a0; font-size:29px; }
   .redondo { width:66px; height:66px; border-radius:50%; background:#0d6b5e;
              display:flex; align-items:center; justify-content:center;
              color:#fff; font-size:28px; }

@@ -38,16 +38,20 @@ DESTINO = (1920, 1080)
 FPS = 24
 
 # --- Tramo 1: la agenda -----------------------------------------------------
-# Encuadre final medido sobre la captura: entra la columna de horas, la del
-# jueves con la cita de las 18:00 y el borde del panel, sin banda gris.
-AGENDA_FIN = (880, 2080, 745, 1420)
+# Encuadre final medido sobre la captura del 29-ago: entra la columna de horas,
+# la del sabado --que es hoy, con la linea roja de la hora encima-- y la cita de
+# las 18:00 que acaba de reservar Lara, con tres dias llenos al lado para que la
+# semana no se lea como un negocio muerto. Se remidio porque al sembrar la agenda en
+# el dia real la cita cambio de columna: antes caia en el jueves.
+AGENDA_FIN = (1400, 2700, 620, 1351)
 AGENDA_SEG = 6.0        # dura el tramo
 AGENDA_CORTE = 3.5      # aqui aparece la cita
 
 # --- Tramo 2: el ROI --------------------------------------------------------
-# La tarjeta "ROI del bot" ocupa x 1776-2680, y 1266-1491. Se encuadra con algo
-# de aire para que se lean las dos cifras y el titulo.
-ROI_FIN = (1722, 2734, 1094, 1663)
+# La tarjeta "ROI del bot" bajo en la pagina al aparecer la lista de proximas
+# citas: ahora ocupa x 1770-2670, y 1380-1605. Se encuadra con aire para que se
+# lean el titulo y las dos cifras (~667 EUR generados, 100 min ahorrados).
+ROI_FIN = (1755, 2695, 1100, 1629)
 ROI_SEG = 5.5
 
 

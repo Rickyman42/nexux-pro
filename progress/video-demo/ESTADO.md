@@ -1,6 +1,6 @@
 # ESTADO DEL ANUNCIO DE 75 SEGUNDOS
 
-> Foto del 28-ago-2026. **Empieza por aquí**: los otros ocho documentos de esta carpeta
+> Foto del 29-ago-2026. **Empieza por aquí**: los otros ocho documentos de esta carpeta
 > cuentan el *cómo*, este cuenta el *dónde estamos*.
 > Si algo de aquí no cuadra con lo que ves, gana lo que veas: actualiza esto.
 
@@ -8,9 +8,9 @@
 
 ## 1. DÓNDE ESTAMOS EN UNA LÍNEA
 
-**Los 14 planos rodados, montados y rotulados: 55,71 s.** El entregable es
-`ANUNCIO-56s-con-rotulos.mp4`. Faltan la música y la voz — y hay **dos fallos abiertos** que se
-ven en pantalla (§ 4.1). Hasta que se cierren, esto no se publica.
+**Los 14 planos rodados, montados y rotulados: 55,71 s, y los dos fallos de pantalla
+cerrados.** El entregable es el proyecto de CapCut `0829`. Faltan la música y la voz. Rodando
+se destaparon **cuatro fallos del producto** que no son del vídeo (§ 4.3).
 
 ---
 
@@ -145,22 +145,46 @@ aborta si no se oscurece.
 
 ## 4. LO QUE FALTA, EN ORDEN
 
-### 4.1 🔴 Dos fallos que se ven en pantalla
+### 4.1 ✅ Los dos fallos de pantalla, cerrados el 29-ago
 
-**a) El plano del CRM se contradice con su propio rótulo.** El rótulo dice «Y la puso en tu
-agenda. Sola.» y el dashboard marca **CITAS HOY: 0**. Al lado, «Próxima cita: jue, 27 de agosto»,
-una fecha ya pasada. Los datos se sembraron el 26 y el plano se grabó con ellos. Quien mire el
-número mientras lee la frase ve que no cuadran.
-**Arreglo:** volver a sembrar con `seed-agenda.mjs` en la fecha del día y regrabar con
-`crm-dos-estados.cjs` + `p8-agenda-y-roi.py`. No gasta créditos de Flow.
+**a) El CRM ya no se contradice con su rótulo.** Marcaba `CITAS HOY: 0` mientras el rótulo
+decía «Y la puso en tu agenda. Sola.», porque la agenda se había sembrado el 26 y el plano se
+grabó tres días después. Ahora se siembra **el día del rodaje** y el panel marca `CITAS HOY: 7`,
+con todas las citas fechadas hoy y el ROI en ~667 €.
 
-**b) La conversación de WhatsApp no se lee.** El P7 dura 9 s precisamente porque hay que leerla,
-y a ese encuadre el móvil ocupa un tercio del ancho: se ve que hay mensajes, no lo que dicen.
-Además el mensaje de Lara es un muro de texto — la misma verborrea que se le mandó corregir a
-Codex, aquí visible en imagen.
-**Dos salidas:** acercar el encuadre hasta que el chat se lea (rehacer `p7-encajar.py`, sin
-regrabar nada), o bajar el plano a 4-5 s y aceptar que la conversación es atmósfera y no
-lectura. La primera vende el producto; la segunda es gratis. **Pendiente de Ricardo.**
+Dos cosas hubo que resolver para llegar ahí:
+
+- **`seed-agenda.mjs` respeta el horario del día que siembra.** La agenda estaba escrita para
+  una jornada de 09:00 a 19:00 con el hueco a las 18:00; sembrada un sábado —que Centro Lena
+  cerraba a las 14:00— dejaba citas y hueco fuera de horario, y Lara no ofrecería nunca las
+  18:00 de un sábado. Ahora elige jornada completa o de media mañana según el `schedule`.
+- **El sábado de Centro Lena se amplió a las 20:00** (`config.json`, copia en
+  `config.json.horario-bak`). Es un negocio de demostración creado para el rodaje, y con cierre
+  a las 14:00 no cabía el hueco de las 18:00 donde entra la cita del plano.
+- **La semana se rellena con `llena-semana.py`.** La vista del CRM es semanal: con un solo día
+  sembrado quedaban cinco columnas vacías, y una agenda desierta dice lo contrario de lo que el
+  plano quiere decir. Ese relleno **no se sube a Google Calendar**: el plano graba el CRM, que
+  lee `appointments.json`.
+
+**b) La conversación de WhatsApp ya se lee.** No era el encuadre: era el tamaño de letra. El
+móvil ocupa un tercio del ancho, así que las burbujas a 23 px se quedaban en 7 px en pantalla.
+Se subieron un 35 % (31 px) y **se regrabó la conversación con la Lara de hoy**, que desde el
+arreglo de verborrea contesta mucho más corto que la del 26-ago.
+
+⚠️ Del mensaje de Lara se quitaron **la lista literal de las diez horas y la URL del
+calendario**, que en pantalla son ruido ilegible. No se inventó texto: todo sale de lo que
+contestó de verdad. Queda dicho porque la regla del pipeline era no tocar lo que responde el
+producto, y aquí se ha tocado por legibilidad.
+
+`p7-pantalla.py` leía `/tmp/conversa-rodaje.json`, que cualquier prueba pisa; ahora lee
+`p7-conversacion.json`, versionado junto al script.
+
+🔴 **CapCut se quedó con el clip viejo del P7 aunque el fichero de disco era el nuevo.** El
+proyecto apuntaba a la ruta correcta y aun así la previsualización mostraba lo anterior, antes
+y después de reabrir. Se arregla con **clic derecho en el clip → Más acciones → Reemplazar el
+clip**, apuntando a una copia con **otro nombre** (`07_P07-en-movil-v2.mp4`). El P8, con el
+mismo nombre de siempre, sí se actualizó solo: no es fiable dar por hecho ni una cosa ni la
+otra, hay que mirar el plano en la previsualización.
 
 ### 4.2 Lo que falta para publicar
 1. **Música.** El audio de Flow es casi mudo: los picos miden 0,004 sobre 1.
@@ -168,10 +192,31 @@ lectura. La primera vende el producto; la segunda es gratis. **Pendiente de Rica
 3. **Dos montajes**: sin voz para la web, con voz para redes.
 4. **Decidir CapCut o Pi** como sala de montaje (§ 3).
 
-### 4.3 Fuera del anuncio, pero descubierto rodándolo
-⚠️ **Clientes y Chats del CRM están vacíos** incluso después de que el bot reserve una cita. Es
-un **fallo de producto, no del rodaje**: un cliente que entre a ver su lista se encuentra lo
-mismo. Por eso el plano 8 enseña dos pantallas y no tres.
+### 4.3 🔴 Fallos del producto destapados rodando
+
+Ninguno es del vídeo. Los cuatro los vería un cliente real.
+
+1. **Lara ofrece huecos que no caben antes del cierre.** Con cierre a las 14:00 ofreció las
+   13:30 para una manicura de 45 min —que acaba a las 14:15— y al confirmar murió con
+   `appointment_conflict`. El cliente ve «justo me han cogido ese hueco» cuando el hueco nunca
+   existió.
+2. **Confirma dos veces y crea dos eventos en Google Calendar.** Al dar el nombre ya daba la
+   cita por reservada, y al responder «sí» la volvía a confirmar. En `appointments.json` solo
+   quedó una, pero en el calendario del negocio entraron dos.
+3. **Pedir una hora concreta hace que diga que no hay hueco cuando sí lo hay.** «¿Tenéis hueco
+   el martes a las seis?» → «*no está disponible* (nuestro horario termina a las 19:00, pero
+   ese hueco no figura en la agenda)», con el día entero libre. Con la pregunta abierta
+   («¿tenéis hueco el lunes por la tarde?») ofrece las 18:00 sin problema.
+4. **El horario del cliente está duplicado en inglés y español** y el propio sistema lo avisa
+   en cada mensaje: `[config-normalizer] horario duplicado y contradictorio en: monday…sunday
+   — manda la clave en inglés`. Si alguien edita solo la mitad española, no pasa nada y no se
+   entera.
+
+Y sigue abierto lo de antes: **Clientes y Chats del CRM están vacíos** incluso después de que
+el bot reserve una cita. Por eso el plano 8 enseña dos pantallas y no tres.
+
+Un quinto, ya corregido: `seed-agenda.mjs` **descartaba el primer argumento** cuando no se le
+pasaba `--dia`, así que se quejaba de que faltaba el calendario teniéndolo delante.
 
 ---
 
