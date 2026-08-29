@@ -192,6 +192,27 @@ def medida(video, dur):
     sys.exit('no se pudo medir el brillo de %s' % video)
 
 
+def pico(video, dur):
+    """Brillo del pixel mas claro de la franja del rotulo, a mitad del plano.
+
+    Es lo que delata al texto: un rotulo blanco mete pixeles a ~250 donde antes
+    no los habia. El brillo MEDIO no vale para todos los planos --en la silla
+    vacia, casi negra, el degradado no puede oscurecer y el texto ocupa tan poca
+    superficie que la media apenas se mueve un punto-- y por eso daba por
+    fallido un plano perfectamente rotulado.
+    """
+    r = subprocess.run(
+        ['ffmpeg', '-v', 'error', '-ss', str(dur / 2), '-i', str(video),
+         '-frames:v', '1',
+         '-vf', 'crop=iw:ih/5:0:ih*4/5,signalstats,metadata=print:file=-',
+         '-f', 'null', '-'],
+        capture_output=True, text=True)
+    for linea in r.stdout.splitlines():
+        if 'YMAX' in linea:
+            return float(linea.split('=')[-1])
+    sys.exit('no se pudo medir el pico de %s' % video)
+
+
 def main():
     if not TROZOS.exists():
         sys.exit('faltan los trozos: corre antes montar-ritmo.py')
@@ -243,9 +264,14 @@ def main():
         # Prueba de que el rotulo ESTA: la franja baja tiene que oscurecerse. Se
         # compara el brillo medio de esa franja antes y despues de superponer; el
         # degradado la baja siempre, asi que si no cae es que no se pinto nada.
-        if medida(salida, dur) >= medida(entrada, dur) - 4:
-            sys.exit('%s: la franja de rotulos no se oscurecio, el overlay no entro'
-                     % fichero)
+        # Vale cualquiera de las dos senales: que el degradado haya oscurecido
+        # la franja, o que el texto haya metido pixeles claros donde no los
+        # habia. Sobre fondo claro manda la primera; sobre fondo oscuro, la
+        # segunda. Exigir solo una fallaba en la mitad de los planos.
+        oscurece = medida(salida, dur) < medida(entrada, dur) - 4
+        aclara = pico(salida, dur) > pico(entrada, dur) + 20
+        if not (oscurece or aclara):
+            sys.exit('%s: la franja no cambio, el rotulo no se pinto' % fichero)
 
         cuantos = 2 if objecion else 1
         print('  %-28s %4.1fs  %d linea(s)  %3d fot.' % (fichero, dur, cuantos, leidos))
