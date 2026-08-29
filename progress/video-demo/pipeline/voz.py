@@ -33,7 +33,7 @@ from pathlib import Path
 
 SALIDA = Path('/tmp/voz')
 PISTA = SALIDA / 'VOZ-anuncio-56s.wav'
-DURACION = 55.71
+DURACION = 55.70
 FPS_AUDIO = 44100
 
 # (segundo en que entra, hasta cuando tiene sitio, texto con sus marcas)
@@ -41,24 +41,30 @@ FPS_AUDIO = 44100
 # la frase entera y la voz dice el remate. La voz elegida habla despacio --de ahi
 # que suene real-- y el guion completo no cabe a ritmo natural.
 BLOQUES = [
-    (0.30, 14.30,
+    # Acto 1, el dolor. Va del segundo 0,30 al 13,50 y es el bloque largo: en
+    # rafaga los rotulos desaparecieron, asi que aqui la voz lleva TODO el relato.
+    (0.30, 13.50,
      '[tired] Son las once y media. Tienes las manos ocupadas. '
      '[sighs] El móvil lleva vibrando desde las diez. '
-     'Habrá cuatro mensajes. [resigned] Y nunca sabrás quiénes eran.'),
+     'Cuando termines, mirarás. Habrá cuatro mensajes. '
+     '[resigned] Dos ya no contestarán. Y nunca sabrás quiénes eran.'),
 
-    (14.30, 16.30, '[hopeful] Alguien contestó por ti.'),
+    # El giro. Dos segundos justos: la frase tiene que ser corta.
+    (13.50, 16.00, '[hopeful] Mientras tú trabajabas, alguien contestó.'),
 
-    (16.30, 25.30, 'Contestó, ofreció hora... y cerró la cita.'),
+    # Los dos planos de producto van sueltos: la frase cae sobre su plano.
+    (16.00, 25.00, 'Contestó, ofreció hora... y cerró la cita.'),
+    (25.00, 32.00, '[warm] Y la puso en tu agenda. Sola.'),
 
-    (25.30, 31.85, '[warm] Y la puso en tu agenda. Sola.'),
-
-    (31.85, 46.50,
-     '[reassuring] Pruébala tú. Sin registrarte. '
+    # Acto 4. El rotulo pone la duda del cliente y la voz da la respuesta, asi
+    # que aqui solo van las respuestas: leer y oir lo mismo es ruido.
+    (32.00, 46.20,
+     '[reassuring] Pruébala tú, sin registrarte. '
      'Es tu WhatsApp, el de siempre. '
      'Te devolvemos el dinero: treinta días. '
-     'Veintinueve euros al mes.'),
+     'Veintinueve euros al mes, sin comisiones por cita.'),
 
-    (46.50, DURACION,
+    (46.20, 55.70,
      '[serious] Una cosa antes de que sigas: '
      '¿cuántos mensajes tienes ahora mismo sin abrir?'),
 ]

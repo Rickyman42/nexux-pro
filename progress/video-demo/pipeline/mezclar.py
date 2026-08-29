@@ -22,7 +22,7 @@ BASE = Path('/home/nexux/brand-assets/video/anuncio-75s')
 VIDEO = BASE / 'ANUNCIO-56s-sin-rotulos.mp4'
 VOZ = BASE / 'VOZ-anuncio-56s.wav'
 MUSICA = BASE / 'MUSICA-quiet-ledger.mp3'
-DURACION = 55.71
+DURACION = 55.70
 
 # La musica arranca por debajo y el compresor la baja otros 8-9 dB cuando entra
 # la voz. Medido de oido sobre el montaje: mas alta tapa las frases cortas del
