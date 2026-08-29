@@ -41,32 +41,39 @@ FPS_AUDIO = 44100
 # la frase entera y la voz dice el remate. La voz elegida habla despacio --de ahi
 # que suene real-- y el guion completo no cabe a ritmo natural.
 BLOQUES = [
-    # Acto 1, el dolor. Va del segundo 0,30 al 13,50 y es el bloque largo: en
-    # rafaga los rotulos desaparecieron, asi que aqui la voz lleva TODO el relato.
+    # Acto 1, el dolor. Del 0,30 al 13,50, y es donde se decide si siguen
+    # viendo. Arranca apagada y sin prisa; los puntos suspensivos son pausas de
+    # verdad, no adorno: el sintetizador los respeta y son lo que separa una
+    # locucion de una lectura.
     (0.30, 13.50,
-     '[tired] Son las once y media. Tienes las manos ocupadas. '
-     '[sighs] El móvil lleva vibrando desde las diez. '
-     'Cuando termines, mirarás. Habrá cuatro mensajes. '
-     '[resigned] Dos ya no contestarán. Y nunca sabrás quiénes eran.'),
+     '[tired] Lleva sonando... desde las diez. '
+     '[sighs] Y tú no puedes cogerlo. '
+     'Nunca puedes. '
+     'Cuando termines habrá cuatro mensajes. '
+     '[resigned] Dos se habrán ido... a otro sitio.'),
 
-    # El giro. Dos segundos justos: la frase tiene que ser corta.
-    (13.50, 16.00, '[hopeful] Mientras tú trabajabas, alguien contestó.'),
+    # El giro. Aqui cambia todo, y la voz tiene que cambiar con ello: es la
+    # unica frase del anuncio que se dice hacia arriba.
+    (13.50, 16.00, '[hopeful] Hoy alguien contestó por ti.'),
 
-    # Los dos planos de producto van sueltos: la frase cae sobre su plano.
-    (16.00, 25.00, 'Contestó, ofreció hora... y cerró la cita.'),
-    (25.00, 32.00, '[warm] Y la puso en tu agenda. Sola.'),
+    # Los dos planos de producto. Se enumera sin prisa, dejando caer cada cosa;
+    # la pausa antes de "cerró la cita" es la que le da el peso.
+    (16.00, 25.00, 'Ofreció hora, confirmó el nombre... y cerró la cita.'),
+    (25.00, 32.00, '[warm] Y la apuntó en tu agenda. ... Sin ti.'),
 
-    # Acto 4. El rotulo pone la duda del cliente y la voz da la respuesta, asi
-    # que aqui solo van las respuestas: leer y oir lo mismo es ruido.
+    # Acto 4. El rotulo pone la duda del cliente y la voz responde, asi que aqui
+    # va firme y corto: son respuestas, no explicaciones.
     (32.00, 46.20,
-     '[reassuring] Pruébala tú, sin registrarte. '
+     '[confident] Pruébala. Sin registrarte. '
      'Es tu WhatsApp, el de siempre. '
-     'Te devolvemos el dinero: treinta días. '
-     'Veintinueve euros al mes, sin comisiones por cita.'),
+     'Treinta días: te devolvemos el dinero. '
+     'Veintinueve euros al mes. Sin comisiones.'),
 
+    # El cierre, hacia dentro. La pausa antes de "sin abrir" es el anuncio
+    # entero: se le deja al espectador el hueco para que conteste el.
     (46.20, 55.70,
-     '[serious] Una cosa antes de que sigas: '
-     '¿cuántos mensajes tienes ahora mismo sin abrir?'),
+     '[serious] Una cosa antes de que sigas... '
+     '¿Cuántos mensajes tienes ahora mismo... sin abrir?'),
 ]
 
 RESPIRO = 0.20
@@ -83,9 +90,9 @@ CLAVE = os.environ.get('ELEVENLABS_API_KEY')
 # estabilidad por defecto la lectura sale plana, que es justo el problema.
 MODELO = 'eleven_v3'
 AJUSTES = {
-    'stability': 0.3,
+    'stability': 0.22,
     'similarity_boost': 0.75,
-    'style': 0.6,
+    'style': 0.75,
     'use_speaker_boost': True,
 }
 

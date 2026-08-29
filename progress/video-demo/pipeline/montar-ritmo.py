@@ -64,17 +64,17 @@ PLAN = [
     ('P01-manos-manicura',        0.0, 1.5, 'acerca', None),
     ('P03-cabina-mensajes',       0.0, 2.0, 'aleja',  None),
     ('P04-pantalla-se-apaga',     5.0, 1.5, 'quieto', None),
-    ('P15-cara-cansada',          1.5, 2.5, 'acerca', 'Habrá cuatro mensajes.'),
+    ('P15-cara-cansada',          1.5, 2.5, 'acerca', 'Cuatro mensajes.'),
     ('P05-lena-final-del-dia',    4.5, 2.0, 'acerca', None),
-    ('P17-silla-vacia',           1.0, 2.5, 'quieto', 'Dos ya no contestarán.'),
+    ('P17-silla-vacia',           1.0, 2.5, 'quieto', 'Se irán a otro sitio.'),
     # --- Acto 2: el giro --------------------------------------------------
     ('P06-mano-movil-apagado',    0.0, 2.5, 'quieto', 'Alguien contestó.'),
     # --- Acto 3: lo que hace el producto ----------------------------------
-    ('P07-en-movil',              0.0, 9.0, 'quieto', 'Contestó, ofreció hora y cerró la cita.'),
-    ('P08-agenda-y-roi',          3.5, 7.0, 'quieto', 'Y la puso en tu agenda. Sola.'),
+    ('P07-en-movil',              0.0, 9.0, 'quieto', 'Ofreció hora, confirmó el nombre y cerró la cita.'),
+    ('P08-agenda-y-roi',          3.5, 7.0, 'quieto', 'Y la apuntó en tu agenda. Sin ti.'),
     # --- Acto 4: las objeciones, tambien en rafaga ------------------------
     ('P09-probando-el-movil',     4.5, 3.5, 'acerca', '«¿Y si contesta cualquier cosa?»'),
-    ('P10-pulgar-whatsapp',       0.0, 3.5, 'aleja',  '«¿Otro programa que aprender?»'),
+    ('P10-pulgar-whatsapp',       0.0, 3.5, 'aleja',  '«¿Otro programa más?»'),
     ('P11-lena-mostrador',        0.0, 4.0, 'acerca', '«¿Y si no me sirve?»'),
     ('P12-negocio-con-clientes',  0.0, 3.2, 'quieto', '«¿Cuánto?»'),
     # --- Acto 5: el cierre ------------------------------------------------
