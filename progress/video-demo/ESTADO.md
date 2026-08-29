@@ -8,23 +8,29 @@
 
 ## 1. DÓNDE ESTAMOS EN UNA LÍNEA
 
-**El anuncio está terminado y exportado: 55,75 s, 1080p, 24 fps.** Diecisiete planos
-rodados, dieciséis en el montaje, voz en off, música y rótulos. El proyecto vive en CapCut
-(`0829 (1)`) para poder editarlo, y el pipeline de la Pi lo regenera entero desde cero.
+**Las dos piezas están terminadas y entregadas.**
 
-Entregable: `ANUNCIO-nexux-pro-56s.mp4` (Descargas) y `ANUNCIO-56s-FINAL.mp4` en
-`~/brand-assets/video/anuncio-75s/`.
+| Pieza | Para | Duración | Dónde |
+|---|---|---|---|
+| `ANUNCIO-nexux-pro-FINAL.mp4` | redes, con voz | 55,75 s · 1080p · 24 fps | Descargas y `~/brand-assets/video/anuncio-75s/` |
+| `ANUNCIO-WEB-55s.mp4` | la página, sin voz | 55,67 s · 720p · 24 fps | ídem |
 
-**Queda pendiente de decisión de Ricardo**, no de trabajo:
+Diecisiete planos rodados, dieciséis en el montaje. La de redes se monta en CapCut
+(`0829 (1)`) para poder editarla; la de la web sale del pipeline con los rótulos ya
+incrustados. Todo se regenera desde cero con los scripts de `pipeline/`.
 
-- La música salió de Suno en **plan gratuito**, que no permite uso comercial y no se arregla
+**Qué queda, y es decisión de Ricardo, no trabajo pendiente:**
+
+- **Las transiciones.** No se pueden poner por automatización: CapCut exige un arrastre real
+  sobre la línea de unión y los eventos del control remoto no le valen (ocho intentos, dos
+  métodos). Son tres clics; qué poner y dónde, en § 3.
+- **La música.** Salió de Suno en plan gratuito, que no permite uso comercial y no se arregla
   actualizando después. Ricardo lo sabe y asume el riesgo mientras el anuncio no mueva dinero;
   si escala, se regenera la misma pista con Pro (10 $/mes) y se sustituye.
-- **Las transiciones no están puestas.** La automatización no puede: CapCut exige un arrastre
-  real sobre la línea de unión y los eventos del control remoto no le valen (ocho intentos, dos
-  métodos). Son tres clics a mano; qué poner y dónde, en § 3.
-- Falta la **versión muda para la web**. Sin voz, los rótulos tienen que decir el guion entero
-  y con ellos el montaje se va a unos 60 s.
+
+⚠️ **Al exportar en CapCut hay que volver a poner 24 fps cada vez.** El diálogo vuelve solo a
+30 aunque la exportación anterior se hiciera a 24, y a 30 se duplican fotogramas de un material
+que es 24. La resolución sí la recuerda.
 
 ---
 
