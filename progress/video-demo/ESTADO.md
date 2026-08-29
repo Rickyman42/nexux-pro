@@ -1,6 +1,6 @@
 # ESTADO DEL ANUNCIO DE 75 SEGUNDOS
 
-> Foto del 29-ago-2026. **Empieza por aquí**: los otros ocho documentos de esta carpeta
+> Foto del 29-ago-2026 (tarde). **Empieza por aquí**: los otros ocho documentos de esta carpeta
 > cuentan el *cómo*, este cuenta el *dónde estamos*.
 > Si algo de aquí no cuadra con lo que ves, gana lo que veas: actualiza esto.
 
@@ -8,9 +8,23 @@
 
 ## 1. DÓNDE ESTAMOS EN UNA LÍNEA
 
-**Los 14 planos rodados, montados y rotulados: 55,71 s, y los dos fallos de pantalla
-cerrados.** El entregable es el proyecto de CapCut `0829`. Faltan la música y la voz. Rodando
-se destaparon **cuatro fallos del producto** que no son del vídeo (§ 4.3).
+**El anuncio está terminado y exportado: 55,75 s, 1080p, 24 fps.** Diecisiete planos
+rodados, dieciséis en el montaje, voz en off, música y rótulos. El proyecto vive en CapCut
+(`0829 (1)`) para poder editarlo, y el pipeline de la Pi lo regenera entero desde cero.
+
+Entregable: `ANUNCIO-nexux-pro-56s.mp4` (Descargas) y `ANUNCIO-56s-FINAL.mp4` en
+`~/brand-assets/video/anuncio-75s/`.
+
+**Queda pendiente de decisión de Ricardo**, no de trabajo:
+
+- La música salió de Suno en **plan gratuito**, que no permite uso comercial y no se arregla
+  actualizando después. Ricardo lo sabe y asume el riesgo mientras el anuncio no mueva dinero;
+  si escala, se regenera la misma pista con Pro (10 $/mes) y se sustituye.
+- **Las transiciones no están puestas.** La automatización no puede: CapCut exige un arrastre
+  real sobre la línea de unión y los eventos del control remoto no le valen (ocho intentos, dos
+  métodos). Son tres clics a mano; qué poner y dónde, en § 3.
+- Falta la **versión muda para la web**. Sin voz, los rótulos tienen que decir el guion entero
+  y con ellos el montaje se va a unos 60 s.
 
 ---
 
