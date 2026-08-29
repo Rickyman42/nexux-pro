@@ -34,15 +34,15 @@ LINEAS = [
     (0.30,  'Son las once y media.'),
     (2.30,  'Tienes las manos ocupadas.'),
     (4.80,  'El móvil lleva vibrando desde las diez.'),
-    (7.80,  'Cuando termines, mirarás. Habrá cuatro mensajes.'),
-    (10.80, 'Dos ya no contestarán. Y nunca sabrás quiénes eran.'),
-    (14.30, 'Mientras tú trabajabas, alguien contestó.'),
+    (7.80,  'Habrá cuatro mensajes.'),
+    (10.80, 'Y nunca sabrás quiénes eran.'),
+    (14.30, 'Alguien contestó por ti.'),
     (16.30, 'Contestó, ofreció hora y cerró la cita.'),
     (25.30, 'Y la puso en tu agenda. Sola.'),
     (32.30, '¿Y si contesta cualquier cosa? Pruébala tú, sin registrarte.'),
-    (35.80, '¿Otro programa que aprender? Es tu WhatsApp, el de siempre.'),
-    (39.30, '¿Y si no me sirve? Te devolvemos el dinero. Treinta días.'),
-    (43.30, '¿Cuánto? Veintinueve euros al mes, sin comisiones por cita.'),
+    (35.80, 'Es tu WhatsApp. El de siempre.'),
+    (39.30, 'Te devolvemos el dinero. Treinta días.'),
+    (43.30, 'Veintinueve euros al mes.'),
     (46.50, 'Una cosa antes de que sigas: ¿cuántos mensajes tienes ahora mismo sin abrir?'),
 ]
 
@@ -50,7 +50,13 @@ RESPIRO = 0.20      # silencio minimo entre una linea y la siguiente
 TOPE_RITMO = 1.15   # por encima de esto la locucion ya se oye acelerada
 ADELANTO_MAX = 0.45  # lo mas que se permite que la voz se adelante a su rotulo
 
-VOZ = os.environ.get('ELEVENLABS_VOICE_ID')
+# La voz del anuncio: "Nexux locucion ES", creada a medida el 29-ago pidiendo
+# mujer espanola de Madrid, castellano neutro, calida y seria, sin tono
+# comercial. Las voces de catalogo de ElevenLabs son inglesas hablando espanol y
+# se les nota; esta se diseno por descripcion y Ricardo eligio esta de tres.
+# Se puede sobrescribir con ELEVENLABS_VOICE_ID si hiciera falta probar otra.
+VOZ_ANUNCIO = '3Gp0pxCx0sghnKOF9dtO'
+VOZ = os.environ.get('ELEVENLABS_VOICE_ID_ANUNCIO') or VOZ_ANUNCIO
 CLAVE = os.environ.get('ELEVENLABS_API_KEY')
 AJUSTES = {
     # Estabilidad media: con 0,7 la locucion sale plana y este guion necesita
