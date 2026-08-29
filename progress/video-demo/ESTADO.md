@@ -70,65 +70,76 @@ fuera del encuadre.
 
 ## 3. EL MONTAJE
 
-**El montaje que se entrega se genera en la Pi con dos scripts**, no en CapCut.
+**El montaje final vive en el proyecto de CapCut `0829`**, para que Ricardo pueda
+modificarlo cuando quiera (decisión suya del 29-ago). Los retoques que exigen precisión
+al fotograma se hacen fuera, en la Pi, y entran en CapCut como clips ya cortados.
 
-```bash
-python3 pipeline/montar-ritmo.py   # los 14 planos -> 55,71 s, deja los trozos en /tmp/ritmo
-python3 pipeline/rotular.py        # les pone los rotulos encima -> ANUNCIO-56s-con-rotulos.mp4
+```
+Pi:  python3 pipeline/montar-ritmo.py   -> 14 clips recortados y con movimiento (/tmp/ritmo)
+     python3 pipeline/srt.py            -> ROTULOS.srt con los textos y sus tiempos
+Windows: ambos en C:\Users\Nexux\Desktop\creatives\anuncio-56s\
+CapCut:  proyecto 0829, 55,71 s
 ```
 
-⚠️ **Esto se desvía de lo que pidió Ricardo el 26-ago** («que la producción sea en CapCut, para
-yo también poder ver qué se va haciendo»). El proyecto `0825` de CapCut existe y tiene los 14
-planos importados, pero la edición con ritmo se hizo con scripts porque exige recortes al
-fotograma y movimientos calculados que a mano no salen repetibles. **Decisión pendiente de
-Ricardo**: o se rehace la timeline en CapCut a partir de estas duraciones, o se acepta que la
-Pi es la sala de montaje y CapCut queda para retoques.
+`rotular.py` sigue existiendo y sirve para sacar una copia con los rótulos quemados sin
+abrir CapCut (útil para enseñar el anuncio rápido), pero **no es el entregable**.
 
 ### Por qué dura 55,71 s y no 52
-El primer montaje con ritmo daba 52 s. Al medir si los rótulos del guion caben en cada plano,
-tres del acto 4 salían a **4,4 palabras por segundo**; por encima de 3 el espectador no termina
-de leer antes del corte. Se les dio el tiempo que pide su texto: P9 y P10 a 3,5 s, P11 a 4,0 s,
-P12 a 3,2 s. Son los planos donde se responde a las objeciones, o sea donde se cierra la venta:
-ahorrarse cuatro segundos ahogándolos es tirar el anuncio.
+El primer montaje con ritmo daba 52 s. Al medir si los rótulos del guion caben en cada
+plano, tres del acto 4 salían a **4,4 palabras por segundo**; por encima de 3 el
+espectador no termina de leer antes del corte. Se les dio el tiempo que pide su texto:
+P9 y P10 a 3,5 s, P11 a 4,0 s, P12 a 3,2 s. Son los planos donde se responde a las
+objeciones, o sea donde se cierra la venta: ahogarlos para ahorrar cuatro segundos es
+tirar el anuncio.
 
 ### Las dos decisiones de edición
-1. **El tiempo se reparte según lo que hay que entender, no a partes iguales.** Unas manos
-   limando se leen en 2 s; la conversación de WhatsApp necesita 9 y el CRM 7.
-2. **Movimiento donde no lo había.** Los clips de Flow son estáticos. Un acercamiento del 4 %
-   a lo largo del plano no se percibe como efecto pero quita la sensación de foto fija. Se
-   alterna acercar y alejar, y se deja quieto lo que ya se mueve solo (P7, P8, P12).
+1. **El tiempo se reparte según lo que hay que entender, no a partes iguales.** Unas
+   manos limando se leen en 2 s; la conversación de WhatsApp necesita 9 y el CRM 7.
+2. **Movimiento donde no lo había.** Los clips de Flow son estáticos. Un acercamiento
+   del 4 % a lo largo del plano no se percibe como efecto pero quita la sensación de
+   foto fija. Se alterna acercar y alejar, y se deja quieto lo que ya se mueve solo
+   (P7, P8, P12).
 
-### Los rótulos
-- **Tipografía Geist**, la de nexux.pro (`--nx-font-sans`). Comprobado que tiene todos los
-  glifos españoles, incluidos «», ¿ y €. La de sistema (DejaVu) se nota y abarata la pieza.
-- **Las dos frases del acto 4 van a la vez, no en secuencia**: la objeción arriba en gris
-  pequeño, la respuesta debajo en blanco y grande. Juntas se leen de un vistazo porque el ojo
-  salta entre líneas; en secuencia necesitarían el doble de tiempo.
-- **El reparto de líneas se equilibra**, no se llena. Llenando, «¿Cuántos mensajes tienes ahora
-  mismo sin abrir?» dejaba «abrir?» colgando solo en la última línea.
-- **El degradado se ajusta al bloque de texto** (arranca 60 px por encima). Con una franja fija
-  del tercio inferior, en el plano del CRM el velo caía justo sobre el panel de ROI —la carta
-  de venta— para oscurecer un rótulo que estaba mucho más abajo.
+### Los rótulos, dentro de CapCut
+Se importan como **una pista de subtítulos**, así que los 13 quedan editables en la
+aplicación y con sus tiempos exactos, sin colocar veinte cuadros de texto a mano.
 
-### 🔴 La trampa que casi se cuela: un PNG sin `-loop 1`
-El primer pase generó un vídeo de **duración exacta, fotogramas exactos y cero errores**… y
-**sin un solo rótulo encima**. Un `-i rotulo.png` sin `-loop 1` es un stream de UN fotograma que
-existe en t=0; el fundido de entrada arranca en 0,3 s, ese fotograma se queda transparente del
-todo y `overlay` lo repite invisible el resto del plano.
+- Los siete planos del acto 4 llevan **la duda y la respuesta como dos líneas del mismo
+  rótulo**. La idea era dos pistas para dar a la duda un gris más pequeño, y es posible
+  (ver la trampa del cabezal, abajo), pero de momento las dos frases salen del mismo
+  tamaño. **Queda pendiente si se quiere recuperar esa jerarquía.**
+- Estilo actual: tamaño **6** y el tercer preset de la fila (blanco con contorno). Se
+  probó sobre el plano del CRM, que es fondo blanco, y sobre los planos oscuros: se lee
+  en los dos.
+- **La tipografía sigue siendo la del sistema, no Geist.** Geist está instalada en
+  Windows (`%LOCALAPPDATA%\Microsoft\Windows\Fonts`, las tres variantes) y CapCut
+  debería ofrecerla, pero su desplegable de fuentes no responde bien; hay que
+  seleccionarla a mano. Es un clic.
 
-Se arregla con `-loop 1 -framerate 24 -t <duración> -i rotulo.png`. Y la lección va más lejos:
-**verificar duración y fotogramas no prueba que se haya pintado nada**. `rotular.py` mide ahora
-el brillo del quinto inferior antes y después de superponer, y aborta si no se oscurece.
+### 🔴 Tres trampas de CapCut, todas pisadas el 29-ago
+1. **Un SRT se inserta donde esté el cabezal, no en sus tiempos.** Con el cabezal al
+   final, los 13 rótulos se colocaron *detrás* del vídeo y el montaje pasó de 55 s a
+   106 s. **Poner el cabezal en 0 justo antes de importar** — y como último paso, porque
+   un clic en zona vacía de la línea de tiempo lo manda al final.
+2. **`Ctrl+A` selecciona todos los clips**, nunca el texto de un campo.
+3. **`BackSpace` / `Supr` borran el clip seleccionado** aunque creas que estás
+   escribiendo en un campo numérico. Así se borró un rótulo sin darse cuenta. Para los
+   números, **usar las flechitas del selector**, no el teclado.
 
-### El proyecto de CapCut, si se retoma
-- Versión **9.3.0.3970**. El permiso de control se concede al ejecutable concreto, así que cada
-  actualización lo rompe. Acceso directo vigente: **"CapCut 9.3"**.
-- **La biblioteca hay que ordenarla por Nombre, A-Z.** Por defecto ordena por hora de
-  importación y los planos salen revueltos.
-- El botón **+** de cada miniatura inserta **donde esté el cabezal**: antes de cada uno, clic en
-  la línea de tiempo y tecla **Fin**.
-- `Ctrl+A` selecciona todos los clips, no el texto de un campo. Y escribir en el campo de escala
-  **concatena** en vez de sustituir (100 + 150 = 9999 %).
+### 🔴 Y una de ffmpeg, del mismo día: un PNG sin `-loop 1`
+Al generar la copia con rótulos quemados, el primer pase dio un vídeo de **duración
+exacta, fotogramas exactos y cero errores**… y **sin un solo rótulo encima**. Un
+`-i rotulo.png` sin `-loop 1` es un stream de UN fotograma que existe en t=0; el fundido
+de entrada arranca en 0,3 s, ese fotograma se queda transparente del todo y `overlay` lo
+repite invisible el resto del plano.
+
+Se arregla con `-loop 1 -framerate 24 -t <duración> -i rotulo.png`. Y la lección va más
+lejos: **verificar duración y fotogramas no prueba que se haya pintado nada**.
+`rotular.py` mide ahora el brillo del quinto inferior antes y después de superponer, y
+aborta si no se oscurece.
+
+### El proyecto viejo
+`0825` sigue guardado, con los 14 planos **sin recortar** (1:47). No se ha tocado.
 
 ---
 
