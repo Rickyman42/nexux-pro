@@ -1,0 +1,130 @@
+---
+/**
+ * El anuncio en la web, montado para que lo indexen.
+ *
+ * Google NO ve el video: ve el texto que lo rodea. De ahi las tres piezas que
+ * lleva esto, por orden de lo que aporta:
+ *
+ *   1. El JSON-LD `VideoObject`. Es lo que hace que el buscador sepa que aqui
+ *      hay un video, de que va y cuanto dura. Sin el no sales en la pestana de
+ *      Videos ni en los resultados con miniatura.
+ *   2. La transcripcion, en el HTML y no cargada por JavaScript. Es lo unico
+ *      que una IA puede citar cuando alguien pregunte por recepcionistas IA,
+ *      que es justo el negocio.
+ *   3. Que no hunda la velocidad, que puntua directo: `preload="none"` para no
+ *      descargar cuatro megas a quien no le da al play, `poster` para que la
+ *      pagina no salte al cargar, y width/height para reservar el hueco.
+ *
+ * Los ficheros van en /public/video/ (anuncio.mp4, anuncio.webm, poster.webp,
+ * poster.jpg y anuncio.vtt). Salen de pipeline/ y pesan 4,1 y 3,9 MB: el
+ * original de 11 MB se comprimio con PSNR 44,5 dB, sin perdida visible.
+ */
+export interface Props {
+  /** La URL publica de la pagina donde vive el video. Va en el schema. */
+  url?: string;
+}
+const { url = 'https://nexux.pro/' } = Astro.props;
+
+const titulo = 'Recepcionista IA para tu salón: contesta, ofrece hora y cierra la cita';
+const descripcion =
+  'Cómo Nexux Pro responde los WhatsApp de tus clientes mientras trabajas, ' +
+  'les ofrece hueco y apunta la cita en tu agenda. 29 € al mes, sin comisiones por cita.';
+
+// La transcripcion sale de los rotulos del propio anuncio, no se escribe aparte:
+// si el video cambia, esto tiene que cambiar con el.
+const transcripcion =
+  'Lleva sonando desde las diez. Y tú no puedes cogerlo. Nunca puedes. ' +
+  'Cuando termines habrá cuatro mensajes. Dos se habrán ido a otro sitio. ' +
+  'Hoy alguien contestó por ti. Ofreció hora, confirmó el nombre y cerró la cita. ' +
+  'Y la apuntó en tu agenda. Sin ti. ' +
+  '«¿Y si contesta cualquier cosa?» Pruébala. Sin registrarte. ' +
+  '«¿Otro programa más?» Es tu WhatsApp de siempre. ' +
+  '«¿Y si no me sirve?» 30 días. Te devolvemos el dinero. ' +
+  '«¿Cuánto?» 29 € al mes. Sin comisiones. ' +
+  '¿Cuántos mensajes tienes ahora mismo sin abrir?';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: titulo,
+  description: descripcion,
+  thumbnailUrl: [new URL('/video/poster.jpg', url).href],
+  uploadDate: '2026-08-30',
+  duration: 'PT55S',                       // ISO 8601: 55 segundos
+  contentUrl: new URL('/video/anuncio.mp4', url).href,
+  embedUrl: new URL('#anuncio', url).href,
+  transcript: transcripcion,
+  publisher: {
+    '@type': 'Organization',
+    name: 'Nexux Pro',
+    url,
+  },
+  // Marca de donde empieza cada parte: Google las usa para los enlaces a
+  // momentos concretos dentro del resultado de busqueda.
+  hasPart: [
+    { '@type': 'Clip', name: 'El problema: los mensajes que no puedes coger', startOffset: 0, url: `${url}#anuncio` },
+    { '@type': 'Clip', name: 'La conversación: contesta, ofrece hora y cierra', startOffset: 16, url: `${url}#anuncio` },
+    { '@type': 'Clip', name: 'La cita entra sola en la agenda', startOffset: 25, url: `${url}#anuncio` },
+    { '@type': 'Clip', name: 'Precio y garantía', startOffset: 32, url: `${url}#anuncio` },
+  ],
+};
+---
+
+<section id="anuncio" class="anuncio">
+  <video
+    class="anuncio__video"
+    poster="/video/poster.webp"
+    preload="none"
+    controls
+    playsinline
+    width="1280"
+    height="720"
+    aria-label={titulo}
+  >
+    <source src="/video/anuncio.webm" type="video/webm" />
+    <source src="/video/anuncio.mp4" type="video/mp4" />
+    <track kind="captions" src="/video/anuncio.vtt" srclang="es" label="Español" default />
+    Tu navegador no reproduce vídeo.
+    <a href="/video/anuncio.mp4">Descárgalo aquí</a>.
+  </video>
+
+  <!--
+    La transcripcion va en el HTML, plegada. El <details> la esconde a la vista
+    pero NO al buscador: el texto esta en el documento desde el primer momento.
+    Cargarla por JavaScript seria tirar a la basura la razon de ponerla.
+  -->
+  <details class="anuncio__texto">
+    <summary>Lo que dice el vídeo</summary>
+    <p>{transcripcion}</p>
+  </details>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+<style>
+  .anuncio {
+    max-width: 60rem;
+    margin-inline: auto;
+  }
+  .anuncio__video {
+    width: 100%;
+    height: auto;          /* con width/height en el HTML, reserva el hueco y no salta */
+    display: block;
+    border-radius: 0.75rem;
+    background: #000;      /* mientras carga el poster, negro y no blanco */
+  }
+  .anuncio__texto {
+    margin-top: 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--nx-color-muted, #6b7280);
+  }
+  .anuncio__texto summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--nx-color-text, #111827);
+  }
+  .anuncio__texto p {
+    margin-top: 0.75rem;
+  }
+</style>
