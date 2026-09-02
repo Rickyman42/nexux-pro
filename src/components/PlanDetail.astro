@@ -32,10 +32,12 @@ const { plan, slug } = Astro.props as Props;
           <span class="plan-price-value">{plan.price}€</span>
           <span class="plan-price-unit">/mes</span>
         </div>
-        <p class="plan-price-warn">
-          <span class="warn-dot"></span>
-          Precio de lanzamiento: mantienes los 29 € mientras sigas de alta.
-        </p>
+        {plan.badge === 'Precio de lanzamiento' && (
+          <p class="plan-price-warn">
+            <span class="warn-dot"></span>
+            Precio de lanzamiento: mantienes los {plan.price} € mientras sigas de alta.
+          </p>
+        )}
 
         <div class="plan-actions">
           <button type="button" data-checkout-plan={slug} class="btn-primary plan-action-primary" data-track={`plan_${slug}_checkout_top`}>
