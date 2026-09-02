@@ -45,6 +45,16 @@ const {
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
+  <!-- Conserva la atribucion antes de que otro script limpie la URL. -->
+  <script is:inline>
+    try {
+      if (location.search) sessionStorage.setItem('nx_pending_query', location.search);
+    } catch (e) {}
+  </script>
+  <script>
+    import "../scripts/measurement.ts";
+  </script>
+
 
 
 

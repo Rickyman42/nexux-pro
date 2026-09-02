@@ -696,7 +696,10 @@ const API = 'https://pi.nexux.pro';
     document.getElementById('suggestions').style.display = 'none';
     document.getElementById('send-btn').disabled = true;
     sending = true;
-    if (!history.length) track('first_message');
+    if (!history.length) {
+      track('first_message');
+      if (window.nxMeasure) window.nxMeasure('demo_started', { channel: channel });
+    }
     addMsg(text, 'user');
     history.push({ role: 'user', content: text });
     showTyping();
@@ -728,6 +731,7 @@ const API = 'https://pi.nexux.pro';
         }
         if (data.appointmentBooked) {
           track('booking');
+          if (window.nxMeasure) window.nxMeasure('demo_booking_created', { channel: channel });
           var apt = data.appointmentBooked;
           var iso = apt.datetime || new Date().toISOString();
           // Reprogramacion: si Lara cancelo, quitamos la cita previa de este cliente creada en la sesion
@@ -846,6 +850,9 @@ const API = 'https://pi.nexux.pro';
     a.addEventListener('click', function(){ track('cta_click'); });
   });
 
+</script>
+<script>
+  import '../scripts/measurement.ts';
 </script>
 </body>
 </html>
