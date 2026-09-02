@@ -1,0 +1,250 @@
+---
+// Página de comparación con Booksy. Existe por dos razones a la vez:
+//
+// 1. VENTA — es el único terreno donde el precio es argumento para Nexux, porque
+//    Booksy cobra por persona del equipo y nosotros no: la diferencia crece con
+//    el tamaño del salón y es comprobable en su propia web.
+// 2. GEO — las IA citan páginas que responden UNA pregunta concreta con datos
+//    verificables. Por eso lleva los precios con su fuente, la fecha en que se
+//    comprobaron, y --sobre todo-- lo que Booksy hace mejor. Una comparación que
+//    solo barre para casa no la cita nadie, y con razón.
+//
+// Los precios de Booksy se leyeron de biz.booksy.com/es-es el 2-sep-2026. Si
+// cambian, se actualiza AQUÍ y en lib/bot-prompt-lara.js (la objeción "Uso
+// Booksy"), que es el otro sitio donde viven.
+import Layout from '../layouts/Layout.astro';
+
+const BOOKSY_BASE = 34.99;
+const BOOKSY_POR_PERSONA_EXTRA = 8;
+const NEXUX = 29;
+const COMPROBADO = '2 de septiembre de 2026';
+
+const ejemplos = [1, 2, 4, 6, 10].map((personas) => ({
+  personas,
+  booksy: BOOKSY_BASE + BOOKSY_POR_PERSONA_EXTRA * (personas - 1),
+  nexux: NEXUX,
+}));
+
+const faq = [
+  {
+    q: '¿Cuánto cuesta Booksy con varios empleados?',
+    a: `Booksy cuesta ${BOOKSY_BASE} € al mes más ${BOOKSY_POR_PERSONA_EXTRA} € por cada persona adicional del equipo (precios sin IVA, comprobados en biz.booksy.com el ${COMPROBADO}). Un salón de cuatro personas paga ${(BOOKSY_BASE + BOOKSY_POR_PERSONA_EXTRA * 3).toFixed(2)} € al mes. Nexux cuesta 29 € al mes con todo el equipo incluido, sea cual sea el tamaño.`,
+  },
+  {
+    q: '¿Nexux se sincroniza con Booksy?',
+    a: 'No. No existe ninguna conexión entre Nexux y Booksy: Nexux no lee la agenda de Booksy ni escribe en ella. Puedes usar los dos a la vez, pero cada uno con su agenda. Nexux trabaja con su propia agenda y con Google Calendar si lo conectas.',
+  },
+  {
+    q: '¿Qué hace Nexux que no hace Booksy?',
+    a: 'Contestar los mensajes. Booksy es una agenda con página de reservas: el cliente entra en ella y reserva. Nexux responde por WhatsApp, Telegram y el chat de la web, propone hueco y deja la cita apuntada, sin pedirle al cliente que entre en ninguna aplicación.',
+  },
+  {
+    q: '¿Qué hace Booksy que no hace Nexux?',
+    a: 'Booksy tiene un marketplace que te trae clientes nuevos que no te conocían, cobros y TPV integrados, y una app propia para el cliente final. Nexux no hace nada de eso: no te trae clientes nuevos, no cobra por ti y no tiene app. Si lo que buscas es captar clientes desconocidos, Booksy hace algo que Nexux no.',
+  },
+  {
+    q: '¿Puedo usar Nexux y Booksy a la vez?',
+    a: 'Sí. Mucha gente lo hace: Booksy le lleva la agenda y Nexux contesta los mensajes que llegan por WhatsApp fuera de horario o mientras está atendiendo. Las dos agendas van por separado, eso hay que tenerlo claro.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Layout
+  title="Alternativa a Booksy: la cuenta con tu equipo | Nexux"
+  description="Booksy cobra 8 € al mes por cada persona adicional del equipo. Calcula lo que pagas según cuántos seáis y compáralo con los 29 € fijos de Nexux. Precios comprobados en su web."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <main class="max-w-4xl mx-auto px-6 py-16">
+
+    <h1 class="text-4xl font-bold mb-6">Alternativa a Booksy: haz la cuenta con tu equipo</h1>
+    <p class="text-xl text-gray-600 mb-4">
+      Booksy cobra por cada persona del equipo. Nexux no. Cuanto más grande es tu salón,
+      más se nota — pero la diferencia de verdad no es el precio, es quién contesta los mensajes.
+    </p>
+    <p class="text-sm text-gray-500 mb-12">
+      Precios de Booksy sin IVA, leídos de
+      <a class="underline" href="https://biz.booksy.com/es-es/" rel="nofollow noopener" target="_blank">su propia web</a>
+      el {COMPROBADO}. Si los cambian, esta página se queda desactualizada: compruébalo tú también.
+    </p>
+
+    <!-- ── Calculadora ──────────────────────────────────────────────── -->
+    <section class="mb-16 bg-gray-50 p-8 rounded-lg" id="calculadora-booksy">
+      <h2 class="text-2xl font-bold mb-2">¿Cuántos sois en el salón?</h2>
+      <p class="text-gray-600 mb-6">Mueve el número y verás lo que pagáis en cada sitio.</p>
+
+      <label for="personas" class="block font-semibold mb-2">
+        Personas que atienden: <span id="personas-val" class="text-blue-600">4</span>
+      </label>
+      <input
+        type="range" id="personas" min="1" max="15" step="1" value="4"
+        class="w-full mb-8 accent-blue-600"
+        aria-describedby="resultado-calc"
+      />
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-6" id="resultado-calc">
+        <div class="bg-white p-6 rounded-lg border border-gray-200">
+          <div class="text-sm text-gray-500 mb-1">Booksy</div>
+          <div class="text-3xl font-bold tabular-nums"><span id="coste-booksy">58,99</span> €<span class="text-base font-normal text-gray-500">/mes</span></div>
+          <div class="text-sm text-gray-500 mt-1" id="desglose-booksy">34,99 € + 3 × 8 €</div>
+        </div>
+        <div class="bg-white p-6 rounded-lg border-2 border-blue-600">
+          <div class="text-sm text-gray-500 mb-1">Nexux</div>
+          <div class="text-3xl font-bold tabular-nums">29 €<span class="text-base font-normal text-gray-500">/mes</span></div>
+          <div class="text-sm text-gray-500 mt-1">todo el equipo incluido</div>
+        </div>
+      </div>
+
+      <p class="text-lg font-semibold" id="ahorro-linea">
+        Diferencia: <span class="text-blue-600 tabular-nums"><span id="ahorro-mes">29,99</span> € al mes</span>
+        <span class="text-gray-500 font-normal">(<span id="ahorro-anio">359,88</span> € al año)</span>
+      </p>
+    </section>
+
+    <!-- ── Tabla de ejemplos, visible sin JavaScript ────────────────── -->
+    <section class="mb-16">
+      <h2 class="text-2xl font-bold mb-6">La cuenta, según el tamaño del salón</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-200">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="border border-gray-200 px-4 py-3 text-left">Personas</th>
+              <th class="border border-gray-200 px-4 py-3 text-left">Booksy</th>
+              <th class="border border-gray-200 px-4 py-3 text-left">Nexux</th>
+              <th class="border border-gray-200 px-4 py-3 text-left">Diferencia al año</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ejemplos.map((e, i) => (
+              <tr class={i % 2 === 1 ? 'bg-gray-50' : ''}>
+                <td class="border border-gray-200 px-4 py-3 font-semibold">{e.personas}</td>
+                <td class="border border-gray-200 px-4 py-3 tabular-nums">{e.booksy.toFixed(2)} €/mes</td>
+                <td class="border border-gray-200 px-4 py-3 tabular-nums">{e.nexux} €/mes</td>
+                <td class="border border-gray-200 px-4 py-3 tabular-nums">{((e.booksy - e.nexux) * 12).toFixed(2)} €</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-gray-500 mt-3">Sin IVA. Booksy: {BOOKSY_BASE} € de cuota más {BOOKSY_POR_PERSONA_EXTRA} € por cada persona adicional.</p>
+    </section>
+
+    <!-- ── La diferencia que no es el precio ────────────────────────── -->
+    <section class="mb-16">
+      <h2 class="text-2xl font-bold mb-6">La diferencia que importa no es el dinero</h2>
+      <p class="text-gray-600 mb-6">
+        Booksy es una agenda con página de reservas: para reservar, tu cliente tiene que entrar en ella.
+        Nexux es quien contesta cuando tu cliente escribe donde siempre ha escrito.
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-200">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="border border-gray-200 px-4 py-3 text-left"></th>
+              <th class="border border-gray-200 px-4 py-3 text-left">Booksy</th>
+              <th class="border border-gray-200 px-4 py-3 text-left">Nexux</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Dónde reserva tu cliente</td>
+              <td class="border border-gray-200 px-4 py-3">En la app o la página de Booksy</td>
+              <td class="border border-gray-200 px-4 py-3">Donde ya escribe: WhatsApp, Telegram o tu web</td>
+            </tr>
+            <tr class="bg-gray-50">
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Mensajes fuera de horario</td>
+              <td class="border border-gray-200 px-4 py-3">Se quedan sin responder</td>
+              <td class="border border-gray-200 px-4 py-3">Se responden y se reserva</td>
+            </tr>
+            <tr>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Coste por persona del equipo</td>
+              <td class="border border-gray-200 px-4 py-3">{BOOKSY_POR_PERSONA_EXTRA} € al mes cada una</td>
+              <td class="border border-gray-200 px-4 py-3">Ninguno</td>
+            </tr>
+            <tr class="bg-gray-50">
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Te trae clientes nuevos</td>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Sí, con su marketplace</td>
+              <td class="border border-gray-200 px-4 py-3">No</td>
+            </tr>
+            <tr>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Cobros y TPV</td>
+              <td class="border border-gray-200 px-4 py-3 font-semibold">Sí</td>
+              <td class="border border-gray-200 px-4 py-3">No</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Honestidad: cuándo NO somos la opción ────────────────────── -->
+    <section class="mb-16 border-l-4 border-gray-300 pl-6">
+      <h2 class="text-2xl font-bold mb-4">Cuándo Booksy te conviene más</h2>
+      <ul class="space-y-3 text-gray-600">
+        <li><strong class="text-gray-900">Si lo que necesitas es que te descubran.</strong> Booksy tiene un escaparate donde la gente busca salón cerca. Nexux no te trae clientes nuevos: atiende a los que ya te escriben.</li>
+        <li><strong class="text-gray-900">Si quieres cobrar desde la misma herramienta.</strong> Booksy lleva pagos y TPV. Nexux no cobra por ti.</li>
+        <li><strong class="text-gray-900">Si trabajas solo.</strong> La diferencia baja a {(BOOKSY_BASE - NEXUX).toFixed(2)} € al mes, y ahí el precio ya no debería decidir: decide si quieres que alguien conteste tus mensajes o no.</li>
+      </ul>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="text-2xl font-bold mb-6">Preguntas frecuentes</h2>
+      <div class="space-y-6">
+        {faq.map((f) => (
+          <div>
+            <h3 class="font-bold text-lg mb-2">{f.q}</h3>
+            <p class="text-gray-600">{f.a}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="bg-gray-50 p-8 rounded-lg">
+      <h2 class="text-2xl font-bold mb-4">Pruébalo antes de decidir</h2>
+      <p class="mb-6">Habla con Lara y mírala reservar una cita de verdad. Sin registrarte ni dar la tarjeta.</p>
+      <a href="/demo" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition inline-block">Ver la demo</a>
+    </section>
+
+  </main>
+
+  <script is:inline define:vars={{ BOOKSY_BASE, BOOKSY_POR_PERSONA_EXTRA, NEXUX }}>
+    (function () {
+      var slider = document.getElementById('personas');
+      if (!slider) return;
+
+      var euros = function (n) {
+        return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      };
+
+      function pinta() {
+        var n = Number(slider.value);
+        var booksy = BOOKSY_BASE + BOOKSY_POR_PERSONA_EXTRA * (n - 1);
+        var extra = n - 1;
+
+        document.getElementById('personas-val').textContent = n;
+        document.getElementById('coste-booksy').textContent = euros(booksy);
+        document.getElementById('desglose-booksy').textContent = extra
+          ? euros(BOOKSY_BASE) + ' € + ' + extra + ' × ' + BOOKSY_POR_PERSONA_EXTRA + ' €'
+          : 'solo la cuota base';
+
+        // Con una sola persona la diferencia es pequeña y decirlo asi es mas
+        // honesto que presentar 5,99 € como un ahorro que cambie una decision.
+        var dif = booksy - NEXUX;
+        document.getElementById('ahorro-mes').textContent = euros(dif);
+        document.getElementById('ahorro-anio').textContent = euros(dif * 12);
+      }
+
+      slider.addEventListener('input', pinta);
+      pinta();
+    })();
+  </script>
+</Layout>
