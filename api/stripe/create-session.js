@@ -8,7 +8,9 @@ export default async function handler(req, res) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const { plan } = body;
 
-  // Producto unico. Los planes starter/pro/total se retiraron el 21-ago-2026.
+  // Los planes starter/pro/total se retiraron el 21-ago-2026. Esta lista es la
+  // que decide que se puede comprar: si un plan no esta aqui, su boton devuelve
+  // invalid_plan y el checkout no llega a abrirse.
   const PLANS = {
     recepcionista: {
       name: 'Nexux Recepcionista IA',
@@ -17,6 +19,14 @@ export default async function handler(req, res) {
       // Precio real creado en Stripe el 21-ago-2026. Se usa si la variable de
       // entorno no esta configurada en Vercel, para que el pago no dependa de eso.
       priceFallback: 'price_1U6jqd2SQwDzHtsFf3wEcuQe',
+    },
+    equipo: {
+      name: 'Nexux Recepcionista Equipo',
+      amount: 7900,
+      priceEnv: 'STRIPE_PRICE_EQUIPO',
+      // Creado en Stripe el 2-sep-2026, mismo motivo que el de arriba: si la
+      // variable no esta en Vercel, el pago sigue funcionando.
+      priceFallback: 'price_1UBHkE2SQwDzHtsFTVWQ67l5',
     },
   };
 

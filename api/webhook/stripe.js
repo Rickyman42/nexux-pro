@@ -112,8 +112,8 @@ async function sendConfirmationEmail(session) {
   const toName = session.customer_details?.name || 'Clienta';
   if (!toEmail) return;
 
-  const plan = session.metadata?.plan || 'pro';
-  const planNames = { starter: 'Plan Starter', pro: 'Plan Pro', total: 'Plan Total' };
+  const plan = session.metadata?.plan || 'recepcionista';
+  const planNames = { recepcionista: 'Nexux Recepcionista IA', equipo: 'Nexux Recepcionista Equipo' };
   const planLabel = planNames[plan] || plan;
   const amount = session.amount_total ? `${(session.amount_total / 100).toFixed(0)}` : '—';
 
@@ -261,8 +261,8 @@ async function sendOnboardingEmail(session, provisionResult) {
   const toName = session.customer_details?.name || 'Clienta';
   if (!toEmail) return;
 
-  const plan = session.metadata?.plan || 'pro';
-  const planNames = { starter: 'Plan Starter', pro: 'Plan Pro', total: 'Plan Total' };
+  const plan = session.metadata?.plan || 'recepcionista';
+  const planNames = { recepcionista: 'Nexux Recepcionista IA', equipo: 'Nexux Recepcionista Equipo' };
   const planLabel = planNames[plan] || plan;
 
   const { clientId, portalUrl, telegramDeepLink, channelSetup, miniWebUrl } = provisionResult;

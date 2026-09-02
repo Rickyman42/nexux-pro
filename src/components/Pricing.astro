@@ -1,5 +1,5 @@
 ---
-import { LAUNCH_PRICE, REGULAR_PRICE } from '../data/plans';
+import { LAUNCH_PRICE, REGULAR_PRICE, EQUIPO_PRICE } from '../data/plans';
 
 const incluye = [
   'Contesta por WhatsApp, Telegram o tu web las 24 horas',
@@ -71,6 +71,13 @@ const etiquetaCanal = { wa: 'WhatsApp', tg: 'Telegram', web: 'Web' };
           <span class="dot-sep"></span>
           <span>Listo en 5 minutos</span>
         </div>
+
+        <p class="plan-equipo-link">
+          ¿Atendéis varias personas y cada una necesita ver <em>su</em> agenda?
+          <a href="/paquetes/equipo" data-track="pricing_equipo">
+            Nexux Recepcionista Equipo, {EQUIPO_PRICE} € al mes →
+          </a>
+        </p>
       </div>
 
       <div class="offer-agenda" aria-label="Ejemplo ilustrativo de una agenda con citas reservadas por el asistente">
@@ -276,4 +283,20 @@ const etiquetaCanal = { wa: 'WhatsApp', tg: 'Telegram', web: 'Web' };
     .offer-agenda { border-top: none; border-left: 1px solid var(--nx-line-hover); }
     .offer-deal { padding: 3rem 2.75rem; }
   }
+
+  .plan-equipo-link {
+    margin: 18px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--nx-text-soft, #8B92A8);
+    text-align: center;
+  }
+  .plan-equipo-link a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+  .plan-equipo-link a:hover { color: var(--nx-accent, #2A9D97); }
 </style>
