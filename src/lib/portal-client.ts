@@ -380,3 +380,77 @@ export async function regenerateWeb(clientId: string, token: string): Promise<{ 
     return await response.json();
   } catch { return { ok: false }; }
 }
+
+
+// ── Fichas de clientes (plan Equipo) ─────────────────────────────────────────
+
+export interface ClienteFicha {
+  telefono: string;
+  nombre: string;
+  citas: number;
+  canceladas: number;
+  ultima: string | null;
+  proxima: string | null;
+  servicio_habitual: string | null;
+  profesional_habitual: string | null;
+  nota: string | null;
+  preferencias: string | null;
+  historial?: Array<{
+    id: string; datetime: string; servicio: string | null;
+    profesional: string | null; duracion_min: number | null; estado: string;
+  }>;
+}
+
+export async function fetchCustomers(
+  clientId: string,
+  token: string,
+): Promise<{ ok: boolean; status: number; clientes?: ClienteFicha[]; total?: number; error?: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/customers`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const payload = await response.json().catch(() => ({}));
+    return { ...payload, ok: response.ok, status: response.status };
+  } catch (error) {
+    return { ok: false, status: 502, error: (error as Error).message };
+  }
+}
+
+export async function fetchCustomer(
+  clientId: string,
+  token: string,
+  phone: string,
+): Promise<{ ok: boolean; status: number; cliente?: ClienteFicha; error?: string }> {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/client/${clientId}/customers/${encodeURIComponent(phone)}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    const payload = await response.json().catch(() => ({}));
+    return { ...payload, ok: response.ok, status: response.status };
+  } catch (error) {
+    return { ok: false, status: 502, error: (error as Error).message };
+  }
+}
+
+export async function saveCustomer(
+  clientId: string,
+  token: string,
+  phone: string,
+  data: { nota?: string; preferencias?: string },
+): Promise<{ ok: boolean; status: number; error?: string }> {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/client/${clientId}/customers/${encodeURIComponent(phone)}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      },
+    );
+    const payload = await response.json().catch(() => ({}));
+    return { ...payload, ok: response.ok, status: response.status };
+  } catch (error) {
+    return { ok: false, status: 502, error: (error as Error).message };
+  }
+}

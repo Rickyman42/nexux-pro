@@ -475,19 +475,16 @@ function renderAppointmentDate(item: Appointment) {
         <section class="crm-view crm-hidden" id="v-clientes">
           <div class="crm-view-hdr">
             <h1 class="crm-view-title">Clientes</h1>
+            <input
+              type="search" id="cli-buscar" class="crm-input"
+              placeholder="Buscar por nombre o teléfono" aria-label="Buscar cliente"
+              style="max-width:280px"
+            />
           </div>
-          {data.plan === 'starter' ? (
-            <div class="crm-lock-card">
-              <div class="crm-lock-icon">🔒</div>
-              <h2>Función del Plan Pro</h2>
-              <p>La sección de Clientes incluye historial completo, notas y preferencias de cada cliente que haya reservado con tu bot.</p>
-              <a href="https://nexux.pro/paquetes/pro" class="crm-btn-primary" target="_blank" rel="noopener">Actualizar a Pro →</a>
-            </div>
-          ) : (
-            <div class="crm-card">
-              <p class="crm-empty">Los clientes que reserven citas a través de tu bot aparecerán aquí.</p>
-            </div>
-          )}
+          <div class="crm-card" id="cli-panel">
+            <div id="cli-lista"><p class="crm-empty">Cargando…</p></div>
+          </div>
+          <div class="crm-card crm-mb crm-hidden" id="cli-ficha"></div>
         </section>
 
         <!-- ── CANALES ────────────────────────────────────── -->
@@ -946,6 +943,7 @@ function renderAppointmentDate(item: Appointment) {
     navBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         showView(btn.dataset.view);
+        if (btn.dataset.view === 'clientes' && !clientesCargados) cargarClientes();
         if (btn.dataset.view === 'conversaciones' && !inboxLoaded) {
           var iframe = document.getElementById('inbox-iframe');
           if (iframe) { iframe.src = inboxUrl; inboxLoaded = true; }
@@ -1254,6 +1252,146 @@ function renderAppointmentDate(item: Appointment) {
     }
 
     cargarEquipo();
+
+    // ── Clientes ──────────────────────────────────────────────────────────
+    // La lista no se "rellena": se deduce de las citas que ya existen. Lo unico
+    // que se guarda aparte es lo que escribe el dueno (nota y preferencias).
+    var clientes = [];
+    var clientesCargados = false;
+
+    function fechaCorta(iso) {
+      if (!iso) return '—';
+      try {
+        return new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch (_) { return '—'; }
+    }
+
+    function telefonoBonito(t) {
+      return String(t || '').replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+    }
+
+    function renderClientes() {
+      var lista = document.getElementById('cli-lista');
+      if (!lista) return;
+      var filtro = (document.getElementById('cli-buscar') || {}).value || '';
+      var q = filtro.trim().toLowerCase();
+      var visibles = q
+        ? clientes.filter(function (c) {
+            return (c.nombre || '').toLowerCase().indexOf(q) !== -1
+              || String(c.telefono || '').indexOf(q.replace(/\D/g, '')) !== -1;
+          })
+        : clientes;
+
+      if (!clientes.length) {
+        lista.innerHTML = '<p class="crm-empty">Aún no hay clientes. Aparecerán solos en cuanto alguien reserve con nombre y teléfono.</p>';
+        return;
+      }
+      if (!visibles.length) {
+        lista.innerHTML = '<p class="crm-empty">Nadie coincide con «' + esc(filtro) + '».</p>';
+        return;
+      }
+
+      lista.innerHTML = '<div class="crm-table-wrap"><table class="crm-table">'
+        + '<thead><tr><th>Cliente</th><th>Citas</th><th>Última</th><th>Próxima</th><th>Suele pedir</th></tr></thead><tbody>'
+        + visibles.map(function (c) {
+            return '<tr class="cli-fila" data-tel="' + esc(c.telefono) + '" style="cursor:pointer">'
+              + '<td><strong>' + esc(c.nombre) + '</strong><br><span class="crm-empty">' + esc(telefonoBonito(c.telefono)) + '</span>'
+              + (c.nota ? ' <span title="Tiene nota">📝</span>' : '') + '</td>'
+              + '<td>' + c.citas + (c.canceladas ? ' <span class="crm-empty">(' + c.canceladas + ' canc.)</span>' : '') + '</td>'
+              + '<td>' + esc(fechaCorta(c.ultima)) + '</td>'
+              + '<td>' + (c.proxima ? '<strong>' + esc(fechaCorta(c.proxima)) + '</strong>' : '—') + '</td>'
+              + '<td>' + esc(c.servicio_habitual || '—') + '</td>'
+              + '</tr>';
+          }).join('') + '</tbody></table></div>';
+
+      lista.querySelectorAll('.cli-fila').forEach(function (fila) {
+        fila.addEventListener('click', function () { abrirFicha(fila.dataset.tel); });
+      });
+    }
+
+    async function abrirFicha(telefono) {
+      var caja = document.getElementById('cli-ficha');
+      if (!caja) return;
+      caja.classList.remove('crm-hidden');
+      caja.innerHTML = '<p class="crm-empty">Cargando ficha…</p>';
+      try {
+        var res = await fetch('/portal-api/customers?clientId=' + clientId + '&phone=' + encodeURIComponent(telefono));
+        var data = await res.json();
+        if (!res.ok || !data.cliente) {
+          caja.innerHTML = '<p class="crm-empty">No se pudo abrir la ficha.</p>';
+          return;
+        }
+        var c = data.cliente;
+        caja.innerHTML = '<div class="crm-view-hdr"><h2 class="crm-view-title">' + esc(c.nombre) + '</h2>'
+          + '<button type="button" class="crm-btn-ghost" id="cli-cerrar">Cerrar</button></div>'
+          + '<p class="crm-empty">' + esc(telefonoBonito(c.telefono)) + ' · ' + c.citas + ' citas'
+          + (c.profesional_habitual ? ' · suele atenderle ' + esc(c.profesional_habitual) : '') + '</p>'
+          + '<label class="crm-team-help" for="cli-nota">Nota</label>'
+          + '<textarea id="cli-nota" class="crm-input" rows="2" placeholder="Lo que convenga recordar de esta persona">' + esc(c.nota || '') + '</textarea>'
+          + '<label class="crm-team-help" for="cli-pref">Preferencias</label>'
+          + '<textarea id="cli-pref" class="crm-input" rows="2" placeholder="Cómo le gusta que le atiendan">' + esc(c.preferencias || '') + '</textarea>'
+          + '<div class="crm-team-add-row"><button type="button" class="crm-btn-primary" id="cli-guardar">Guardar</button>'
+          + '<span id="cli-msg" class="crm-empty"></span></div>'
+          + '<h3 class="crm-team-help" style="margin-top:18px">Historial</h3>'
+          + '<div class="crm-table-wrap"><table class="crm-table"><tbody>'
+          + (c.historial || []).map(function (h) {
+              return '<tr><td>' + esc(fechaCorta(h.datetime)) + '</td>'
+                + '<td>' + esc(h.servicio || '—') + '</td>'
+                + '<td>' + esc(h.profesional || '—') + '</td>'
+                + '<td>' + (h.estado === 'cancelled' ? '<span class="crm-empty">cancelada</span>' : '') + '</td></tr>';
+            }).join('') + '</tbody></table></div>';
+
+        document.getElementById('cli-cerrar').addEventListener('click', function () {
+          caja.classList.add('crm-hidden');
+        });
+        document.getElementById('cli-guardar').addEventListener('click', async function () {
+          var msg = document.getElementById('cli-msg');
+          msg.textContent = 'Guardando…';
+          var guardado = await fetch('/portal-api/customers', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clientId: clientId,
+              phone: c.telefono,
+              nota: document.getElementById('cli-nota').value,
+              preferencias: document.getElementById('cli-pref').value,
+            }),
+          }).catch(function () { return null; });
+          msg.textContent = guardado && guardado.ok ? 'Guardado ✅' : 'No se pudo guardar';
+          if (guardado && guardado.ok) { clientesCargados = false; cargarClientes(); }
+        });
+      } catch (_) {
+        caja.innerHTML = '<p class="crm-empty">No se pudo abrir la ficha.</p>';
+      }
+    }
+
+    async function cargarClientes() {
+      var lista = document.getElementById('cli-lista');
+      if (!lista) return;
+      try {
+        var res = await fetch('/portal-api/customers?clientId=' + clientId);
+        // El servidor es quien decide si el plan lo incluye: aqui solo se pinta
+        // lo que conteste, sin repetir la tabla de planes en el navegador.
+        if (res.status === 403) {
+          lista.innerHTML = '<div class="crm-lock-card"><div class="crm-lock-icon">🔒</div>'
+            + '<h2>Está en el plan Equipo</h2>'
+            + '<p>Las fichas de clientes reúnen el historial de cada persona, con sus notas y preferencias, a partir de las citas que ya tienes.</p>'
+            + '<a href="https://nexux.pro/paquetes/equipo" class="crm-btn-primary" target="_blank" rel="noopener">Ver el plan Equipo →</a></div>';
+          clientesCargados = true;
+          return;
+        }
+        var data = await res.json();
+        clientes = (data && data.clientes) || [];
+        clientesCargados = true;
+        renderClientes();
+      } catch (_) {
+        lista.innerHTML = '<p class="crm-empty">No se pudo cargar la lista.</p>';
+      }
+    }
+
+    var buscador = document.getElementById('cli-buscar');
+    if (buscador) buscador.addEventListener('input', renderClientes);
+
 
     // ── Cabinas y equipamiento ────────────────────────────────────────
     // Un recurso es algo limitado que la cita ocupa. Dos personas pueden
