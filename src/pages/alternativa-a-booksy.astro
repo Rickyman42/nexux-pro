@@ -19,6 +19,13 @@ const BOOKSY_POR_PERSONA_EXTRA = 8;
 const NEXUX = 29;
 const COMPROBADO = '2 de septiembre de 2026';
 
+// En espanol el decimal es coma. toFixed(2) escribe 34.99 y queda de web
+// traducida a medias, justo en la cifra que el visitante viene a mirar.
+const eur = (n) => n.toLocaleString('es-ES', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 const ejemplos = [1, 2, 4, 6, 10].map((personas) => ({
   personas,
   booksy: BOOKSY_BASE + BOOKSY_POR_PERSONA_EXTRA * (personas - 1),
@@ -28,7 +35,7 @@ const ejemplos = [1, 2, 4, 6, 10].map((personas) => ({
 const faq = [
   {
     q: '¿Cuánto cuesta Booksy con varios empleados?',
-    a: `Booksy cuesta ${BOOKSY_BASE} € al mes más ${BOOKSY_POR_PERSONA_EXTRA} € por cada persona adicional del equipo (precios sin IVA, comprobados en biz.booksy.com el ${COMPROBADO}). Un salón de cuatro personas paga ${(BOOKSY_BASE + BOOKSY_POR_PERSONA_EXTRA * 3).toFixed(2)} € al mes. Nexux cuesta 29 € al mes con todo el equipo incluido, sea cual sea el tamaño.`,
+    a: `Booksy cuesta ${eur(BOOKSY_BASE)} € al mes más ${BOOKSY_POR_PERSONA_EXTRA} € por cada persona adicional del equipo (precios sin IVA, comprobados en biz.booksy.com el ${COMPROBADO}). Un salón de cuatro personas paga ${eur(BOOKSY_BASE + BOOKSY_POR_PERSONA_EXTRA * 3)} € al mes. Nexux cuesta 29 € al mes con todo el equipo incluido, sea cual sea el tamaño.`,
   },
   {
     q: '¿Nexux se sincroniza con Booksy?',
@@ -128,15 +135,15 @@ const jsonLd = {
             {ejemplos.map((e, i) => (
               <tr class={i % 2 === 1 ? 'bg-gray-50' : ''}>
                 <td class="border border-gray-200 px-4 py-3 font-semibold">{e.personas}</td>
-                <td class="border border-gray-200 px-4 py-3 tabular-nums">{e.booksy.toFixed(2)} €/mes</td>
+                <td class="border border-gray-200 px-4 py-3 tabular-nums">{eur(e.booksy)} €/mes</td>
                 <td class="border border-gray-200 px-4 py-3 tabular-nums">{e.nexux} €/mes</td>
-                <td class="border border-gray-200 px-4 py-3 tabular-nums">{((e.booksy - e.nexux) * 12).toFixed(2)} €</td>
+                <td class="border border-gray-200 px-4 py-3 tabular-nums">{eur((e.booksy - e.nexux) * 12)} €</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p class="text-sm text-gray-500 mt-3">Sin IVA. Booksy: {BOOKSY_BASE} € de cuota más {BOOKSY_POR_PERSONA_EXTRA} € por cada persona adicional.</p>
+      <p class="text-sm text-gray-500 mt-3">Sin IVA. Booksy: {eur(BOOKSY_BASE)} € de cuota más {BOOKSY_POR_PERSONA_EXTRA} € por cada persona adicional.</p>
     </section>
 
     <!-- ── La diferencia que no es el precio ────────────────────────── -->
@@ -192,7 +199,7 @@ const jsonLd = {
       <ul class="space-y-3 text-gray-600">
         <li><strong class="text-gray-900">Si lo que necesitas es que te descubran.</strong> Booksy tiene un escaparate donde la gente busca salón cerca. Nexux no te trae clientes nuevos: atiende a los que ya te escriben.</li>
         <li><strong class="text-gray-900">Si quieres cobrar desde la misma herramienta.</strong> Booksy lleva pagos y TPV. Nexux no cobra por ti.</li>
-        <li><strong class="text-gray-900">Si trabajas solo.</strong> La diferencia baja a {(BOOKSY_BASE - NEXUX).toFixed(2)} € al mes, y ahí el precio ya no debería decidir: decide si quieres que alguien conteste tus mensajes o no.</li>
+        <li><strong class="text-gray-900">Si trabajas solo.</strong> La diferencia baja a {eur(BOOKSY_BASE - NEXUX)} € al mes, y ahí el precio ya no debería decidir: decide si quieres que alguien conteste tus mensajes o no.</li>
       </ul>
     </section>
 
