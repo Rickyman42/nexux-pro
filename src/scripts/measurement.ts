@@ -6,6 +6,7 @@ type NxWindow = Window & {
   plausible?: (eventName: string, options?: { props?: NxProperties }) => void;
   gtag?: (...args: unknown[]) => void;
   fbq?: (...args: unknown[]) => void;
+  oaiq?: (...args: unknown[]) => void;
 };
 
 const nxWindow = window as NxWindow;
@@ -102,6 +103,62 @@ function sendConsentTrackers(eventName: string, properties: NxProperties): void 
   }
 }
 
+function openAiEvent(eventName: string, properties: NxProperties):
+  { name: string; data: Record<string, any>; options?: Record<string, any> } | null {
+  if (eventName === 'chatgpt_ads_landing') {
+    return {
+      name: 'page_viewed',
+      data: {
+        type: 'contents',
+        contents: [{ id: location.pathname || '/', name: document.title, content_type: 'page' }],
+      },
+    };
+  }
+
+  if (eventName === 'demo_started') {
+    return {
+      name: 'custom',
+      data: { type: 'custom' },
+      options: { custom_event_name: 'demo_started' },
+    };
+  }
+
+  if (eventName === 'demo_booking_created') {
+    return { name: 'appointment_scheduled', data: { type: 'customer_action' } };
+  }
+
+  if (eventName === 'checkout_started') {
+    return {
+      name: 'checkout_started',
+      data: {
+        type: 'contents',
+        amount: 2900,
+        currency: 'EUR',
+        contents: [{
+          id: String(properties.plan || 'recepcionista'),
+          name: 'Nexux Recepcionista IA',
+          content_type: 'plan',
+          amount: 2900,
+          currency: 'EUR',
+          quantity: 1,
+        }],
+      },
+    };
+  }
+
+  return null;
+}
+
+function sendOpenAiTracker(eventName: string, properties: NxProperties): void {
+  if (localStorage.getItem('nx_cookie_consent') !== 'accepted' || !nxWindow.oaiq) return;
+  const event = openAiEvent(eventName, properties);
+  if (!event) return;
+  nxWindow.oaiq('measure', event.name, event.data, {
+    ...(event.options || {}),
+    event_id: `nx_${eventName}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  });
+}
+
 function measure(eventName: string, properties: NxProperties = {}): void {
   const payload = publicProperties(properties);
 
@@ -118,6 +175,7 @@ function measure(eventName: string, properties: NxProperties = {}): void {
   });
 
   sendConsentTrackers(eventName, payload);
+  sendOpenAiTracker(eventName, payload);
   document.dispatchEvent(new CustomEvent('nx:measurement', {
     detail: { eventName, properties: payload },
   }));
