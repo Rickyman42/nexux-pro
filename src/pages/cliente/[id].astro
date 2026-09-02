@@ -1095,9 +1095,35 @@ function renderAppointmentDate(item: Appointment) {
     var COLORES_EQUIPO = ['#2A9D97', '#C2683F', '#5C6BC0', '#8E6BA8', '#4A8F5B', '#B5804A'];
     var equipo = [];
     var modoEquipo = false;
+    // Agendas de Google donde el negocio puede escribir, y si su plan permite
+    // dar una a cada persona. Lo segundo lo dice el servidor: aqui no se
+    // duplica la tabla de planes.
+    var calendariosGoogle = [];
+    var puedeAgendaPropia = false;
 
     function colorDe(profesional, indice) {
       return (profesional && profesional.color) || COLORES_EQUIPO[indice % COLORES_EQUIPO.length];
+    }
+
+    /**
+     * El desplegable de agenda de una persona.
+     *
+     * La opcion vacia --la agenda del negocio-- va primero y es la de siempre:
+     * quien no elija nada sigue como hasta ahora, con todas las citas juntas.
+     */
+    function selectorAgenda(profesional, i) {
+      if (!calendariosGoogle.length) {
+        return '<span class="crm-empty">Conecta Google para poder elegir</span>';
+      }
+      var actual = profesional.calendar_id || '';
+      return '<select class="crm-input crm-team-cal" data-i="' + i + '"'
+        + ' aria-label="Agenda de ' + esc(profesional.name) + '">'
+        + '<option value="">Agenda del negocio</option>'
+        + calendariosGoogle.map(function (c) {
+            return '<option value="' + esc(c.id) + '"' + (c.id === actual ? ' selected' : '') + '>'
+              + esc(c.nombre) + (c.principal ? ' (principal)' : '') + '</option>';
+          }).join('')
+        + '</select>';
     }
 
     function renderEquipo() {
@@ -1107,11 +1133,15 @@ function renderAppointmentDate(item: Appointment) {
         wrap.innerHTML = '<p class="crm-empty">Solo tú. Añade a alguien si atendéis a la vez.</p>';
         return;
       }
-      wrap.innerHTML = '<div class="crm-table-wrap"><table class="crm-table"><tbody>'
+      var cabecera = puedeAgendaPropia
+        ? '<thead><tr><th>Quién</th><th>Su agenda de Google</th><th></th></tr></thead>'
+        : '';
+      wrap.innerHTML = '<div class="crm-table-wrap"><table class="crm-table">' + cabecera + '<tbody>'
         + equipo.map(function (profesional, i) {
           return '<tr>'
             + '<td><span class="crm-team-dot" style="background:' + esc(colorDe(profesional, i)) + '"></span>'
             + esc(profesional.name) + '</td>'
+            + (puedeAgendaPropia ? '<td>' + selectorAgenda(profesional, i) + '</td>' : '')
             + '<td><button type="button" class="crm-btn-del" data-i="' + i + '">🗑</button></td>'
             + '</tr>';
         }).join('') + '</tbody></table></div>';
@@ -1119,6 +1149,12 @@ function renderAppointmentDate(item: Appointment) {
         btn.addEventListener('click', function () {
           equipo.splice(parseInt(btn.dataset.i, 10), 1);
           renderEquipo();
+        });
+      });
+      wrap.querySelectorAll('.crm-team-cal').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+          // Se guarda en memoria; al pulsar Guardar equipo viaja con el resto.
+          equipo[parseInt(sel.dataset.i, 10)].calendar_id = sel.value || null;
         });
       });
     }
@@ -1134,9 +1170,24 @@ function renderAppointmentDate(item: Appointment) {
             name: profesional.name,
             active: profesional.active !== false,
             color: colorDe(profesional, i),
+            // Sin esto el desplegable se vaciaria al recargar: el objeto se
+            // reconstruye aqui y lo que no se copie deja de existir.
+            calendar_id: profesional.calendar_id || null,
           };
         });
         modoEquipo = data.mode === 'team';
+        puedeAgendaPropia = !!(data.capacidades && data.capacidades.agenda_por_profesional);
+
+        // Las agendas solo se piden si van a servir para algo.
+        if (puedeAgendaPropia && !calendariosGoogle.length) {
+          try {
+            var resGoogle = await fetch('/portal-api/google?clientId=' + clientId);
+            if (resGoogle.ok) {
+              var google = await resGoogle.json();
+              calendariosGoogle = google.calendarios || [];
+            }
+          } catch (_) { /* sin agendas, el desplegable lo dice */ }
+        }
         var check = document.getElementById('team-mode');
         if (check) check.checked = modoEquipo;
         var colorInicial = document.getElementById('team-color');
