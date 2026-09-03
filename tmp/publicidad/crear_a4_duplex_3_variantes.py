@@ -101,13 +101,19 @@ def add_shadow(image, box, alpha=40):
     return base.add_shadow(image, box, radius=24, blur=16, alpha=alpha)
 
 
+# El QR es la unica accion de toda la octavilla y competia en tamano con el logo. En papel
+# repartido en mano tiene que ser lo segundo que se ve, despues del titular. El numero vivia
+# repetido en la funcion y en cada llamada, asi que agrandarlo descuadraba las posiciones.
+QR_SIZE = 258
+
+
 def paste_qr(image, x, y, dark=False):
     draw = ImageDraw.Draw(image)
-    size = 205
+    size = QR_SIZE
     draw.rounded_rectangle((x - 11, y - 11, x + size + 11, y + size + 11), radius=17, fill=WHITE, outline=LINE, width=2)
     image.paste(qr_variante(size), (x, y))
-    draw.text((x + size // 2, y + size + 29), "MIRA LA DEMO", font=bold(13), fill=WHITE if dark else INK, anchor="mm")
-    draw.text((x + size // 2, y + size + 53), "nexux.pro", font=bold(13), fill=TEAL if dark else TEAL_DARK, anchor="mm")
+    draw.text((x + size // 2, y + size + 31), "HABLA CON LARA AHORA", font=bold(15), fill=WHITE if dark else INK, anchor="mm")
+    draw.text((x + size // 2, y + size + 56), "Tarda 30 segundos · nexux.pro", font=bold(12), fill=TEAL if dark else TEAL_DARK, anchor="mm")
 
 
 def footer(image, dark, y=1390):
@@ -116,7 +122,7 @@ def footer(image, dark, y=1390):
     draw.text((CONTENT + 125, y + 36), "29 €/mes", font=bold(26), fill=INK if dark else WHITE, anchor="mm")
     draw.text((CONTENT, y + 98), "WhatsApp · Telegram · Web", font=bold(16), fill=WHITE if dark else INK)
     draw.text((CONTENT, y + 128), "Sin comisiones por cita", font=sans(14), fill="#D7E0E2" if dark else GREY)
-    paste_qr(image, ART_W - CONTENT - 205, y - 5, dark=dark)
+    paste_qr(image, ART_W - CONTENT - QR_SIZE, y - 5, dark=dark)
 
 
 def chat_card(image, box):
@@ -233,7 +239,7 @@ def variant_1_back():
     draw.text((CONTENT, 1275), "Escanea y prueba la conversación.", font=sans(16), fill=GREY)
     draw.rounded_rectangle((CONTENT, 1335, 675, 1404), radius=34, fill=INK)
     draw.text((385, 1369), "MIRAR LA DEMO", font=bold(17), fill=WHITE, anchor="mm")
-    paste_qr(image, ART_W - CONTENT - 205, 1225, False)
+    paste_qr(image, ART_W - CONTENT - QR_SIZE, 1225, False)
     return image.convert("RGB")
 
 
@@ -288,7 +294,7 @@ def variant_2_back():
     draw.text((CONTENT, 1140), "Escanea y mira cómo responde Lara.", font=sans(16), fill="#D7E1E1")
     draw.rounded_rectangle((CONTENT, 1205, 675, 1274), radius=34, fill=TEAL)
     draw.text((385, 1239), "PROBAR LA DEMO", font=bold(17), fill=INK, anchor="mm")
-    paste_qr(image, ART_W - CONTENT - 205, 1118, True)
+    paste_qr(image, ART_W - CONTENT - QR_SIZE, 1118, True)
     draw.text((CONTENT, 1410), "WhatsApp · Telegram · Web", font=bold(16), fill=WHITE)
     draw.text((CONTENT, 1442), "29 €/mes · Sin comisiones", font=sans(15), fill="#D7E1E1")
     return image.convert("RGB")
@@ -354,7 +360,7 @@ def variant_3_back():
     draw.text((CONTENT, 1210), "¿Quieres verla funcionando?", font=serif(27), fill=INK)
     draw.rounded_rectangle((CONTENT, 1270, 675, 1339), radius=34, fill=INK)
     draw.text((385, 1304), "MIRAR LA DEMO", font=bold(17), fill=WHITE, anchor="mm")
-    paste_qr(image, ART_W - CONTENT - 205, 1145, False)
+    paste_qr(image, ART_W - CONTENT - QR_SIZE, 1145, False)
     draw.text((CONTENT, 1430), "WhatsApp · Telegram · Web", font=bold(15), fill=GREY)
     return image.convert("RGB")
 
@@ -406,7 +412,7 @@ def photo_front(filename, headline, accent, notification_box, qr_side, supportin
     draw.text((CONTENT, y + 66), supporting, font=sans(16), fill="#E1E8E9")
     image = notification(image, notification_box)
     draw = ImageDraw.Draw(image)
-    qr_x = ART_W - CONTENT - 205 if qr_side == "right" else CONTENT
+    qr_x = ART_W - CONTENT - QR_SIZE if qr_side == "right" else CONTENT
     price_x = qr_x - 270 if qr_side == "right" else qr_x + 245
     draw.rounded_rectangle((price_x, 1420, price_x + 240, 1492), radius=36, fill=TEAL)
     draw.text((price_x + 120, 1456), "29 €/mes", font=bold(24), fill=INK, anchor="mm")
@@ -484,7 +490,7 @@ def conversation_back(title, accent, proof_title, proof_body):
     draw.text((CONTENT + 142, 1303), "Sin comisiones por cita", font=bold(14), fill=INK)
     draw.rounded_rectangle((CONTENT, 1365, 710, 1443), radius=39, fill=INK)
     draw.text((410, 1404), "QUIERO VERLA RESERVAR", font=bold(16), fill=WHITE, anchor="mm")
-    paste_qr(image, ART_W - CONTENT - 205, 1292, False)
+    paste_qr(image, ART_W - CONTENT - QR_SIZE, 1292, False)
     draw.text((CONTENT, 1510), "nexux.pro", font=bold(15), fill=INK)
     draw.text((CONTENT + 125, 1510), "WhatsApp · Telegram · Web", font=bold(13), fill=GREY)
     return image.convert("RGB")
@@ -660,9 +666,11 @@ SCREEN_LAYOUTS = {
 
 def paste_qr_compact(image, x, y):
     draw = ImageDraw.Draw(image)
-    size = 180
-    draw.text((x + size // 2, y - 27), "ESCANEA LA DEMO", font=bold(13), fill=INK, anchor="mm")
-    draw.rounded_rectangle((x - 10, y - 10, x + size + 10, y + size + 10), radius=16, fill=WHITE, outline=LINE, width=2)
+    size = 224
+    # El rotulo va DENTRO de la tarjeta blanca. Al agrandar el QR, el texto suelto subia
+    # hasta cruzarse con la tablet de la foto y quedaba ilegible sobre el mueble.
+    draw.rounded_rectangle((x - 12, y - 52, x + size + 12, y + size + 12), radius=16, fill=WHITE, outline=LINE, width=2)
+    draw.text((x + size // 2, y - 28), "HABLA CON LARA AHORA", font=bold(14), fill=INK, anchor="mm")
     image.paste(qr_variante(size), (x, y))
 
 
@@ -711,7 +719,7 @@ def autonomous_front(filename, headline, accent, supporting):
     draw.text((CONTENT + 292, 1508), "SIN COMISIONES", font=bold(14), fill=INK)
     draw.text((CONTENT + 292, 1539), "WhatsApp · Telegram · Web", font=bold(13), fill=INK)
     draw.text((CONTENT + 292, 1567), "La cita sigue siendo tuya · nexux.pro", font=sans(12), fill=GREY)
-    paste_qr_compact(image, ART_W - CONTENT - 180, 1390)
+    paste_qr_compact(image, ART_W - CONTENT - 224, 1398)
     return image.convert("RGB")
 
 
