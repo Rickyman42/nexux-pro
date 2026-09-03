@@ -107,7 +107,7 @@ const services: { name: string; duration: number; price: number }[] = data.servi
       var duration = serviceEl.selectedOptions[0]?.dataset.duration ? Number(serviceEl.selectedOptions[0].dataset.duration) : 60;
 
       try {
-        var r = await fetch('/api/book', {
+        var r = await fetch('/pub-api/book', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ clientId, client_name: name, client_phone: phone, service, datetime, duration_min: duration }),

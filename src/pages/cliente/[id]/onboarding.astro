@@ -880,7 +880,7 @@ const planLabel = data.plan === 'recepcionista'
   /* ── Analytics ──────────────────────────────────────── */
   function trackOb(event, data) {
     try {
-      fetch('/api/analytics/ob', {
+      fetch('/pub-api/analytics/ob', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event: event, clientId: clientId, data: data || {} }),
