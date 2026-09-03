@@ -1,0 +1,29 @@
+---
+// Puente para los QR del papel. El QR de una octavilla no puede medirse: quien lo escanea
+// llega a la web como cualquier otra visita y no hay forma de saber que venia de un papel,
+// ni de cual. Haciendolo pasar por aqui, cada octavilla lleva su propio codigo y la visita
+// entra ya etiquetada, sin que el usuario note nada: es una redireccion, no una pantalla.
+//
+// Codigos cortos a proposito: cuanto mas corta la direccion, mas simple queda el dibujo del
+// QR y mejor lo lee un movil de noche, en la calle y con el papel arrugado.
+export const prerender = false;
+
+const OCTAVILLAS: Record<string, string> = {
+  d1: '01-dolor-directo',
+  d2: '02-cita-que-no-vuelve',
+  d3: '03-producto-explicito',
+};
+
+const codigo = String(Astro.params.codigo || '').toLowerCase();
+// Un codigo que no reconocemos no puede dejar tirado a nadie: sigue a la demo igual,
+// simplemente etiquetado como desconocido para que se vea en las estadisticas.
+const variante = OCTAVILLAS[codigo] ?? `desconocida-${codigo || 'vacio'}`;
+
+const destino = new URL('https://nexux.pro/demo');
+destino.searchParams.set('utm_source', 'octavilla');
+destino.searchParams.set('utm_medium', 'papel');
+destino.searchParams.set('utm_campaign', 'reparto-mostoles');
+destino.searchParams.set('utm_content', variante);
+
+return Astro.redirect(destino.toString(), 302);
+---
