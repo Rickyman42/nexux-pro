@@ -1,4 +1,5 @@
 ---
+import Medicion from '../components/Medicion.astro';
 const API = 'https://pi.nexux.pro';
 ---
 <!DOCTYPE html>
@@ -256,6 +257,9 @@ const API = 'https://pi.nexux.pro';
     })();
   </script>
 
+  <!-- Pixeles de medicion: sin esto la demo solo medía en Umami y la conversion
+       de la campana no podia contarse nunca (ver components/Medicion.astro). -->
+  <Medicion />
 </head>
 <body>
 

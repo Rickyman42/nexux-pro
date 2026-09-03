@@ -1,0 +1,68 @@
+---
+// Bloque de medicion para paginas que NO usan Layout.astro (la demo, por ejemplo).
+//
+// El 3-sept-2026 se descubrio que /demo solo cargaba Umami: sin pixel de OpenAI, sin Meta
+// y sin GA4. Y la conversion que mide la campana ("cita confirmada") ocurre precisamente
+// ahi, asi que era imposible que se contara ni una. El contador llevaba 0 eventos desde
+// que se creo y no era falta de trafico: era que el pixel no existia en esa pagina.
+//
+// GA4 y Meta esperan al consentimiento; Umami no lo necesita porque no usa cookies.
+const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
+---
+
+{openAiAdsPixelId && <script is:inline data-pixel-id={openAiAdsPixelId}>
+  (function (w, d, s, u) {
+    var current = d.currentScript;
+    var pixelId = current && current.getAttribute('data-pixel-id');
+    if (!pixelId || w.oaiq) return;
+    var q = function () { q.q.push(arguments); };
+    q.q = [];
+    w.oaiq = q;
+    var consent = false;
+    try { consent = localStorage.getItem('nx_cookie_consent') === 'accepted'; } catch (e) {}
+    q('consent', consent);
+    q('init', { pixelId: pixelId });
+    var js = d.createElement(s);
+    js.async = true;
+    js.src = u;
+    var first = d.getElementsByTagName(s)[0];
+    if (first && first.parentNode) first.parentNode.insertBefore(js, first);
+    d.addEventListener('nx:consent-granted', function () { q('consent', true); });
+  })(window, document, 'script', 'https://bzrcdn.openai.com/sdk/oaiq.min.js');
+</script>}
+
+<script is:inline>
+  function nxLoadTrackers() {
+    if (window._nxTrackersLoaded) return;
+    window._nxTrackersLoaded = true;
+    // GA4
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-GS6BCN6TMJ';
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', 'G-GS6BCN6TMJ', { anonymize_ip: true });
+    // Meta Pixel
+    !function(f,b,e,v,n,t,ss)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;ss=b.getElementsByTagName(e)[0];
+    ss.parentNode.insertBefore(t,ss)}(window,document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1467739621760495');
+    fbq('track', 'PageView');
+  }
+  if (localStorage.getItem('nx_cookie_consent') === 'accepted') { nxLoadTrackers(); }
+  document.addEventListener('nx:consent-granted', nxLoadTrackers);
+</script>
+
+<script defer data-domain="nexux.pro" src="https://plausible.io/js/script.tagged-events.outbound-links.js"></script>
+
+<script>
+  import "../scripts/measurement.ts";
+</script>
