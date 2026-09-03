@@ -747,12 +747,22 @@ function renderAppointmentDate(item: Appointment) {
                 <span class="billing-plan-name">{planLabel}</span>
                 <span class="billing-plan-sub">{planPriceLabel}</span>
               </div>
-              <button id="btn-billing-portal" class="crm-btn-primary">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                Gestionar suscripción
-              </button>
+              {data.billing?.stripe !== false && (
+                <button id="btn-billing-portal" class="crm-btn-primary">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  Gestionar suscripción
+                </button>
+              )}
             </div>
-            <p class="billing-hint">Cambia de plan, actualiza tu método de pago o cancela desde el portal de Stripe.</p>
+            {data.billing?.stripe === false ? (
+              <p class="billing-hint">
+                Esta cuenta se dio de alta a mano, sin pasar por la pasarela de pago, así que
+                no hay suscripción que gestionar todavía. En cuanto se active el pago aparecerá
+                aquí el acceso al portal de Stripe.
+              </p>
+            ) : (
+              <p class="billing-hint">Cambia de plan, actualiza tu método de pago o cancela desde el portal de Stripe.</p>
+            )}
           </div>
 
           <div class="crm-section">
@@ -816,7 +826,9 @@ function renderAppointmentDate(item: Appointment) {
               </div>
             </div>
             )}
-            <p class="billing-hint" style="margin-top:16px">Para cambiar de plan usa el botón “Gestionar suscripción” arriba — Stripe te mostrará las opciones disponibles.</p>
+            {data.billing?.stripe !== false && (
+              <p class="billing-hint" style="margin-top:16px">Para cambiar de plan usa el botón “Gestionar suscripción” arriba — Stripe te mostrará las opciones disponibles.</p>
+            )}
           </div>
 
           <div class="crm-section">
@@ -2490,7 +2502,11 @@ function renderAppointmentDate(item: Appointment) {
           if (d.url) {
             window.location.href = d.url;
           } else {
-            showToast('Error al abrir el portal de facturación');
+            // Un "no se pudo" a secas deja al dueno sin saber si es culpa suya. Se
+            // distingue el caso de no tener suscripcion del de Stripe fallando.
+            showToast(d && d.error === 'billing_unavailable'
+              ? 'Esta cuenta no tiene suscripción activa en Stripe'
+              : 'No se pudo abrir el portal de facturación. Inténtalo en un minuto.');
             billingBtn.disabled = false;
             billingBtn.textContent = 'Gestionar suscripción';
           }

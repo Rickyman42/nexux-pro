@@ -33,6 +33,9 @@ export interface ClientData {
     isTrial: boolean;
     trialEndsAt: string | null;
     expiresAt: string | null;
+    // Si la cuenta no salio de un pago por Stripe no hay portal que abrir, y el
+    // boton de gestionar la suscripcion solo puede acabar en error.
+    stripe?: boolean;
   };
   channels: {
     whatsapp: {
