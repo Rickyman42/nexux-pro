@@ -147,7 +147,7 @@ const planLabel = data.plan === 'recepcionista'
           </button>
           <button class="ob-canal-opt" data-canal="tg_new">
             <span class="ob-canal-icon">✈️</span>
-            <strong>Telegram — empezamos</strong>
+            <strong>Telegram — empezamos <em class="ob-reco">recomendado</em></strong>
             <span class="ob-canal-desc">Quiero usar Telegram, empezamos desde cero</span>
           </button>
 
@@ -733,6 +733,19 @@ const planLabel = data.plan === 'recepcionista'
       line-height: 1.8;
     }
     .ob-guide-ol li { margin: 0; }
+    /* Telegram recomendado: no caduca ni hay que reescanear nada */
+    .ob-reco {
+      font-style: normal;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.1rem 0.35rem;
+      margin-left: 0.35rem;
+      border-radius: 999px;
+      background: rgba(56, 160, 233, 0.16);
+      color: #38a0e9;
+      vertical-align: middle;
+    }
     /* TG QR in onboarding */
     .ob-tg-qr-wrap { margin: 0.75rem 0 0.5rem; }
     .ob-tg-qr-wrap canvas { border-radius: 10px; border: 4px solid #fff; display: block; }
@@ -1044,7 +1057,7 @@ const planLabel = data.plan === 'recepcionista'
     var tgDeepLink = 'https://t.me/NexuxProAssistantBot?start=c_' + clientId;
 
     var GUIDES = {
-      whatsapp: '<strong>📱 WhatsApp</strong><p>Perfecto. Nuestro equipo se pondrá en contacto contigo en menos de 24h para conectar tu número — sin cambiar el que ya tienen guardado tus clientas, sin perder chats.</p><p class="ob-guide-tip">Solo necesitarás escanear un código QR desde tu teléfono cuando te lo indiquemos. Tardas 2 minutos.</p>',
+      whatsapp: '<strong>📱 WhatsApp</strong><p>Perfecto. Nuestro equipo se pondrá en contacto contigo en menos de 24h para conectar tu número — sin cambiar el que ya tienen guardado tus clientas, sin perder chats.</p><p class="ob-guide-tip">Solo necesitarás escanear un código QR desde tu teléfono cuando te lo indiquemos. Tardas 2 minutos.</p><p class="ob-guide-tip">⏳ Importante: ese código dura 24 horas. Si se te pasa el plazo, la conexión se apaga sola y la vuelves a activar desde tu panel, en Canales.</p><p class="ob-guide-tip">💡 Puedes tener los dos a la vez. Telegram no caduca ni se desconecta, así que muchos salones lo dejan puesto también como red de seguridad.</p>',
       tg_group: '<strong>💬 Telegram — grupo existente</strong><p>Añade a Lara como administradora de tu grupo y empezará a responder sola a tus clientas.</p><ol class="ob-guide-ol"><li>Abre tu grupo de Telegram</li><li>Miembros → Añadir administrador</li><li>Busca <code>@NexuxProAssistantBot</code></li></ol><p class="ob-guide-tip">Eso es todo. Lara activa al instante.</p>',
       tg_new:   '<strong>✈️ Telegram — empezamos desde cero</strong><p>Comparte este enlace con tus clientas. Las que lo abran podrán chatear directamente con Lara para pedir cita.</p><div class="ob-guide-link"><a href="' + tgDeepLink + '" target="_blank">' + tgDeepLink + '</a><button data-copy="' + tgDeepLink + '" class="ob-copy-btn">Copiar</button></div><div class="ob-tg-qr-wrap"><canvas id="ob-tg-qr" width="180" height="180"></canvas><div class="ob-tg-qr-actions"><a id="ob-tg-qr-dl" download="lara-telegram.png" class="ob-link-sm">⬇️ Descargar QR</a></div></div><p class="ob-guide-tip">Imprímelo para el mostrador o ponlo en tu bio de Instagram.</p>',
 

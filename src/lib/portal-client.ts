@@ -35,7 +35,13 @@ export interface ClientData {
     expiresAt: string | null;
   };
   channels: {
-    whatsapp: { provider: 'baileys' | 'twilio'; connected: boolean };
+    whatsapp: {
+      provider: 'baileys' | 'twilio';
+      connected: boolean;
+      // El portal distingue 'aun no lo ha escaneado' de 'se le paso el plazo de 24h':
+      // en el segundo caso no hay QR que ensenar, hay que ofrecer reactivarlo.
+      qr?: { caducado: boolean; primerQrEn: number | null; caducadoEn: number | null; expiraEn?: number };
+    };
     telegram: { enabled: boolean; ownerLinked: boolean };
   };
 }

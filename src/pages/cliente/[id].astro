@@ -523,6 +523,79 @@ function renderAppointmentDate(item: Appointment) {
             <div id="gcal-body"></div>
           </div>
 
+          <div class="crm-card crm-tg-card">
+            <div class="crm-card-head">
+              <h2 class="crm-card-title">Telegram</h2>
+              <span class="crm-chip chip-reco">Recomendado</span>
+              <span class={`crm-chip ${data.channels.telegram.ownerLinked ? 'chip-green' : 'chip-yellow'}`}>
+                {data.channels.telegram.ownerLinked ? 'Vinculado' : 'No vinculado'}
+              </span>
+            </div>
+            <p class="crm-tg-porque">
+              Es el canal que menos guerra da: no hay que escanear nada cada cierto tiempo,
+              no se desconecta solo y funciona a la vez en el móvil y en el ordenador.
+              Tus clientes solo tienen que abrir un enlace.
+            </p>
+            <div class="crm-tg-paso">
+              <span class="crm-tg-num">1</span>
+              <div class="crm-tg-paso-txt">
+                <strong>Instala Telegram</strong>
+                <p class="crm-muted-p">Es gratis. Con instalarlo una vez, vale para siempre.</p>
+                <div class="crm-tg-descargas">
+                  <a class="crm-tg-dl" href="https://apps.apple.com/app/telegram-messenger/id686449807" target="_blank" rel="noopener">
+                    <span class="crm-tg-dl-ico"></span>
+                    <span><small>iPhone y iPad</small><strong>App Store</strong></span>
+                  </a>
+                  <a class="crm-tg-dl" href="https://play.google.com/store/apps/details?id=org.telegram.messenger" target="_blank" rel="noopener">
+                    <span class="crm-tg-dl-ico">▶</span>
+                    <span><small>Android</small><strong>Google Play</strong></span>
+                  </a>
+                  <a class="crm-tg-dl" href="https://desktop.telegram.org/" target="_blank" rel="noopener">
+                    <span class="crm-tg-dl-ico">🖥</span>
+                    <span><small>Windows y Mac</small><strong>Ordenador</strong></span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="crm-tg-paso">
+              <span class={`crm-tg-num ${data.channels.telegram.ownerLinked ? 'crm-tg-num-ok' : ''}`}>
+                {data.channels.telegram.ownerLinked ? '✓' : '2'}
+              </span>
+              <div class="crm-tg-paso-txt">
+                <strong>Conecta tu Telegram</strong>
+                {data.channels.telegram.ownerLinked ? (
+                  <p class="crm-muted-p">Listo. Te avisamos aquí de cada cita nueva.</p>
+                ) : (
+                  <>
+                    <p class="crm-muted-p">Para recibir los avisos de citas y ver la actividad de Lara.</p>
+                    <a href={ownerTelegramUrl} class="crm-btn-primary" target="_blank" rel="noopener">Conectar mi Telegram →</a>
+                  </>
+                )}
+              </div>
+            </div>
+            <div class="crm-tg-paso">
+              <span class="crm-tg-num">3</span>
+              <div class="crm-tg-paso-txt">
+                <strong>Pásale el enlace a tus clientes</strong>
+                <p class="crm-muted-p">Lo tienes justo aquí abajo, con su código QR para pegar en el mostrador.</p>
+              </div>
+            </div>
+            <div class="crm-tg-customer">
+              <strong class="crm-section-lbl">Enlace para tus clientes</strong>
+              <p class="crm-muted-p">Compártelo para que reserven en Telegram.</p>
+              <div class="crm-copy-row">
+                <input id="telegram-customer-link" type="text" value={customerTelegramUrl} readonly class="crm-input" />
+                <button id="telegram-copy" type="button" class="crm-btn-ghost">Copiar</button>
+              </div>
+              <div class="crm-tg-qr-wrap">
+                <p class="crm-muted-p" style="margin-top:1rem;margin-bottom:0.5rem">O escanea el QR para compartirlo fácilmente:</p>
+                <canvas id="tg-qr-canvas" width="180" height="180"></canvas>
+                <div class="crm-tg-qr-actions">
+                  <a id="tg-qr-download" download="lara-telegram.png" class="crm-btn-ghost" style="font-size:0.8rem">⬇️ Descargar QR</a>
+                </div>
+              </div>
+            </div>
+          </div>
           {showWhatsApp && (
             <div class="crm-card crm-mb">
               <div class="crm-card-head">
@@ -531,7 +604,21 @@ function renderAppointmentDate(item: Appointment) {
                   {data.channels.whatsapp.connected ? 'Conectado' : data.botStatus === 'pending_qr' ? 'Pendiente QR' : 'Desconectado'}
                 </span>
               </div>
-              {!data.channels.whatsapp.connected && (
+              {!data.channels.whatsapp.connected && data.channels.whatsapp.qr?.caducado && (
+                <div class="crm-qr-caducado">
+                  <p class="crm-qr-caducado-t">Este QR ya no está activo</p>
+                  <p class="crm-muted-p">
+                    Pasaron 24 horas sin escanearlo, así que apagamos la conexión para que no
+                    se quede colgada. Puedes volver a activarla cuando quieras: te damos otro
+                    día entero para escanearlo.
+                  </p>
+                  <button id="wa-reactivar" type="button" class="crm-btn-primary">Volver a activar WhatsApp</button>
+                  <p class="crm-muted-p" style="margin-top:0.75rem">
+                    Mientras tanto Telegram sigue funcionando con normalidad.
+                  </p>
+                </div>
+              )}
+              {!data.channels.whatsapp.connected && !data.channels.whatsapp.qr?.caducado && (
                 <div class="crm-qr-block" id="wa-qr-block">
                   <p class="crm-qr-hint">Escanea este QR desde WhatsApp en tu móvil.<br/><small>WhatsApp → Dispositivos vinculados → Vincular dispositivo</small></p>
                   <div id="wa-qr-wrap">
@@ -539,6 +626,7 @@ function renderAppointmentDate(item: Appointment) {
                     <img id="wa-qr-img" src="" alt="QR WhatsApp" class="crm-qr-img" style="display:none" />
                     <p id="wa-qr-connected" class="crm-qr-ok" style="display:none">✅ WhatsApp conectado</p>
                   </div>
+                  <p class="crm-qr-caduca">Tienes 24 horas para escanearlo. Pasado ese plazo la conexión se apaga sola y se reactiva desde aquí.</p>
                 </div>
               )}
               {hasLegacyAdvancedTools && (
@@ -560,35 +648,6 @@ function renderAppointmentDate(item: Appointment) {
             </div>
           )}
 
-          <div class="crm-card">
-            <div class="crm-card-head">
-              <h2 class="crm-card-title">Telegram</h2>
-              <span class={`crm-chip ${data.channels.telegram.ownerLinked ? 'chip-green' : 'chip-yellow'}`}>
-                {data.channels.telegram.ownerLinked ? 'Vinculado' : 'No vinculado'}
-              </span>
-            </div>
-            {!data.channels.telegram.ownerLinked && (
-              <div class="crm-tg-owner">
-                <p>Vincula tu Telegram para recibir avisos de citas y actividad del bot.</p>
-                <a href={ownerTelegramUrl} class="crm-btn-primary" target="_blank" rel="noopener">Vincular mi Telegram →</a>
-              </div>
-            )}
-            <div class="crm-tg-customer">
-              <strong class="crm-section-lbl">Enlace para tus clientes</strong>
-              <p class="crm-muted-p">Compártelo para que reserven en Telegram.</p>
-              <div class="crm-copy-row">
-                <input id="telegram-customer-link" type="text" value={customerTelegramUrl} readonly class="crm-input" />
-                <button id="telegram-copy" type="button" class="crm-btn-ghost">Copiar</button>
-              </div>
-              <div class="crm-tg-qr-wrap">
-                <p class="crm-muted-p" style="margin-top:1rem;margin-bottom:0.5rem">O escanea el QR para compartirlo fácilmente:</p>
-                <canvas id="tg-qr-canvas" width="180" height="180"></canvas>
-                <div class="crm-tg-qr-actions">
-                  <a id="tg-qr-download" download="lara-telegram.png" class="crm-btn-ghost" style="font-size:0.8rem">⬇️ Descargar QR</a>
-                </div>
-              </div>
-            </div>
-          </div>
         </section>
 
         <!-- ── CONFIGURACIÓN ──────────────────────────────── -->
@@ -1627,6 +1686,29 @@ function renderAppointmentDate(item: Appointment) {
     })();
 
     gcalCargar();
+
+    // ── Reactivar WhatsApp tras caducar el QR ─────────────────────────
+    var waReactivar = document.getElementById('wa-reactivar');
+    if (waReactivar) {
+      waReactivar.addEventListener('click', function () {
+        waReactivar.disabled = true;
+        waReactivar.textContent = 'Activando...';
+        fetch('/portal-api/wa-reactivar?clientId=' + encodeURIComponent(clientId), { method: 'POST' })
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d && d.ok) {
+              window.location.reload();
+            } else {
+              waReactivar.disabled = false;
+              waReactivar.textContent = 'No se pudo activar — reintentar';
+            }
+          })
+          .catch(function () {
+            waReactivar.disabled = false;
+            waReactivar.textContent = 'No se pudo activar — reintentar';
+          });
+      });
+    }
 
     // ── Telegram copy ─────────────────────────────────────────────────
     // ── Telegram QR ───────────────────────────────────────────────────────────
@@ -3674,7 +3756,70 @@ function renderAppointmentDate(item: Appointment) {
     .crm-qr-hint { color: var(--crm-muted); font-size: 13px; margin: 0 0 0.75rem; }
     .crm-qr-hint small { font-size: 11px; opacity: 0.75; }
     .crm-qr-ok { color: #4caf50; font-size: 14px; font-weight: 600; margin: 0.5rem 0 0; }
-    .crm-tg-qr-wrap { margin-top: 1rem; }
+    /* Telegram recomendado: pasos numerados y botones de descarga de la app */
+  .crm-tg-card { border-color: rgba(56, 160, 233, 0.35); }
+  .crm-chip.chip-reco {
+    background: rgba(56, 160, 233, 0.14);
+    color: #38a0e9;
+    border: 1px solid rgba(56, 160, 233, 0.35);
+  }
+  .crm-tg-porque {
+    margin: 0 0 1.25rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    opacity: 0.75;
+  }
+  .crm-tg-paso { display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 1.35rem; }
+  .crm-tg-num {
+    flex: 0 0 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: rgba(56, 160, 233, 0.14);
+    color: #38a0e9;
+    border: 1px solid rgba(56, 160, 233, 0.3);
+  }
+  .crm-tg-num-ok { background: rgba(52, 199, 89, 0.16); color: #34c759; border-color: rgba(52, 199, 89, 0.35); }
+  .crm-tg-paso-txt { min-width: 0; flex: 1; }
+  .crm-tg-paso-txt > strong { display: block; margin-bottom: 0.2rem; }
+  .crm-tg-descargas {
+    display: grid;
+    /* Tres en fila en el ordenador y apiladas en el movil, sin que se salga nada */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+  .crm-tg-dl {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .crm-tg-dl:hover { border-color: rgba(56, 160, 233, 0.5); transform: translateY(-1px); }
+  .crm-tg-dl-ico { font-size: 1.15rem; line-height: 1; }
+  .crm-tg-dl small { display: block; font-size: 0.7rem; opacity: 0.65; }
+  .crm-tg-dl strong { display: block; font-size: 0.85rem; }
+  @media (prefers-reduced-motion: reduce) { .crm-tg-dl { transition: none; } .crm-tg-dl:hover { transform: none; } }
+
+  /* QR de WhatsApp caducado */
+  .crm-qr-caducado {
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 184, 0, 0.28);
+    background: rgba(255, 184, 0, 0.06);
+  }
+  .crm-qr-caducado-t { margin: 0 0 0.4rem; font-weight: 600; }
+  .crm-qr-caduca { margin-top: 0.75rem; font-size: 0.78rem; opacity: 0.7; text-align: center; }
+
+  .crm-tg-qr-wrap { margin-top: 1rem; }
     .crm-tg-qr-wrap canvas { border-radius: 10px; border: 4px solid #fff; display: block; }
     .crm-tg-qr-actions { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
     .crm-tg-qr-actions a { font-size: 0.78rem !important; }
