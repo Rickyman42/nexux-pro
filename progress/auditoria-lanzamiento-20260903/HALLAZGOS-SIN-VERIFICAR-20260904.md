@@ -1,3 +1,69 @@
+# ⚠️ HALLAZGOS SIN VERIFICAR — LEER ESTO ANTES DE CREERSE NADA DE LO DE ABAJO
+
+Estos 44 "hallazgos" salieron de una auditoría en paralelo (run `wf_c2e58bdf-cd3`,
+4-sep-2026) que **se cortó por límite de sesión**. Completó 4 de 5 mapeos y
+**cero refutadores de 132**. El resultado de la herramienta decía
+"0 confirmados, 44 descartados": **eso es falso**. No se descartaron; nunca
+llegaron a juzgarse. El contador miente.
+
+**Por tanto: nada de lo que hay debajo es un hecho hasta que alguien lo compruebe
+en el fichero que EJECUTA.** Son sospechas con buena pinta, no evidencia.
+
+---
+
+## Lo que SÍ se ha verificado a mano desde entonces
+
+| Hallazgo | Veredicto | Dónde quedó |
+|---|---|---|
+| Recordatorios leen campos que no existen | ✅ **CIERTO** | Arreglado, commit `0ba4015` |
+| Renombrar el teléfono a secas manda la cita a un móvil ajeno | ✅ **CIERTO** | Evitado en el mismo arreglo |
+| El recordatorio solo salía por WhatsApp | ✅ **CIERTO** | Arreglado |
+| El resumen de las 21:00 iba al chat interno de Nexux | ✅ **CIERTO** | Arreglado |
+| La lista de clientes estaba congelada en el arranque | ✅ **CIERTO** | Arreglado |
+| Factura envuelta dos veces + cast mentiroso | ✅ **CIERTO** | Arreglado, `bbceb8e` |
+| Un fallo de carga se veía como "no tienes facturas" | ✅ **CIERTO** | Arreglado |
+| Informe mensual con `a.phone` / `a.servicio` / `a.precio` | ✅ **CIERTO** | Arreglado, `e799b6a` |
+| Panel de administración: 3 columnas con "undefined" | ✅ **CIERTO** | Arreglado |
+| "Próxima cita" del portal sale vacía | ✅ **CIERTO** | Arreglado, `54e56e5` |
+| `index.json` marca 12 activos y las fichas dicen 3 | ✅ **CIERTO** | Rodeado: ahora se comprueban las dos cosas |
+| Aviso de cancelación al dueño con "undefined" | ❓ **NO REPRODUCIDO** | No aparecen esos campos en `whatsapp.js` ni `telegram.js` |
+| **Horario duplicado inglés/español** | ⚠️ **CIERTO PERO LATENTE** | Ver abajo |
+
+### El horario duplicado, con precisión
+
+Verificado el 4-sep: **hoy no está haciendo daño**, y conviene decirlo para que
+nadie corra a "arreglarlo" rompiendo algo.
+
+- El panel del cliente escribe las claves **en inglés** (`monday_open`…), y el
+  motor lee inglés. **Editar el horario desde el panel sí funciona.**
+- Hay 13 avisos en el registro de que inglés y español **discrepan en viernes**
+  (20:00 contra 19:00). Manda el inglés, así que la copia española es peso muerto
+  que puede desviarse sin que nadie se entere.
+- El único cliente con horario **solo** en español es `demo`, que ni siquiera
+  figura en `index.json`.
+
+**La mina de verdad está en `lib/onboarding.js:130` (`buildConfig`)**: escribe
+`horario` con días en español, `servicios` en español y `plan: 'starter'`, un plan
+retirado. Ese flujo **está enchufado** (`whatsapp.js` lo consulta en cada mensaje
+entrante y el webhook de la Pi puede arrancarlo), pero **ahora mismo no hay ningún
+cliente con `onboarding.json` activo**, así que no está corriendo. Si algún día
+arranca, dará de alta a un cliente con la forma vieja y su horario será ignorado.
+
+Prioridad: media. No urge, pero no se puede dejar olvidado.
+
+---
+
+## Lo que sigue SIN mirar
+
+Todo lo demás de este fichero. En particular: el plan Equipo que nace sin
+agendas, el MRR del panel de administración que ignora los planes en venta, las
+carpetas de cliente sin `config.json`, la falta de reintento si el servicio está
+caído durante la ventana de 10 minutos del recordatorio, y las citas de Telegram
+que meten `tg_<chatId>` en el campo del teléfono (esto último ya está rodeado en
+los recordatorios, pero sigue contaminando el CRM y las fichas de cliente).
+
+---
+
 
 ==============================================================================
 ?  —  12 hallazgos
