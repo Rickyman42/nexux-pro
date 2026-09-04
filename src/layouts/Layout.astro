@@ -1,4 +1,6 @@
 ---
+import PixelOpenAI from '../components/PixelOpenAI.astro';
+import AvisoCookies from '../components/AvisoCookies.astro';
 export interface Props {
   title?: string;
   description?: string;
@@ -46,32 +48,14 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
+  <PixelOpenAI />
+
   <!-- Conserva la atribucion antes de que otro script limpie la URL. -->
   <script is:inline>
     try {
       if (location.search) sessionStorage.setItem('nx_pending_query', location.search);
     } catch (e) {}
   </script>
-  {openAiAdsPixelId && <script is:inline data-pixel-id={openAiAdsPixelId}>
-    (function (w, d, s, u) {
-      var current = d.currentScript;
-      var pixelId = current && current.getAttribute('data-pixel-id');
-      if (!pixelId || w.oaiq) return;
-      var q = function () { q.q.push(arguments); };
-      q.q = [];
-      w.oaiq = q;
-      var consent = false;
-      try { consent = localStorage.getItem('nx_cookie_consent') === 'accepted'; } catch (e) {}
-      q('consent', consent);
-      q('init', { pixelId: pixelId });
-      var js = d.createElement(s);
-      js.async = true;
-      js.src = u;
-      var first = d.getElementsByTagName(s)[0];
-      if (first && first.parentNode) first.parentNode.insertBefore(js, first);
-      d.addEventListener('nx:consent-granted', function () { q('consent', true); });
-    })(window, document, 'script', 'https://bzrcdn.openai.com/sdk/oaiq.min.js');
-  </script>}
   <script>
     import "../scripts/measurement.ts";
   </script>
@@ -165,35 +149,8 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
     <slot />
   </main>
 
-  <!-- Cookie consent banner -->
-  <div id="nx-cookie-banner" class="cookie-banner" role="dialog" aria-label="Consentimiento de cookies" hidden>
-    <div class="cookie-text">
-      <strong>🍪 Usamos cookies para mejorar la experiencia.</strong><br/>
-      Analítica (GA4) y publicidad (Meta) sólo si las aceptas. Tú decides.
-    </div>
-    <div class="cookie-actions">
-      <button id="cookie-reject" class="btn-ghost cookie-btn">Sólo necesarias</button>
-      <button id="cookie-accept" class="btn-primary cookie-btn">Aceptar todo</button>
-    </div>
-  </div>
+  <AvisoCookies />
 
-  <script is:inline>
-    (function() {
-      var banner = document.getElementById('nx-cookie-banner');
-      var stored = localStorage.getItem('nx_cookie_consent');
-      if (!stored) banner.removeAttribute('hidden');
-
-      document.getElementById('cookie-accept').addEventListener('click', function() {
-        localStorage.setItem('nx_cookie_consent', 'accepted');
-        document.dispatchEvent(new CustomEvent('nx:consent-granted'));
-        banner.setAttribute('hidden', '');
-      });
-      document.getElementById('cookie-reject').addEventListener('click', function() {
-        localStorage.setItem('nx_cookie_consent', 'rejected');
-        banner.setAttribute('hidden', '');
-      });
-    })();
-  </script>
 
   <style is:global>
     @import '../styles/global.css';

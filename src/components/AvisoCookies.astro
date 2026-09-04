@@ -1,0 +1,35 @@
+---
+// Aviso de cookies. Vivia incrustado dentro de Layout.astro, asi que /demo —que no usa esa
+// plantilla— no tenia ninguno: quien entraba directo por el QR de las octavillas no podia
+// aceptar, y por eso Meta y GA4 no se activaban nunca para ese trafico.
+// (auditoria 3-sept-2026, area E)
+---
+
+<div id="nx-cookie-banner" class="cookie-banner" role="dialog" aria-label="Consentimiento de cookies" hidden>
+  <div class="cookie-text">
+    <strong>🍪 Usamos cookies para mejorar la experiencia.</strong><br/>
+    Analítica (GA4) y publicidad (Meta) sólo si las aceptas. Tú decides.
+  </div>
+  <div class="cookie-actions">
+    <button id="cookie-reject" class="btn-ghost cookie-btn">Sólo necesarias</button>
+    <button id="cookie-accept" class="btn-primary cookie-btn">Aceptar todo</button>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    var banner = document.getElementById('nx-cookie-banner');
+    var stored = localStorage.getItem('nx_cookie_consent');
+    if (!stored) banner.removeAttribute('hidden');
+
+    document.getElementById('cookie-accept').addEventListener('click', function() {
+      localStorage.setItem('nx_cookie_consent', 'accepted');
+      document.dispatchEvent(new CustomEvent('nx:consent-granted'));
+      banner.setAttribute('hidden', '');
+    });
+    document.getElementById('cookie-reject').addEventListener('click', function() {
+      localStorage.setItem('nx_cookie_consent', 'rejected');
+      banner.setAttribute('hidden', '');
+    });
+  })();
+</script>

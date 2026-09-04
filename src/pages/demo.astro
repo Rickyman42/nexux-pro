@@ -1,5 +1,6 @@
 ---
 import Medicion from '../components/Medicion.astro';
+import AvisoCookies from '../components/AvisoCookies.astro';
 const API = 'https://pi.nexux.pro';
 ---
 <!DOCTYPE html>
@@ -228,9 +229,37 @@ const API = 'https://pi.nexux.pro';
       s.dataset.hostUrl = 'https://nexux.pro/stats';
       document.head.appendChild(s);
 
-      // De donde viene la visita. El QR ya esta impreso y no se le puede anadir
-      // etiqueta, asi que se deduce por la huella que deja: quien llega escaneando
-      // un codigo entra sin venir de ningun enlace y casi siempre desde el movil.
+      // De donde viene la visita.
+      //
+      // Las etiquetas UTM MANDAN sobre cualquier deduccion. Desde que los QR de las
+      // octavillas llevan /f/d1|d2|d3, la variante viene escrita en la direccion; antes
+      // se adivinaba por el navegador y salia mal: 6 de cada 8 llegadas que traian
+      // utm_source=octavilla se guardaban como "directo".
+      // (auditoria 3-sept-2026, area E)
+      function parametrosCampana() {
+        var busqueda = location.search;
+        // measurement.ts limpia la URL; si ya paso, la direccion original queda guardada.
+        if (!busqueda) { try { busqueda = sessionStorage.getItem('nx_pending_query') || ''; } catch (e) {} }
+        try { return new URLSearchParams(busqueda); } catch (e) { return new URLSearchParams(''); }
+      }
+
+      function datosLlegada() {
+        var p = parametrosCampana();
+        var fuente = p.get('utm_source');
+        return {
+          // Si no hay etiqueta, entonces si se deduce.
+          origen: fuente || origenProbable(),
+          utm_source: fuente || null,
+          utm_medium: p.get('utm_medium') || null,
+          utm_campaign: p.get('utm_campaign') || null,
+          // Esto es lo que separa una octavilla de otra. Sin guardarlo, la pregunta
+          // "cual convierte mas" no tiene respuesta posible.
+          utm_content: p.get('utm_content') || null,
+        };
+      }
+
+      // Solo para visitas que llegan SIN etiqueta: quien escanea un codigo entra sin
+      // venir de ningun enlace y casi siempre desde el movil.
       function origenProbable() {
         var hayEnlace = !!document.referrer;
         var esMovil = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
@@ -249,7 +278,7 @@ const API = 'https://pi.nexux.pro';
         intentos++;
         if (window.umami && typeof window.umami.track === 'function') {
           clearInterval(t);
-          window.umami.track('demo-llegada', { origen: origenProbable() });
+          window.umami.track('demo-llegada', datosLlegada());
         } else if (intentos > 40) {
           clearInterval(t);   // 20s sin cargar: bloqueador o red; la visita se cuenta igual
         }
@@ -858,5 +887,6 @@ const API = 'https://pi.nexux.pro';
 <script>
   import '../scripts/measurement.ts';
 </script>
+  <AvisoCookies />
 </body>
 </html>

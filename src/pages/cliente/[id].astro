@@ -13,6 +13,15 @@ if (!clientId || !token) {
 
 const data = await getClientData(clientId, token);
 
+// Aqui, y no treinta lineas mas abajo: todo lo que viene despues usa `data`.
+if (!data) {
+  // Se borra la sesion ANTES de mandar al login. Si no, el middleware ve la cookie,
+  // devuelve al portal, el portal vuelve al login... y el cliente se queda encerrado.
+  Astro.cookies.delete('nexux_token', { path: '/' });
+  Astro.cookies.delete('nexux_client', { path: '/' });
+  return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
+}
+
 // Senales de confianza: que el dueno vea de un vistazo que el sistema esta vivo,
 // sin tener que preguntarselo a nadie. Si el dato no llega, se dice; no se maquilla.
 const _conf = (data as any).confianza || {};
@@ -49,10 +58,6 @@ const laraTexto = !_lara
 // La copia se hace cada noche: si la ultima tiene mas de 36 h, algo va mal.
 const backupAlDia = !!_backup && (Date.now() - new Date(_backup.fecha).getTime()) < 129600000;
 const backupTexto = _backup ? _horaCorta(_backup.fecha) : 'Sin copia';
-if (!data) {
-  return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
-}
-
 const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long', timeZone: data.timezone || 'Europe/Madrid' });
 const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: data.timezone || 'Europe/Madrid' });
 
@@ -156,7 +161,13 @@ function renderAppointmentDate(item: Appointment) {
 >
   <Fragment slot="head">
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <!-- is:inline es lo que evita que Astro convierta esta etiqueta en un import de
+         modulo. Sin ello, la libreria se cargaba en su propio ambito y la variable
+         QRCode nunca llegaba a ser global: el lienzo del QR quedaba con CERO pixeles
+         pintados y el boton de descargar sin destino, con un reintento cada 300 ms
+         para siempre. Justo en el canal que promocionamos como recomendado.
+         (auditoria 3-sept-2026, area D) -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   </Fragment>
 
   <div id="crm" class="crm-light" data-clientid={clientId} data-inbox-token={token}>

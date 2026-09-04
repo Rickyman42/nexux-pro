@@ -7,30 +7,10 @@
 // que se creo y no era falta de trafico: era que el pixel no existia en esa pagina.
 //
 // GA4 y Meta esperan al consentimiento; Umami no lo necesita porque no usa cookies.
-const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
+import PixelOpenAI from './PixelOpenAI.astro';
 ---
 
-{openAiAdsPixelId && <script is:inline data-pixel-id={openAiAdsPixelId}>
-  (function (w, d, s, u) {
-    var current = d.currentScript;
-    var pixelId = current && current.getAttribute('data-pixel-id');
-    if (!pixelId || w.oaiq) return;
-    var q = function () { q.q.push(arguments); };
-    q.q = [];
-    w.oaiq = q;
-    var consent = false;
-    try { consent = localStorage.getItem('nx_cookie_consent') === 'accepted'; } catch (e) {}
-    q('consent', consent);
-    q('init', { pixelId: pixelId });
-    var js = d.createElement(s);
-    js.async = true;
-    js.src = u;
-    var first = d.getElementsByTagName(s)[0];
-    if (first && first.parentNode) first.parentNode.insertBefore(js, first);
-    d.addEventListener('nx:consent-granted', function () { q('consent', true); });
-  })(window, document, 'script', 'https://bzrcdn.openai.com/sdk/oaiq.min.js');
-</script>}
-
+<PixelOpenAI />
 <script is:inline>
   function nxLoadTrackers() {
     if (window._nxTrackersLoaded) return;
