@@ -185,6 +185,33 @@ Si devuelve FALLO, **no está hecho**. (El verificador no valida `.css` ni `.ast
 
 ---
 
+8. **Un script suelto sin `dotenv` puede dejar a un cliente sin calendario — para siempre.**
+   El 24-ago-2026 Lara reservaba citas, las confirmaba por WhatsApp y no llegaban al Google Calendar
+   del negocio. Estuvo dos días así y no había ni una línea de log. Cadena completa:
+   `clean-cal.mjs` importaba `tokenDeAcceso` sin `import 'dotenv/config'` → `GOOGLE_OAUTH_CLIENT_ID`
+   valía `undefined`, que `URLSearchParams` manda como la cadena literal `"undefined"` → Google
+   responde `401 invalid_client / The OAuth client was not found.` → `google-oauth.js` tomaba
+   **cualquier** 400/401 por «el cliente ha revocado el permiso» y escribía `revocado: true` en el
+   estado de producción → `isCalendarConfigured` devolvía false y `whatsapp.js` **ni llamaba** a
+   `createCalendarEvent`, así que tampoco se imprimía su aviso. Sin camino de vuelta: solo lo limpiaba
+   una reconexión manual por el portal.
+   **Lo que hay que llevarse de aquí:**
+   - La hipótesis obvia («cambiamos de proyecto de Google, las credenciales no cuadran») era **falsa**.
+     Se refutó midiendo contra el endpoint real de Google, no razonando. Códigos, medidos el 25-ago:
+     `invalid_grant` = el permiso del cliente ya no vale (es del cliente) · `invalid_client` = nuestro
+     client_id/secret no valen · `unauthorized_client` = el token lo emitió otro cliente OAuth ·
+     `invalid_request` = petición mal montada. **Solo el primero justifica marcar revocado.**
+   - Un fallo de plataforma nuestro nunca debe escribirse como un estado permanente del cliente.
+   - Una puerta (`if (isCalendarConfigured(...))`) que se salta el trabajo tiene que avisar **en la
+     puerta**. Poner el aviso dentro de lo que hay detrás de la puerta es no ponerlo.
+   Blindaje puesto: `lib/alerta-calendario.js` (Telegram + `data/calendario-estado.json` +
+   `data/calendario-incidencias.jsonl`), guardia de credenciales en `google-oauth.js`,
+   avisos en `calendar.js`/`whatsapp.js`/`telegram.js`/`provision-http.js`, 9 tests de regresión en
+   `test/calendario-no-silencioso.test.mjs`, y vigilante diario en cron 08:20
+   (`nexux-clients/scripts/vigilante-calendario.mjs`).
+
+---
+
 ## 8. REGISTRO DE TRABAJO — OBLIGATORIO
 
 Al terminar una tarea, **una línea** al final de `progress/REGISTRO.md`:

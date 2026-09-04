@@ -139,3 +139,404 @@ La evidencia completa va además a ~/nexus-brain/quality-ledger.md. Aquí solo e
 2026-08-24 | claude | Dos fallos de producto que se veian en esa toma, arreglados: (1) la regex PROPONE de reserva-guard.js llevaba un byte de retroceso 0x08 donde iba \b, asi que el guardian del nombre NO HA FUNCIONADO NUNCA y el cliente leia en pantalla 'a nombre de *[Tu Nombre]*'; (2) el panel del CRM no renderizaba el formato de WhatsApp y se veian los asteriscos crudos | commits 1d52979 y 9e63741. Tests 8/8 nuevos y 7/7 previos sin regresion; en vivo tras reiniciar: 0 fugas del hueco, 1 pregunta limpia; en navegador real 0 asteriscos y 14 negritas | OK
 2026-08-24 | claude | Google Calendar ROTO en produccion: al renovar el permiso devuelve 401 invalid_client y las citas que reserva Lara NO llegan al calendario del negocio. Invisible dos dias porque el token viejo aguantaba | log de nexux-clients al cerrar una reserva real + verify-cal.mjs; google-oauth.json marcado revocado:true | FALLO
   causa: no arreglado, es de Ricardo — hay que reconectar el OAuth del cliente con las credenciales del proyecto nuevo y revisar si al resto de clientes les pasa igual
+2026-08-25 | claude-code | Diagnostico del fallo silencioso de Google Calendar y restauracion del cliente demo; hipotesis de credenciales refutada con medicion contra Google | quality-ledger 2026-08-25 + evento de prueba 41dlp0oanjsdqt5ndr7liat9dg creado y borrado | PARCIAL
+  causa: el blindaje de google-oauth.js y el aviso por Telegram estan disenados pero sin implementar, a la espera del OK de Ricardo (tocan 7 ficheros del camino caliente de reservas).
+2026-08-25 | claude-code | Blindaje anti-fallo-silencioso del calendario: guardia de credenciales, distincion invalid_client/invalid_grant, avisos Telegram + fichero de estado, dotenv en los 3 scripts sueltos y vigilante diario en cron 08:20 | nexux-verify 10/10 OK + 63/63 tests + Telegram probado en vivo | OK
+2026-09-03 | claude | Cierre de dos items que el registro tenia abiertos, confirmados por Ricardo. (1) Video de demo: version web ya en produccion (src/components/Anuncio.astro + public/video/anuncio.mp4|webm|vtt, commit 479893a, referenciada desde index.astro); version de difusion/publicidad terminada en C:\Users\Nexux\Downloads\ANUNCIO-nexux-pro-FINAL.mp4 (55.75s, 58MB, 29-ago), fuera del repo por ser entregable externo. (2) Stripe: los dos bugs criticos del plan de 79 EUR (checkout invalid_plan + equipo.json ausente, ambos del commit f15b029/e813ed0) confirmados solucionados; solo queda pendiente el archivado de precios viejos (249/449/749/promo 49), que es limpieza de catalogo, no un bug | https://nexux.pro/video/anuncio.mp4 HTTP 200, git rev-list origin/main...HEAD = 0 0; ls Downloads 60959050 bytes / ffprobe 55.75s | OK
+2026-09-03 | claude | Archivado en Stripe LIVE de precios viejos. Los tres del catalogo pre-pivote (Starter 249, Pro 449, Total 749 - price_1TXf2R2.../1TXf2Q2.../1TXf2Q2SQwDzHtsF5E4YgjLf) YA estaban archivados de antes (active=False), confirmado consultando la API. El unico que seguia ACTIVO era "Lara Promocion Especial" 49 EUR (price_1Tdob42SQwDzHtsF6N1uyV8P): 0 suscripciones vivas con ese precio, archivado ahora (active=false verificado). Sin tocar: Demo Nexux Pro 7 dias gratis, Nexux Amplified 9.99/9.95 (otros productos) y un precio TEST de Nexux Intelligence ya inactivo con nota de borrar en el nombre, fuera de lo pedido | consulta API Stripe antes/despues (active=False verificado) | OK
+2026-09-03 | claude | Revisada (solo lectura, sin activar nada) la campaña de OpenAI Ads Manager para nexux.pro: OPENAI_CPC_ES_NEXUX29_10D_202609, CPC manual, presupuesto 75 EUR, ventana 02-12 sept 2026, grupo de anuncios ES_Citas_WhatsApp_RecepcionistaIA con 3 anuncios de texto (A01/A02/A03, sin video, apuntan a nexux.pro/paquetes/recepcionista). El interruptor de la campaña esta APAGADO a proposito (lista para que Ricardo la active a mano, tal como pidio). Pero hay un bloqueo real ademas del interruptor: "Revision de marca de la cuenta en curso" y la cuenta esta configurada como Individual, no como Business; el modal de verificacion de OpenAI ofrece "Comenzar verificacion" (no dice completada), lo que contradice el aviso de que la revision "ya esta en curso". Sin tocar nada del formulario. Cada dia que pasa bloqueada consume dias de la ventana de 10 dias (empieza 2-sept, ya ayer) | capturas y texto de pagina de ads.openai.com/manage/campaigns y /manage/ads | PARCIAL
+  causa: la decision de cambiar el tipo de cuenta a Business y aportar los datos fiscales es de Ricardo, no se ha tocado
+2026-09-03 | claude | Correccion sobre la entrada anterior de la campana OpenAI Ads: "Individual" es correcto (Nexux no es empresa registrada todavia, confirmado por Ricardo) y la revision de marca SI esta genuinamente en curso del lado de OpenAI (Resumen -> Tareas: "La revision de marca de tu cuenta sigue en curso", no un formulario sin empezar; el modal "Como te anuncias" que vi antes solo ofrece un selector para CAMBIAR de tipo, no prueba que no se hiciera). Sin tocar nada del formulario de verificacion. Hallazgo nuevo y real: en Conversiones hay 3 advertencias -- ninguna campana activa usa eventos de conversion, cero eventos de servidor a servidor, y la fuente de datos Nexux.pro-ChatGPT Ads lleva 0 eventos recibidos nunca (0%). El pixel esta puesto en el sitio (measurement.ts) pero en Ads Manager nunca se creo el "evento de conversion" (paso 2 de 4) ni se vinculo a la campana (paso 4): aunque se active la campana y pase la revision de marca, no habra manera de medir citas/demos reales contra el gasto, solo clics | capturas ads.openai.com/overview y /settings/conversions | PARCIAL
+  causa: crear y vincular el evento de conversion es una decision de configuracion de Ricardo (que evento medir: demo_started o appointment_scheduled), no se ha creado nada sin pedirlo
+2026-09-03 | claude | Creado y vinculado el evento de conversion pedido por Ricardo. En Herramientas -> Conversiones se creo "Cita confirmada" (evento base estandar "Cita programada", que OpenAI traduce internamente a appointment_scheduled) sobre la fuente de datos Nexux.pro-ChatGPT Ads; el codigo de pixel que muestra OpenAI (oaiq('measure','appointment_scheduled',{type:'customer_action'})) coincide exacto con lo que measurement.ts ya envia en demo_booking_created, sin tocar codigo. Vinculado en Campanas -> Editar campana -> Evento de conversion -> Cita confirmada, guardado con exito ("Campana actualizada"). El interruptor de la campana se dejo APAGADO, sin activarla | capturas del formulario de conversion y de la campana tras guardar, mensaje "Campana actualizada" | OK
+2026-09-03 | claude | Aclaracion sobre el checklist "Configurar el seguimiento de conversiones" que Ricardo vio con el paso 4 sin marcar. Reabri el editor de la campana tras recargar la pagina: "Evento de conversion: Cita confirmada" sigue guardado, el vinculo no se perdio. La advertencia "Ninguna campana ACTIVA usa eventos de conversion" sigue apareciendo porque exige que la campana este encendida y sirviendo, no solo configurada -- y sigue apagada a proposito mas bloqueada por la revision de marca. El checklist deberia marcar el paso 4 solo cuando la campana este activa de verdad, no antes | reapertura del modal de editar campana mostrando "Cita confirmada" seleccionado; texto de advertencias sin cambios | OK
+2026-09-03 | claude | Respondida con fuente oficial la pregunta de cuando y como avisan de la verificacion de OpenAI Ads. Doc "Ads Manager Beta Account Setup" (help.openai.com/en/articles/20001213, actualizado hace 15 dias): avisan POR EMAIL al contacto que creo la cuenta -- verificado en Configuracion>Usuarios que el unico usuario y administrador es Ricardo, arteenpixel@gmail.com, alta 2-sept-2026. NO dan plazo: "high volume of applications reviewed in a rolling queue, verification may take some time" y "We are unable to expedite account review or ad review requests at this time". Clave que explica la confusion anterior: "Verification and account review are separate steps -- completing an identity or business verification flow does not always mean the ad account is ready to run campaigns immediately", o sea que la verificacion por telefono de Ricardo (Persona) esta hecha y aun asi la revision de cuenta sigue en cola. PROHIBIDO reintentar: crear otra cuenta o reenviar solicitud no adelanta la cola y ensucia el expediente. Comprobado ademas que lo que si depende de nosotros ya esta listo: facturacion completa (Visa terminada en 2520, perfil Nexux Innovacion Digital con direccion de Mostoles, facturas a arteenpixel@gmail.com, EUR pospago) y nombre+logo de cuenta puestos, que el propio doc marca como requisito para que sirvan los anuncios. Unico hueco menor: campo NIF vacio en el perfil de facturacion | help.openai.com articulos 20001213 y 20001217; paginas de Usuarios y Configuracion de facturacion de la cuenta | OK
+2026-09-03 | claude | Cerrado el ultimo hueco del perfil de facturacion de OpenAI Ads: Ricardo relleno el campo de identificacion fiscal como tipo ES CIF (numero no se transcribe aqui por ser dato personal y estar este registro en git). Verificado releyendo la pagina de Configuracion de facturacion: ya no aparece "-", el dato figura guardado. Con esto la facturacion queda completa (metodo de pago, perfil con direccion, identificacion fiscal, correo de facturas, EUR pospago) y no queda nada pendiente por nuestra parte para que la campana pueda servir; solo falta la revision de cuenta de OpenAI, que avisan por email a arteenpixel@gmail.com y no tiene plazo ni se puede acelerar | pagina de Configuracion de facturacion releida tras el cambio | OK
+2026-09-03 | claude | Arreglado el bucle de reconexion de WhatsApp que llenaba Telegram de "Bot WhatsApp conectado y listo" (commit 237f1c9 en nexux-clients). Ricardo lo planteo bien: si con un cliente ya pasa, con 100 o 1000 es insostenible. Cuatro causas de fondo en lib/whatsapp.js, ninguna era el aviso en si: (1) startBot no tenia guardia de reentrada, dos llamadas casi simultaneas abrian DOS sockets con las mismas credenciales y WhatsApp mata uno (428/440), realimentando el bucle; (2) el socket viejo nunca se cerraba ni se le quitaban listeners, asi que cada evento suyo programaba otra reconexion fantasma; (3) reintento fijo a 5s, que con muchos clientes caidos a la vez seria una tormenta contra WhatsApp -- ahora espera creciente 5/10/20s con techo de 5 min; (4) tras 5 intentos se RENDIA para siempre y dejaba al cliente mudo hasta reiniciar el servicio entero y sin avisar (esto es lo que paso el 22-ago con todos los bots caidos) -- ahora no abandona nunca y avisa una vez al pasar el umbral. El aviso de conexion queda solo para vinculacion nueva o vuelta tras caida avisada; de las caidas ya avisa el vigilante de cron. Datos medidos antes del arreglo: 289 reconexiones de nexux-empresa y 91 de Centro Lena en el log, con "connected" consecutivos sin "disconnected" en medio (firma de sockets duplicados). Comprobado que nexux-empresa YA estaba sin credenciales antes de tocar nada (patron 408 = QR sin escanear, no lo rompi yo): de 19 clientes solo Centro Lena tiene sesion reala | node --check OK, 104/104 tests con control positivo (sabotear una asercion devuelve exit 1), pm2 online tras reinicio y Centro Lena reconectado sin mandar aviso | OK
+2026-09-03 | claude | De paso, test/equipo-inicial.test.mjs fallaba (103/104) por el calendario, no por el codigo: el dia de prueba es hoy+2 saltando el fin de semana, asi que un jueves o viernes se iba al lunes (hoy+4) y quedaba FUERA de la ventana de 4 dias que pedia a availabilityFor. Por eso el 2-sept daba 101/101 y hoy 3-sept fallaba. Ampliada la ventana a 7 dias con el porque escrito en el propio test. Verificado que ese test no importa whatsapp.js ni transitivamente, o sea que el fallo era preexistente y no lo causo mi cambio | 7/7 en ese fichero y 104/104 en la bateria completa | OK
+2026-09-03 | claude | El QR de WhatsApp caduca a las 24h y el bot se apaga, por decision de Ricardo: un alta que no se completa mantenia un socket abierto y un codigo nuevo cada minuto DE POR VIDA; con mil clientes y un 10% sin vincular serian cien sesiones tirando de la Pi sin que nadie las use. BACKEND (nexux-clients): contador en disco (clients/<id>/wa-qr-estado.json, no en memoria porque un reinicio regalaba otras 24h), apagado del socket al vencer, aviso por Telegram al cliente, y funcion reactivaWhatsApp() + endpoint POST /client/:id/whatsapp/reactivar para devolverle el plazo entero desde su propio portal sin tocar el servidor. La caducidad solo afecta a quien NUNCA vinculo: a un cliente que lleva meses funcionando y se le cae la sesion se le sigue reintentando siempre, porque apagarle el WhatsApp a las 24h seria dejarle el negocio mudo. FRONTEND (nexux-pro): la vista de Canales pone Telegram PRIMERO con distintivo Recomendado, explica en llano por que (no hay que reescanear, no se desconecta, va en movil y ordenador a la vez) y guia en 3 pasos con botones de descarga de la app (App Store, Google Play y Ordenador); WhatsApp queda debajo, avisando de las 24h, y si ya caduco enseña un bloque con boton Volver a activar en vez de un QR muerto. ONBOARDING: la guia de WhatsApp avisa del plazo de 24h y de que se reactiva desde el panel, y sugiere dejar Telegram tambien como red de seguridad; la opcion de Telegram lleva ya el distintivo de recomendado | 4 tests nuevos de caducidad (108 en total), prueba real end-to-end en produccion: forzado el vencimiento en un cliente de pruebas, se apago (0 QR en 45s), /status devolvio qr.caducado=true, POST reactivar devolvio ok y el contador arranco de cero; pnpm build OK y vista de Canales comprobada en navegador real (Telegram recomendado con sus 3 pasos y descargas, WhatsApp detras) | OK
+  causa parcial: el bloque de QR caducado no se ha podido ver renderizado en navegador porque el unico cliente con portal completo tiene WhatsApp conectado y ese bloque solo aparece cuando NO lo esta; su logica si esta probada en el backend y el marcado compila
+2026-09-03 | claude | Fallo propio detectado y corregido en el mismo pase: al mover la tarjeta de Telegram delante de la de WhatsApp busque "{showWhatsApp && (" a secas, y esa cadena aparece DOS veces (dashboard y canales), asi que la tarjeta acabo incrustada en la columna Estado del dashboard. Se vio en la captura del navegador, no en el build (compilaba igual). Rehecho acotando la busqueda al rango de la seccion de canales y con una comprobacion que aborta si los limites no salen en orden | captura del navegador antes (tarjeta dentro del dashboard, columna de 90px) y despues (Canales correcto) | OK
+2026-09-03 | claude | HALLAZGO DE INFRAESTRUCTURA: pnpm build tumbo la Pi entera (reinicio, 7 min de uptime, todos los servicios caidos y restaurados solos por PM2). Causa: el build de Astro agota los 3,7 GB de RAM. Con NODE_OPTIONS=--max-old-space-size=1400 no solo deja de tumbarla, sino que el build baja de 652 s a 89 s: lo que iba lento era el thrashing de memoria. A partir de ahora, los builds en la Pi con esa variable | uptime tras el reinicio, PM2 14/14 servicios online, build completo en 89,51 s | OK
+2026-09-03 | claude | Arreglado el boton Gestionar suscripcion que Ricardo reporto como no carga y no hace nada (commits 039b9a5 en nexux-clients y 05fad4f en nexux-pro). Causa medida contra el backend: devuelve no_stripe_customer con HTTP 400 porque la cuenta no tiene stripeCustomerId; los TRES clientes activos estan asi porque se dieron de alta a mano y nunca pasaron por la pasarela. NO era un fallo del boton para quien paga de verdad (el alta via Stripe si guarda el identificador), pero el portal ofrecia a todos un boton que para algunos solo podia acabar en error y el aviso no explicaba nada. Ahora /status expone billing.stripe (si/no, sin el identificador) y el portal sustituye el boton por una explicacion cuando no hay suscripcion, quitando tambien la frase de abajo que remitia a un boton inexistente. Si hay suscripcion y aun asi falla, el mensaje distingue no tiene suscripcion de no se pudo abrir, intentalo en un minuto | curl al backend devolviendo el 400 antes del arreglo; /status con stripe:false despues; pnpm build OK; navegador real sobre el MISMO cliente de la captura de Ricardo: sin boton, con la explicacion y sin frases incoherentes | OK
+2026-09-03 | claude | PUSH hecho con OK de Ricardo: nexux-clients-core d8011c3..039b9a5 (3 commits: bucle de reconexion, caducidad del QR, billing.stripe en /status) y nexux-pro f15b029..05fad4f (2 commits: canales con Telegram delante, boton de suscripcion). Escaneados los diffs antes de subir en busca de sk_live/whsec_/tokens/claves privadas: limpios. Verificado el despliegue de Vercel descargando el portal real de produccion con token: aparecen menos guerra da, App Store, Google Play y Recomendado. El texto de las 24h no aparece en ese cliente porque su WhatsApp SI esta conectado y ese aviso solo sale cuando no lo esta, que es el comportamiento correcto | curl autenticado a https://nexux.pro/cliente/... HTTP 200, 127438 bytes, 4 de 4 marcadores presentes | OK
+2026-09-03 | claude | STRIPE: activado el cambio de plan 29 <-> 79 en el portal de clientes con OK expreso de Ricardo (configuracion bpc_1ShYHb2SQwDzHtsFV5Zm5t9K, la predeterminada). Antes estaba DESACTIVADO, asi que la frase del portal de nexux.pro que decia para cambiar de plan usa el boton Gestionar suscripcion era falsa: el cliente entraba y no encontraba donde. Ahora: los dos productos declarados (prod_V6xlRvLwrMTEJF 29 EUR y prod_VBf4ODSQteOaIk 79 EUR), prorrateo se prorratean cargos y creditos con momento del cargo prorrata de facturas en el momento de la actualizacion (= always_invoice, cobra el pico al instante, como eligio Ricardo), bajada de plan actualizar de inmediato, cancelacion al final del periodo pagado y sin devolucion, codigos de promocion desactivados. OJO: fin de las pruebas en las actualizaciones esta activado, o sea que un cliente en periodo de prueba que cambie de plan PIERDE la prueba y empieza a pagar de inmediato | Dashboard de Stripe revisado pantalla por pantalla tras aplicarlo por API; los dos productos y el radio de prorrateo confirmados a la vista | OK
+  causa parcial: la API de Stripe con la version 2025-08-27.basil NO devuelve features.subscription_update.products ni en el POST ni en el GET, aunque el Dashboard si los muestra guardados. Verificar esa parte por API da un falso negativo: hay que mirarlo en el Dashboard
+2026-09-03 | claude | Stripe: los periodos de prueba YA NO se pierden al cambiar de plan, por decision de Ricardo. trial_update_behavior pasa de end_trial a continue_trial en la configuracion del portal bpc_1ShYHb2SQwDzHtsFV5Zm5t9K. Antes, un cliente en prueba que subiera o bajara de plan perdia los dias que le quedaban y empezaba a pagar en ese momento; ahora los conserva y se le empieza a cobrar al terminar, ya con el plan nuevo | leido antes (end_trial), aplicado y releido despues (continue_trial); el resto de la configuracion sin tocar, verificado en la misma lectura | OK
+2026-09-03 | claude | Respondida con doc oficial la pregunta de que pasa con el dinero al BAJAR de plan (79 a 29). Cita literal de docs.stripe.com/billing/subscriptions/prorations: Negative prorations arent automatically refunded and positive prorations arent immediately billed, although you can do both manually. O sea: al bajar NO se devuelve nada a la tarjeta automaticamente. Se genera un saldo A FAVOR del cliente que se descuenta de las siguientes facturas. Ejemplo a dia 10 de un mes de 30: credito 55,30 EUR por los 21 dias sin usar del plan de 79, cargo 20,30 EUR por esos dias al de 29, quedan 35,00 EUR a favor; su siguiente factura de 29 sale a 0 y aun le sobran 6 EUR para el mes siguiente. Para devolverle dinero de verdad hay que hacer el reembolso a mano | documentacion oficial de Stripe consultada y citada | OK
+2026-09-03 | claude | Publicado un artefacto con el recorrido completo que ve el cliente al pulsar Gestionar suscripcion: 5 pantallas navegables, ticket de prorrateo con deslizador del dia del cambio y conmutador subir/bajar que recalcula y explica el saldo a favor. Datos reales de la configuracion; tarjeta, facturas y nombre del salon son de ejemplo y esta rotulado como simulacion que no cobra nada. URL claude.ai/code/artifact/560feddb-3db5-46cf-a095-b4ada4746f27. Actualizado tras el cambio de trial_update_behavior para que no dijera lo contrario de lo configurado | artefacto publicado y republicado con los textos corregidos | OK
+2026-09-03 | claude | Stripe: la BAJADA de plan ya no se aplica al momento, se programa para el final del periodo pagado (schedule_at_period_end.conditions = decreasing_item_amount). Decision de Ricardo con buen criterio: si se aplicaba al instante, la pasarela dejaba el sobrante como saldo a favor y el cliente se quedaba esperando un ingreso que nunca llega. Ahora el cliente disfruta entero el mes que pago con el plan caro y el dia de la renovacion pasa al barato, sin dinero suelto de por medio. Las SUBIDAS siguen aplicandose al momento con cobro del pico (always_invoice), que es lo que interesa a ambas partes | leido antes (conditions vacio), aplicado y releido despues (decreasing_item_amount); prorrateo de subidas y continue_trial intactos en la misma lectura | OK
+2026-09-03 | claude | CORREGIDA una creencia equivocada de Ricardo, importante porque afecta a lo que se le promete al cliente: penso que al cancelar le devuelven el dinero. NO. La configuracion de cancelacion es at_period_end con proration=none: no se reingresa nada, simplemente se deja de cobrar y el cliente sigue usando el servicio hasta agotar lo pagado. Y aunque se cambiara a cancelacion inmediata, la pasarela TAMPOCO devolveria a la tarjeta sola: generaria un saldo a favor de una suscripcion que ya no existe, que es peor. Devolver dinero de verdad es siempre un reembolso manual desde el dashboard. Sin tocar nada de la cancelacion: queda a decision de Ricardo | configuracion leida por API (mode=at_period_end, proration=none) + doc oficial de prorratas | OK
+2026-09-03 | claude | AUDITORIA PRE-CAMPANA. Hallazgo critico y corregido (commit 44241c0): PRICE_TO_PLAN en lib/stripe-webhook.js seguia con el catalogo de antes del pivote (249/449/749, los tres archivados) y NO tenia los precios de 29 ni de 79. Como el codigo exige que el plan resuelva antes de aplicar nada, un precio desconocido no da error: el webhook responde ok y no hace nada. O sea que un cliente que cambiara de plan desde el portal de pagos -- justo lo que se acababa de habilitar hoy -- habria pagado 79 quedandose con las funciones de 29, en silencio y sin rastro en logs. Anadidos los dos precios vigentes, mantenidos los retirados. Nuevo test/precios-mapeados.test.mjs con control positivo (quitando el precio de 29 la bateria falla) | 111/111 tests, node --check OK, servicio reiniciado y online | OK
+2026-09-03 | claude | Resto de la auditoria pre-campana, todo COMPROBADO EN VIVO y sin incidencias: (1) el bucle de reconexion de WhatsApp esta resuelto de verdad -- en 6,4 h desde el arreglo, Centro Lena lleva 1 conexion y 0 caidas, cuando antes se caia cada 15-90 min; las 54 desconexiones que quedan son del cliente sin vincular, que es lo que apagara la caducidad de 24 h. (2) La landing de los anuncios responde 200 en 0,1 s y lleva el pixel de medicion con el ID correcto. (3) El checkout de 29 crea sesion de pago live correctamente. (4) Los DOS webhooks de Stripe que preocupaban a Codex son inofensivos: /webhook/stripe reescribe a /api/webhook/stripe y ambos acaban en la Pi, pero el handler descarta duplicados por event.id y marca ANTES de los efectos, y no hay await entre comprobar y marcar, asi que tampoco hay carrera. (5) Cancelaciones y cambios de plan SI se manejan (customer.subscription.deleted desactiva al cliente y manda correo de win-back; updated aplica limites y funciones del plan nuevo) | curl a produccion, logs de PM2 desde el ultimo arranque, lectura del codigo del webhook y de vercel.json | OK
+2026-09-03 | claude | 🔴 FALLO CRITICO DE MEDICION encontrado y corregido antes de arrancar la campana (commit 6911a85, pusheado y desplegado). La pagina /demo NO usa Layout.astro y todos los pixeles vivian ahi: la demo solo cargaba Umami, sin OpenAI, sin Meta, sin GA4 ni Plausible. Y la conversion que mide la campana (cita confirmada) ocurre justo ahi: demo.astro dispara demo_booking_created al reservar y measurement.ts comprueba que exista window.oaiq antes de enviarlo; como no existia, se descartaba EN SILENCIO. Eso explica los 0 eventos recibidos del panel: no era falta de trafico, era imposible que llegara ninguno. Se habria gastado el presupuesto entero sin poder atribuir una sola cita. Extraido el bloque a components/Medicion.astro e incluido en la demo | medido en produccion antes (demo: solo stats/script.js; home y landing: los cinco) y despues (demo: los cinco, incluido el pixel ID correcto); en navegador se confirmo oaiq/fbq/gtag/plausible undefined antes y function despues | OK
+2026-09-03 | claude | Conversion PROBADA de punta a punta en navegador limpio (sin extensiones): al disparar demo_booking_created salen los cinco envios con atribucion completa -- bzr.openai.com/v1/sdk/events con el pixel ID y ec=1, facebook.com/tr con ev=demo_booking_created y las utm, GA4 con en=demo_booking_created y ep.utm_source/medium/campaign, Umami y Plausible. AVISO PARA FUTURAS PRUEBAS: en el Chrome de Ricardo las llamadas a GA4 y a OpenAI devuelven 503 por sus extensiones; en navegador limpio salen bien. Si se mide con su navegador se ven errores que no son reales | peticiones de red capturadas en los dos navegadores y comparadas | OK
+  causa parcial: el recuento en el panel de OpenAI no se ha podido confirmar todavia -- su propia documentacion admite hasta 7 h de retraso entre la entrega y los informes, y la consola no cargaba. Lo verificado es que el evento SALE correctamente, que es la parte que depende de nosotros
+2026-09-03 | claude | QR de las octavillas MEDIDOS (commit f5e90e8, desplegado). Las tres variantes llevaban el MISMO QR apuntando a https://nexux.pro/demo a secas: una visita desde el papel era indistinguible de cualquier otra y el reparto no podia decir que octavilla funciona. Ahora hay nexux.pro/f/<codigo> que redirige 302 a la demo etiquetando origen, medio, campana y variante (d1 dolor-directo, d2 cita-que-no-vuelve, d3 producto-explicito); un codigo desconocido tambien lleva a la demo, marcado como tal, para que un QR mal leido no deje a nadie tirado. Regenerados los 4 PDF con el QR de cada variante | las 4 redirecciones probadas en produccion devuelven 302 con las utm correctas; los 6 QR (anverso y reverso de las 3 variantes) leidos con zxing-cpp y cada uno devuelve la direccion de SU variante | OK
+2026-09-03 | claude | Nota de entorno para regenerar las octavillas: el generador usa fuentes de Windows (Arial y Georgia desde C:/Windows/Fonts), asi que en la Pi no se puede ejecutar sin cambiar el aspecto. Se monto una copia de trabajo en C:/Users/Nexux/Desktop/gen-octavillas con la estructura minima (tmp/publicidad + public/img + output) y se instalaron en el Python de Windows reportlab, pypdf, qrcode y zxing-cpp, que faltaban. En la Pi se dejo pypdf vendorizado en tmp/publicidad/deps, como ya estaban qrcode y colorama. El generador parcheado esta en la Pi y su version previa en crear_a4_duplex_3_variantes.py.original | generacion completa ejecutada en Windows: 4 PDF de ~8 MB cada uno | OK
+2026-09-03 | claude | Octavillas, segunda pasada por peticion de Ricardo: QR de 205 a 258 px (compacto de 180 a 224), unos 22 mm en papel, y el rotulo pasa de MIRA LA DEMO a HABLA CON LARA AHORA / Tarda 30 segundos, que da motivo y coste en vez de nombrar el boton. Ricardo DESCARTA poner la ciudad: las octavillas se quedan genericas a proposito. Al agrandar aparecio un defecto que solo se veia mirando: en la variante 03 el rotulo suelto se cruzaba con la tablet de la foto y quedaba ilegible sobre el mueble; se metio dentro de la tarjeta blanca. El tamano estaba repetido en la funcion y en las 6 llamadas, ahora sale de una constante | los 6 QR releidos con zxing-cpp tras cada regeneracion, cada uno devuelve su variante; revisadas a ojo las tres variantes por anverso y reverso, con recorte ampliado de la esquina del QR | OK
+2026-09-03 | claude (Fable 5.1, orquestador) | AUDITORIA DE LANZAMIENTO lanzada por orden de Ricardo: comprobar al 100 por cien, en la capa real, que todo el proyecto funciona antes de presentarlo al publico. PRP maestro en C:/Users/Nexux/.claude/PRPs/20260903_120000_auditoria-lanzamiento-nexux-pro.md. Fase 1: siete auditores Opus 5 en paralelo, SOLO LECTURA (prohibido push, build en la Pi, instalar, reiniciar, tocar datos o codigo), cada uno con briefing autocontenido y linea de grounding: A estabilidad de la API (la pregunta de Ricardo: por que se reinicia), B compra y alta, C Lara en los tres canales, D CRM/portal, E web+SEO+medicion, G seguridad y RGPD, H operacion/backups/crons. Definicion de verificado: comando y salida de esta misma sesion contra produccion o la Pi; lo demas se declara NO VERIFICADO. Informes en progress/auditoria-lanzamiento-20260903/. Fase 2: consolidacion y priorizacion (Fable). Fase 3: correcciones una a una (Opus 5 / Codex) con commit sin push. Fase 4: re-verificacion | estado de la Pi al lanzar: load 0,16, 1,7 GB libres, disco al 80 por ciento (23 GB), nexux-clients online con 2 reinicios | PARCIAL
+  causa: en curso; se cierra cuando lleguen los siete informes y se consoliden
+2026-09-03 | claude (Fable) | Corregido un resto MIO de esta madrugada, cazado por el auditor A (M-5): clients/nexux-demo-mostoles-42a928/wa-qr-estado.json tenia caducadoEn 5 minutos despues de primerQrEn, imposible con la logica de 24 h. Fue una prueba manual: puse caducadoEn a mano para ver la pantalla de QR caducado en el portal y no lo limpie, dejando un cliente active=true con el WhatsApp apagado. Fichero borrado; con el proximo arranque o desde el boton del portal vuelve a pedir QR con su plazo entero | fichero mostrado y borrado; hipotesis del auditor confirmada por el autor del resto | OK
+2026-09-03 | claude (Fable) | 🔴 CERRADO EN CALIENTE el bloqueante G-B1 de la auditoria de seguridad (commit en nexux-clients, sin push): las rutas /admin/* de provision-http.js aceptaban una clave por defecto escrita en el codigo porque ADMIN_KEY no estaba definida; el auditor lo comprobo con curl en produccion (HTTP 200) y esas rutas permiten mandar WhatsApp en nombre de nexux-empresa. Arreglo: funcion adminAutorizado() con comparacion en tiempo constante, sin fallback (sin ADMIN_KEY = cerrado), y ADMIN_KEY aleatoria de 64 hex anadida al .env (escrito en bytes: el .env no es UTF-8 puro y una escritura de texto lo habria corrompido). Reinicio del servicio de unos 10 s, justificado por ser un agujero abierto a internet; hecho con auditores C, D, E y H aun trabajando | curl tras reinicio: clave antigua 401, sin clave 401, clave nueva 200, /health 200 | OK
+2026-09-03 | claude (cuenta nueva, Haiku+workflow 6 lentes) | Revision del briefing de traspaso y del PRP v4 antes de entregarlos a otra cuenta de Claude. CONFIRMADO por mi tras remedirlo: (1) hay un SEGUNDO handler /webhook/stripe en lib/admin.js:49, montado por index.js:9 en un Express aparte (ADMIN_PORT 3458), que el PRP v4 no nombra en ningun sitio -- arreglar solo provision-http.js:1611 lo deja abierto; (2) el PRP se equivoca al decir que no existe caducador de trial: scripts/trial-expiry.js existe (8360 bytes, 25-jul), lo que no existe es lib/trial-expiry.js; (3) src/pages/api/book.ts existe en fuente y sigue dando 404 en produccion, confirmando la trampa de la carpeta api/ de la raiz. Ademas verificado que el comando SSH del briefing funciona, que las dos copias del PRP son identicas salvo 2 lineas en blanco, y que las ramas task/ola1-* estan libres. Briefing ampliado con estado medido, 8 trampas ya pisadas, como se cierra una tarea aqui, hallazgos de la revision separados en CONFIRMADO/NO VERIFICADO, y prohibiciones que faltaban (datos reales de clientes, mensajeria a personas reales, Stripe LIVE mas alla de webhooks, pm2 y crons) | briefing en Desktop + copia en progress/auditoria-lanzamiento-20260903/BRIEFING-CONTINUAR-20260903.md; salida cruda en REVISION-BRIEFING-Y-PRP-20260903.json | PARCIAL
+  causa: la fase adversarial del workflow se corto por limite de sesion (32 de 33 refutadores muertos), asi que solo 2 hallazgos pasaron refutacion independiente y el resto queda declarado NO VERIFICADO dentro del propio briefing; entre ellos la afirmacion de que el apartado 3 del PRP v4 cuenta una causa falsa, que es justo el corazon tecnico del plan y hay que remedir antes de codear
+2026-09-03 | claude (cuenta nueva, Sonnet) | REPARACION REAL 1 de la Ola 1 (W5, bloqueante G1-b/G1-c): el formulario publico de reserva devolvia 404 y no reservaba nada, y la medicion de abandono del alta tampoco existia. Causa: la carpeta api/ de la raiz son funciones serverless de Vercel y ganan sobre el enrutado de Astro, asi que src/pages/api/book.ts y src/pages/api/analytics/ob.ts nacian muertos pese a estar bien escritos. Movidas ambas a src/pages/pub-api/ y actualizadas sus dos unicas llamadas (reservar/[id].astro y cliente/[id]/onboarding.astro). Sin cambios de logica. NO se tocan src/pages/api/webhook/stripe.ts ni api/leads/pro.ts, igual de sombreados, porque pertenecen al camino del pago y ese diseno sigue en disputa. Trabajado en worktree ~/nexux-pro-wt-ola1 rama task/ola1-lanzamiento-pro desde 71a2e03, commit 0bf1a1f SIN PUSH | manifest .vercel/output/config.json publica ^/pub-api/book$ y ^/pub-api/analytics/ob$ y ya NO publica api/book (control positivo: la comprobacion devuelve True para la nueva y False para la vieja, luego distingue); build completo en la Pi con NODE_OPTIONS=--max-old-space-size=1400 en 55 s sin tumbarla | PARCIAL
+  causa: verificado solo en el artefacto de build; la comprobacion contra produccion (POST a https://nexux.pro/pub-api/book) exige el push que Ricardo aun no ha autorizado
+2026-09-04 | claude (Fable 5.1) | PRP v5 CERRADO PARA EJECUCION. El camino del dinero se ha vuelto a medir linea a linea en el codigo que ejecuta y el diagnostico de la v4 se ha reescrito entero. Hechos medidos: (1) hay CUATRO receptores de Stripe escritos y solo R1 (Vercel api/webhook/stripe.js) recibe algo -- Stripe tiene 2 endpoints registrados y ambos acaban en esa funcion, ninguno apunta a la Pi; (2) el receptor de la Pi que ve internet (provision-http.js:1611, el tunel de Cloudflare va directo al 3460 sin nginx) esta MUERTO: express.json global en la linea 39 se traga el cuerpo y JSON.parse revienta con 400 invalid_json a todo evento, nunca verifica ni ejecuta nada -- el revisor tenia razon y la v4 contaba una causa falsa; (3) el segundo receptor lib/admin.js:49 es correcto pero escucha en 127.0.0.1:3458 y no es alcanzable desde fuera; (4) el agujero real esta en la FUNCION handleStripeWebhook:223 (if secret AND sigHeader: sin cabecera no verifica), hoy inalcanzable, y se abre a internet en cuanto alguien arregle la ruta sin tocar la funcion -- por eso el orden es funcion primero, ruta despues; (5) B1 exacto: nadie escribe sessionStorage.laraData, salon llega null, provisionClient de Vercel devuelve null SIN llamar a la Pi, manda un correo que promete una llamada en 24h y responde 200, asi que Stripe no reintenta jamas; (6) config.active: whatsapp.js 0 veces, twilio.js 0, rutas publicas de reserva y chat web no lo comprueban; (7) ai.js descarta finish_reason, imposible detectar cortes en Telegram; (8) scripts/trial-expiry.js existe entero, sin cron. Diseno de dos endpoints de Ricardo mantenido, con una alternativa interna anotada para decidir en D7. Ola 1 con fichero:linea por tarea, 18-22 h reales | PRP en Windows .claude/PRPs/20260903_213000_arreglo-lanzamiento-nexux-pro.md y copia identica en progress/auditoria-lanzamiento-20260903/PRP-ARREGLO-LANZAMIENTO-V5.md (V4 conservada como historico); evidencia: sed/grep sobre provision-http.js, lib/stripe-webhook.js, lib/admin.js, index.js, api/webhook/stripe.js, api/stripe/create-session.js, checkout.ts; ss -ltnp; nginx sites-enabled; ufw; curl GET a pi.nexux.pro; GET /v1/webhook_endpoints en Stripe live sin imprimir la clave | OK
+
+## 2026-09-04 · Octavillas en imprenta: QR verificados (Opus 5)
+
+VERIFICADO, no asumido. Ricardo preguntaba si las octavillas ya repartidas/en imprenta
+estaban bien diferenciadas. Comprobado sobre el fichero real de imprenta y contra produccion:
+
+- `F:\Imprimir\nexux-pro-variantes-mixtas-a4-duplex-4up.pdf` (2 paginas, 4-up): se decodificaron
+  los QR con zxing-cpp -> 8 codigos, tres direcciones distintas y correctas:
+  https://nexux.pro/f/d1 (x4) · /f/d2 (x2) · /f/d3 (x2)
+- Redirectores en vivo: d1 -> 302 utm_content=01-dolor-directo · d2 -> 02-cita-que-no-vuelve
+  · d3 -> 03-producto-explicito
+
+CONCLUSION: no hay que reimprimir nada. La diferenciacion por variante esta bien hecha.
+
+CORRECCION A LO QUE DIJE ANTES: afirme que "el panel va a mentir sobre las octavillas".
+Impreciso. El evento de inicio de compra SI guarda la variante (fila real en Umami con
+utm_content=02-cita-que-no-vuelve, medida por el area E). Lo que se adivina mal es el campo
+"origen" del evento de VISITA a /demo (6 de 8 guardadas como directo/interno). La URL completa
+queda en url_query, asi que lo recogido se recupera. Sigue siendo W4 de la Ola 1, 30 min.
+
+Como lo comprueba Ricardo:
+  for c in d1 d2 d3; do curl -s -i https://nexux.pro/f/$c | grep -i '^location:'; done
+Debe salir una utm_content distinta en cada una.
+
+## 2026-09-04 · P2 del PRP v5 — receptor de Stripe de la Pi (Opus 5)
+
+Commit `4a1beff` en el worktree `task/ola1-lanzamiento-clients`. SIN push, SIN reiniciar.
+En produccion sigue el codigo viejo.
+
+MEDIDO, no deducido: `POST https://pi.nexux.pro/webhook/stripe` con JSON valido y cabecera
+de firma devuelve `{"error":"invalid_json"}` HTTP 400. Causa: `express.json()` en la linea 39
+corre antes que la ruta de la 1611. Ese receptor devolvia 400 a todos los eventos desde el
+primer dia, y por eso ni llegaba a comprobar la firma.
+
+Cambios: 4.1 firma exigida siempre · 4.2 ruta por encima del parser · 4.3 retirado el segundo
+receptor de lib/admin.js · 4.4 guarda de duplicados + payment_failed idempotente.
+
+Verificacion: test/webhook-stripe-firma.test.mjs (6 casos contra el servidor real, cwd temporal)
+· SABOTEADO: al devolver la firma a opcional, "sin cabecera" pasa de 400 a 200 y el test lo caza
+· suite completa 117/117 · nexux-verify 7/7 OK.
+
+Como lo comprueba Ricardo:
+  1) ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node --test test/webhook-stripe-firma.test.mjs 2>&1 | tail -6"
+     Debe salir: # pass 6 / # fail 0
+  2) curl -s -X POST -H 'Content-Type: application/json' -H 'stripe-signature: t=1,v1=x' \
+       -d '{"id":"e","type":"customer.subscription.deleted","data":{"object":{"customer":"c"}}}' \
+       https://pi.nexux.pro/webhook/stripe
+     Debe salir {"error":"invalid_json"} = produccion SIGUE con el codigo viejo, no se ha desplegado nada.
+
+PENDIENTE: el reinicio de nexux-clients para que esto entre en produccion necesita OK de Ricardo
+(decision 9 del PRP: corta las sesiones de WhatsApp de los 3 clientes activos).
+
+## 2026-09-04 · P3 del PRP v5 — que la orden de reserva no pueda cortarse (Opus 5)
+
+Commit `46ebb71` en el worktree `task/ola1-lanzamiento-clients`. SIN push, SIN reiniciar.
+
+Problema: la etiqueta [RESERVA:...] va al final del texto del modelo y Telegram tenia techo
+de 150 (WhatsApp 450). Si el corte caia ahi, la cita no se creaba, la clienta veia codigo y
+no saltaba ningun aviso. Subir el numero solo bajaba la probabilidad.
+
+Cambios: ai.js deja de tirar `finish_reason` (nuevo `chatConDetalle`; `chat` sigue igual para
+los otros 8 consumidores) · `respuestaCortada()` en reserva-guard.js · telegram a 450 · en
+telegram y whatsapp, si viene cortada se reintenta una vez y, si vuelve a venir cortada, NO se
+envia: mensaje corto a la clienta y aviso al dueno en Telegram.
+
+Verificacion: test/respuesta-cortada.test.mjs (10 casos) · SABOTEADO (detector siempre false ->
+4 tests rojos, salida 1, fichero restaurado identico) · suite completa 127/127 · nexux-verify 7/7.
+
+Como lo comprueba Ricardo:
+  ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node --test test/respuesta-cortada.test.mjs 2>&1 | tail -6"
+  Debe salir: # pass 10 / # fail 0
+
+NO VERIFICADO (y no se disfraza):
+  - Una reserva real de extremo a extremo por Telegram. Exige cuenta de Telegram; la hace
+    Ricardo. Es lo que cierra este arreglo de verdad.
+  - Twilio queda fuera: no llama al modelo; su canal vive en provision-http.js:792 y su bucle
+    de acciones esta roto de antes (C-B3, Ola 2).
+  - El chat de la demo y el widget web no llevan detector: el PRP acota P3 a canales de cliente.
+
+## 2026-09-04 · Hueco de P3 cerrado: WhatsApp no avisaba al dueno (Opus 5)
+
+Commit `56ffc7b`. Lo detecto Ricardo, no yo. En Telegram la rama del doble corte avisaba al
+dueno; en WhatsApp solo mandaba la disculpa y hacia return. El PRP v5 6.3 lo pide en los dos.
+
+CAUSA DEL DESCUIDO (para que no se repita): busque un avisador DENTRO de whatsapp.js, no lo
+encontre y conclui que no existia el mecanismo. Existia un fichero mas alla:
+`notifyOwnerTelegram(clientId, text)` en lib/telegram.js:795. La comprobacion correcta era
+buscar en todo el codigo, no solo en el fichero que estaba tocando. Mismo patron que el resto
+de fallos de esta auditoria: mirar donde es comodo, no donde esta.
+
+Import circular descartado midiendolo: telegram.js carga whatsapp.js con `await import()`
+diferido, no estatico. `import('./lib/whatsapp.js')` resuelve con sus 10 exports. `node --check`
+no habria detectado un ciclo.
+
+Verificacion: caso nuevo en test/respuesta-cortada.test.mjs que recorre los DOS canales y exige
+el aviso con el mismo texto (comprobacion sobre el codigo fuente, declarada como tal en el
+propio test) · SABOTEADO: sin la llamada, falla con 'whatsapp: la rama del doble corte NO avisa
+al dueno' · suite 128/128 · nexux-verify 3/3.
+
+Como lo comprueba Ricardo:
+  ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node --test test/respuesta-cortada.test.mjs 2>&1 | tail -6"
+  Debe salir: # pass 11 / # fail 0
+
+## 2026-09-04 · P4 del PRP v5 — un cliente de baja deja de ser atendido (Opus 5)
+
+Commit `e2845ac`. SIN push, SIN reiniciar.
+
+MEDIDO antes de tocar: config.active se comprobaba 0 veces en whatsapp.js, 0 en twilio.js,
+1 en telegram.js (en el camino del mensaje entrante, correcta) y 3 en scheduler.js. El GET
+/public/:clientId si lo comprobaba; el POST /public/:clientId/book que CREA la cita, no.
+
+Cambios: guardia en handleMessage (WhatsApp), en handleInboundCall (Twilio, antes de disparar
+el seguimiento y el aviso al dueno) y en la ruta publica de reserva (403 inactive).
+
+DECISION documentada: se usa `!active` a secas. NO se propago la excepcion `plan !== 'demo'`
+del GET hermano porque se midio que HOY NINGUN CLIENTE tiene plan 'demo' (el directorio
+llamado `demo` tiene plan 'total'): es condicion muerta. Ademas propagarla habria dejado sin
+efecto la futura caducidad de las pruebas (Ola 2, punto 1).
+
+Verificacion FUNCIONAL (no sobre el codigo fuente, a diferencia del caso de P3):
+test/cliente-inactivo.test.mjs, 6 casos, llamando a las funciones reales con un socket falso
+y contra el servidor real arrancado en puerto libre · SABOTEADOS los tres guardias por
+separado: whatsapp 2 rojos, twilio 1, ruta publica 1, los tres con salida 1, ficheros
+restaurados identicos · suite 134/134 · nexux-verify 5/5.
+
+Como lo comprueba Ricardo:
+  ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node --test test/cliente-inactivo.test.mjs 2>&1 | tail -6"
+  Debe salir: # pass 6 / # fail 0
+
+Observado y NO tocado: outreach-runner.js tampoco mira active (es el motor de captacion, no
+atiende clientas de un salon). /api/lara-web/chat no lleva clientId: es el widget de ventas
+de Nexux, no un canal de cliente. Ninguno de los dos entra en P4.
+
+## 2026-09-04 · P5 del PRP v5 — modo de cuenta explicito (Opus 5)
+
+Commit `cbc2bb4`. SIN push, SIN reiniciar. Migracion NO aplicada (ver abajo).
+
+Problema: `isTrial = !stripeSubscriptionId`. Cualquier alta sin suscripcion era prueba de 7
+dias, incluida la cuenta de rescate de quien YA pago. Y scripts/trial-expiry.js repetia la
+misma regla dos veces mas (su migracion retroactiva y su bucle).
+
+Cambios: lib/account-mode.js nuevo (stripe_paid | manual_paid | demo, decideModoCuenta,
+esPrueba) · provision-http.js escribe accountMode y /provision lo acepta · isTrial se conserva
+DERIVADO porque lo leen 4 sitios · trial-expiry solo caduca demos y ya no inventa pruebas ·
+scripts/migrar-account-mode.mjs con --dry-run por defecto.
+
+Verificacion: test/account-mode.test.mjs 8 casos (todas las ramas) · SABOTEADO (vuelve la
+logica vieja -> tests 3 y 4 rojos, salida 1, restaurado identico) · suite 142/142 ·
+nexux-verify 6/6.
+
+Como lo comprueba Ricardo:
+  1) ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node --test test/account-mode.test.mjs 2>&1 | tail -5"
+     Debe salir: # pass 8 / # fail 0
+  2) ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node scripts/migrar-account-mode.mjs --dir /home/nexux/nexux-clients/clients"
+     Enseña la tabla SIN escribir nada.
+
+DECISION PENDIENTE DE RICARDO — la migracion NO se aplica:
+En simulacion contra los datos reales, la regla automatica marcaria como `demo` con fecha de
+caducidad YA PASADA a dos cuentas ACTIVAS:
+  - nexux-empresa                        (caducaria 2026-06-18)
+  - estudio-ricardo-demo-mostoles-946279 (caducaria 2026-08-29)
+Si se aplica y despues se enciende el cron del caducador (Ola 2, punto 1), esas dos se apagan.
+Hay que decidir una por una si son demo o manual_paid ANTES de lanzar --aplicar.
+
+## 2026-09-04 · accountMode: override por cliente y MIGRACION APLICADA (Opus 5)
+
+Commit `832be7f`. Sin push, sin reiniciar. Lo que SI ha cambiado en produccion: los datos de
+los 18 config.json (la version en marcha los ignora, lee isTrial).
+
+DECISION DE RICARDO: nexux-empresa y estudio-ricardo-demo-mostoles-946279 son manual_paid y
+no caducan jamas. La regla automatica las habria marcado demo con fecha vencida.
+
+Cambio: flag --manual-paid <id1,id2> en scripts/migrar-account-mode.mjs. La tabla marca esas
+filas como DECIDIDO A MANO. Un id inexistente ABORTA con codigo 1 sin escribir nada (probado):
+sin eso, una errata habria dejado la cuenta caducando en silencio.
+
+Copia previa: /tmp/configs-antes-accountmode.tar.gz (18 ficheros, 5.957 bytes).
+
+VERIFICACION (la que pidio Ricardo, ejecutada):
+  1. Simulacion re-ejecutada -> 0 clientes pendientes de accountMode.
+  2. Las dos cuentas -> accountMode=manual_paid, isTrial=false, trialEndsAt=null, active=true.
+  3. Cuentas ACTIVAS en modo demo -> 0. Las tres activas quedan manual_paid.
+  4. Las 8 demos inactivas conservan su trialEndsAt intacto.
+  5. Suite completa 159/159.
+
+Como lo comprueba Ricardo:
+  ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node scripts/migrar-account-mode.mjs --dir /home/nexux/nexux-clients/clients | tail -3"
+  Debe decir que todos 'ya lo tiene' y ningun 'se pondria'.
+
+CORRECCION DE METODO (la detecto Ricardo): venia informando 142/142 con el filtro
+`node --test 'test/*.test.mjs'`. El arbol real tiene 159: hay DOS directorios de tests,
+`test/` y `tests/`, mas `test-lara.mjs` suelto en la raiz. 17 tests se quedaban fuera de mi
+numero. A partir de aqui, `node --test` SIN filtros. Dos directorios de tests es el mismo
+patron de "la misma cosa en dos sitios" que ha causado casi todos los fallos de esta auditoria.
+
+## 2026-09-04 · PUSH autorizado por Ricardo — ramas y arreglos de seguridad (Opus 5)
+
+Se subio lo siguiente, tras barrer los diffs buscando secretos (solo aparecieron dos cadenas
+`whsec_` que son ficheros de prueba inventados: 'whsec_solo_para_test' y 'whsec_otro'):
+
+1. `nexux-clients` main: 039b9a5 -> efd9797. Los tres arreglos de seguridad que llevaban
+   dias solo en la Pi (44241c0 PRICE_TO_PLAN, abd1c26 panel admin, efd9797 enlace de dueno
+   de Telegram). Este repo NO despliega solo: la Pi corre desde su copia local.
+2. `nexux-clients` rama nueva `task/ola1-lanzamiento-clients` (6 commits: P2, P3, hueco de
+   P3, P4, P5 y el override de la migracion).
+3. `nexux-pro` rama nueva `task/ola1-lanzamiento-pro` (W5).
+
+LO QUE **NO** SE HA HECHO, a proposito:
+`nexux-pro` main sigue en 71a2e03. **Produccion esta igual que antes del push.** Subir esa
+rama a main es lo que despliega en Vercel, y eso es el despliegue de verdad: pide canario y
+vuelta atras anotada (PRP v5, apartado 10). Ademas W5 solo no arregla nada visible sin el
+resto del bloque web (W1-W7, sin hacer): el PRP pide UN solo despliegue con todo.
+
+NO VERIFICADO: si Vercel ha creado una previsualizacion para la rama. `gh` no esta instalado
+ni en la Pi ni en Windows, y no tengo acceso al panel de Vercel. Se comprueba en el panel.
+
+Comprobaciones hechas:
+  git -C ~/nexux-clients rev-list --count origin/main..HEAD  -> 0
+  git ls-remote --heads origin | grep ola1                   -> las dos ramas existen
+  git -C ~/nexux-pro log --oneline -1 origin/main            -> 71a2e03 (sin tocar)
+
+## 2026-09-04 · Bloque web de la Ola 1: W1, W2, W3, W4, W6 (Opus 5)
+
+Commit `af162f1` en la rama `task/ola1-lanzamiento-pro`. SIN desplegar: nexux-pro main sigue
+en 71a2e03. W5 ya estaba en 0bf1a1f.
+
+W1 enlace caducado = cliente encerrado (eran DOS fallos: el 500 y, detras, el bucle
+portal->login->portal; se corta borrando la sesion antes de redirigir) · W2 /demo sin aviso de
+cookies, extraido a AvisoCookies.astro y usado por Layout y demo · W3 el pixel de OpenAI
+cargaba sin permiso en TODO el sitio, extraido a PixelOpenAI.astro y arreglado una sola vez ·
+W4 la demo adivinaba el origen en vez de leer las UTM y no guardaba utm_content · W6 el QR de
+Telegram no se dibujaba (falta is:inline).
+
+ENCONTRADO DE MAS, no estaba en la auditoria: el mismo fallo del QR estaba TAMBIEN en
+cliente/[id]/onboarding.astro:1169, la primera pantalla de un cliente recien dado de alta.
+Arregladas las dos.
+
+VERIFICACION: compilado (47 s, con el limite de memoria obligatorio) y comprobado en la SALIDA
+COMPILADA, no en el fuente. W1 probado EJECUTANDO con servidor de desarrollo y tarro de cookies:
+sin cookie 302 · cookie invalida 302 y borra cookies (antes 500) · recorrido completo 1 salto y
+200 en la pagina de acceso · token valido 200 con panel · token cruzado 302 sin filtrar nada.
+SABOTEADO por dos caminos y cada uno reprodujo su fallo: sin borrar la sesion vuelven los 50
+saltos, guard mal colocado vuelve el 500. Restaurado identico.
+
+AVISO SOBRE LA VERIFICACION DE W3: el identificador del pixel no esta en ningun .env local
+(viene del entorno de Vercel), asi que ese bloque no se renderiza en una compilacion de aqui.
+Para verificarlo se compilo con un valor falso. En produccion lo pone Vercel.
+
+Como lo comprueba Ricardo (necesita levantar el servidor de desarrollo):
+  ssh 192.168.0.120 "cd ~/nexux-pro-wt-ola1 && pnpm dev --port 4331 --host 127.0.0.1"
+  y en otra terminal:
+  curl -s -D- -o /dev/null -H 'Cookie: nexux_token=nada' http://127.0.0.1:4331/cliente/nexux-demo-mostoles-42a928 | head -4
+  Debe salir 302 (no 500) y dos Set-Cookie que borran la sesion.
+
+Observado y NO tocado: el bloque de GA4/Meta sigue duplicado entre Layout.astro y
+Medicion.astro (consolidarlo toca las 18 paginas que usan Layout). Y si el dueno de A abre la
+direccion de B, se le cierra su propia sesion: molesto, no es un agujero.
+
+PENDIENTE del bloque web: W7 (textos legales, necesita datos de Ricardo) y W8 (citas del
+portal con zona horaria, 3 sitios).
+
+## 2026-09-04 · W7 (legales): datos aportados por Ricardo — INCOMPLETO
+
+Aportado: **Ricardo Mansilla · NIF 47451707Q**
+
+FALTA para poder redactar y publicar W7:
+  1. DOMICILIO fiscal / direccion de contacto. No se inventa.
+  2. DECISION sobre la garantia de 30 dias: se promete en el pie, en las dos paginas de plan
+     y en las meta descripciones, y NO aparece en ninguna condicion legal (legal.astro:48
+     titula justo lo contrario, "Exclusion de garantias"). O se sostiene en las condiciones
+     o se retira de los textos comerciales. Con la campana arrancando, esto no puede quedar
+     a medias.
+  3. Ademas, /privacidad no declara Umami, Plausible ni el pixel de OpenAI (los tres que se
+     activan en el sitio). Eso si lo puedo redactar yo en cuanto haya 1 y 2.
+
+## 2026-09-04 · W8 — la hora de las citas del panel (Opus 5)
+
+Commit `6d8fce9` en task/ola1-lanzamiento-clients. SIN push, SIN reiniciar.
+
+Dos fallos, misma raiz: el panel manda la hora sin zona. Crear fallaba SIEMPRE (el motor exige
+desfase explicito). Mover la interpretaba con el RELOJ DE LA PI: a un cliente de Canarias la
+cita se le guardaba una hora corrida, sin error y sin aviso.
+
+Arreglado en la Pi, no en el navegador: los tres sitios del panel (crear, editar, arrastrar)
+pasan por dos endpoints, y isoConZona() ya existe y esta probada. Comprobada antes de usarla en
+las cuatro combinaciones verano/invierno x peninsula/Canarias.
+
+VERIFICACION: test/citas-zona-horaria.test.mjs, 6 casos contra los endpoints reales ·
+SABOTEADO por tres caminos, los tres cazados, incluido EL ARREGLO INCORRECTO de anadir una "Z"
+(4 casos en rojo) · suite 165/165.
+
+Como lo comprueba Ricardo:
+  ssh 192.168.0.120 "cd ~/nexux-clients-wt-ola1 && node --test test/citas-zona-horaria.test.mjs 2>&1 | tail -5"
+  Debe salir: # pass 6 / # fail 0
+
+CORRECCION A MIS PROPIAS AFIRMACIONES (P2 y P4): dije que las pruebas corrian "con cwd temporal"
+y sin tocar datos reales. Cierto para la configuracion, FALSO para las citas:
+lib/booking-bridge.js:28 resuelve su raiz desde la posicion del modulo, no desde el directorio
+de trabajo, asi que escribe siempre en clients/ del repositorio. Sus pruebas dejaron dos
+clientes falsos DENTRO DEL WORKTREE; ya borrados. Comprobado que produccion no se toco (cero
+clientes de prueba en ~/nexux-clients/clients). El test nuevo asume esa realidad, crea y borra
+sus clientes en el worktree, y lleva un seguro que aborta si se ejecutara sobre produccion.
+
+Observado y NO tocado: booking-bridge.js dice en un comentario "misma raiz que data.js" y es
+falso; solo coinciden si el proceso arranca desde la raiz del repo. Fallo latente.
+
+## 2026-09-04 · Boton "Compartir mi pagina de reservas" (Opus 5)
+
+Commit `40dd363` en task/ola1-lanzamiento-pro. SIN desplegar.
+
+La pagina /reservar/<clientId> ya existia y funcionaba pero era HUERFANA: cero enlaces a ella
+en todo el portal. El negocio no podia encontrarla. Ahora hay un boton en el panel que abre un
+dialogo con el enlace copiable y su QR.
+
+Cero dependencias y cero CSS nuevo: se reutiliza la libreria de QR del head (la de W6), el
+patron <dialog class="crm-dialog">, showToast() y las clases .crm-copy-row / .crm-tg-qr-wrap,
+que ya traian su regla para movil.
+
+VERIFICADO EN NAVEGADOR REAL (servidor de desarrollo por tunel SSH; el cortafuegos no expone
+ese puerto): dialogo <dialog> nativo abierto · el enlace sale de location.origin (con el
+servidor en 127.0.0.1:4331 mostraba esa direccion, no nexux.pro: prueba de que no esta escrito
+a mano) · el QR se pinta, 18.377 pixeles oscuros · el QR se DECODIFICO con zxing desde el
+propio lienzo y devuelve el enlace exacto · copiar funciona, leido el portapapeles de vuelta ·
+aviso "¡Copiado!" visible al instante y oculto a los 2,2 s · movil 375x812 sin desbordamiento ·
+la pagina publica sigue con fetch("/pub-api/book") y CERO referencias a /api/book · los 3
+errores de consola son preexistentes y del modo desarrollo.
+
+## 2026-09-04 · W7 COMPLETADO — identificacion y sistemas de medicion (Opus 5)
+
+Commit `b754d4b`. Sustituye al apunte anterior marcado INCOMPLETO.
+
+Datos de Ricardo: Titular **Nexux Innovacion Digital** (sin S.L.) · NIF **47451707Q** ·
+C/ Tulipan 20, Mostoles (Madrid).
+
+El "S.L." se retira porque el NIF aportado es de persona fisica. Y estaba en MAS SITIOS de los
+que decia la auditoria, que solo miro las paginas legales:
+  - src/components/Footer.astro (x2): visible en TODAS las paginas.
+  - src/layouts/Layout.astro, JSON-LD: campo `legalName` y `disambiguatingDescription`,
+    o sea, se le estaba afirmando a Google y a los motores de IA.
+Comprobado en la salida compilada: cero apariciones de "Digital S.L.".
+
+Se declaran los tres sistemas que faltaban: pixel de OpenAI, Umami y Plausible. Umami aparte,
+por estar alojado en servidores propios. Anadida la mencion de transferencia internacional
+(hallazgo del area G) y que rechazar significa que los sistemas publicitarios NO se cargan.
+
+DEPENDENCIA: esa ultima frase solo es cierta con W3 desplegado. Van juntos en la misma rama.
+
+NO TOCADO por decision expresa de Ricardo: la GARANTIA DE 30 DIAS. Se sigue prometiendo en el
+pie, en las dos paginas de plan y en las meta descripciones, y las condiciones legales dicen lo
+contrario. RIESGO ABIERTO, no resuelto.
+
+NO redactado por un abogado: borrador tecnico que corrige omisiones evidentes. La revision
+juridica sigue pendiente.
+2026-09-04 | claude (Opus 5, autonomo mientras Ricardo dormia) | BLOQUE DINERO de la Ola 1: D1, D2, D3, D4, D6 y P6 hechos y verificados; D7 NO tocado (necesita OK de Ricardo). (1) P6 commit 2118542 en clients: el correo de bienvenida salia despues de responder y sin await, asi que un fallo de Brevo dejaba al cliente pagando y sin el unico enlace que abre su cuenta, en silencio; ahora se espera, se comprueba el 2xx, se anota en config.json (welcomeEmailSentAt + messageId) y si falla /provision devuelve 503 para que Stripe reintente 3 dias y el reintento SOLO mande el correo que falto; estado explicito en el indice (provisionando/completada/fallo_reintentable) y cerrojo atomico por stripeSessionId porque dos entregas simultaneas del mismo evento creaban DOS cuentas por un cobro. (2) D1+D2+D3 commit 371955a en pro: el modal pide el nombre del negocio antes de pagar (nadie escribia sessionStorage.laraData, por eso salon llegaba null y Vercel ni llamaba a la Pi = quien pagaba no existia); un alta no confirmada devuelve 503 en vez de 200; se exige clientId en la respuesta; retirados los DOS remitentes de correo de Vercel (185 lineas) que habrian mandado dos correos al primer cliente real; ventana de 300 s en la firma (antes una firma de hace un ano colaba); aviso de Telegram solo en alta nueva; borradas src/pages/api/webhook/stripe.ts (reenviaba la firma de Stripe, justo lo prohibido) y src/pages/api/leads/pro.ts (llevaba un PROVISION_SECRET por defecto en el codigo). (3) D4: lista blanca de la Pi con equipo. (4) D6: auditados los eventos reales de Stripe en solo lectura - 0 entregas pendientes, 0 compras completadas en los ultimos 100 eventos, 31 checkout.session.expired, y el customer.subscription.updated que si ocurrio lo recibio Vercel y lo ignoro, confirmando el diagnostico del PRP v5. (5) commit 3bccdc7: prueba de integracion de la cadena entera con las dos piezas reales conectadas | 22 tests nuevos (7 alta + 10 webhook/checkout + 5 integracion). Suites completas: nexux-clients 155/155, nexux-pro 15/15 (no tenia ninguno). Sabotaje ejecutado sobre el codigo real en las 6 protecciones criticas: quitar el 503 del correo tumba 2 tests, quitar el cerrojo 1, permitir correo repetido 1, quitar el 503 del alta 3, quitar la ventana de 300s 1, quitar salon de metadata 1; restaurado todo verde. Build en la Pi 41,75 s con NODE_OPTIONS. nexux-verify 9/9 OK. Todo en worktrees, SIN PUSH | OK
+2026-09-04 | claude (Opus 5, autonomo) | Ola 2 puntos 2 y 3, mismo patron que el alta rota (se cobra y no se entrega). (1) commit 694352e en pro: al cliente de 79 EUR el portal le decia que su plan costaba 749 EUR y le ofrecia Starter/Pro/Total, retirados el 21-ago; el codigo solo conocia "recepcionista" o "lo viejo", y equipo caia en lo viejo. Ahora hay una idea explicita de planes en catalogo (29 y 79): quien tiene uno ve los dos con el suyo marcado, y quien tiene un plan retirado ve el suyo con su precio real mas un aviso honesto de que ya no se vende. El tipo ClientData ni siquiera contemplaba equipo. (2) commit 2b3049f en clients: subir a Equipo aplicaba limites y funciones pero NO montaba las agendas por profesional, que es exactamente lo que se compra con ese plan; ahora se montan preguntando por capacidad (lib/planes.js) y no por nombre de plan, respetando las agendas que el dueno ya tuviera, usando el numero que declaro al darse de alta si lo hay, y sin borrar nada al bajar de plan | portal verificado RENDERIZANDO la pagina SSR real contra una Pi de mentira (no vale el build: la pagina no existe hasta que alguien la pide): cliente equipo 79EUR x2 y CERO apariciones de 749/449/249; cliente de 29 los suyos; cliente antiguo sus precios mas el aviso. Cambio de plan: 5 tests nuevos con sabotaje (desactivando el montaje caen 2). Suite nexux-clients 160/160 | OK
+2026-09-04 | claude (Opus 5, autonomo) | Seguridad: con el enlace publico de reservas de un salon se le podia llenar la agenda entera. El chat de Lara y la demo ya se limitaban por IP; la ruta que ESCRIBE citas (POST /public/:clientId/book) no tenia ningun limite ni autenticacion, y la pagina esta hecha para repartirla. Puesto limite por linea (5/minuto, 20/hora, contado en memoria como los otros dos limitadores del fichero, con limpieza del mapa) y tope de 200 caracteres en client_name, client_phone y service, que antes entraban sin medida en la agenda del negocio, su correo y su movil. Commit 4168249, sin push. ADEMAS, correccion de un hallazgo equivocado de la auditoria C: NO existe un canal de mensajes por Twilio que "no reserve nada" -- lib/twilio.js solo atiende llamadas perdidas y aprovisiona numeros, el unico webhook es de voz, y de los clientes reales solo 1 (inactivo) tiene twilio: los 3 activos usan baileys. No hay nada que arreglar ahi | 5 tests nuevos: la primera reserva nunca se corta, el limite es por linea y no castiga a una clienta por lo que haga otra, una reserva normal pasa, un nombre de 10.000 caracteres se rechaza, y la baja del cliente manda por encima de todo. Sabotaje: desactivando el limitador cae el test 1. Suite nexux-clients 165/165, nexux-pro 15/15, build web 43 s, nexux-verify 8/8 OK, main de ambos repos intacto y 13 servicios online | OK
