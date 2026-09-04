@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 ---
 <Layout
   title="¡Pago completado! — Nexux Pro"
-  description="Tu plan Nexux está activándose. Te contactamos en menos de 24h."
+  description="Tu cuenta ya está creada. Te hemos enviado el enlace a tu panel."
   canonical="https://nexux.pro/gracias"
 >
   <section class="gracias-wrap">
@@ -11,33 +11,41 @@ import Layout from '../layouts/Layout.astro';
       <div class="gracias-icon">🎉</div>
       <h1 class="gracias-title">¡Pago completado!</h1>
       <p class="gracias-sub">
-        Hemos recibido tu pedido correctamente. En menos de <strong>24&nbsp;horas</strong> te
-        contactamos para activar Lara en tu salón y dejarlo todo listo.
+        Tu cuenta ya está creada y Lara está configurada. Te hemos enviado un correo con el
+        enlace a tu panel: suele llegar en <strong>menos de un minuto</strong>.
       </p>
 
       <div class="gracias-steps">
         <div class="gracias-step">
           <span class="step-num">1</span>
           <div>
-            <strong>Revisa tu email</strong>
-            <p>Te hemos enviado una confirmación con los detalles de tu plan.</p>
+            <strong>Abre el correo</strong>
+            <p>Asunto «Tu portal está listo», de Ricardo de Nexux (hola@nexux.pro). Dentro
+            tienes el enlace a tu panel: ese enlace es tu acceso, guárdalo.</p>
           </div>
         </div>
         <div class="gracias-step">
           <span class="step-num">2</span>
           <div>
-            <strong>Ricardo te escribe</strong>
-            <p>Nuestro equipo se pone en contacto contigo para la configuración inicial.</p>
+            <strong>Conecta tu WhatsApp</strong>
+            <p>En tu panel, en <em>Canales</em>, escanea el código desde el móvil:
+            WhatsApp → Dispositivos vinculados → Vincular dispositivo. Dos minutos y Lara
+            empieza a contestar. Sigues con tu mismo número y no pierdes ningún chat.</p>
           </div>
         </div>
         <div class="gracias-step">
           <span class="step-num">3</span>
           <div>
-            <strong>Lara lista en tu salón</strong>
-            <p>La configuración completa tarda menos de un día. Sin instalar nada.</p>
+            <strong>Ajusta horarios y servicios</strong>
+            <p>Todo se cambia desde el panel cuando quieras. Sin instalar nada.</p>
           </div>
         </div>
       </div>
+
+      <p class="gracias-ayuda">
+        ¿No te ha llegado el correo? Mira en la carpeta de spam y, si sigue sin aparecer,
+        escríbenos a <a href="https://t.me/nexux_soporte_bot">t.me/nexux_soporte_bot</a>.
+      </p>
 
       <a href="/" class="btn-primary gracias-cta">Volver a nexux.pro</a>
     </div>
@@ -134,6 +142,14 @@ import Layout from '../layouts/Layout.astro';
     line-height: 1.5;
     margin: 0;
   }
+
+  .gracias-ayuda {
+    margin: 1.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--nx-ink-muted);
+    line-height: 1.6;
+  }
+  .gracias-ayuda a { color: var(--nx-magnet-deep); }
 
   .gracias-cta {
     display: inline-flex;
