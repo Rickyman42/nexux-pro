@@ -428,3 +428,40 @@ autorización, no una genérica. Lo que no puedas comprobar, dilo con esas palab
 - [x] Prueba de la cadena entera SIN cobrar (`3bccdc7`): pago → UNA cuenta completa y activa → UN correo con su enlace → el enlace abre el portal y un token inventado no → doble entrega no duplica → con la Pi caida se pide reintento → cancelar desactiva → una baja sin firma se rechaza. Eslabones 1-4 y 7-8 de la aceptacion, en verde
 - [ ] Prueba de aceptacion REAL (apartado 9): necesita el push, un cobro de 29 € y un canal conectado. Todo eso lo autoriza Ricardo
 - [~] Ola 2 — hechos los puntos 2 y 3; el resto pendiente
+
+---
+
+## D7 — CERRADO EL 4-SEP-2026, Y LA CAUSA NO ERA NINGUNA DE LAS PREVISTAS
+
+Este apartado se escribió suponiendo que el receptor de la Pi «nunca ha funcionado» y que el
+riesgo estaba en exponerlo. **El diagnóstico era incorrecto.** Lo que no funcionaba eran los
+**dos** endpoints, y por una razón que este PRP no contempla en ninguna línea:
+
+> Ambos estaban clavados a `api_version 2026-04-22.dahlia`. La cuenta opera en
+> `2025-08-27.basil`. Cuando Stripe no puede representar un evento en la versión que pide el
+> endpoint, **no lo entrega y no lo reintenta**: sin error, sin traza, sin reintento.
+
+Consecuencia: **el alta automática no funcionó ni una sola vez desde el 19-may-2026.** Los tres
+clientes activos se dieron de alta a mano — por eso ninguno tiene `stripeCustomerId`.
+
+Lo que este PRP daba por hecho y era falso:
+
+| Suposición del PRP | Realidad medida |
+|---|---|
+| «el receptor de la Pi nunca ha funcionado» | ninguno de los dos funcionaba, y no por el código |
+| D6 «0 entregas pendientes» se leyó como *todo entregado* | significaba *nadie reclamó ningún evento* |
+| D7b: reenviar un evento desde el panel bastaría como prueba | no habría probado nada: el problema estaba antes de la entrega |
+| el riesgo era exponer la Pi a internet | la Pi respondía bien; el riesgo real era invisible y estaba en Stripe |
+
+**Cómo quedó (todo verificado, ver `INCIDENTE-WEBHOOKS-STRIPE-20260904.md`):**
+
+- `we_1UBtum2SQwDzHtsF0l8UOnuj` → Pi, 5 eventos de ciclo de vida, versión heredada de la cuenta.
+- `we_1UBuBE2SQwDzHtsFzwx5YKm8` → Vercel, solo `checkout.session.completed`, `2025-08-27.basil`.
+- `we_1TYhnJ…` (el de `dahlia`) **borrado**, con relevo comprobado antes de borrar.
+- Se ejecutó el diseño de **dos endpoints**; la alternativa de ruta interna no hizo falta.
+- Compra real de 29 € reproducida por el camino real: cuenta `prueba-nexux-pro-c43c20`,
+  `accountMode: stripe_paid`, primer cliente con identificador de Stripe.
+
+**La regla que sale de aquí, y que este PRP debería haber tenido:** al crear un endpoint por API
+**no pasar `api_version`**. Y `pending_webhooks: 0` recién nacido un evento **no es éxito**: es
+que nadie lo reclamó.
