@@ -188,7 +188,9 @@ no sirve, sólo anota errores.
 Así que se arregló la causa de la ambigüedad (fallo #9). Commit `9d23acf`: la Pi registra ahora
 **todo** evento cuya firma acepta, tenga cliente o no. Repetida la prueba con un evento real:
 
-
+```
+[stripe-webhook] firma OK: customer.subscription.updated evt_1UBuhp2SQwDzHtsFCFoj8SMF
+```
 
 Condiciones que hacen la prueba concluyente:
 
