@@ -10,8 +10,11 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401 });
   }
 
-  const invoices = await getClientInvoices(clientId, token);
-  return new Response(JSON.stringify({ ok: true, invoices }), {
+  // ok:true significaba "la peticion llego", no "las facturas se han cargado".
+  // Ahora dice la verdad: si la consulta fallo, el portal puede avisar en vez de
+  // ensenar un "no tienes facturas" que no es cierto.
+  const { ok, invoices } = await getClientInvoices(clientId, token);
+  return new Response(JSON.stringify({ ok, invoices }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
