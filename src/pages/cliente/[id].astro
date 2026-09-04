@@ -399,7 +399,7 @@ function renderAppointmentDate(item: Appointment) {
                     <strong class="crm-next-apt-hour">{nextAptFormatted.time}</strong>
                   </div>
                   <div>
-                    <div style="font-size:14px;font-weight:600;color:var(--crm-text)">{nextApt.clientName || nextApt.clientPhone}</div>
+                    <div style="font-size:14px;font-weight:600;color:var(--crm-text)">{nextApt.client_name || nextApt.clientName || nextApt.client_phone || nextApt.clientPhone || 'Cliente sin nombre'}</div>
                     <div class="crm-muted-p">{nextApt.service}</div>
                   </div>
                 </div>
