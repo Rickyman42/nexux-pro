@@ -98,7 +98,7 @@ detrás de una puerta a la que Stripe nunca llamó.
 | 6 | Ya existía otra variable `STRIPE_WEBHOOK_SECRET` con el valor **viejo**, así que renombrar chocaba | Error de Vercel al renombrar | **RESUELTO** (se cambió el valor de la existente) |
 | 7 | El código de Vercel devuelve **400 tanto si falta la clave como si la firma es mala**: indistinguible desde fuera | Lectura de `api/webhook/stripe.js:16-21` | Pendiente (mejora, no bloqueante) |
 | 8 | Cloudflare responde **403 error 1010** a peticiones de `python-urllib` contra `pi.nexux.pro` | Al reproducir la compra | Rodeado: se llama a `127.0.0.1:3460` |
-| 9 | La Pi **sólo registra** eventos cuando encuentra cliente: un evento aceptado sin cliente asociado no deja rastro, así que el silencio es ambiguo | `lib/stripe-webhook.js:239-260` | Pendiente (mejora de diagnóstico) |
+| 9 | La Pi **sólo registra** eventos cuando encuentra cliente: un evento aceptado sin cliente asociado no deja rastro, así que el silencio es ambiguo | `lib/stripe-webhook.js:239-260` | **RESUELTO** (commit 9d23acf) |
 | 10 | Guardián del script de borrado demasiado estricto: exigía versión **vacía** y el buzón bueno la tiene **explícita pero correcta** | El script se negó a borrar | **RESUELTO** (compara con la versión real de la cuenta) |
 
 ---
@@ -174,5 +174,32 @@ a **la misma ruta**, `/provision`, con la misma cabecera.
 - El campo "¿Cómo se llama tu negocio?" se ve con muy poco contraste.
 - `www.nexux.es/mi-cuenta` da 404 desde algún punto del flujo de compra.
 - Fallo #7: distinguir en el código "falta la clave" de "firma inválida".
-- Fallo #9: que la Pi registre también los eventos aceptados sin cliente asociado.
 - Limpieza: `.env.copia-*` en `~/nexux-clients` (se conservan como vuelta atrás).
+
+---
+
+## 12. Prueba positiva directa del buzón de la Pi (12:51)
+
+El resultado de la sección 8 seguía siendo **indirecto**: "0 entregas pendientes y silencio en
+el log" es exactamente lo que se veía cuando Stripe **no entregaba nada**, porque la Pi sólo
+escribía al encontrar cliente. Se intentó un registro independiente de llegada en `cloudflared`:
+no sirve, sólo anota errores.
+
+Así que se arregló la causa de la ambigüedad (fallo #9). Commit `9d23acf`: la Pi registra ahora
+**todo** evento cuya firma acepta, tenga cliente o no. Repetida la prueba con un evento real:
+
+
+
+Condiciones que hacen la prueba concluyente:
+
+- **Un solo oyente.** Tras el arreglo, la Pi es el único buzón suscrito a
+  `customer.subscription.updated`, comprobado por API antes de disparar; el script aborta si
+  hay más de uno. Así `pending_webhooks` cuenta sólo las entregas de la Pi.
+- **Evento real firmado por Stripe**, no una petición fabricada.
+- `pending_webhooks = 0` **y** cero líneas de rechazo desde el reinicio.
+- Suite 159/160; el único fallo es `citas-zona-horaria`, que se niega por diseño a correr
+  sobre el repositorio de producción y falla idéntico sin el cambio.
+
+No se usó el botón "Send test webhook" del panel por dos razones: el Workbench nuevo no lo
+tiene, y esta prueba es mejor — usa un evento real y deja evidencia permanente para todos los
+que vengan detrás.
