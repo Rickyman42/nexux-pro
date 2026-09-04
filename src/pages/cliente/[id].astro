@@ -867,7 +867,7 @@ function renderAppointmentDate(item: Appointment) {
             </div>
             )}
             {data.billing?.stripe !== false && (
-              <p class="billing-hint" style="margin-top:16px">Para cambiar de plan usa el botón “Gestionar suscripción” arriba — Stripe te mostrará las opciones disponibles.</p>
+              <p class="billing-hint" style="margin-top:16px">Desde “Gestionar suscripción” puedes <strong>cambiar de plan</strong>, <strong>actualizar tu tarjeta</strong>, <strong>descargar tus facturas</strong> y <strong>cancelar la suscripción</strong>. Si cancelas, sigues teniendo el servicio hasta el final del periodo que ya has pagado.</p>
             )}
           </div>
 
@@ -875,6 +875,7 @@ function renderAppointmentDate(item: Appointment) {
             <span class="crm-section-lbl">Historial de facturas</span>
             <div id="invoices-loading" class="invoices-loading">Cargando facturas…</div>
             <div id="invoices-empty" class="invoices-empty crm-hidden">Sin facturas todavía.</div>
+            <div id="invoices-error" class="invoices-empty crm-hidden">No hemos podido cargar tus facturas ahora mismo. Vuelve a intentarlo en un momento; si sigue igual, escríbenos.</div>
             <table id="invoices-table" class="invoices-table crm-hidden">
               <thead>
                 <tr>
@@ -2655,7 +2656,15 @@ function renderAppointmentDate(item: Appointment) {
         .then(function(r) { return r.json(); })
         .then(function(d) {
           loading.classList.add('crm-hidden');
-          if (!d.ok || !d.invoices || d.invoices.length === 0) {
+          // Antes, un fallo de carga y "no tienes facturas" acababan en el mismo
+          // mensaje, asi que nadie sabia cual de las dos cosas pasaba.
+          if (!d.ok) {
+            var errorBox = document.getElementById('invoices-error');
+            if (errorBox) errorBox.classList.remove('crm-hidden');
+            else empty.classList.remove('crm-hidden');
+            return;
+          }
+          if (!Array.isArray(d.invoices) || d.invoices.length === 0) {
             empty.classList.remove('crm-hidden');
             return;
           }

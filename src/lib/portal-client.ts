@@ -122,14 +122,27 @@ export interface Invoice {
   description: string | null;
 }
 
-export async function getClientInvoices(clientId: string, token: string): Promise<Invoice[]> {
+// La Pi responde {invoices:[...]}, no una lista pelada. El `as Invoice[]` que
+// habia aqui mentia sobre la forma y callaba al compilador: el portal recibia el
+// objeto entero, le hacia .forEach y reventaba, y el catch del navegador lo
+// disfrazaba de "Sin facturas todavia". Una factura pagada quedaba invisible.
+// Se devuelve ademas si la consulta SALIO BIEN, para poder distinguir "no tienes
+// facturas" de "no hemos podido cargarlas", que antes se veian igual.
+export async function getClientInvoices(
+  clientId: string,
+  token: string,
+): Promise<{ ok: boolean; invoices: Invoice[] }> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/invoices`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) return [];
-    return (await response.json()) as Invoice[];
-  } catch { return []; }
+    if (!response.ok) return { ok: false, invoices: [] };
+    const cuerpo = (await response.json()) as { invoices?: Invoice[] } | Invoice[];
+    const invoices = Array.isArray(cuerpo) ? cuerpo : (cuerpo?.invoices ?? []);
+    return { ok: true, invoices };
+  } catch {
+    return { ok: false, invoices: [] };
+  }
 }
 
 export async function getBillingPortalUrl(clientId: string, token: string): Promise<string | null> {
