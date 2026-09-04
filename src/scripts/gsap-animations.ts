@@ -147,7 +147,7 @@ ScrollTrigger.batch('.eyebrow', {
 
 // ─── SCROLL PROGRESS INDICATOR (optional UX polish) ─────────────────────────
 const progressBar = document.createElement('div');
-progressBar.style.cssText = 'position:fixed;top:0;left:0;height:2px;background:var(--nx-accent,#6c63ff);z-index:9999;width:0;pointer-events:none;';
+progressBar.style.cssText = 'position:fixed;top:0;left:0;height:2px;background:var(--nx-magnet);z-index:9999;width:0;pointer-events:none;';
 document.body.appendChild(progressBar);
 
 ScrollTrigger.create({
