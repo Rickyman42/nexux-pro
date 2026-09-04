@@ -14,6 +14,22 @@
       <p>No hemos podido cargar el pago. <button type="button" class="checkout-error-link" data-open-lara>Pregúntale a Lara</button> y te echa una mano.</p>
     </div>
 
+    <form id="checkout-datos" class="checkout-datos" hidden>
+      <label for="checkout-negocio">¿Cómo se llama tu negocio?</label>
+      <input
+        id="checkout-negocio"
+        name="negocio"
+        type="text"
+        required
+        maxlength="80"
+        autocomplete="organization"
+        placeholder="Ej: Peluquería Marta"
+        enterkeyhint="go"
+      />
+      <p class="checkout-datos-ayuda">Es el nombre con el que Lara saludará a tus clientes.</p>
+      <button type="submit" class="checkout-datos-boton">Continuar al pago</button>
+    </form>
+
     <div id="stripe-checkout-mount"></div>
   </div>
 </div>
@@ -80,6 +96,56 @@
   }
 
   .checkout-loading,
+  .checkout-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.5rem 0 0.25rem;
+  }
+
+  .checkout-datos label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--nx-text, #e8eaf0);
+  }
+
+  .checkout-datos input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    color: var(--nx-text, #e8eaf0);
+    background: var(--nx-surface, #12121a);
+    border: 1px solid var(--nx-line, #1e2233);
+    border-radius: 14px;
+  }
+
+  .checkout-datos input:focus-visible {
+    outline: 2px solid var(--nx-accent, #4ecdc4);
+    outline-offset: 1px;
+  }
+
+  .checkout-datos input[aria-invalid='true'] {
+    border-color: #ff6b6b;
+  }
+
+  .checkout-datos-ayuda {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--nx-muted, #8b92a8);
+  }
+
+  .checkout-datos-boton {
+    margin-top: 0.4rem;
+    padding: 0.95rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0b0d12;
+    background: var(--nx-accent, #4ecdc4);
+    border: 0;
+    border-radius: 50px;
+    cursor: pointer;
+  }
+
   .checkout-error {
     display: grid;
     justify-items: center;
