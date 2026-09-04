@@ -1,0 +1,40 @@
+---
+// Pixel de publicidad de OpenAI.
+//
+// Hasta el 4-sept-2026 este bloque estaba copiado letra por letra en Layout.astro y en
+// Medicion.astro, y en los dos cargaba el SDK SIEMPRE, pasandole `consent:false` cuando el
+// visitante habia dicho que no. Cargar el SDK ya es una peticion a un tercero que ademas
+// deja lo suyo en el navegador: rechazar tiene que significar que NO se carga.
+// (auditoria 3-sept-2026, area E)
+const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
+---
+
+{openAiAdsPixelId && <script is:inline data-pixel-id={openAiAdsPixelId}>
+  (function (w, d, s, u) {
+    var current = d.currentScript;
+    var pixelId = current && current.getAttribute('data-pixel-id');
+    if (!pixelId || w.oaiq) return;
+    var q = function () { q.q.push(arguments); };
+    q.q = [];
+    w.oaiq = q;
+
+    // Sin consentimiento no se pide nada a nadie. La cola queda montada por si acaso,
+    // pero no sale ni una peticion.
+    function cargar() {
+      if (w.__nxOaiqCargado) return;
+      w.__nxOaiqCargado = true;
+      q('consent', true);
+      q('init', { pixelId: pixelId });
+      var js = d.createElement(s);
+      js.async = true;
+      js.src = u;
+      var first = d.getElementsByTagName(s)[0];
+      if (first && first.parentNode) first.parentNode.insertBefore(js, first);
+    }
+
+    var aceptado = false;
+    try { aceptado = localStorage.getItem('nx_cookie_consent') === 'accepted'; } catch (e) {}
+    if (aceptado) cargar();
+    else d.addEventListener('nx:consent-granted', cargar);
+  })(window, document, 'script', 'https://bzrcdn.openai.com/sdk/oaiq.min.js');
+</script>}

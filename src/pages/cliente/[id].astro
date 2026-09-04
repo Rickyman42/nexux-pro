@@ -13,6 +13,15 @@ if (!clientId || !token) {
 
 const data = await getClientData(clientId, token);
 
+// Aqui, y no treinta lineas mas abajo: todo lo que viene despues usa `data`.
+if (!data) {
+  // Se borra la sesion ANTES de mandar al login. Si no, el middleware ve la cookie,
+  // devuelve al portal, el portal vuelve al login... y el cliente se queda encerrado.
+  Astro.cookies.delete('nexux_token', { path: '/' });
+  Astro.cookies.delete('nexux_client', { path: '/' });
+  return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
+}
+
 // Senales de confianza: que el dueno vea de un vistazo que el sistema esta vivo,
 // sin tener que preguntarselo a nadie. Si el dato no llega, se dice; no se maquilla.
 const _conf = (data as any).confianza || {};
@@ -49,10 +58,6 @@ const laraTexto = !_lara
 // La copia se hace cada noche: si la ultima tiene mas de 36 h, algo va mal.
 const backupAlDia = !!_backup && (Date.now() - new Date(_backup.fecha).getTime()) < 129600000;
 const backupTexto = _backup ? _horaCorta(_backup.fecha) : 'Sin copia';
-if (!data) {
-  return Astro.redirect(`/cliente/${clientId}/login?reason=expired`);
-}
-
 const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'long', timeZone: data.timezone || 'Europe/Madrid' });
 const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: data.timezone || 'Europe/Madrid' });
 
@@ -62,17 +67,26 @@ const limitedProgress = data.metrics.conversationLimit
   ? Math.min(100, Math.round((data.metrics.conversationCount / data.metrics.conversationLimit) * 100))
   : 100;
 const isRecepcionista = data.plan === 'recepcionista';
+const isEquipo = data.plan === 'equipo';
+// Los planes que se pueden contratar hoy. Starter, Pro y Total se retiraron el
+// 21-ago-2026 y solo siguen vivos para los clientes que ya los tenian: a nadie
+// mas se le deben ensenar, y menos como si fueran su plan.
+const enCatalogo = isRecepcionista || isEquipo;
 const hasLegacyAdvancedTools = data.plan === 'pro' || data.plan === 'total';
 const planLabel = isRecepcionista
   ? 'Recepcionista IA'
-  : data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
+  : isEquipo
+    ? 'Recepcionista Equipo'
+    : data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
 const planPriceLabel = isRecepcionista
   ? '29€/mes'
-  : data.plan === 'starter'
-    ? '249€/mes'
-    : data.plan === 'pro'
-      ? '449€/mes'
-      : '749€/mes';
+  : isEquipo
+    ? '79€/mes'
+    : data.plan === 'starter'
+      ? '249€/mes'
+      : data.plan === 'pro'
+        ? '449€/mes'
+        : '749€/mes';
 const qrImageSrc = data.qrPngBase64
   ? data.qrPngBase64.startsWith('data:image') ? data.qrPngBase64 : `data:image/png;base64,${data.qrPngBase64}`
   : null;
@@ -156,7 +170,13 @@ function renderAppointmentDate(item: Appointment) {
 >
   <Fragment slot="head">
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <!-- is:inline es lo que evita que Astro convierta esta etiqueta en un import de
+         modulo. Sin ello, la libreria se cargaba en su propio ambito y la variable
+         QRCode nunca llegaba a ser global: el lienzo del QR quedaba con CERO pixeles
+         pintados y el boton de descargar sin destino, con un reintento cada 300 ms
+         para siempre. Justo en el canal que promocionamos como recomendado.
+         (auditoria 3-sept-2026, area D) -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   </Fragment>
 
   <div id="crm" class="crm-light" data-clientid={clientId} data-inbox-token={token}>
@@ -262,6 +282,7 @@ function renderAppointmentDate(item: Appointment) {
         <section class="crm-view" id="v-dashboard">
           <div class="crm-view-hdr">
             <h1 class="crm-view-title">Dashboard</h1>
+            <button type="button" id="open-share-modal" class="crm-btn-primary">Compartir mi página de reservas</button>
           </div>
 
           <div class="crm-kpi-grid">
@@ -767,9 +788,15 @@ function renderAppointmentDate(item: Appointment) {
 
           <div class="crm-section">
             <span class="crm-section-lbl">Planes disponibles</span>
-            {isRecepcionista ? (
+            {!enCatalogo && (
+              <p class="billing-hint" style="margin-bottom:12px">
+                Tu plan ya no se vende: lo mantenemos para las cuentas que lo tenían. Si quieres
+                pasarte a uno de los actuales, escríbenos y lo vemos sin prisa.
+              </p>
+            )}
+            {enCatalogo ? (
               <div class="billing-plans-grid">
-                <div class="billing-plan-card current">
+                <div class={`billing-plan-card ${isRecepcionista ? 'current' : ''}`}>
                   <div class="bpc-header">
                     <span class="bpc-name">Recepcionista IA</span>
                     <span class="bpc-price">29€<small>/mes</small></span>
@@ -780,7 +807,20 @@ function renderAppointmentDate(item: Appointment) {
                     <li>✅ Agenda y reservas automáticas</li>
                     <li>✅ Sin permanencia ni comisión por cita</li>
                   </ul>
-                  <span class="bpc-current-tag">Plan actual</span>
+                  {isRecepcionista && <span class="bpc-current-tag">Plan actual</span>}
+                </div>
+                <div class={`billing-plan-card ${isEquipo ? 'current' : ''}`}>
+                  <div class="bpc-header">
+                    <span class="bpc-name">Recepcionista Equipo</span>
+                    <span class="bpc-price">79€<small>/mes</small></span>
+                  </div>
+                  <ul class="bpc-features">
+                    <li>✅ Todo lo del plan de 29€</li>
+                    <li>✅ Agenda propia para cada profesional</li>
+                    <li>✅ Ficha de cliente con su historial</li>
+                    <li>✅ Sin permanencia ni comisión por cita</li>
+                  </ul>
+                  {isEquipo && <span class="bpc-current-tag">Plan actual</span>}
                 </div>
               </div>
             ) : (
@@ -872,6 +912,35 @@ function renderAppointmentDate(item: Appointment) {
       </div>
     </dialog>
   )}
+
+  <!-- La pagina publica de reservas ya existia y funcionaba, pero no habia ninguna opcion
+       en el portal que llevara a ella: el negocio no podia encontrarla ni compartirla.
+       Esto es la puerta de entrada; la pagina no se toca. -->
+  <dialog id="share-modal" class="crm-dialog" aria-labelledby="share-modal-title">
+    <div class="crm-modal-form">
+      <h3 id="share-modal-title">Comparte tu página de reservas</h3>
+      <p class="crm-muted-p">
+        Mándasela a tus clientas por WhatsApp, ponla en tu perfil de Instagram o imprime el
+        código para dejarlo en el mostrador. Reservan solas, sin llamarte.
+      </p>
+      <label class="crm-section-lbl" for="share-link">Tu enlace</label>
+      <div class="crm-copy-row">
+        <input id="share-link" type="text" value="" readonly class="crm-input" />
+        <button id="share-copy" type="button" class="crm-btn-primary">Copiar</button>
+      </div>
+      <div class="crm-tg-qr-wrap">
+        <p class="crm-muted-p" style="margin-top:1rem;margin-bottom:0.5rem">O deja que escaneen este código:</p>
+        <canvas id="share-qr" width="200" height="200" role="img" aria-label="Código QR de tu página de reservas"></canvas>
+        <div class="crm-tg-qr-actions">
+          <a id="share-qr-download" download="mi-pagina-de-reservas.png" class="crm-btn-ghost" style="font-size:0.8rem">⬇️ Descargar QR</a>
+        </div>
+      </div>
+      <div class="crm-modal-actions">
+        <a id="share-open" href="#" target="_blank" rel="noopener" class="crm-btn-ghost">Verla</a>
+        <button type="button" id="close-share-modal" class="crm-btn-ghost">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
 
   <dialog id="new-apt-modal" class="crm-dialog">
     <form id="new-apt-form" class="crm-modal-form">
@@ -1781,7 +1850,64 @@ function renderAppointmentDate(item: Appointment) {
       if (canalSection && !canalSection.classList.contains('crm-hidden')) pollWaQr();
     })();
 
-        var telegramCopy = document.getElementById('telegram-copy');
+        // ── Compartir la pagina publica de reservas ────────────────────────────────
+    // El enlace se construye con location.origin y NO se escribe a mano: asi vale igual en
+    // produccion, en una previsualizacion de Vercel y en el servidor de desarrollo.
+    var shareModal = document.getElementById('share-modal');
+    var shareUrl = location.origin + '/reservar/' + encodeURIComponent(clientId);
+
+    function pintaQrCompartir() {
+      var canvas = document.getElementById('share-qr');
+      if (!canvas) return;
+      // Misma libreria que el QR de Telegram, ya cargada en el head con is:inline (W6).
+      // Si aun no ha llegado, se reintenta: no se anade otra dependencia.
+      if (typeof QRCode === 'undefined') { setTimeout(pintaQrCompartir, 300); return; }
+      QRCode.toCanvas(canvas, shareUrl, { width: 200, margin: 1, color: { dark: '#0a0a0f', light: '#ffffff' } }, function (err) {
+        var dl = document.getElementById('share-qr-download');
+        if (!err && dl) dl.href = canvas.toDataURL('image/png');
+      });
+    }
+
+    var abrirCompartir = document.getElementById('open-share-modal');
+    if (abrirCompartir && shareModal) {
+      abrirCompartir.addEventListener('click', function () {
+        var campo = document.getElementById('share-link');
+        if (campo instanceof HTMLInputElement) campo.value = shareUrl;
+        var verla = document.getElementById('share-open');
+        if (verla) verla.href = shareUrl;
+        pintaQrCompartir();
+        // showModal() da foco, fondo bloqueado y cierre con Esc sin escribir una linea.
+        shareModal.showModal();
+      });
+    }
+
+    var cerrarCompartir = document.getElementById('close-share-modal');
+    if (cerrarCompartir && shareModal) {
+      cerrarCompartir.addEventListener('click', function () { shareModal.close(); });
+    }
+
+    var copiarCompartir = document.getElementById('share-copy');
+    if (copiarCompartir) {
+      copiarCompartir.addEventListener('click', async function () {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          showToast('¡Copiado!');
+        } catch (_) {
+          // navigator.clipboard no existe fuera de https. En ese caso se selecciona el texto
+          // para que copiarlo sea un gesto, no una pelea.
+          var campo = document.getElementById('share-link');
+          if (campo instanceof HTMLInputElement) {
+            campo.focus();
+            campo.select();
+            var copiado = false;
+            try { copiado = document.execCommand('copy'); } catch (e) {}
+            showToast(copiado ? '¡Copiado!' : 'Copia el enlace con Ctrl+C');
+          }
+        }
+      });
+    }
+
+    var telegramCopy = document.getElementById('telegram-copy');
     var telegramCustomerLink = document.getElementById('telegram-customer-link');
 
     if (telegramCopy) {

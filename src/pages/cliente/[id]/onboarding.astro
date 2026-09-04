@@ -880,7 +880,7 @@ const planLabel = data.plan === 'recepcionista'
   /* ── Analytics ──────────────────────────────────────── */
   function trackOb(event, data) {
     try {
-      fetch('/api/analytics/ob', {
+      fetch('/pub-api/analytics/ob', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event: event, clientId: clientId, data: data || {} }),
@@ -1166,5 +1166,9 @@ const planLabel = data.plan === 'recepcionista'
 })();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<!-- Mismo fallo que en cliente/[id].astro: sin is:inline, Astro convierte esta
+     etiqueta en un import de modulo y la variable QRCode nunca es global, asi que el
+     lienzo se queda en blanco. Aqui pesa mas todavia: es la primera pantalla que ve
+     un cliente recien dado de alta. (auditoria 3-sept-2026, area D) -->
+<script is:inline src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </Layout>

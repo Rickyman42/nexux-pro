@@ -26,14 +26,36 @@ function getElements() {
     errorEl: document.getElementById('checkout-error'),
     mount: document.getElementById('stripe-checkout-mount'),
     label: document.getElementById('checkout-plan-label'),
+    datos: document.getElementById('checkout-datos') as HTMLFormElement | null,
+    negocio: document.getElementById('checkout-negocio') as HTMLInputElement | null,
   };
 }
 
-function getCheckoutBody(plan: string) {
-  let laraData: Record<string, any> = {};
+// El nombre del negocio viaja hasta Stripe como metadata[salon] y de ahi al alta
+// automatica. Sin el, /provision rechaza la peticion con missing_fields y el
+// cliente paga sin recibir cuenta. Antes se leia de sessionStorage.laraData, que
+// NADIE escribia: por eso llegaba vacio siempre.
+function leerLaraData(): Record<string, any> {
   try {
-    laraData = JSON.parse(sessionStorage.getItem('laraData') || '{}');
-  } catch {}
+    return JSON.parse(sessionStorage.getItem('laraData') || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function guardarNombreNegocio(salon: string) {
+  try {
+    const datos = leerLaraData();
+    datos.salon = salon;
+    sessionStorage.setItem('laraData', JSON.stringify(datos));
+  } catch {
+    // Si el navegador no deja guardar, el dato viaja igual en esta compra:
+    // openCheckout lo lleva en memoria.
+  }
+}
+
+function getCheckoutBody(plan: string, salonExplicito?: string) {
+  const laraData = leerLaraData();
 
   let ciudadFromUrl: string | undefined;
   const match = location.pathname.match(/^\/ciudad\/([a-z]+)/);
@@ -44,7 +66,7 @@ function getCheckoutBody(plan: string) {
   return {
     plan,
     nombre: laraData.nombre,
-    salon: laraData.salon,
+    salon: salonExplicito || laraData.salon,
     telefono: laraData.telefono,
     ciudad: laraData.ciudad || ciudadFromUrl,
     canal: laraData.canal,
@@ -53,18 +75,48 @@ function getCheckoutBody(plan: string) {
 }
 
 export async function openCheckout(plan: string) {
-  const { modal, loading, errorEl, mount, label } = getElements();
+  const { modal, loading, errorEl, mount, label, datos, negocio } = getElements();
   if (!modal || !loading || !errorEl || !mount || !label) return;
 
   mount.innerHTML = '';
-  loading.removeAttribute('hidden');
   errorEl.setAttribute('hidden', '');
   modal.removeAttribute('hidden');
   document.body.style.overflow = 'hidden';
   label.textContent = PLAN_LABELS[plan] || plan;
 
+  // Si Lara ya sabe el nombre del negocio, no se vuelve a preguntar.
+  const yaSabido = (leerLaraData().salon || '').trim();
+  if (yaSabido) {
+    loading.removeAttribute('hidden');
+    return abrirPagoStripe(plan, yaSabido);
+  }
+
+  if (!datos || !negocio) {
+    // Sin el formulario no podemos conseguir el dato: mejor no cobrar a ciegas.
+    loading.setAttribute('hidden', '');
+    errorEl.removeAttribute('hidden');
+    console.error('[checkout] falta el formulario del nombre del negocio');
+    return;
+  }
+
+  loading.setAttribute('hidden', '');
+  datos.removeAttribute('hidden');
+  datos.dataset.plan = plan;
+  negocio.value = '';
+  negocio.removeAttribute('aria-invalid');
+  negocio.focus();
+}
+
+async function abrirPagoStripe(plan: string, salon: string) {
+  const { loading, errorEl, mount, datos } = getElements();
+  if (!loading || !errorEl || !mount) return;
+
+  datos?.setAttribute('hidden', '');
+  loading.removeAttribute('hidden');
+  errorEl.setAttribute('hidden', '');
+
   try {
-    const body = getCheckoutBody(plan);
+    const body = getCheckoutBody(plan, salon);
     const res = await fetch('/api/stripe/create-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -91,7 +143,7 @@ export async function openCheckout(plan: string) {
 }
 
 export function closeCheckout() {
-  const { modal, loading, errorEl, mount } = getElements();
+  const { modal, loading, errorEl, mount, datos } = getElements();
   if (!modal || !loading || !errorEl || !mount) return;
 
   modal.setAttribute('hidden', '');
@@ -99,6 +151,7 @@ export function closeCheckout() {
   mount.innerHTML = '';
   loading.removeAttribute('hidden');
   errorEl.setAttribute('hidden', '');
+  datos?.setAttribute('hidden', '');
 
   if (embeddedCheckout) {
     embeddedCheckout.destroy();
@@ -116,7 +169,7 @@ function showSuccessMessage() {
       <span>🎉</span>
       <div>
         <strong>¡Pago completado!</strong>
-        <p>En menos de 24h te contactamos para activar tu asistente.</p>
+        <p>Te hemos enviado un correo con el enlace a tu panel. Revisa tu bandeja.</p>
       </div>
     </div>
   `;
@@ -126,6 +179,21 @@ function showSuccessMessage() {
 
 function initCheckout() {
   document.getElementById('checkout-close')?.addEventListener('click', closeCheckout);
+
+  document.getElementById('checkout-datos')?.addEventListener('submit', event => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const campo = document.getElementById('checkout-negocio') as HTMLInputElement | null;
+    const salon = (campo?.value || '').trim();
+    if (!salon) {
+      campo?.setAttribute('aria-invalid', 'true');
+      campo?.focus();
+      return;
+    }
+    campo?.removeAttribute('aria-invalid');
+    guardarNombreNegocio(salon);
+    void abrirPagoStripe(form.dataset.plan || 'recepcionista', salon);
+  });
 
   document.getElementById('checkout-modal')?.addEventListener('click', event => {
     if (event.target === event.currentTarget) closeCheckout();
