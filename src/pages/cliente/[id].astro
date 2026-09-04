@@ -273,6 +273,7 @@ function renderAppointmentDate(item: Appointment) {
         <section class="crm-view" id="v-dashboard">
           <div class="crm-view-hdr">
             <h1 class="crm-view-title">Dashboard</h1>
+            <button type="button" id="open-share-modal" class="crm-btn-primary">Compartir mi página de reservas</button>
           </div>
 
           <div class="crm-kpi-grid">
@@ -883,6 +884,35 @@ function renderAppointmentDate(item: Appointment) {
       </div>
     </dialog>
   )}
+
+  <!-- La pagina publica de reservas ya existia y funcionaba, pero no habia ninguna opcion
+       en el portal que llevara a ella: el negocio no podia encontrarla ni compartirla.
+       Esto es la puerta de entrada; la pagina no se toca. -->
+  <dialog id="share-modal" class="crm-dialog" aria-labelledby="share-modal-title">
+    <div class="crm-modal-form">
+      <h3 id="share-modal-title">Comparte tu página de reservas</h3>
+      <p class="crm-muted-p">
+        Mándasela a tus clientas por WhatsApp, ponla en tu perfil de Instagram o imprime el
+        código para dejarlo en el mostrador. Reservan solas, sin llamarte.
+      </p>
+      <label class="crm-section-lbl" for="share-link">Tu enlace</label>
+      <div class="crm-copy-row">
+        <input id="share-link" type="text" value="" readonly class="crm-input" />
+        <button id="share-copy" type="button" class="crm-btn-primary">Copiar</button>
+      </div>
+      <div class="crm-tg-qr-wrap">
+        <p class="crm-muted-p" style="margin-top:1rem;margin-bottom:0.5rem">O deja que escaneen este código:</p>
+        <canvas id="share-qr" width="200" height="200" role="img" aria-label="Código QR de tu página de reservas"></canvas>
+        <div class="crm-tg-qr-actions">
+          <a id="share-qr-download" download="mi-pagina-de-reservas.png" class="crm-btn-ghost" style="font-size:0.8rem">⬇️ Descargar QR</a>
+        </div>
+      </div>
+      <div class="crm-modal-actions">
+        <a id="share-open" href="#" target="_blank" rel="noopener" class="crm-btn-ghost">Verla</a>
+        <button type="button" id="close-share-modal" class="crm-btn-ghost">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
 
   <dialog id="new-apt-modal" class="crm-dialog">
     <form id="new-apt-form" class="crm-modal-form">
@@ -1792,7 +1822,64 @@ function renderAppointmentDate(item: Appointment) {
       if (canalSection && !canalSection.classList.contains('crm-hidden')) pollWaQr();
     })();
 
-        var telegramCopy = document.getElementById('telegram-copy');
+        // ── Compartir la pagina publica de reservas ────────────────────────────────
+    // El enlace se construye con location.origin y NO se escribe a mano: asi vale igual en
+    // produccion, en una previsualizacion de Vercel y en el servidor de desarrollo.
+    var shareModal = document.getElementById('share-modal');
+    var shareUrl = location.origin + '/reservar/' + encodeURIComponent(clientId);
+
+    function pintaQrCompartir() {
+      var canvas = document.getElementById('share-qr');
+      if (!canvas) return;
+      // Misma libreria que el QR de Telegram, ya cargada en el head con is:inline (W6).
+      // Si aun no ha llegado, se reintenta: no se anade otra dependencia.
+      if (typeof QRCode === 'undefined') { setTimeout(pintaQrCompartir, 300); return; }
+      QRCode.toCanvas(canvas, shareUrl, { width: 200, margin: 1, color: { dark: '#0a0a0f', light: '#ffffff' } }, function (err) {
+        var dl = document.getElementById('share-qr-download');
+        if (!err && dl) dl.href = canvas.toDataURL('image/png');
+      });
+    }
+
+    var abrirCompartir = document.getElementById('open-share-modal');
+    if (abrirCompartir && shareModal) {
+      abrirCompartir.addEventListener('click', function () {
+        var campo = document.getElementById('share-link');
+        if (campo instanceof HTMLInputElement) campo.value = shareUrl;
+        var verla = document.getElementById('share-open');
+        if (verla) verla.href = shareUrl;
+        pintaQrCompartir();
+        // showModal() da foco, fondo bloqueado y cierre con Esc sin escribir una linea.
+        shareModal.showModal();
+      });
+    }
+
+    var cerrarCompartir = document.getElementById('close-share-modal');
+    if (cerrarCompartir && shareModal) {
+      cerrarCompartir.addEventListener('click', function () { shareModal.close(); });
+    }
+
+    var copiarCompartir = document.getElementById('share-copy');
+    if (copiarCompartir) {
+      copiarCompartir.addEventListener('click', async function () {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          showToast('¡Copiado!');
+        } catch (_) {
+          // navigator.clipboard no existe fuera de https. En ese caso se selecciona el texto
+          // para que copiarlo sea un gesto, no una pelea.
+          var campo = document.getElementById('share-link');
+          if (campo instanceof HTMLInputElement) {
+            campo.focus();
+            campo.select();
+            var copiado = false;
+            try { copiado = document.execCommand('copy'); } catch (e) {}
+            showToast(copiado ? '¡Copiado!' : 'Copia el enlace con Ctrl+C');
+          }
+        }
+      });
+    }
+
+    var telegramCopy = document.getElementById('telegram-copy');
     var telegramCustomerLink = document.getElementById('telegram-customer-link');
 
     if (telegramCopy) {
