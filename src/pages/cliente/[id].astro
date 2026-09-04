@@ -67,17 +67,26 @@ const limitedProgress = data.metrics.conversationLimit
   ? Math.min(100, Math.round((data.metrics.conversationCount / data.metrics.conversationLimit) * 100))
   : 100;
 const isRecepcionista = data.plan === 'recepcionista';
+const isEquipo = data.plan === 'equipo';
+// Los planes que se pueden contratar hoy. Starter, Pro y Total se retiraron el
+// 21-ago-2026 y solo siguen vivos para los clientes que ya los tenian: a nadie
+// mas se le deben ensenar, y menos como si fueran su plan.
+const enCatalogo = isRecepcionista || isEquipo;
 const hasLegacyAdvancedTools = data.plan === 'pro' || data.plan === 'total';
 const planLabel = isRecepcionista
   ? 'Recepcionista IA'
-  : data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
+  : isEquipo
+    ? 'Recepcionista Equipo'
+    : data.plan.charAt(0).toUpperCase() + data.plan.slice(1);
 const planPriceLabel = isRecepcionista
   ? '29€/mes'
-  : data.plan === 'starter'
-    ? '249€/mes'
-    : data.plan === 'pro'
-      ? '449€/mes'
-      : '749€/mes';
+  : isEquipo
+    ? '79€/mes'
+    : data.plan === 'starter'
+      ? '249€/mes'
+      : data.plan === 'pro'
+        ? '449€/mes'
+        : '749€/mes';
 const qrImageSrc = data.qrPngBase64
   ? data.qrPngBase64.startsWith('data:image') ? data.qrPngBase64 : `data:image/png;base64,${data.qrPngBase64}`
   : null;
@@ -779,9 +788,15 @@ function renderAppointmentDate(item: Appointment) {
 
           <div class="crm-section">
             <span class="crm-section-lbl">Planes disponibles</span>
-            {isRecepcionista ? (
+            {!enCatalogo && (
+              <p class="billing-hint" style="margin-bottom:12px">
+                Tu plan ya no se vende: lo mantenemos para las cuentas que lo tenían. Si quieres
+                pasarte a uno de los actuales, escríbenos y lo vemos sin prisa.
+              </p>
+            )}
+            {enCatalogo ? (
               <div class="billing-plans-grid">
-                <div class="billing-plan-card current">
+                <div class={`billing-plan-card ${isRecepcionista ? 'current' : ''}`}>
                   <div class="bpc-header">
                     <span class="bpc-name">Recepcionista IA</span>
                     <span class="bpc-price">29€<small>/mes</small></span>
@@ -792,7 +807,20 @@ function renderAppointmentDate(item: Appointment) {
                     <li>✅ Agenda y reservas automáticas</li>
                     <li>✅ Sin permanencia ni comisión por cita</li>
                   </ul>
-                  <span class="bpc-current-tag">Plan actual</span>
+                  {isRecepcionista && <span class="bpc-current-tag">Plan actual</span>}
+                </div>
+                <div class={`billing-plan-card ${isEquipo ? 'current' : ''}`}>
+                  <div class="bpc-header">
+                    <span class="bpc-name">Recepcionista Equipo</span>
+                    <span class="bpc-price">79€<small>/mes</small></span>
+                  </div>
+                  <ul class="bpc-features">
+                    <li>✅ Todo lo del plan de 29€</li>
+                    <li>✅ Agenda propia para cada profesional</li>
+                    <li>✅ Ficha de cliente con su historial</li>
+                    <li>✅ Sin permanencia ni comisión por cita</li>
+                  </ul>
+                  {isEquipo && <span class="bpc-current-tag">Plan actual</span>}
                 </div>
               </div>
             ) : (

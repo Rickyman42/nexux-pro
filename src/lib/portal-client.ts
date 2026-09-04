@@ -16,7 +16,9 @@ export interface ClientData {
   clientId: string;
   name: string;
   timezone?: string;
-  plan: 'starter' | 'pro' | 'total' | 'recepcionista';
+  // 'equipo' es el plan de 79 EUR, en venta desde el 2-sep-2026. Faltaba aqui,
+  // y por eso el portal lo trataba como si fuera el viejo Total de 749 EUR.
+  plan: 'starter' | 'pro' | 'total' | 'recepcionista' | 'equipo';
   active: boolean;
   botStatus: 'connected' | 'disconnected' | 'pending_qr';
   qrPngBase64?: string;
