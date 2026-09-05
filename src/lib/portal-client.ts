@@ -47,7 +47,14 @@ export interface ClientData {
       // en el segundo caso no hay QR que ensenar, hay que ofrecer reactivarlo.
       qr?: { caducado: boolean; primerQrEn: number | null; caducadoEn: number | null; expiraEn?: number };
     };
-    telegram: { enabled: boolean; ownerLinked: boolean };
+    // Los dos enlaces los calcula la Pi (lib/telegram.js). El de dueno lleva un token
+    // derivado del accessToken: sin el, quien lo pulsa entra como clienta, no como dueno.
+    telegram: {
+      enabled: boolean;
+      ownerLinked: boolean;
+      ownerDeepLink: string | null;
+      customerDeepLink: string;
+    };
   };
 }
 
