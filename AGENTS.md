@@ -1,6 +1,10 @@
 # AGENTS.md — nexux.pro
 
 > **Léeme entero antes de tocar nada.** Vale para cualquier agente: Claude Code, Codex, OpenCode, Qwen, ZCODE.
+> ⚠️ **MODO DE TRABAJO OBLIGATORIO:** lee `progress/MODO-DE-TRABAJO-NEXUX-PRO.md` antes de empezar
+> cualquier tarea. Define los roles (Opus jefe de equipo, Codex desarrolla, verificador contrasta) y las
+> reglas: UNA tarea corta a la vez, cerrada 100% y probada EN LA PRÁCTICA; ningún "hecho" sin contrastar;
+> Ricardo decide el qué; avisar cuando dos agentes se cruzan; nada "a medias" sin dejarlo escrito.
 > Ley general de Nexux: `~/nexus-brain/AGENTS.md` en la Pi. Este archivo NO la repite: solo añade lo propio de nexux.pro.
 > Si hay conflicto, manda la ley general. Estado del proyecto: `~/nexus-brain/nexux-live-state.md`.
 > Historial de trabajo de este repo: `progress/REGISTRO.md` (léete las últimas 20 líneas).
