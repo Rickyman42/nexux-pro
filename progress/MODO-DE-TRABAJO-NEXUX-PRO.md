@@ -70,6 +70,12 @@ o que "ya está en producción", se comprueba contra **origin** (`git rev-list -
 dar 0) y se registra **commit + hora del reinicio**, no un "en producción" genérico. La memoria de una
 sesión de otro agente no es evidencia: el servidor sí.
 
+**Regla "canario" (obligatoria, en TODO el sistema):** ningún deploy se da por terminado sin una ronda de
+comprobaciones justo después de activarlo (web carga, rutas clave, el cambio concreto). Si 3 o más fallan
+seguidas → rollback inmediato. Es la misma regla que ya está en `~/nexus-brain/AGENTS.md` §POST-DEPLOY;
+aquí se repite para que ningún agente la salte: **nada se entrega como "funciona" sin haberse comprobado
+justo después de encenderlo.**
+
 ---
 
 ## 5. HERRAMIENTAS Y ACCESO

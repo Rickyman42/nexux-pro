@@ -640,3 +640,4 @@ CAPA EXTERNA: UptimeRobot confirmado por pantallazo de Ricardo -> monitor https:
 - **NO se ha tocado**: `owner_email` en `clients/nexux-empresa/config.json` y `clients/peluqueria-prueba-.../config.json` — son datos de dos cuentas concretas, no texto de cara al cliente. Decide Ricardo.
 - **Cruce de agentes**: `~/nexux-clients/conversa-rodaje.mjs` tiene 54 líneas modificadas sin commitear que no son mías. No se han tocado ni commiteado.
 - **Hallazgo suelto**: el token del túnel de Cloudflare va en texto plano en los argumentos de PM2 (`cloudflared-provision`), visible en cualquier `pm2 jlist`.
+2026-09-06 | verificador | UNIFICACION EMAIL a info@nexux.pro desplegada: web 2d12683 + backend 632977c + reinicio; canario 5/5 (legal/privacidad/gracias 0 hola@, backend info@, health 200) | canario verde + test 7/7 | OK
