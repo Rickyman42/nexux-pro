@@ -65,6 +65,11 @@ El desarrollador reporta a Ricardo (no al verificador directamente), con:
 Entonces el verificador —con acceso a la Pi y al repo— la **contrasta de forma independiente** y Ricardo
 da la luz de push/deploy/cobro cuando procede. **El push y el cobro los autoriza siempre Ricardo.**
 
+**Regla "desplegado" (lección del 6-sept, cruce de agentes):** antes de afirmar que algo "falta desplegar"
+o que "ya está en producción", se comprueba contra **origin** (`git rev-list --count origin/main..HEAD` debe
+dar 0) y se registra **commit + hora del reinicio**, no un "en producción" genérico. La memoria de una
+sesión de otro agente no es evidencia: el servidor sí.
+
 ---
 
 ## 5. HERRAMIENTAS Y ACCESO
