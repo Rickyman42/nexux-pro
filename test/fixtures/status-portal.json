@@ -1,0 +1,118 @@
+{
+  "clientId": "salon-de-prueba",
+  "name": "Salon De Prueba",
+  "plan": "recepcionista",
+  "capacidades": {
+    "agenda_por_profesional": false,
+    "fichas_clientes": false
+  },
+  "timezone": "Europe/Madrid",
+  "active": true,
+  "botStatus": "pending_qr",
+  "nextAppointments": [],
+  "metrics": {
+    "conversationCount": 0,
+    "conversationLimit": 1000,
+    "appointmentsBooked": 0,
+    "appointmentsCancelled": 0
+  },
+  "confianza": {
+    "backup": {
+      "fecha": "2026-09-05T02:00:14.110Z",
+      "copias": 10
+    },
+    "lara": {
+      "ultimaRespuesta": null,
+      "conversacionesHoy": 0
+    }
+  },
+  "schedule": {
+    "monday": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "tuesday": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "wednesday": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "thursday": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "friday": {
+      "open": "09:00",
+      "close": "20:00"
+    },
+    "saturday": {
+      "open": "09:00",
+      "close": "14:00"
+    },
+    "sunday": null,
+    "lunes": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "martes": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "miercoles": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "jueves": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "viernes": {
+      "open": "09:00",
+      "close": "19:00"
+    },
+    "sabado": {
+      "open": "09:00",
+      "close": "14:00"
+    },
+    "domingo": null
+  },
+  "services": [
+    {
+      "name": "Corte de pelo",
+      "duration": 30,
+      "price": 15
+    },
+    {
+      "name": "Tinte",
+      "duration": 90,
+      "price": 45
+    }
+  ],
+  "billing": {
+    "isTrial": false,
+    "trialEndsAt": null,
+    "expiresAt": null,
+    "stripe": false
+  },
+  "channels": {
+    "whatsapp": {
+      "provider": "baileys",
+      "connected": false,
+      "credenciales": false,
+      "qr": {
+        "caducado": false,
+        "primerQrEn": 1788595280738,
+        "caducadoEn": null,
+        "expiraEn": 1788681680738
+      }
+    },
+    "telegram": {
+      "enabled": true,
+      "ownerLinked": false,
+      "ownerDeepLink": "https://t.me/NexuxProAssistantBot?start=o_TOKENDEDUENODEPRUEBA",
+      "customerDeepLink": "https://t.me/NexuxProAssistantBot?start=c_salon-de-prueba"
+    }
+  }
+}

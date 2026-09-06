@@ -90,8 +90,11 @@ const planPriceLabel = isRecepcionista
 const qrImageSrc = data.qrPngBase64
   ? data.qrPngBase64.startsWith('data:image') ? data.qrPngBase64 : `data:image/png;base64,${data.qrPngBase64}`
   : null;
-const ownerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=${data.clientId}`;
-const customerTelegramUrl = `https://t.me/NexuxProAssistantBot?start=c_${data.clientId}`;
+// NO se fabrican aqui. El de dueno necesita el token o_ que solo la Pi puede derivar del
+// accessToken; el id pelado que habia antes daba de alta al dueno como si fuera clienta.
+const ownerTelegramUrl = data.channels.telegram.ownerDeepLink;
+const customerTelegramUrl = data.channels.telegram.customerDeepLink
+  || `https://t.me/NexuxProAssistantBot?start=c_${data.clientId}`;
 const showWhatsApp = !!data.channels.whatsapp?.provider;
 
 const booked = data.metrics.appointmentsBooked;
@@ -589,7 +592,11 @@ function renderAppointmentDate(item: Appointment) {
                 ) : (
                   <>
                     <p class="crm-muted-p">Para recibir los avisos de citas y ver la actividad de Lara.</p>
-                    <a href={ownerTelegramUrl} class="crm-btn-primary" target="_blank" rel="noopener">Conectar mi Telegram →</a>
+                    {ownerTelegramUrl ? (
+                      <a href={ownerTelegramUrl} class="crm-btn-primary" target="_blank" rel="noopener">Conectar mi Telegram →</a>
+                    ) : (
+                      <p class="crm-muted-p">No podemos generar tu enlace ahora mismo. Escribe a soporte y lo resolvemos.</p>
+                    )}
                   </>
                 )}
               </div>
