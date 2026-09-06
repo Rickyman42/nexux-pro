@@ -2855,10 +2855,15 @@ function renderAppointmentDate(item: Appointment) {
     .crm-nav-btn svg { flex-shrink: 0; opacity: 0.75; }
     .crm-nav-btn.active svg { opacity: 1; }
 
+    /* Tres cosas en una fila dentro de una columna de 220px (196 utiles) no caben:
+       cada enlace partia su texto por dentro y se leian entrelazados
+       ("ConfiguracionSoporte inicial"). En una barra lateral el alto sobra y el
+       ancho no, asi que se apilan. */
     .crm-sidebar-foot {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.45rem;
       padding-top: 0.75rem;
       border-top: 1px solid var(--crm-line);
       margin-top: 0.5rem;
@@ -2879,6 +2884,9 @@ function renderAppointmentDate(item: Appointment) {
       font-size: 12px;
       color: var(--crm-muted);
       text-decoration: none;
+      /* Si algun dia no cabe, que se vea que no cabe en vez de partirse y
+         mezclarse con el enlace de al lado. */
+      white-space: nowrap;
     }
 
     .crm-support-link:hover { color: var(--crm-accent); }
