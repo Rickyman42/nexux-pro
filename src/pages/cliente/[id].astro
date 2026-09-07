@@ -768,6 +768,22 @@ function renderAppointmentDate(item: Appointment) {
         <!-- ── BILLING ──────────────────────────────────────────────────────────────── -->
         <section class="crm-view crm-hidden" id="v-billing">
           <h1 class="crm-view-title">Facturación</h1>
+
+          <div class="fact-estado" id="fact-estado" data-tono="cargando">
+            <div class="fact-cab">
+              <span class="fact-punto" aria-hidden="true"></span>
+              <h2 class="fact-titulo" id="fact-titulo">Comprobando tu suscripción…</h2>
+            </div>
+            <p class="fact-detalle" id="fact-detalle">Estamos preguntándoselo a la pasarela de pago. Tarda un segundo.</p>
+            <div class="fact-datos crm-hidden" id="fact-datos">
+              <div class="fact-dato"><span class="fact-dato-lbl">Tu plan</span><span class="fact-dato-val" id="fact-plan">—</span></div>
+              <div class="fact-dato"><span class="fact-dato-lbl">Precio</span><span class="fact-dato-val" id="fact-precio">—</span></div>
+              <div class="fact-dato"><span class="fact-dato-lbl" id="fact-proximo-lbl">Próximo cobro</span><span class="fact-dato-val" id="fact-proximo">—</span></div>
+              <div class="fact-dato"><span class="fact-dato-lbl">Tarjeta</span><span class="fact-dato-val" id="fact-tarjeta">—</span></div>
+            </div>
+            <p class="fact-pie" id="fact-pie"></p>
+          </div>
+
           <div class="crm-section">
             <span class="crm-section-lbl">Plan activo</span>
             <div class="billing-plan-row">
@@ -2694,10 +2710,87 @@ function renderAppointmentDate(item: Appointment) {
         });
     }
 
+    // ── Estado de facturacion ────────────────────────────────────────────
+    // Todo lo que se pinta aqui viene de la Pi, que a su vez lo ha comprobado
+    // con la pasarela. Si algo no se sabe, se dice; no se rellena el hueco.
+    var factCargado = false;
+
+    function haceCuanto(iso) {
+      if (!iso) return null;
+      var ms = Date.now() - Date.parse(iso);
+      if (isNaN(ms) || ms < 0) return null;
+      var min = Math.floor(ms / 60000);
+      if (min < 2) return 'hace un momento';
+      if (min < 60) return 'hace ' + min + ' minutos';
+      var h = Math.floor(min / 60);
+      if (h < 24) return 'hace ' + h + (h === 1 ? ' hora' : ' horas');
+      var d = Math.floor(h / 24);
+      return 'hace ' + d + (d === 1 ? ' día' : ' días');
+    }
+
+    function pintaFacturacion(d) {
+      var caja = document.getElementById('fact-estado');
+      var datos = document.getElementById('fact-datos');
+      document.getElementById('fact-titulo').textContent = d.titulo;
+      document.getElementById('fact-detalle').textContent = d.detalle;
+      caja.setAttribute('data-tono', d.tranquilo ? 'bien' : 'ojo');
+
+      document.getElementById('fact-plan').textContent = d.planNombre || '—';
+      document.getElementById('fact-precio').textContent =
+        d.precioEuros ? d.precioEuros + ' € al mes' : '—';
+      // La etiqueta cambia con la situacion: la misma fecha significa cosas
+      // distintas segun si te van a cobrar, si es tu ultimo dia o si estas de
+      // prueba. Llamarlo todo "proximo cobro" seria mentir en tres de los casos.
+      var etiquetaFecha = 'Próximo cobro';
+      var valorFecha = d.renuevaEnTexto || 'Todavía no lo sabemos';
+      if (d.estado === 'termina') { etiquetaFecha = 'Servicio hasta'; }
+      else if (d.estado === 'prueba') { etiquetaFecha = 'Prueba hasta'; }
+      else if (d.estado === 'manual') { valorFecha = 'No hay cobros'; }
+      else if (d.estado === 'cancelada' || d.estado === 'desactivada') {
+        valorFecha = d.renuevaEnTexto || 'Ninguno';
+      }
+      document.getElementById('fact-proximo-lbl').textContent = etiquetaFecha;
+      document.getElementById('fact-proximo').textContent = valorFecha;
+      document.getElementById('fact-tarjeta').textContent = d.tarjeta
+        ? (d.tarjeta.marca ? d.tarjeta.marca.toUpperCase() : 'Tarjeta') + ' ···· ' + d.tarjeta.ultimos4
+        : (d.tienePasarela ? 'Todavía no lo sabemos' : 'Ninguna');
+      datos.classList.remove('crm-hidden');
+
+      // El pie es lo que da tranquilidad de verdad: dice que esto se mira, y
+      // cuando se miro por ultima vez. Sin eso, "todo en orden" es una frase
+      // pintada en una pantalla.
+      var cuando = haceCuanto(d.comprobadoEn);
+      var pie = 'Revisamos todos los días que lo que dice tu suscripción y lo que dice la pasarela de pago coincidan. Si algo no cuadra lo vemos nosotros y te avisamos: no tienes que estar pendiente.';
+      if (cuando) pie = 'Comprobado con la pasarela de pago ' + cuando + '. ' + pie;
+      document.getElementById('fact-pie').textContent = pie;
+    }
+
+    function sinPoderComprobar() {
+      var caja = document.getElementById('fact-estado');
+      caja.setAttribute('data-tono', 'sin-datos');
+      document.getElementById('fact-titulo').textContent = 'No hemos podido comprobar tu suscripción ahora mismo';
+      document.getElementById('fact-detalle').textContent =
+        'Es un problema nuestro para consultarlo, no un problema con tu pago: tu servicio sigue funcionando igual. Vuelve a entrar en un rato y, si sigue así, escríbenos por Soporte.';
+      document.getElementById('fact-pie').textContent = '';
+    }
+
+    function cargaFacturacion() {
+      if (factCargado) return;
+      factCargado = true;
+      fetch('/portal-api/facturacion?clientId=' + clientId)
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res && res.ok && res.datos) pintaFacturacion(res.datos);
+          else sinPoderComprobar();
+        })
+        .catch(sinPoderComprobar);
+    }
+
     // Load invoices when billing nav button is clicked
     var billingNavBtn = document.querySelector('.crm-nav-btn[data-view=billing]');
     if (billingNavBtn) {
       billingNavBtn.addEventListener('click', function() {
+        cargaFacturacion();
         var table = document.getElementById('invoices-table');
         if (table && !table.classList.contains('inv-loaded')) {
           table.classList.add('inv-loaded');
@@ -2707,6 +2800,7 @@ function renderAppointmentDate(item: Appointment) {
     }
     // Also load if billing is the initial view
     if ((localStorage.getItem('crm-view') || 'dashboard') === 'billing') {
+      cargaFacturacion();
       var table = document.getElementById('invoices-table');
       if (table) { table.classList.add('inv-loaded'); loadInvoices(); }
     }
@@ -3434,6 +3528,41 @@ function renderAppointmentDate(item: Appointment) {
       padding: 3px 8px; border-radius: 999px;
     }
     /* ── Invoice table ─────────────────────────────────────────────── */
+    /* Tarjeta de estado de facturacion. El color no decora: verde solo
+       cuando el dueno no tiene que hacer NADA. */
+    .fact-estado {
+      border: 1px solid var(--crm-border, #e6e6ea);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 22px;
+      background: #fff;
+    }
+    .fact-estado[data-tono="bien"] { border-color: #b7e3c4; background: #f4fbf6; }
+    .fact-estado[data-tono="ojo"] { border-color: #f0d2a0; background: #fffaf1; }
+    .fact-estado[data-tono="sin-datos"] { border-color: #e6e6ea; background: #fafafb; }
+    .fact-cab { display: flex; align-items: center; gap: 10px; }
+    .fact-punto {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #c8c8d0; flex: 0 0 auto;
+    }
+    .fact-estado[data-tono="bien"] .fact-punto { background: #2f9e5e; }
+    .fact-estado[data-tono="ojo"] .fact-punto { background: #d9922b; }
+    .fact-titulo { font-size: 17px; font-weight: 700; margin: 0; line-height: 1.3; }
+    .fact-detalle { margin: 8px 0 0; font-size: 14px; line-height: 1.55; color: #4a4a55; }
+    .fact-datos {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px; margin-top: 18px; padding-top: 16px;
+      border-top: 1px solid rgba(0,0,0,.07);
+    }
+    .fact-dato { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .fact-dato-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #8a8a95; }
+    .fact-dato-val { font-size: 15px; font-weight: 600; color: #1c1c22; overflow-wrap: anywhere; }
+    .fact-pie { margin: 16px 0 0; font-size: 12.5px; line-height: 1.5; color: #7a7a86; }
+    @media (max-width: 640px) {
+      .fact-estado { padding: 16px; }
+      .fact-datos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
     .invoices-loading, .invoices-empty {
       font-size: 13px; color: var(--crm-text-muted); padding: 12px 0;
     }

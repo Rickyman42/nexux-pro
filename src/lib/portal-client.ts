@@ -152,6 +152,29 @@ export async function getClientInvoices(
   }
 }
 
+/**
+ * El estado de facturacion tal y como lo cuenta la Pi: plan, precio, cuando
+ * renueva, con que tarjeta y cuando se comprobo con la pasarela.
+ *
+ * Si la Pi no contesta se devuelve ok:false y la pantalla lo dice. Nunca se
+ * rellena con un "todo correcto" de adorno: una tranquilidad falsa es peor que
+ * ninguna, porque el dia que haya un problema de verdad nadie se la creera.
+ */
+export async function getFacturacion(
+  clientId: string,
+  token: string,
+): Promise<{ ok: boolean; datos: Record<string, unknown> | null }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/facturacion`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return { ok: false, datos: null };
+    return { ok: true, datos: (await response.json()) as Record<string, unknown> };
+  } catch {
+    return { ok: false, datos: null };
+  }
+}
+
 export async function getBillingPortalUrl(clientId: string, token: string): Promise<string | null> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/billing-portal`, {
