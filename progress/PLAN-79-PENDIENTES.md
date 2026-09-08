@@ -528,3 +528,76 @@ Google OAuth). La aplicación va bien porque dotenv lo limpia, pero cualquier sc
 ### Pasos 5 y 6, pendientes
 5. Cancelación solo por el bot de soporte, nunca autoservicio en dos clics.
 6. Quitar el botón "Gestionar suscripción" que abre el portal de Stripe.
+
+---
+
+## Paso 3, cerrado: probado contra Stripe de verdad — y el fallo que destapó (8-sep, 03:05)
+
+`54686d0` en `nexux-clients`. **Sin push: lo autoriza Ricardo.**
+
+Con la clave de modo prueba que autorizó Ricardo (usada **solo inline**, nunca guardada en el `.env`
+ni en ningún fichero) se hace el recorrido entero. Lo que faltaba del paso 3 ya no falta.
+
+**El historial de facturas del cliente de prueba es la prueba del dinero:**
+
+| Importe | Estado | Motivo |
+|---|---|---|
+| 29,00 € | pagada | alta de la suscripción |
+| **50,00 €** | pagada | **la diferencia 79−29, cobrada al subir** |
+| 29,00 € | pagada | renovación, ya bajado |
+
+Los tres pasos con su comprobación: subir deja **una sola línea** (no dos planes cobrándose), el mapeo
+precio→plan resuelve `equipo`; bajar **no toca nada hoy** (sigue en 79, que ya está pagado) y deja la
+fase siguiente en 29 con `end_behavior: release`; y con el reloj de pruebas se adelanta un mes y **la
+bajada entra sola**, con el mapeo resolviendo `recepcionista`. Eso es lo que separa "queda bien
+programado" de "pasa de verdad".
+
+### 🔴 Lo que encontró: la fecha de renovación se buscaba donde ya no está
+
+El SDK de Stripe habla la versión de API `2026-04-22.dahlia`. En esa versión `current_period_end` se
+mudó de la suscripción a su **línea**:
+
+```
+sub.current_period_end                -> undefined
+sub.items.data[0].current_period_end  -> 1791421432
+```
+
+Es el mismo tipo de desajuste de versiones que dejó los webhooks muertos cuatro meses. Lo que estaba
+roto sin que lo supiera nadie:
+
+- **El panel de facturación (paso 2)** se habría quedado **para siempre** en *"la fecha de tu próxima
+  renovación aparecerá aquí en cuanto la comprobemos"*.
+- **El vigilante diario (paso 1)** nunca habría guardado la fecha de renovación — que es exactamente
+  lo que se construyó para guardar.
+- La clave que evita cobrar dos veces por un doble clic caía a `0` fijo: al no llevar el periodo, un
+  cambio legítimo el mes siguiente se habría rechazado como si fuera un duplicado.
+
+**No lo vio nadie porque hoy no hay ningún cliente pagando.** Se habría visto con el primero — y
+habría sido él quien lo descubriera. En el paso 2 lo tuve delante (`renuevaEl: null` en la suscripción
+real) y lo di por bueno diciéndome que una suscripción cancelada no tiene periodo siguiente. Era
+verdad, y por eso tapaba el fallo.
+
+Arreglado en un solo sitio, `finDelPeriodo()`, que mira **las dos formas**: la nueva (nuestras
+llamadas) y la vieja (los avisos que Stripe manda a la Pi, que van con la versión de la cuenta,
+`2025-08-27.basil`). Las dos conviven de verdad en esta casa.
+
+### Cómo repetirlo
+
+```
+cd ~/nexux-clients
+STRIPE_TEST_KEY=sk_test_... node scripts/test-cambio-plan-modo-prueba.mjs
+```
+El script se niega a arrancar si la clave no empieza por `sk_test_`. Crea todo, lo comprueba y lo
+borra solo.
+
+**Limpieza**: cliente, tarjeta, suscripción, calendario y reloj **borrados** (0 de cada uno en la
+cuenta de pruebas, comprobado). Los **7 precios y 4 productos** de las tres pasadas quedan
+**archivados, no borrados**: Stripe no permite borrar precios por API, ni productos que tengan
+precios. Están inactivos y fuera del catálogo, en el entorno de pruebas aislado.
+
+**Estado**: 313 pruebas, 312 verdes (falla sólo `citas-zona-horaria`, guardia de producción).
+Sabotajes: facturación 7/7 · cambio de plan 12/12 · tarjeta 8/8 · suscripciones 7/7 — **34, ninguno se
+escapa**.
+
+**Sigue sin probarse**: teclear una tarjeta real en el formulario del paso 4 y ver el cobro. Ahora se
+puede hacer con esta misma clave de pruebas; no entraba en lo que autorizó Ricardo para esta tanda.
