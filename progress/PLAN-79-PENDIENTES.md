@@ -525,9 +525,7 @@ se puede usar la 4242, así que eso sigue esperando a la **`sk_test_…`** que p
 Google OAuth). La aplicación va bien porque dotenv lo limpia, pero cualquier script en bash que haga
 `. ./.env` se lleva el `\r` pegado al valor. Es una trampa para el futuro, no un fallo de hoy.
 
-### Pasos 5 y 6, pendientes
-5. Cancelación solo por el bot de soporte, nunca autoservicio en dos clics.
-6. Quitar el botón "Gestionar suscripción" que abre el portal de Stripe.
+
 
 ---
 
@@ -601,3 +599,90 @@ escapa**.
 
 **Sigue sin probarse**: teclear una tarjeta real en el formulario del paso 4 y ver el cobro. Ahora se
 puede hacer con esta misma clave de pruebas; no entraba en lo que autorizó Ricardo para esta tanda.
+---
+
+## Pasos 5 y 6 — Se acaba la cancelación en autoservicio (8-sep, 04:10)
+
+`8d5837a` en `nexux-clients` · `e884c15` en `nexux-pro`. **Sin push: lo autoriza Ricardo.**
+
+**Había DOS formas de cancelar solo, no una.** Quitar el botón habría dejado la otra abierta:
+
+1. El botón **"Gestionar suscripción"**, que abría el portal de Stripe (donde cancelar son dos clics).
+   Fuera el botón, su lógica, el puente con la Pi y la ruta. Las dos rutas contestan **410 con lo que
+   hay que hacer**, no un error seco, por si queda una pestaña vieja abierta.
+2. **El propio portal de Stripe.** Se entra con un enlace público y el email del cliente, **sin pasar
+   por nosotros**. Ahí se desactivó la cancelación:
+   `bpc_1ShYHb2SQwDzHtsFV5Zm5t9K` → `subscription_cancel.enabled = false`. Comprobado después.
+   Para volver atrás: el mismo `POST` con `features[subscription_cancel][enabled]=true`.
+
+**En su sitio**, el bloque "¿Quieres cancelar?" que lleva al bot de soporte, y que dice **por qué** no
+hay botón: para poder ayudar antes de que se vaya, y si aun así quiere irse, se le deja hecho sin
+vueltas ni permanencia. Un cliente que quiere irse y no encuentra por dónde se enfada; uno al que le
+dices con quién hablar, no.
+
+**La escalada** (`POST /soporte/baja`): la llama el bot, no un cliente, así que va con el secreto del
+servidor. **Aquí no se cancela nada** — hay una prueba que lee `lib/baja.js` y salta si alguien mete
+una llamada que cancele. Avisa a Ricardo por Telegram con lo que necesita para decidir sin ir a buscar
+nada: quién es, qué paga, desde cuándo, hasta cuándo tiene pagado, cómo localizarle, por qué se va,
+qué se le ofreció, y la línea *"Nadie ha cancelado nada. Decides tú."*
+
+**La retención es honesta**: se ofrece **una vez** y lo que encaje con el motivo. Al que le parece
+caro, el plan de 29 — **no un descuento**, porque si se regala a todo el que se queja deja de valer.
+Al que no lo usa, terminar de configurarlo. Al que dice que no le funciona, arreglarlo hoy *"y si no,
+te damos la baja sin más vueltas"*. **A quien cierra el negocio no se le ofrece nada**, que es
+faltarle al respeto. Los cuatro tienen su sabotaje.
+
+**Cazado probándolo en vivo**: el primer aviso salió con `avisado: false` — un tropiezo de red justo
+tras reiniciar, y el mensaje se habría perdido. Ahora **tres intentos** y, si aun así no sale, el
+aviso entero queda escrito en el log. Un mensaje de Telegram perdido no puede ser la única traza de
+que alguien se quiere ir. *(De paso: `notifyTelegram` en `stripe-webhook.js` se traga los fallos con
+un `.catch(() => {})`. No lo he tocado, pero el aviso de "cliente desactivado" puede estar
+perdiéndose igual. Apuntado.)*
+
+**Comprobado en vivo**: 410 en las rutas retiradas · 401 sin secreto · 400 con motivo inventado ·
+**aviso llegando de verdad a tu Telegram** (`avisado: true`, dos mensajes marcados como prueba).
+En navegador (`nexux-pro/scripts/mira-baja.py`): ni "Gestionar suscripción", ni "portal de Stripe", ni
+**un solo enlace a stripe.com**, ni un botón que diga cancelar. Config restaurado idéntico por md5.
+
+**Pruebas**: 13 nuevas. **10 sabotajes, los 10 cazados.** Regresión 325/326.
+
+### 🔴 Lo que falta para que el paso 5 funcione de verdad: el bot no existe
+
+`@nexux_soporte_bot` **está registrado en Telegram, pero en la Pi no hay ni código, ni token, ni
+proceso**. Aparece sólo como enlace: en el portal, en la página de gracias y en el email de
+bienvenida. **Hoy, quien escriba ahí no le contesta nadie.**
+
+Eso ya era así antes de este paso — no lo he roto yo — pero ahora importa mucho más: acabo de mandar
+ahí a todo el que quiera cancelar. Un cliente que quiere irse y escribe al vacío es peor que un botón
+de cancelar: se va igual, y además enfadado.
+
+**Lo que hace falta**: el token de `@nexux_soporte_bot` (BotFather → `/mytoken`). Con él, el bot es
+una carcasa fina: la conversación, la retención y el aviso ya están escritos y probados en
+`lib/baja.js` y en `POST /soporte/baja`.
+
+---
+
+## Paso 4, cerrado: la tarjeta probada contra Stripe de verdad (8-sep, 04:00)
+
+Mismo `8d5837a`. `scripts/test-tarjeta-modo-prueba.mjs`, con la clave de pruebas.
+
+Un negocio pagando con **Mastercard ····4444**, se cambia a **Visa ····4242** por el mismo camino que
+usa el portal, se adelanta un mes con el reloj de pruebas y **el cobro de la renovación sale de la
+tarjeta nueva**. Las dos facturas, pagadas.
+
+Comprobado además: la etiqueta que vuelve es `{marca, ultimos4, caduca}` y **nada más** — ni número,
+ni CVC, ni nada que proteger. Y la tarjeta queda puesta **en el cliente Y en la suscripción**: si sólo
+se pusiera en uno, la próxima factura seguiría intentando la vieja.
+
+**Cazado**: mi lectura de "en qué tarjeta se cobró" fallaba, porque en esta versión de la API el pago
+ya no cuelga de la factura igual. Era mi comprobación, no el producto — pero un test que no sabe leer
+el resultado no prueba nada, así que se arregló antes de darlo por bueno.
+
+```
+cd ~/nexux-clients
+STRIPE_TEST_KEY=sk_test_... node scripts/test-tarjeta-modo-prueba.mjs
+```
+
+**Limpieza**: cliente, tarjetas, suscripción y reloj borrados — 0 de cada uno en la cuenta de pruebas,
+comprobado. Precios y productos **archivados** (Stripe no deja borrarlos). La clave no ha quedado
+escrita en ningún fichero.
