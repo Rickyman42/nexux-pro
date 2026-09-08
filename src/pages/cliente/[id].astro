@@ -803,21 +803,19 @@ function renderAppointmentDate(item: Appointment) {
                 <span class="billing-plan-name">{planLabel}</span>
                 <span class="billing-plan-sub">{planPriceLabel}</span>
               </div>
-              {data.billing?.stripe !== false && (
-                <button id="btn-billing-portal" class="crm-btn-primary">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                  Gestionar suscripción
-                </button>
-              )}
+              {/* Aqui habia un boton "Gestionar suscripcion" que llevaba al portal
+                  de Stripe, donde cancelar eran dos clics. Todo lo que hacia ese
+                  portal se hace ya dentro de Nexux: cambiar de plan, cambiar la
+                  tarjeta y ver las facturas. Lo unico que no se hace aqui es
+                  cancelar, y es a proposito. */}
             </div>
             {data.billing?.stripe === false ? (
               <p class="billing-hint">
                 Esta cuenta se dio de alta a mano, sin pasar por la pasarela de pago, así que
-                no hay suscripción que gestionar todavía. En cuanto se active el pago aparecerá
-                aquí el acceso al portal de Stripe.
+                no hay ningún cobro automático ni suscripción que gestionar.
               </p>
             ) : (
-              <p class="billing-hint">Cambia de plan, actualiza tu método de pago o cancela desde el portal de Stripe.</p>
+              <p class="billing-hint">Todo lo de tu suscripción se hace aquí mismo: cambiar de plan, cambiar la tarjeta y descargar tus facturas.</p>
             )}
           </div>
 
@@ -916,8 +914,20 @@ function renderAppointmentDate(item: Appointment) {
             <p class="billing-hint crm-hidden" id="plan-aviso" style="margin-top:14px"></p>
 
             {data.billing?.stripe !== false && (
-              <p class="billing-hint" style="margin-top:16px">Desde “Gestionar suscripción” puedes <strong>cambiar de plan</strong>, <strong>actualizar tu tarjeta</strong>, <strong>descargar tus facturas</strong> y <strong>cancelar la suscripción</strong>. Si cancelas, sigues teniendo el servicio hasta el final del periodo que ya has pagado.</p>
+              <p class="billing-hint" style="margin-top:16px">Al <strong>subir de plan</strong> el cambio se nota al momento y solo pagas la diferencia de los días que quedan. Al <strong>bajar</strong> no se te cobra nada hoy: sigues con lo que tienes hasta el final del mes que ya has pagado.</p>
             )}
+          </div>
+
+          <div class="crm-section">
+            <span class="crm-section-lbl">¿Quieres cancelar?</span>
+            <div class="baja-caja">
+              <p class="baja-texto">
+                Escríbenos a soporte y lo vemos contigo. No lo hacemos con un botón a propósito:
+                muchas veces lo que falla se arregla en cinco minutos, y si aun así quieres irte,
+                te lo dejamos hecho sin vueltas ni permanencia.
+              </p>
+              <a class="baja-boton" href="https://t.me/nexux_soporte_bot" target="_blank" rel="noopener">Hablar con soporte</a>
+            </div>
           </div>
 
           <div class="crm-section">
@@ -2666,34 +2676,7 @@ function renderAppointmentDate(item: Appointment) {
       });
     }
 
-    // ── Billing portal button ──────────────────────────────────────────
-    var billingBtn = document.getElementById('btn-billing-portal');
-    if (billingBtn) {
-      billingBtn.addEventListener('click', async function () {
-        billingBtn.disabled = true;
-        billingBtn.textContent = 'Cargando...';
-        try {
-          var r = await fetch('/portal-api/billing?clientId=' + encodeURIComponent(clientId));
-          var d = await r.json();
-          if (d.url) {
-            window.location.href = d.url;
-          } else {
-            // Un "no se pudo" a secas deja al dueno sin saber si es culpa suya. Se
-            // distingue el caso de no tener suscripcion del de Stripe fallando.
-            showToast(d && d.error === 'billing_unavailable'
-              ? 'Esta cuenta no tiene suscripción activa en Stripe'
-              : 'No se pudo abrir el portal de facturación. Inténtalo en un minuto.');
-            billingBtn.disabled = false;
-            billingBtn.textContent = 'Gestionar suscripción';
-          }
-        } catch (_) {
-          showToast('Error de conexión');
-          billingBtn.disabled = false;
-          billingBtn.textContent = 'Gestionar suscripción';
-        }
-      });
-    }
-
+    // El boton del portal de Stripe se quito: cancelar no es autoservicio.
     // ── Invoices loader ────────────────────────────────────────────────
     function loadInvoices() {
       var loading = document.getElementById('invoices-loading');
@@ -3740,6 +3723,18 @@ function renderAppointmentDate(item: Appointment) {
       padding: 3px 8px; border-radius: 999px;
     }
     /* ── Invoice table ─────────────────────────────────────────────── */
+    .baja-caja {
+      border: 1px solid var(--crm-border, #e6e6ea); border-radius: 12px;
+      padding: 18px; background: #fff;
+    }
+    .baja-texto { margin: 0 0 14px; font-size: 14px; line-height: 1.6; color: #4a4a55; }
+    .baja-boton {
+      display: inline-block; padding: 10px 18px; border-radius: 9px;
+      border: 1px solid var(--crm-border, #d9d9e0); background: #fff;
+      color: #1c1c22; font-size: 14px; font-weight: 600; text-decoration: none;
+    }
+    .baja-boton:hover { border-color: #2f9e5e; color: #2f9e5e; }
+
     .fact-cambiar-tarjeta {
       margin-top: 14px; padding: 9px 16px;
       border: 1px solid var(--crm-border, #d9d9e0); border-radius: 9px;

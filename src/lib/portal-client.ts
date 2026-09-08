@@ -242,16 +242,8 @@ export async function llamarTarjeta(
   }
 }
 
-export async function getBillingPortalUrl(clientId: string, token: string): Promise<string | null> {
-  try {
-    const response = await fetch(`${BASE_URL}/client/${clientId}/billing-portal`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) return null;
-    const data = await response.json() as { url?: string };
-    return data.url || null;
-  } catch { return null; }
-}
+// getBillingPortalUrl se quito: el portal de Stripe permitia cancelar en dos
+// clics y la cancelacion ya no es autoservicio (decision de Ricardo, 8-sep-2026).
 
 export async function resendPortalLink(clientId: string, email: string): Promise<void> {
   const url = new URL(`${BASE_URL}/client/${clientId}/resend-link`);
