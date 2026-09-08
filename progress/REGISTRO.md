@@ -707,3 +707,75 @@ sea el dueno: el permiso se concede por QUIEN pide la cita, no se hereda de la c
 ### Lo que falta
 El arreglo del motor **ya esta vivo** en la Pi (`pm2 restart`, servicio online). El del panel es
 `nexux-pro`, que vive en Vercel: **no llega a Ricardo hasta que se haga push, y eso lo autoriza el.**
+
+---
+
+## Puerta giratoria: quien ya estuvo no vuelve a tener el mes gratis (8-sep, 08:10)
+
+`728baa4` en `nexux-clients` + `cda738d` en `nexux-pro`. **Sin push.**
+
+Lo pidio Ricardo: cancelar dias antes del cobro y volver a abrir cuenta salia gratis y se podia
+repetir. **Hoy no habia ningun control**: cada alta nacia como si fuera la primera.
+
+### Como se decide
+
+Cuatro senales, y **no valen lo mismo**:
+
+| senal | peso | por que |
+|---|---|---|
+| WhatsApp | fuerte | es el producto: sin ese numero no hay servicio, y cambiarlo cuesta clientes |
+| Telegram | fuerte | la cuenta es de una persona; abrir otra es un movil nuevo |
+| email | fuerte para acusar | coincidir es concluyente; lo facil es **evitarlo** (un `+1` y ya) |
+| IP | **debil** | cambia sola y dos negocios comparten wifi u operador. Nunca basta sola |
+
+- coincidencia **fuerte** + alta **gratis** -> **no se crea nada** (409) y se avisa a Ricardo.
+- coincidencia **fuerte** + alta **de pago** -> se crea con normalidad. Solo aviso.
+- **solo la IP** -> nunca bloquea. Solo aviso.
+
+El que vuelve **puede pagar y entra por el camino normal**. Si no paga, no pasa nada mas.
+
+### Lo que se cuida, y por que
+
+- **Lo que no se ha podido mirar se dice.** El aviso lleva una linea "sin comparar: Telegram" cuando
+  esa senal no venia en el alta. No es lo mismo mirar y no encontrar que no mirar; contarlo como
+  limpio seria mentir en la direccion peligrosa.
+- **Los valores de relleno no acusan a nadie.** Ocho cuentas de demo comparten el telefono
+  `600000000`: sin esto se delatarian unas a otras. Un numero de verdad no se escribe con dos
+  digitos distintos.
+- **Si el propio control falla, un alta gratis NO sale igual** (503). Regalar el mes por un fallo
+  nuestro es exactamente lo que se intenta evitar. Un alta **de pago** si sale: ahi el riesgo es al
+  reves, perder un cobro.
+- **La IP hace un viaje** porque la Pi tiene el historial pero no ve al visitante: quien le habla es
+  Vercel. Se recoge al abrir el checkout y viaja en la sesion de Stripe hasta el alta.
+  ⚠️ **Esto mete la IP del visitante en Stripe.** Es un dato personal mas en un sitio donde ya estan
+  su nombre, telefono, email y tarjeta — pero conviene que la politica de privacidad lo diga.
+  **Decision de Ricardo.**
+
+### Comprobado
+- **19 pruebas nuevas**: 12 del detector + 7 contra la ruta REAL de `/provision` (se carga el fichero
+  entero, con su express y su autenticacion; solo se neutraliza lo que saldria de la maquina).
+- **6 sabotajes** (`scripts/sabotaje-puerta.py`), cada uno lo caza al menos una prueba: la IP
+  ascendida a fuerte, el `+1` sin quitar, los rellenos contando, la puerta que avisa pero no bloquea,
+  la IP/Telegram sin guardarse, y bloquear tambien a quien paga.
+- **347/347** en toda la suite. **Verificador 9/9.**
+- **En vivo, contra el servicio que corre**: un alta gratis con el telefono de Kalon devolvio 409,
+  encontro **dos** cuentas suyas anteriores, dijo `sinComparar: [telegram]`, y **no creo ninguna
+  carpeta** (22 antes, 22 despues). *(Ese aviso le llego a Ricardo por Telegram: era esta prueba.)*
+
+### 🔴 Hay una SEGUNDA puerta, y no pasa por el control
+
+`provision.js` es una CLI que **escribe la carpeta del cliente a mano**, sin pasar por `/provision`.
+Se salta el control entero. Ademas genera una cuenta con la forma vieja: sin `accountMode`, sin
+plantillas, y con `plan: 'total'` — un plan **retirado el 21-ago**.
+
+De las 22 cuentas, **solo `demo` salio de ahi**. Es legado.
+
+**No la he parcheado**: ponerle un control de fraude encima a un generador de cuentas rotas es
+pulir lo que no toca. Las dos salidas razonables son **borrarla** o **hacer que llame a
+`/provision`** como todo lo demas. **Decide Ricardo.**
+
+### Lo que queda dicho, no hecho
+Media docena de copias de "avisar por Telegram" repartidas por el repo se tragan el fallo en
+silencio (`stripe-webhook.js`, `whatsapp.js`, `roi-report.js`, `twilio.js`, `scheduler.js`,
+`lemon.js`). La nueva (`lib/aviso-telegram.js`) devuelve si ha salido y, si no, deja el texto entero
+en el log. Migrar las viejas hoy —sobre todo la del webhook de Stripe— es mas riesgo que valor.
