@@ -957,3 +957,45 @@ falsos negativos seguidos por no mirar lo que hacia mi propia herramienta.
 El calendario pinta sus horas con la del **navegador** (`fmtTime`), no con la del salon. Para un
 dueno que mire su panel desde otro pais, el calendario y esta tabla dirian horas distintas. No se ha
 tocado: es anterior a este cambio y toca todo el calendario.
+
+---
+
+## ROI del bot: decia 638 EUR con el bot apagado (8-sep, 15:55)
+
+`3f59631` en `nexux-clients` (ya vivo) + `4bf897d` en `nexux-pro` (**sin push**).
+
+**Tres cosas mal, y la primera la meti yo esta misma manana.**
+
+**1. Contaba TODAS las citas.** Al hacer que "Total reservadas" saliera del fichero de citas en vez
+del contador que solo suben los bots, la tarjeta de ROI heredo ese numero y empezo a apuntarle al bot
+lo que Ricardo anota a mano. Con el bot **apagado** y **cero conversaciones**, el panel decia
+**"~638 EUR generados"**. Eso no es un numero optimista: es inventado. **Lo avise como efecto lateral
+al hacer el cambio y no lo arregle entonces; habria que haberlo arreglado en el mismo commit.**
+
+**2. Multiplicaba las citas por la MEDIA del catalogo.** Con "Cambiar ruedas" a 68 EUR y
+"Amortiguadores" a 251, cada cita valia 159,50 — tambien las de 68. Ahora se suma el precio **real**
+de cada una.
+
+**3. Los dos numeros de la tarjeta no cuadraban entre si.** 638 arriba y "4 citas x ~160 EUR" abajo:
+4 x 159,5 = 638, pero redondeado a 160 da 640. Eso solo, sin mas, ya hace que nadie se crea la
+tarjeta.
+
+**Y si el bot reserva un servicio sin precio, no se estima**: se cuenta aparte para poder decir que
+el importe se queda corto. Si el bot no ha reservado nada, no se pinta un cero grande con pinta de
+resultado: se dice que todavia no ha reservado nada.
+
+4 pruebas nuevas (12 en el fichero) y 2 sabotajes mas, incluido uno que comprueba que no vuelve a
+contarse todo. **367/367.** Verificador 5/5. Comprobado contra el cliente real: `roi: 0 citas`, y
+"Total reservadas" sigue diciendo 5, que es lo correcto.
+
+## Y lo de "Inactivo" NO es por los canales
+
+Ricardo lo dio por hecho. No lo es: `_base.json` nace con `active: true`, y el unico sitio que lo
+apaga en una cuenta de pago es el webhook de Stripe cuando **se cancela la suscripcion**.
+
+`prueba-nexux-pro-c43c20` tiene **`suscripcionEstado: canceled`** y por eso `active: false`. Es la
+compra de prueba con `cus_VCHnSFwP5PjSkz` — la tarjeta real.
+
+**Importa mas de lo que parece:** con la cuenta inactiva, el bot **no contesta** aunque conecte
+WhatsApp (`lib/telegram.js` y el resto comprueban `config.active`). Conectar el canal no lo va a
+arreglar. **Decision de Ricardo:** o se reactiva esa cuenta a mano, o se prueba con otra.
