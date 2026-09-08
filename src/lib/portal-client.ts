@@ -2,10 +2,13 @@ const BASE_URL = import.meta.env.NEXUX_CLIENTS_URL || 'https://pi.nexux.pro';
 
 export interface Appointment {
   id: string;
-  clientPhone?: string;
-  clientName?: string;
+  // La Pi manda SIEMPRE guion bajo. Las dos de camello se quedan por si algun
+  // sitio viejo las escribe, pero leer solo esas devuelve vacio siempre: es lo
+  // que dejaba la columna CLIENTE en blanco en el dashboard.
   client_phone?: string;
   client_name?: string;
+  clientPhone?: string;
+  clientName?: string;
   service: string;
   datetime: string;
   duration_min?: number;

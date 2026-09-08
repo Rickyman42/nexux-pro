@@ -40,6 +40,16 @@ with sync_playwright() as p:
         fallos.append("el numero de citas de hoy no esta marcado para poder refrescarlo")
         print("fallos:", fallos); sys.exit(1)
 
+    # El numero, no el localizador: un locator se vuelve a evaluar cada vez que
+    # lo miras, asi que compararlo consigo mismo mas tarde no compara nada.
+    filas_antes = pag.locator("#proximas-cuerpo tr").count()
+    print("filas en 'proximas citas' al entrar:", filas_antes)
+    if filas_antes:
+        celdas = pag.locator("#proximas-cuerpo tr").first.locator("td").all_inner_texts()
+        print("primera fila:", celdas)
+        if len(celdas) > 2 and not celdas[2].strip():
+            fallos.append("la columna CLIENTE sale vacia")
+
     antes = marcador.first.inner_text().strip()
     reservadas_antes = pag.locator('.crm-kpi-val[data-contador="reservadas"]').first.inner_text().strip()
     print("al entrar -> citas hoy:", antes, "| reservadas:", reservadas_antes)
@@ -66,11 +76,38 @@ with sync_playwright() as p:
     dlg = pag.locator("dialog[open]")
     dlg.locator('input[name="client_name"]').fill("Prueba Contador")
     dlg.locator('input[name="service"]').fill("Corte")
+    dur = dlg.locator('input[name="duration_min"]')
+    if dur.count():
+        dur.fill("15")
     hoy = pag.evaluate("() => new Date().toLocaleDateString('en-CA')")
-    # Una hora distinta en cada pasada: repitiendo la misma, la segunda vez choca
-    # con la cita de la primera y la creacion falla por hueco ocupado -- que es
-    # un fallo del banco de pruebas, no del producto.
-    hora_libre = "09:%02d" % (int(time.time()) % 60)
+    # Tiene que ser FUTURA: "proximas citas" solo ensena lo que queda por delante,
+    # asi que una cita a las 09:xx de hoy no aparece ahi por mucho que el contador
+    # suba. Y con minuto distinto en cada pasada, para no chocar con la anterior.
+    # Se busca un hueco de verdad. Adivinar una hora hace que la prueba choque
+    # con la cita que dejo la pasada anterior y parezca que el producto falla.
+    hora_libre = pag.evaluate("""async (clientId) => {
+        const r = await fetch('/portal-api/appointments?clientId=' + encodeURIComponent(clientId));
+        const citas = r.ok ? await r.json() : [];
+        const hoy = new Date().toLocaleDateString('en-CA');
+        const ocupadas = citas
+          .filter(c => (c.status || 'confirmed') === 'confirmed')
+          .map(c => { const d = new Date(c.datetime); return [d, new Date(d.getTime() + (c.duration_min || 60) * 60000)]; })
+          .filter(([a]) => a.toLocaleDateString('en-CA') === hoy);
+        const ahora = Date.now();
+        for (let m = 9 * 60; m < 19 * 60; m += 15) {
+          const ini = new Date(); ini.setHours(Math.floor(m / 60), m % 60, 0, 0);
+          const fin = new Date(ini.getTime() + 15 * 60000);
+          if (ini.getTime() <= ahora) continue;                 // tiene que ser futura
+          if (ocupadas.some(([a, b]) => ini < b && a < fin)) continue;
+          return String(ini.getHours()).padStart(2, '0') + ':' + String(ini.getMinutes()).padStart(2, '0');
+        }
+        return null;
+    }""", CLIENTE)
+    if not hora_libre:
+        print("no queda ningun hueco libre hoy: la comprobacion no puede seguir")
+        fallos.append("sin hueco libre para probar")
+        print("fallos:", fallos); sys.exit(1)
+    print("hueco libre encontrado:", hora_libre)
     pag.evaluate(
         """([d, h]) => {
             const f = document.getElementById('apt-date-val');
@@ -87,6 +124,15 @@ with sync_playwright() as p:
     aviso = pag.locator(".crm-toast-show")
     if aviso.count():
         print("aviso del panel al guardar:", aviso.first.inner_text().strip())
+
+    filas_despues = pag.locator("#proximas-cuerpo tr").count()
+    print("filas en 'proximas citas' tras crear:", filas_despues)
+    nombres = pag.locator("#proximas-cuerpo tr td:nth-child(3)").all_inner_texts()
+    print("nombres que se ven:", nombres)
+    if filas_despues <= filas_antes:
+        fallos.append("la tabla de proximas citas no se ha actualizado")
+    if any(not n.strip() for n in nombres):
+        fallos.append("hay filas con el cliente en blanco")
 
     despues = marcador.first.inner_text().strip()
     reservadas_despues = pag.locator('.crm-kpi-val[data-contador="reservadas"]').first.inner_text().strip()

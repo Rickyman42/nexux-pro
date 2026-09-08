@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
-import { getClientData, type Appointment } from '../../lib/portal-client';
+import { getClientData } from '../../lib/portal-client';
 
 const { id: clientId } = Astro.params;
 const token = Astro.cookies.get('nexux_token')?.value;
@@ -167,10 +167,6 @@ const weekdayLabels: [string, string][] = [
   ['thursday','Jueves'],['friday','Viernes'],['saturday','Sabado'],['sunday','Domingo'],
 ];
 
-function renderAppointmentDate(item: Appointment) {
-  const date = new Date(item.datetime);
-  return { date: dateFormatter.format(date), time: timeFormatter.format(date) };
-}
 ---
 <Layout
   title={`Portal - ${data.name}`}
@@ -188,7 +184,7 @@ function renderAppointmentDate(item: Appointment) {
     <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   </Fragment>
 
-  <div id="crm" class="crm-light" data-clientid={clientId} data-inbox-token={token} data-stripe-key={import.meta.env.PUBLIC_STRIPE_KEY || ''}>
+  <div id="crm" class="crm-light" data-clientid={clientId} data-inbox-token={token} data-stripe-key={import.meta.env.PUBLIC_STRIPE_KEY || ''} data-zona={data.timezone || 'Europe/Madrid'}>
 
     <!-- SIDEBAR -->
     <aside class="crm-sidebar" id="crm-sidebar">
@@ -371,29 +367,18 @@ function renderAppointmentDate(item: Appointment) {
                 <h2 class="crm-card-title">Próximas citas</h2>
                 <span class="crm-chip chip-accent" data-contador="citasHoy" data-contador-sufijo=" hoy">{todayAppointments} hoy</span>
               </div>
-              {data.nextAppointments.length ? (
-                <div class="crm-table-wrap">
-                  <table class="crm-table">
-                    <thead><tr><th>Fecha</th><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Estado</th></tr></thead>
-                    <tbody>
-                      {data.nextAppointments.slice(0, 6).map(item => {
-                        const row = renderAppointmentDate(item);
-                        return (
-                          <tr>
-                            <td>{row.date}</td>
-                            <td>{row.time}</td>
-                            <td>{item.clientName || item.clientPhone}</td>
-                            <td>{item.service}</td>
-                            <td><span class={`crm-chip ${item.status === 'confirmed' ? 'chip-green' : 'chip-red'}`}>{item.status === 'confirmed' ? 'Confirmada' : 'Cancelada'}</span></td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p class="crm-empty">Las citas reservadas por tu bot aparecerán aquí.</p>
-              )}
+              <!-- Esta tabla la pinta el javascript, con las mismas citas que se
+                   descarga el calendario. Antes la pintaba el servidor y no la
+                   volvia a tocar nadie: al crear una cita habia que recargar. Y
+                   pintandola en dos sitios acabarian diciendo cosas distintas,
+                   que es justo lo que paso con el nombre del cliente. -->
+              <div class="crm-table-wrap crm-hidden" id="proximas-tabla">
+                <table class="crm-table">
+                  <thead><tr><th>Fecha</th><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Estado</th></tr></thead>
+                  <tbody id="proximas-cuerpo"></tbody>
+                </table>
+              </div>
+              <p class="crm-empty" id="proximas-vacio">Cargando…</p>
             </div>
           </div>
 
@@ -2188,6 +2173,60 @@ function renderAppointmentDate(item: Appointment) {
         refrescaContadores();
       });
 
+      // ── "Proximas citas" del dashboard ───────────────────────────────
+      // Sale de las mismas citas que pinta el calendario: si cambia una, cambia
+      // esto. No cuesta ninguna peticion extra.
+      // La hora del SALON, no la del navegador. Existe para cosas como Kalon,
+      // que esta en Canarias: si el dueno mira su panel desde la peninsula, las
+      // horas le bailarian una hora. El servidor ya lo hacia asi cuando pintaba
+      // esta tabla, y pasarla al navegador no puede empeorarlo.
+      var zonaDelSalon = (document.getElementById('crm') || {}).dataset
+        ? document.getElementById('crm').dataset.zona || 'Europe/Madrid'
+        : 'Europe/Madrid';
+      var fechaLarga = new Intl.DateTimeFormat('es-ES', {
+        weekday: 'short', day: 'numeric', month: 'long', timeZone: zonaDelSalon,
+      });
+      var horaLarga = new Intl.DateTimeFormat('es-ES', {
+        hour: '2-digit', minute: '2-digit', timeZone: zonaDelSalon,
+      });
+
+      function pintaProximasCitas(citas) {
+        var cuerpo = document.getElementById('proximas-cuerpo');
+        var tabla = document.getElementById('proximas-tabla');
+        var vacio = document.getElementById('proximas-vacio');
+        if (!cuerpo || !tabla || !vacio) return;
+
+        var ahora = Date.now();
+        var proximas = (citas || [])
+          .filter(function (c) {
+            return (c.status || 'confirmed') === 'confirmed'
+              && new Date(c.datetime).getTime() >= ahora;
+          })
+          .sort(function (a, b) { return new Date(a.datetime) - new Date(b.datetime); })
+          .slice(0, 6);
+
+        if (!proximas.length) {
+          tabla.classList.add('crm-hidden');
+          vacio.textContent = 'Las citas que te reserven apareceran aqui.';
+          vacio.classList.remove('crm-hidden');
+          cuerpo.innerHTML = '';
+          return;
+        }
+
+        cuerpo.innerHTML = proximas.map(function (c) {
+          var d = new Date(c.datetime);
+          return '<tr>'
+            + '<td>' + esc(fechaLarga.format(d)) + '</td>'
+            + '<td>' + esc(horaLarga.format(d)) + '</td>'
+            + '<td>' + esc(appointmentName(c)) + '</td>'
+            + '<td>' + esc(c.service || 'Sin servicio') + '</td>'
+            + '<td><span class="crm-chip chip-green">Confirmada</span></td>'
+            + '</tr>';
+        }).join('');
+        vacio.classList.add('crm-hidden');
+        tabla.classList.remove('crm-hidden');
+      }
+
       async function loadCalendar() {
         // Reparte en columnas las citas que se pisan en el tiempo. Devuelve, por
         // cita, en que columna va y cuantas hay en su grupo.
@@ -2427,10 +2466,12 @@ function renderAppointmentDate(item: Appointment) {
           colsEl.appendChild(col);
         }
 
-        // Los numeros de arriba salen de las mismas citas que se acaban de
-        // pintar: si se repintan, se refrescan. Asi se cubren de una vez crear,
-        // mover, editar y cancelar, sin poner la llamada en cada uno.
+        // Los numeros de arriba y la tabla de proximas salen de las mismas
+        // citas que se acaban de pintar: si se repintan, se refrescan. Asi se
+        // cubren de una vez crear, mover, editar y cancelar, sin poner la
+        // llamada en cada uno.
         refrescaContadores();
+        pintaProximasCitas(apts);
 
         var nowD = new Date(); var nowFrac = nowD.getHours() + nowD.getMinutes() / 60;
         if (nowFrac >= minH && nowFrac <= maxH) {
