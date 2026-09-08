@@ -641,3 +641,69 @@ CAPA EXTERNA: UptimeRobot confirmado por pantallazo de Ricardo -> monitor https:
 - **Cruce de agentes**: `~/nexux-clients/conversa-rodaje.mjs` tiene 54 líneas modificadas sin commitear que no son mías. No se han tocado ni commiteado.
 - **Hallazgo suelto**: el token del túnel de Cloudflare va en texto plano en los argumentos de PM2 (`cloudflared-provision`), visible en cualquier `pm2 jlist`.
 2026-09-06 | verificador | UNIFICACION EMAIL a info@nexux.pro desplegada: web 2d12683 + backend 632977c + reinicio; canario 5/5 (legal/privacidad/gracias 0 hola@, backend info@, health 200) | canario verde + test 7/7 | OK
+
+---
+
+## Calendario del plan de 79: no se podia mover ni corregir NINGUNA cita (8-sep, 06:55)
+
+`41c9c02` en `nexux-clients` + `f6f97e7` en `nexux-pro`. **Sin push.**
+
+Lo dijo Ricardo: "en el calendario de los 79 no se pueden desplazar las citas, ni editar, ni nada".
+Reproducido en un navegador de verdad antes de opinar: se agarra la cita, se arrastra, y al soltar
+vuelve a su sitio. El servidor contestaba **409 `lead_time_violation`**.
+
+**La causa no era el calendario.** Al dueno ya se le quitaba el margen de antelacion
+(`lead_time_min = 0`), pero eso solo le llega hasta **ahora**: cualquier hora **ya pasada** seguia
+rechazada. El margen existe para lo que se le OFRECE al cliente por WhatsApp — no le dejamos pedir
+hora para dentro de cinco minutos —, y se le estaba aplicando igual al negocio sobre su propia
+agenda.
+
+Traducido a un salon de verdad: **a las 18:00 no puedes tocar la cita de las 10:00 de esa misma
+manana.** Ni moverla, ni corregir a que hora vino realmente el cliente, ni anotar despues a quien
+entro sin cita. La agenda tambien es el registro de lo que paso, no solo de lo que va a pasar.
+
+Y con la agenda de demo —que es toda de dias pasados— **no se movia absolutamente nada**. Por eso
+parecia que el calendario entero estaba roto.
+
+### Comprobado, no supuesto
+Contra el servidor que EJECUTA (`localhost:3460`), no contra el codigo:
+
+| lo que se intenta | antes | ahora |
+|---|---|---|
+| mover a manana | funcionaba | funciona |
+| mover a hace 3 horas (hoy) | **409** | **guarda** |
+| mover a la semana pasada | **409** | **guarda** |
+| cliente reservando para ayer | 409 | **409** (no cambia) |
+| cliente dentro del margen de 2h | 409 | **409** (no cambia) |
+
+En el navegador, el caso exacto de la captura de Ricardo: la cita de las 09:30 del 24-ago pasa a
+09:00, respuesta 200, aviso "Cita actualizada", y en la rejilla quedan 5 a las 09:30 donde habia 6.
+
+### Dos cosas mas que salieron por el camino
+
+**"Ese horario ya esta ocupado" era mentira.** Hueco pillado y negocio cerrado volvian con el mismo
+motivo. El panel decia "ya esta ocupado" sobre un hueco **vacio a la vista**: quien lo lee no piensa
+"esa hora no la trabajo", piensa que el panel no va. Ahora son motivos distintos
+(`outside_business_hours`), verificado: domingo -> "A esa hora el negocio no atiende"; encima de otra
+cita -> "no esta disponible".
+
+**El panel no decia por que.** Todo era "No se pudo modificar la cita", que no distingue un domingo
+cerrado de un corte de internet. Ahora hay una tabla de motivos en lenguaje llano, escrita en el
+panel (no copiada del servidor) para que la misma causa lea igual en todas partes. Crear una cita a
+mano pasa ya por la misma tabla: antes tenia su propia frase, y tambien mentia.
+
+**Un agujero que abri yo y cerre:** el permiso de tocar el pasado se leia del `config.json`. Un
+`allow_past: true` escrito ahi por una migracion o un copiar y pegar se lo habria dado tambien a
+Lara y a la web — un cliente reservando para ayer. Ahora se apaga a proposito para todo lo que no
+sea el dueno: el permiso se concede por QUIEN pide la cita, no se hereda de la configuracion.
+
+### Sabotaje
+- Quitada la excepcion del motor -> caen 2 de 5.
+- Devuelto el permiso a que se herede del config -> cae 1 de 5 (la del cliente colandose).
+- Restaurado -> 5 de 5.
+
+**328/328 en verde** en toda la suite. `nexux-verify.py`: 5/5 OK.
+
+### Lo que falta
+El arreglo del motor **ya esta vivo** en la Pi (`pm2 restart`, servicio online). El del panel es
+`nexux-pro`, que vive en Vercel: **no llega a Ricardo hasta que se haga push, y eso lo autoriza el.**

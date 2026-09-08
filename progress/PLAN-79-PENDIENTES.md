@@ -821,3 +821,39 @@ pasarlos por `lib/rutas.js`.
 1 ✅ · 2 ✅ · **3 abierto (vídeo de Google — Ricardo)** · 4 ✅ · 5 ✅ · **6 abierto (garantía de 30 días
 — decisión de Ricardo)** · **7 ✅ (falta que Ricardo ejecute el barrido)** · 8 ✅ · 9 ✅ · 10 ✅ ·
 11 ✅ · 12 ✅ · 13 ✅. Panel de facturación: los 6 pasos cerrados.
+
+---
+
+## Punto 6 — Garantia y cancelacion: DECIDIDO por Ricardo (8-sep-2026)
+
+**Se cancela a mano, desde Stripe, y a proposito no se pone facil.** No hay autoservicio: ni boton
+en el panel, ni el portal de Stripe. Las dos puertas ya estaban cerradas el 8-sep; esto lo confirma
+como decision, no como estado provisional.
+
+Quien quiera irse escribe a soporte (`@nexux_soporte_bot`), el bot atiende, recoge el motivo y
+ofrece ayuda; si insiste, avisa a Ricardo. **Cancela Ricardo, en Stripe, con la mano.**
+
+### Requisito nuevo que abre esta decision: la puerta giratoria
+
+Ricardo: *"habria que controlar que esa cuenta no se hayan creado mas veces, porque se puede dar el
+caso de que cancelen dias antes y vuelvan a abrir otra para tener otro mes gratis y asi
+sucesibamente."*
+
+El riesgo es real y es **consecuencia directa de la prueba gratis**: cancelar antes de que cobre y
+volver a darse de alta sale gratis y se puede repetir. Hoy **no hay ningun control**: cada alta nace
+como cuenta nueva sin mirar si ese negocio ya estuvo.
+
+**No implementado todavia. Antes hay que decidir dos cosas, y las decide Ricardo:**
+
+1. **Que cuenta como "el mismo negocio".** Candidatos, de mas a menos fiable:
+   el **telefono de WhatsApp** (es el producto: sin el no hay servicio, y cambiarlo cuesta),
+   el **email del dueno**, el **numero de Stripe del cliente**, el nombre + ciudad.
+   El telefono es el mas dificil de falsear; el email, el mas facil (un `+1` y ya).
+2. **Que se hace al detectarlo.** Tres niveles, de suave a duro:
+   avisar a Ricardo y dejar entrar · **dejar entrar pero SIN prueba gratis** (cobra desde el dia 1)
+   · no dejar abrir cuenta.
+
+Recomendacion: **avisar + sin prueba gratis**, casando por telefono de WhatsApp. Bloquear del todo
+castiga al que vuelve de buena fe, que es un cliente que ya te conoce.
+
+**Marcado como pendiente de decision, no de trabajo.**
