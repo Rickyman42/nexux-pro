@@ -750,3 +750,74 @@ python3 ~/scripts/nexux-verify.py "service:nexux-clients" "service:telegram-clau
 ```
 E2E con el caso nuevo: primera vez → ofrecimiento y **0 avisos**; insiste → **1 aviso** con lo que
 dijo. Verificador 5/5. Los dos servicios reiniciados y online: el bot corre el código nuevo.
+
+---
+
+## Punto 7 — Los tests ya no escriben en los clientes de verdad (8-sep, 04:50)
+
+`ce8c6b6` en `nexux-clients`. **Sin push.**
+
+**La causa no era un test descuidado.** La carpeta de clientes se resolvía en **27 sitios y de tres
+formas distintas**: unos desde el directorio de trabajo, otros desde la posición del fichero, y sólo
+`whatsapp.js` miraba una variable de entorno. En producción las tres daban lo mismo, así que nadie lo
+notó nunca — pero significaba que **las pruebas no tenían a dónde escribir que no fuera la carpeta de
+los clientes reales**.
+
+La única defensa que existía era un guardia que hacía reventar un test si se ejecutaba en la Pi.
+Protegía, sí, pero al precio de que ese test **no se ejecutase nunca**: llevaba semanas saliendo en
+rojo en cada regresión. Un test que no corre no protege de nada.
+
+**Lo hecho**: `lib/rutas.js` es ahora el único sitio que lo decide. Manda `CLIENTS_DIR` si está
+puesta; si no, la carpeta que hay al lado del código (posición del fichero, no directorio de trabajo:
+un script lanzado desde otro sitio se encontraba antes con cero clientes en vez de con un error). Los
+27 sitios pasan por ahí. Los scripts de cron son CommonJS y no pueden importar un módulo ESM, así que
+leen `CLIENTS_DIR` ellos mismos — que es lo que importa.
+
+Los tests se desvían con `CLIENTS_DIR` en vez de con `chdir`. **Incluidos los que lanzan un servidor
+aparte**: sin pasársela al proceso hijo, el hijo abría producción. Eso era exactamente lo que estaba
+pasando.
+
+**Una prueba nueva recorre el repo entero y falla dando nombre y línea** si alguien vuelve a
+calculársela por su cuenta. Encontró **14 sitios que se me habían pasado** buscándolos a mano.
+
+**Resultado**: **323 de 323 en verde**, incluida `citas-zona-horaria`. Y comprobado con la cuenta
+antes/después: una regresión completa **ya no crea ni una carpeta ni un config**.
+
+### 🔴 Falta que Ricardo ejecute el barrido
+
+Son **83 carpetas de mentira** entre los **22 clientes de verdad** (`salon-de-prueba-*`,
+`salon-con-prisa-*`, `salon-sin-catalogo-*`, `peluqueria-de-prueba-*`, `salon-publico`…). Comprobado
+una a una: todo son citas de test ("Corte", sin nombre ni teléfono de nadie) y **ningún nombre coincide
+con un cliente real**. La lista se separó por fecha del `config.json`, no por nombre, para no fiarse
+de un patrón.
+
+**No lo he borrado yo**: el guardia de seguridad de Ricardo bloquea el borrado recursivo, y hace bien.
+No se ha esquivado. Copia de seguridad hecha antes de nada:
+`~/backups/restos-clients-20260908.tar.gz` (94 carpetas, 16K).
+
+El comando, para que lo ejecute Ricardo:
+
+    cd ~/nexux-clients && xargs -d '\n' -a /tmp/barrer.txt rm -rf \
+      && pm2 restart nexux-clients && sleep 8 \
+      && pm2 logs nexux-clients --lines 20 --nostream | grep "clients loaded"
+
+Tiene que decir **22 clients loaded**. Si dice otra cosa, se restaura con:
+
+    tar xzf ~/backups/restos-clients-20260908.tar.gz -C ~/nexux-clients
+
+La lista `/tmp/barrer.txt` se pierde al reiniciar la Pi. Se regenera con:
+
+    cd ~/nexux-clients && comm -23 \
+      <(ls -d clients/*/ | sed 's|clients/||;s|/$||' | sort) \
+      <(find clients -maxdepth 2 -name config.json ! -newermt "2026-09-08 04:00" -printf "%h\n" \
+        | sed 's|clients/||' | sort) \
+      | sed 's|^|clients/|' > /tmp/barrer.txt
+
+**Quedan fuera a propósito**: `conversa-rodaje.mjs` y `seed-agenda.mjs`, que otro agente está editando
+ahora mismo. Los dos se calculan la carpeta por su cuenta; cuando esa persona termine, hay que
+pasarlos por `lib/rutas.js`.
+
+### Estado de la lista del producto de 79
+1 ✅ · 2 ✅ · **3 abierto (vídeo de Google — Ricardo)** · 4 ✅ · 5 ✅ · **6 abierto (garantía de 30 días
+— decisión de Ricardo)** · **7 ✅ (falta que Ricardo ejecute el barrido)** · 8 ✅ · 9 ✅ · 10 ✅ ·
+11 ✅ · 12 ✅ · 13 ✅. Panel de facturación: los 6 pasos cerrados.
