@@ -686,3 +686,67 @@ STRIPE_TEST_KEY=sk_test_... node scripts/test-tarjeta-modo-prueba.mjs
 **Limpieza**: cliente, tarjetas, suscripción y reloj borrados — 0 de cada uno en la cuenta de pruebas,
 comprobado. Precios y productos **archivados** (Stripe no deja borrarlos). La clave no ha quedado
 escrita en ningún fichero.
+
+---
+
+## Corrección: me equivoqué con el bot de soporte (8-sep, 05:00)
+
+`003b021` en `telegram-claude-bot` · `b3b9a51` en `nexux-clients`. **Sin push.**
+
+**Ricardo tenía razón.** `telegram-claude-bot` **es** `@nexux_soporte_bot`: lleva corriendo en pm2,
+tiene `src/soporte.js` con su tema de baja, sus 29 pruebas y una comprobación e2e que mete un mensaje
+de desconocido por el mismo camino que Telegram. Todo lo que dije de "no existe como servicio" era
+falso.
+
+**Cómo me equivoqué**: busqué la cadena `nexux_soporte` en el código y en los `.env`, y la identidad
+del bot no está ahí — está **dentro del token**. Un `getMe` con ese token lo habría dicho en un
+segundo, y es exactamente lo que llevo escrito en memoria: *verificar lo que EJECUTA, no lo que
+documenta*. Miré el nombre de la carpeta y di por hecho lo demás.
+
+**Donde no tenía razón Ricardo**: `provision-http.js` 2175-2200 no era un flujo previo a medio montar;
+es código que escribí yo anoche. Antes de mi commit ahí estaba la ruta del portal de Stripe y
+`soporte/baja` no aparecía ni una vez (`git show 81579a4`).
+
+### Lo grave que había, y era culpa mía
+
+El bot contestaba a quien quería irse: *"Puedes darte de baja tú mismo: Panel → Facturación →
+gestionar suscripción"*. **Ese botón lo quité yo anoche.** O sea que durante unas horas el bot estuvo
+mandando a un cliente que se quería ir a un sitio que ya no existe. Peor que no contestarle.
+
+Corregido, siguiendo la decisión: **1ª vez** se le atiende, se le ofrece ayuda de verdad y se le
+pregunta qué le falla; **2ª vez (insiste)** se avisa a Ricardo con lo que ha contado y al cliente se
+le dice que nadie le ha tocado nada. El aviso lleva ahora "QUIERE DARSE DE BAJA" y el pie
+"NADIE HA CANCELADO NADA: decides tú" — decirle "le he mandado al correo" en una baja sería falso.
+
+**Cazado por la e2e, y era grave**: el antirrebote de 2 segundos se tragaba el segundo mensaje. El
+cliente decía que se quería ir, se le ofrecía ayuda, contestaba enseguida *"no, de verdad"* — **y no
+recibía nada, y el aviso no salía nunca.** Ahora el tema se mira antes de callarse y la baja no se
+calla: es el único caso en que el silencio cuesta un cliente.
+
+**Las cuatro pruebas de la baja sujetaban la política vieja** (exigían que la respuesta dijera
+"Facturación"). Cambiadas a la vez que la respuesta: una prueba que sujeta una regla derogada obliga a
+mantener el error.
+
+### Y quité mi propio duplicado
+
+`lib/baja.js` y `POST /soporte/baja` en la Pi: borrados. El bot ya hacía eso, y mi endpoint pedía un
+`clientId` que el bot no tiene —sólo conoce un chat de Telegram—, así que **no se habría podido usar
+nunca**. Era código muerto con un segundo formato de aviso para lo mismo.
+
+**Lo que sí se queda de anoche**, porque no lo hacía nadie: las dos puertas al autoservicio cerradas
+—la ruta del portal (410) y la cancelación en el portal de clientes de Stripe— y el bloque
+"¿Quieres cancelar?" del panel.
+
+### Evidencia
+
+```
+cd ~/telegram-claude-bot && node --test "test/*.test.mjs"        # 32/32
+cd ~/telegram-claude-bot && node scripts/comprobar-soporte-e2e.mjs
+cd ~/nexux-clients && node --test "test/*.test.mjs"              # 312/313
+python3 ~/scripts/nexux-verify.py "service:nexux-clients" "service:telegram-claude-bot" \
+  "contains:/home/nexux/telegram-claude-bot/src/soporte.js::QUIERE DARSE DE BAJA" \
+  "contains:/home/nexux/telegram-claude-bot/src/soporte.js::insisteEnLaBaja" \
+  "file:/home/nexux/telegram-claude-bot/scripts/comprobar-soporte-e2e.mjs"
+```
+E2E con el caso nuevo: primera vez → ofrecimiento y **0 avisos**; insiste → **1 aviso** con lo que
+dijo. Verificador 5/5. Los dos servicios reiniciados y online: el bot corre el código nuevo.
