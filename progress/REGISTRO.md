@@ -912,3 +912,48 @@ prueba que compara las dos: si dejan de coincidir, se pone roja.
 ### 🔴 La tarjeta de "Herramientas rapidas" sigue en produccion
 No es que no se quitara: **esta quitada en el codigo desde `bcdf1bc` y ese commit no se ha subido.**
 `nexux.pro` vive en Vercel y no cambia hasta que se hace push. Pendiente de Ricardo.
+
+---
+
+## "Proximas citas": no se refrescaba, y el cliente salia en blanco (8-sep, 14:45)
+
+`0c5040c` en `nexux-pro`. **Sin push.**
+
+Ricardo, probando con el panel real comprado: el contador se actualiza solo, la tabla no. Al mirarla
+aparecio un segundo fallo que llevaba ahi desde siempre y que se ve en su propia captura: **la
+columna CLIENTE estaba VACIA**, aunque las citas tienen nombre ("Monica", "dani").
+
+**El nombre.** La fila leia `item.clientName`, **en camello**. La Pi manda `client_name`, con guion
+bajo. Nunca coincidia: salia vacio **siempre**, para todos los clientes. Lo que lo dejo colar es que
+el tipo `Appointment` declara **las dos formas**, asi que elegir la que no llega nunca compilaba sin
+una queja.
+
+**El refresco.** La tabla la pintaba el servidor al cargar la pagina y no la volvia a tocar nadie.
+
+**Se arreglan los dos de una vez**, y con la misma regla de siempre: la tabla pasa a pintarla **solo
+el javascript**, con las mismas citas que ya se descarga el calendario.
+- Un solo sitio que la pinta: no puede volver a divergir.
+- **Cero peticiones nuevas**: reaprovecha la que ya se hacia.
+- Usa `appointmentName()`, el ayudante que ya sabe leer las dos formas y que usa el resto del panel.
+- Se formatea con la **zona horaria del salon**, no la del navegador. El servidor ya lo hacia asi y
+  pasarlo al navegador no podia empeorarlo: existe para cosas como Kalon, que esta en Canarias.
+
+`renderAppointmentDate` se queda sin uso y se borra. La he dejado muerta yo, no es codigo ajeno.
+
+**Medido en el navegador, contra el cliente real comprado:** la tabla pasa de **3 a 4 filas** al
+crear una cita, con su nombre y ordenada; los numeros de 4 a 5 y de 5 a 6; **una** peticion; **cero**
+con la pagina quieta.
+
+363/363. Verificador 4/4. Las 3 citas de prueba creadas en ese cliente se han borrado: 3 antes,
+3 despues, y comprobado que son exactamente las mismas.
+
+### Lo que fallo de mi lado, tres veces seguidas
+Mi banco de pruebas creaba la cita **en el pasado** (no sale en "proximas"), luego **encima de otra**
+(la creacion fallaba por hueco ocupado), y luego **encima de la que dejo la pasada anterior**. Cada
+vez parecia que el producto no iba. Ahora **busca un hueco libre de verdad** antes de crear. Tres
+falsos negativos seguidos por no mirar lo que hacia mi propia herramienta.
+
+### Abierto, no hecho
+El calendario pinta sus horas con la del **navegador** (`fmtTime`), no con la del salon. Para un
+dueno que mire su panel desde otro pais, el calendario y esta tabla dirian horas distintas. No se ha
+tocado: es anterior a este cambio y toca todo el calendario.
