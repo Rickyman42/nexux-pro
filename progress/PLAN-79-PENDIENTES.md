@@ -418,9 +418,65 @@ haga el paso 4, hay que cambiar la frase y la prueba a la vez.
 **Se guarda la etiqueta de la tarjeta** (marca, cuatro últimos, caducidad) en el config para que no
 desaparezca al recargar. Es lo que Stripe enseña en cualquier recibo. El número, el CVV y el token de
 pago no tocan la Pi. Si prefieres que ni eso se guarde, se quita en dos líneas.
+---
 
-### Pasos 3 a 6, pendientes
-3. Cambiar de plan desde el panel llamando a Stripe desde la Pi.
+## Paso 3 — Cambiar de plan desde el panel — HECHO, PERO NO PROBADO CONTRA STRIPE (8-sep, 02:10)
+
+`6fb2905` en `nexux-clients` · `dd0a4b2` en `nexux-pro`. **Sin push: lo autoriza Ricardo.**
+
+**Qué hay**: en la tarjeta del otro plan, un botón "Cambiar a este plan". Antes de nada sale un cuadro
+que dice exactamente qué va a pasar. Si sube: el importe de hoy, calculado **por Stripe**, no por
+nosotros. Si baja: "hoy no se te cobra nada, sigues igual hasta el día X y ese día pasas a 29 €".
+
+**Las decisiones que hay detrás, y por qué**:
+- **Subir es inmediato** y se cobra hoy la parte proporcional. Se nota al momento.
+- **Bajar espera al final del mes que ya está pagado.** Bajarlo hoy le quitaría las agendas por
+  profesional que pagó hasta fin de mes; devolverle la diferencia no le devuelve el mes. Se hace con
+  un calendario de suscripción de Stripe, y al terminar la suscripción vuelve a la normalidad.
+- **Con un cobro pendiente no se toca el plan.** Primero se resuelve el cobro.
+- **Desde un plan retirado no se cambia solo**: va a Soporte, y se le dice que no pierde nada.
+
+**Dos seguros con el dinero**: clave de idempotencia (dos clics no son dos cobros) y
+`error_if_incomplete` (una tarjeta rechazada NO deja a nadie en el plan de 79 sin haberlo pagado).
+Los dos tienen su sabotaje.
+
+**No se duplica el webhook.** Lo que pasa después del cambio —límites, funciones, montar las agendas
+por profesional— ya lo hace el manejador de `customer.subscription.updated`. **Comprobado en los logs
+de la Pi que ese webhook recibe eventos reales de Stripe** (`firma OK: customer.subscription.updated`
+y una desactivación real). Copiar esa lógica aquí habría sido crear la segunda verdad de siempre.
+
+**Pruebas**: 29 nuevas — 19 de la decisión y 10 de *qué se le pide exactamente a Stripe*, con un
+Stripe de mentira inyectado. **12 sabotajes, los 12 cazados**: confirmar sin saber el importe · bajar
+de golpe · cambiar con un cobro pendiente · ofrecer un plan retirado · quitar la clave de idempotencia
+· dejar pasar una tarjeta rechazada · cobrar la diferencia el mes que viene · aplicar la bajada ya ·
+dejar la suscripción atada al calendario · añadir una línea en vez de sustituirla (en el cambio y en
+la previsualización) · callar un cambio ya programado. Restaurado idéntico por md5.
+Regresión: 297 de 298.
+
+**En vivo, en el navegador** (`nexux-pro/scripts/mira-cambio-plan.py`): subida sin importe → el botón
+de confirmar sale **apagado** y dice por qué; bajada → confirmable, con la fecha; fallo de la pasarela
+→ el aviso dice que **no se le ha cobrado nada** y el botón vuelve a encenderse. Config restaurado
+idéntico por md5.
+
+### 🔴 Lo que NO está probado, y hace falta para poder decir que sí
+
+La clave de Stripe de la Pi es **`sk_live`**, de producción. No hay ninguna suscripción activa en toda
+la cuenta. Así que **subir y bajar de plan no se han ejecutado nunca contra Stripe**: están escritos
+y probados con un Stripe de mentira, pero la pasarela real no los ha visto.
+
+Lo que sí está comprobado contra Stripe de verdad: **la forma de la petición**. Stripe rechaza la
+previsualización con `invoice_upcoming_none` ("no se puede previsualizar una suscripción cancelada"),
+**no** con un error de parámetros — o sea, entiende lo que le mandamos.
+
+**Para cerrarlo hace falta una clave de pruebas de Stripe** (`sk_test_…`, del mismo panel, pestaña de
+modo prueba). Con ella se crea un cliente falso con la tarjeta 4242 y se prueban subida y bajada
+enteras en diez minutos, sin mover un euro. La alternativa es esperar al primer cliente que pague de
+verdad, y probar el cobro con él.
+
+**De paso**: `lib/stripe-session.js` llevaba una **tercera copia** de la tabla de precios (2900/7900 a
+mano). Hoy coincide con el catálogo. Hay una prueba nueva que salta si algún día deja de coincidir.
+
+### Pasos 4 a 6, pendientes
 4. Actualizar tarjeta con Stripe Elements embebido (PCI: la tarjeta nunca toca la Pi).
 5. Cancelación solo por el bot de soporte, nunca autoservicio en dos clics.
 6. Quitar el botón "Gestionar suscripción" que abre el portal de Stripe.
