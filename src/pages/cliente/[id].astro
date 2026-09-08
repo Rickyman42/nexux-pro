@@ -1249,6 +1249,7 @@ const weekdayLabels: [string, string][] = [
     // citas a la misma hora. Con una sola persona todo funciona como siempre.
     var COLORES_EQUIPO = ['#2A9D97', '#C2683F', '#5C6BC0', '#8E6BA8', '#4A8F5B', '#B5804A'];
     var equipo = [];
+    var catalogoEquipo = [];
     var modoEquipo = false;
     // Agendas de Google donde el negocio puede escribir, y si su plan permite
     // dar una a cada persona. Lo segundo lo dice el servidor: aqui no se
@@ -1258,6 +1259,119 @@ const weekdayLabels: [string, string][] = [
 
     function colorDe(profesional, indice) {
       return (profesional && profesional.color) || COLORES_EQUIPO[indice % COLORES_EQUIPO.length];
+    }
+
+    var DIAS_PROPIOS = [
+      ['monday', 'Lun'], ['tuesday', 'Mar'], ['wednesday', 'Mié'],
+      ['thursday', 'Jue'], ['friday', 'Vie'], ['saturday', 'Sáb'], ['sunday', 'Dom'],
+    ];
+
+    function intervaloDelDia(schedule, day) {
+      if (!schedule || !schedule[day]) return null;
+      return Array.isArray(schedule[day]) ? schedule[day][0] : schedule[day];
+    }
+
+    function descansoDelDia(intervalo) {
+      if (!intervalo) return null;
+      if (intervalo.lunch_close && intervalo.lunch_open) {
+        return { open: intervalo.lunch_close, close: intervalo.lunch_open };
+      }
+      return Array.isArray(intervalo.breaks) && intervalo.breaks.length ? intervalo.breaks[0] : null;
+    }
+
+    function editorHorarioPropio(schedule, kind, index) {
+      var hereda = !schedule;
+      return '<details class="crm-own-schedule" data-kind="' + kind + '" data-i="' + index + '">'
+        + '<summary>Horario propio <span>' + (hereda ? 'Usa el del negocio' : 'Personalizado') + '</span></summary>'
+        + '<label class="crm-schedule-inherit"><input type="checkbox" class="crm-schedule-inherit-check"'
+        + (hereda ? ' checked' : '') + '> Usar el horario del negocio</label>'
+        + '<div class="crm-own-schedule-days"' + (hereda ? ' hidden' : '') + '>'
+        + DIAS_PROPIOS.map(function (par) {
+          var day = par[0];
+          var label = par[1];
+          var intervalo = intervaloDelDia(schedule, day);
+          var descanso = descansoDelDia(intervalo);
+          var cerrado = !intervalo;
+          return '<div class="crm-own-schedule-day" data-day="' + day + '">'
+            + '<strong>' + label + '</strong>'
+            + '<label class="crm-schedule-open"><input type="checkbox" class="crm-day-closed"'
+            + (cerrado ? ' checked' : '') + '> Cerrado</label>'
+            + '<input type="time" class="crm-day-open crm-input-time" value="' + esc(intervalo?.open || '09:00') + '"'
+            + (cerrado ? ' disabled' : '') + ' aria-label="Apertura ' + label + '">'
+            + '<span>–</span>'
+            + '<input type="time" class="crm-day-close crm-input-time" value="' + esc(intervalo?.close || '19:00') + '"'
+            + (cerrado ? ' disabled' : '') + ' aria-label="Cierre ' + label + '">'
+            + '<label class="crm-schedule-break"><input type="checkbox" class="crm-day-break"'
+            + (descanso ? ' checked' : '') + (cerrado ? ' disabled' : '') + '> Descanso</label>'
+            + '<input type="time" class="crm-day-break-open crm-input-time" value="' + esc(descanso?.open || '14:00') + '"'
+            + (!descanso || cerrado ? ' disabled' : '') + ' aria-label="Inicio descanso ' + label + '">'
+            + '<span>–</span>'
+            + '<input type="time" class="crm-day-break-close crm-input-time" value="' + esc(descanso?.close || '16:00') + '"'
+            + (!descanso || cerrado ? ' disabled' : '') + ' aria-label="Fin descanso ' + label + '">'
+            + '</div>';
+        }).join('') + '</div></details>';
+    }
+
+    function leerHorarioPropio(editor) {
+      var hereda = editor.querySelector('.crm-schedule-inherit-check');
+      if (hereda && hereda.checked) return null;
+      var schedule = {};
+      editor.querySelectorAll('.crm-own-schedule-day').forEach(function (row) {
+        var day = row.dataset.day;
+        var cerrado = row.querySelector('.crm-day-closed');
+        if (cerrado && cerrado.checked) { schedule[day] = null; return; }
+        var open = row.querySelector('.crm-day-open');
+        var close = row.querySelector('.crm-day-close');
+        var value = { open: open ? open.value : '09:00', close: close ? close.value : '19:00' };
+        var descanso = row.querySelector('.crm-day-break');
+        if (descanso && descanso.checked) {
+          var pausaDesde = row.querySelector('.crm-day-break-open');
+          var pausaHasta = row.querySelector('.crm-day-break-close');
+          value.lunch_close = pausaDesde ? pausaDesde.value : '14:00';
+          value.lunch_open = pausaHasta ? pausaHasta.value : '16:00';
+        }
+        schedule[day] = value;
+      });
+      return schedule;
+    }
+
+    function activarEditoresHorario(wrap, items) {
+      wrap.querySelectorAll('.crm-own-schedule').forEach(function (editor) {
+        var index = parseInt(editor.dataset.i, 10);
+        var item = items[index];
+        if (!item) return;
+        var hereda = editor.querySelector('.crm-schedule-inherit-check');
+        var days = editor.querySelector('.crm-own-schedule-days');
+
+        function actualizarControles() {
+          var heredado = !!(hereda && hereda.checked);
+          if (days) days.hidden = heredado;
+          var resumen = editor.querySelector('summary span');
+          if (resumen) resumen.textContent = heredado ? 'Usa el del negocio' : 'Personalizado';
+          item.schedule = leerHorarioPropio(editor);
+        }
+
+        hereda && hereda.addEventListener('change', actualizarControles);
+        editor.querySelectorAll('.crm-own-schedule-day').forEach(function (row) {
+          var cerrado = row.querySelector('.crm-day-closed');
+          var descanso = row.querySelector('.crm-day-break');
+          function bloquearDia() {
+            var noAbre = !!(cerrado && cerrado.checked);
+            row.querySelectorAll('input[type="time"]').forEach(function (input) {
+              var esDescanso = input.classList.contains('crm-day-break-open')
+                || input.classList.contains('crm-day-break-close');
+              input.disabled = noAbre || (esDescanso && !(descanso && descanso.checked));
+            });
+            if (descanso) descanso.disabled = noAbre;
+            item.schedule = leerHorarioPropio(editor);
+          }
+          cerrado && cerrado.addEventListener('change', bloquearDia);
+          descanso && descanso.addEventListener('change', bloquearDia);
+          row.querySelectorAll('input[type="time"]').forEach(function (input) {
+            input.addEventListener('change', function () { item.schedule = leerHorarioPropio(editor); });
+          });
+        });
+      });
     }
 
     /**
@@ -1288,18 +1402,27 @@ const weekdayLabels: [string, string][] = [
         wrap.innerHTML = '<p class="crm-empty">Solo tú. Añade a alguien si atendéis a la vez.</p>';
         return;
       }
-      var cabecera = puedeAgendaPropia
-        ? '<thead><tr><th>Quién</th><th>Su agenda de Google</th><th></th></tr></thead>'
-        : '';
-      wrap.innerHTML = '<div class="crm-table-wrap"><table class="crm-table">' + cabecera + '<tbody>'
-        + equipo.map(function (profesional, i) {
-          return '<tr>'
-            + '<td><span class="crm-team-dot" style="background:' + esc(colorDe(profesional, i)) + '"></span>'
-            + esc(profesional.name) + '</td>'
-            + (puedeAgendaPropia ? '<td>' + selectorAgenda(profesional, i) + '</td>' : '')
-            + '<td><button type="button" class="crm-btn-del" data-i="' + i + '">🗑</button></td>'
-            + '</tr>';
-        }).join('') + '</tbody></table></div>';
+      wrap.innerHTML = '<div class="crm-team-people">' + equipo.map(function (profesional, i) {
+        var seleccionados = Array.isArray(profesional.service_ids) ? profesional.service_ids : [];
+        var serviciosHtml = catalogoEquipo.length
+          ? '<div class="crm-team-services">' + catalogoEquipo.map(function (servicio) {
+              return '<label><input type="checkbox" class="crm-team-service" data-i="' + i
+                + '" value="' + esc(servicio.id) + '"' + (seleccionados.includes(servicio.id) ? ' checked' : '') + '> '
+                + esc(servicio.name) + '</label>';
+            }).join('') + '</div>'
+          : '<p class="crm-empty">Añade primero los servicios del negocio.</p>';
+        return '<article class="crm-team-person">'
+          + '<div class="crm-team-person-head"><strong><span class="crm-team-dot" style="background:'
+          + esc(colorDe(profesional, i)) + '"></span>' + esc(profesional.name) + '</strong>'
+          + '<button type="button" class="crm-btn-del" data-i="' + i + '" aria-label="Eliminar a '
+          + esc(profesional.name) + '">🗑</button></div>'
+          + '<div class="crm-team-person-block"><span class="crm-field-label">Servicios que hace</span>'
+          + serviciosHtml + '</div>'
+          + (puedeAgendaPropia ? '<div class="crm-team-person-block"><label class="crm-field-label">Su agenda de Google</label>'
+            + selectorAgenda(profesional, i) + '</div>' : '')
+          + editorHorarioPropio(profesional.schedule, 'professional', i)
+          + '</article>';
+      }).join('') + '</div>';
       wrap.querySelectorAll('.crm-btn-del').forEach(function (btn) {
         btn.addEventListener('click', function () {
           equipo.splice(parseInt(btn.dataset.i, 10), 1);
@@ -1312,6 +1435,16 @@ const weekdayLabels: [string, string][] = [
           equipo[parseInt(sel.dataset.i, 10)].calendar_id = sel.value || null;
         });
       });
+      wrap.querySelectorAll('.crm-team-service').forEach(function (check) {
+        check.addEventListener('change', function () {
+          var profesional = equipo[parseInt(check.dataset.i, 10)];
+          if (!profesional) return;
+          profesional.service_ids = Array.from(
+            wrap.querySelectorAll('.crm-team-service[data-i="' + check.dataset.i + '"]:checked'),
+          ).map(function (input) { return input.value; });
+        });
+      });
+      activarEditoresHorario(wrap, equipo);
     }
 
     async function cargarEquipo() {
@@ -1319,6 +1452,7 @@ const weekdayLabels: [string, string][] = [
         var res = await fetch('/portal-api/professionals?clientId=' + clientId);
         if (!res.ok) return;
         var data = await res.json();
+        catalogoEquipo = (data.services || []).filter(function (servicio) { return servicio.active !== false; });
         equipo = (data.professionals || []).map(function (profesional, i) {
           return {
             id: profesional.id,
@@ -1328,6 +1462,9 @@ const weekdayLabels: [string, string][] = [
             // Sin esto el desplegable se vaciaria al recargar: el objeto se
             // reconstruye aqui y lo que no se copie deja de existir.
             calendar_id: profesional.calendar_id || null,
+            service_ids: Array.isArray(profesional.service_ids)
+              ? profesional.service_ids.slice() : catalogoEquipo.map(function (servicio) { return servicio.id; }),
+            schedule: profesional.schedule || null,
           };
         });
         modoEquipo = data.mode === 'team';
@@ -1358,7 +1495,13 @@ const weekdayLabels: [string, string][] = [
         var colorInput = document.getElementById('team-color');
         var nombre = nameInput ? nameInput.value.trim() : '';
         if (!nombre) { showToast('Escribe un nombre'); return; }
-        equipo.push({ name: nombre, active: true, color: colorInput ? colorInput.value : null });
+        equipo.push({
+          name: nombre,
+          active: true,
+          color: colorInput ? colorInput.value : null,
+          service_ids: catalogoEquipo.map(function (servicio) { return servicio.id; }),
+          schedule: null,
+        });
         renderEquipo();
         if (nameInput) nameInput.value = '';
         // Avanzar al siguiente color de la paleta: si no, todos salen del mismo
@@ -1563,13 +1706,16 @@ const weekdayLabels: [string, string][] = [
       if (!recursos.length) {
         wrap.innerHTML = '<p class="crm-empty">Sin cabinas ni equipamiento limitado.</p>';
       } else {
-        wrap.innerHTML = '<div class="crm-table-wrap"><table class="crm-table"><thead><tr>'
-          + '<th>Nombre</th><th>A la vez</th><th></th></tr></thead><tbody>'
+        wrap.innerHTML = '<div class="crm-team-people">'
           + recursos.map(function (recurso, i) {
-            return '<tr><td>' + esc(recurso.name) + '</td>'
-              + '<td>' + esc(recurso.capacity) + '</td>'
-              + '<td><button type="button" class="crm-btn-del" data-i="' + i + '">🗑</button></td></tr>';
-          }).join('') + '</tbody></table></div>';
+            return '<article class="crm-team-person">'
+              + '<div class="crm-team-person-head"><strong>' + esc(recurso.name) + '</strong>'
+              + '<span class="crm-resource-capacity">' + esc(recurso.capacity) + ' a la vez</span>'
+              + '<button type="button" class="crm-btn-del" data-i="' + i + '" aria-label="Eliminar '
+              + esc(recurso.name) + '">🗑</button></div>'
+              + editorHorarioPropio(recurso.schedule, 'resource', i)
+              + '</article>';
+          }).join('') + '</div>';
         wrap.querySelectorAll('.crm-btn-del').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var fuera = recursos.splice(parseInt(btn.dataset.i, 10), 1)[0];
@@ -1582,6 +1728,7 @@ const weekdayLabels: [string, string][] = [
             renderRecursos();
           });
         });
+        activarEditoresHorario(wrap, recursos);
       }
       renderRequisitos();
     }
@@ -1618,7 +1765,9 @@ const weekdayLabels: [string, string][] = [
         var res = await fetch('/portal-api/resources?clientId=' + clientId);
         if (!res.ok) return;
         var data = await res.json();
-        recursos = data.resources || [];
+        recursos = (data.resources || []).map(function (recurso) {
+          return { ...recurso, schedule: recurso.schedule || null };
+        });
         requisitos = {};
         (data.services || []).forEach(function (servicio) {
           var req = (servicio.resource_requirements || [])[0];
@@ -1639,7 +1788,7 @@ const weekdayLabels: [string, string][] = [
         var capacidad = parseInt(capInput ? capInput.value : '1', 10);
         if (!nombre) { showToast('Escribe un nombre'); return; }
         if (!capacidad || capacidad < 1) { showToast('¿Cuántas caben a la vez?'); return; }
-        recursos.push({ name: nombre, capacity: capacidad, active: true });
+        recursos.push({ name: nombre, capacity: capacidad, active: true, schedule: null });
         renderRecursos();
         if (nameInput) nameInput.value = '';
         if (capInput) capInput.value = '1';
@@ -4095,6 +4244,89 @@ const weekdayLabels: [string, string][] = [
       margin-right: 0.5rem;
       vertical-align: middle;
     }
+    .crm-team-people {
+      display: grid;
+      gap: 0.75rem;
+      margin: 0.8rem 0;
+    }
+    .crm-team-person {
+      border: 1px solid var(--crm-line);
+      border-radius: 10px;
+      padding: 0.85rem;
+      background: var(--crm-surface);
+    }
+    .crm-team-person-head {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      min-height: 30px;
+    }
+    .crm-team-person-head strong { flex: 1; font-size: 14px; color: var(--crm-text); }
+    .crm-resource-capacity { font-size: 12px; color: var(--crm-muted); }
+    .crm-team-person-block { margin-top: 0.75rem; }
+    .crm-field-label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--crm-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .crm-team-services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.35rem 0.8rem;
+    }
+    .crm-team-services label,
+    .crm-schedule-inherit {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--crm-text);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .crm-team-services input,
+    .crm-schedule-inherit input,
+    .crm-own-schedule-day input[type="checkbox"] {
+      accent-color: var(--crm-accent);
+    }
+    .crm-own-schedule {
+      margin-top: 0.8rem;
+      border-top: 1px solid var(--crm-line);
+      padding-top: 0.65rem;
+    }
+    .crm-own-schedule summary {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--crm-text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .crm-own-schedule summary span {
+      color: var(--crm-muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+    .crm-schedule-inherit { margin: 0.75rem 0 0.55rem; }
+    .crm-own-schedule-days { overflow-x: auto; }
+    .crm-own-schedule-day {
+      display: grid;
+      grid-template-columns: 34px 78px 86px 10px 86px 82px 86px 10px 86px;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 650px;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--crm-line);
+      color: var(--crm-muted);
+      font-size: 12px;
+    }
+    .crm-own-schedule-day:last-child { border-bottom: none; }
+    .crm-own-schedule-day strong { color: var(--crm-text); font-size: 12px; }
+    .crm-schedule-open,
+    .crm-schedule-break { display: flex; align-items: center; gap: 0.3rem; }
+    .crm-own-schedule-day .crm-input-time { width: 86px; min-width: 0; }
     .crm-team-msg {
       margin: 0.7rem 0 0;
       font-size: 13px;
