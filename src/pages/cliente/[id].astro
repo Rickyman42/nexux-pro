@@ -272,7 +272,7 @@ function renderAppointmentDate(item: Appointment) {
         <section class="crm-ops-strip" aria-label="Resumen operativo de hoy">
           <div class="crm-ops-item">
             <span class="crm-ops-label">Citas hoy</span>
-            <strong class="crm-ops-value">{todayAppointments}</strong>
+            <strong class="crm-ops-value" data-contador="citasHoy">{todayAppointments}</strong>
             <span class="crm-ops-note">{nextAptFormatted ? `Proxima ${nextAptFormatted.time}` : 'Sin proximas citas'}</span>
           </div>
           <div class="crm-ops-item">
@@ -297,11 +297,11 @@ function renderAppointmentDate(item: Appointment) {
           <div class="crm-kpi-grid">
             <div class="crm-kpi">
               <span class="crm-kpi-lbl">Citas hoy</span>
-              <strong class="crm-kpi-val">{todayAppointments}</strong>
+              <strong class="crm-kpi-val" data-contador="citasHoy">{todayAppointments}</strong>
             </div>
             <div class="crm-kpi">
               <span class="crm-kpi-lbl">Total reservadas</span>
-              <strong class="crm-kpi-val">{data.metrics.appointmentsBooked}</strong>
+              <strong class="crm-kpi-val" data-contador="reservadas">{data.metrics.appointmentsBooked}</strong>
             </div>
             <div class="crm-kpi">
               <span class="crm-kpi-lbl">{convRemaining != null ? 'Conversaciones restantes' : 'Conversaciones'}</span>
@@ -369,7 +369,7 @@ function renderAppointmentDate(item: Appointment) {
             <div class="crm-card crm-apts-card">
               <div class="crm-card-head">
                 <h2 class="crm-card-title">Próximas citas</h2>
-                <span class="crm-chip chip-accent">{todayAppointments} hoy</span>
+                <span class="crm-chip chip-accent" data-contador="citasHoy" data-contador-sufijo=" hoy">{todayAppointments} hoy</span>
               </div>
               {data.nextAppointments.length ? (
                 <div class="crm-table-wrap">
@@ -2156,6 +2156,38 @@ function renderAppointmentDate(item: Appointment) {
         });
       }
 
+      // ── Los numeros del dashboard, al dia ────────────────────────────
+      // Se piden cuando hay motivo para creer que han cambiado, no en bucle: un
+      // temporizador cada pocos segundos serian miles de peticiones al dia para
+      // no enterarse de nada casi nunca.
+      var ultimoRefresco = 0;
+
+      async function refrescaContadores() {
+        try {
+          // Sin no-store el navegador reutiliza la respuesta anterior y el numero
+          // no se mueve aunque la cita ya este creada: pasaba en la comprobacion.
+          var r = await fetch('/portal-api/contadores?clientId=' + encodeURIComponent(clientId), { cache: 'no-store' });
+          if (!r.ok) return;
+          var d = await r.json();
+          if (!d || !d.ok) return;          // si no se han podido leer, se dejan los de antes
+          ultimoRefresco = Date.now();
+          var nodos = document.querySelectorAll('[data-contador]');
+          for (var i = 0; i < nodos.length; i++) {
+            var cual = nodos[i].getAttribute('data-contador');
+            if (typeof d[cual] !== 'number') continue;
+            nodos[i].textContent = d[cual] + (nodos[i].getAttribute('data-contador-sufijo') || '');
+          }
+        } catch (_) { /* sin conexion: los numeros se quedan como estaban */ }
+      }
+
+      // Al volver a la pestana, y solo si ha pasado un minuto: por si la cita la
+      // metio otra persona o el bot mientras no mirabas.
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState !== 'visible') return;
+        if (Date.now() - ultimoRefresco < 60000) return;
+        refrescaContadores();
+      });
+
       async function loadCalendar() {
         // Reparte en columnas las citas que se pisan en el tiempo. Devuelve, por
         // cita, en que columna va y cuantas hay en su grupo.
@@ -2394,6 +2426,11 @@ function renderAppointmentDate(item: Appointment) {
           });
           colsEl.appendChild(col);
         }
+
+        // Los numeros de arriba salen de las mismas citas que se acaban de
+        // pintar: si se repintan, se refrescan. Asi se cubren de una vez crear,
+        // mover, editar y cancelar, sin poner la llamada en cada uno.
+        refrescaContadores();
 
         var nowD = new Date(); var nowFrac = nowD.getHours() + nowD.getMinutes() / 60;
         if (nowFrac >= minH && nowFrac <= maxH) {

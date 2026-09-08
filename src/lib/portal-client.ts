@@ -89,6 +89,26 @@ export async function getClientData(clientId: string, token: string): Promise<Cl
   }
 }
 
+export interface Contadores {
+  citasHoy: number;
+  reservadas: number;
+  canceladas: number;
+}
+
+/** Solo los numeros del dashboard. Devuelve null si no se han podido leer: el
+ *  panel deja entonces los de antes, en vez de pintar ceros que no son ciertos. */
+export async function getContadores(clientId: string, token: string): Promise<Contadores | null> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/contadores`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return null;
+    return (await response.json()) as Contadores;
+  } catch {
+    return null;
+  }
+}
+
 export async function updateClientConfig(clientId: string, token: string, config: Partial<ClientConfig>): Promise<boolean> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/config`, {
