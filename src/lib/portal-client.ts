@@ -23,6 +23,9 @@ export interface ClientData {
   botStatus: 'connected' | 'disconnected' | 'pending_qr';
   qrPngBase64?: string;
   nextAppointments: Appointment[];
+  /** Todas las citas de hoy, hayan pasado o no, contadas en la zona horaria del salon.
+   *  Opcional porque una Pi que aun no se haya actualizado no lo manda. */
+  citasHoy?: number;
   metrics: {
     conversationCount: number;
     conversationLimit: number | null;

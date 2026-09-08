@@ -62,7 +62,13 @@ const dateFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 
 const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: data.timezone || 'Europe/Madrid' });
 
 const todayKey = new Date().toDateString();
-const todayAppointments = data.nextAppointments.filter(item => new Date(item.datetime).toDateString() === todayKey).length;
+// Manda lo que cuenta la Pi: ella ve TODAS las del dia (y en la zona horaria
+// del salon), mientras que aqui solo llegan las que aun no han pasado. Con el
+// filtro de antes, a las 18:00 la cita de las 15:30 dejaba de contar y el
+// numero se iba borrando solo segun avanzaba la tarde.
+const todayAppointments = typeof data.citasHoy === 'number'
+  ? data.citasHoy
+  : data.nextAppointments.filter(item => new Date(item.datetime).toDateString() === todayKey).length;
 const limitedProgress = data.metrics.conversationLimit
   ? Math.min(100, Math.round((data.metrics.conversationCount / data.metrics.conversationLimit) * 100))
   : 100;
@@ -427,53 +433,6 @@ function renderAppointmentDate(item: Appointment) {
             </div>
           </div>
 
-          <!-- ── Herramientas rápidas ─────────────────────────────── -->
-          {!isRecepcionista && <div class="crm-dash-row" style="margin-top:1.5rem">
-            <div class="crm-card" style="flex:1">
-              <h2 class="crm-card-title">⚡ Herramientas rápidas</h2>
-              <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.75rem">
-
-                {data.plan === 'starter' ? (
-                  <>
-                    <!-- Llamada perdida — bloqueado en Starter -->
-                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem;opacity:0.6;position:relative">
-                      <div style="position:absolute;top:0.6rem;right:0.75rem;font-size:0.75rem;background:#2d3148;color:#94a3b8;padding:0.2rem 0.5rem;border-radius:99px">Plan Pro</div>
-                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">📞 <strong style="color:#e2e8f0">Llamada perdida</strong> — Lara contacta al cliente automáticamente</p>
-                      <a href="https://nexux.pro/paquetes/pro" target="_blank" rel="noopener" style="display:inline-block;font-size:0.8rem;color:#4ECDC4;font-weight:600;text-decoration:none;margin-top:0.25rem">Actualizar a Pro para activar →</a>
-                    </div>
-
-                    <!-- Mini-web — bloqueado en Starter -->
-                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem;opacity:0.6;position:relative">
-                      <div style="position:absolute;top:0.6rem;right:0.75rem;font-size:0.75rem;background:#2d3148;color:#94a3b8;padding:0.2rem 0.5rem;border-radius:99px">Plan Pro</div>
-                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">🌐 <strong style="color:#e2e8f0">Mini-web</strong> — Página con tus servicios y horarios optimizada para Google</p>
-                      <a href="https://nexux.pro/paquetes/pro" target="_blank" rel="noopener" style="display:inline-block;font-size:0.8rem;color:#4ECDC4;font-weight:600;text-decoration:none;margin-top:0.25rem">Actualizar a Pro para activar →</a>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <!-- Llamada perdida — activo en Pro/Total -->
-                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
-                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">📞 <strong style="color:#e2e8f0">Llamada perdida</strong> — Lara contacta al cliente automáticamente</p>
-                      <div style="display:flex;gap:0.5rem">
-                        <input id="missed-call-phone" type="tel" placeholder="Teléfono (ej: 666123456)" style="flex:1;background:#0b0d12;border:1px solid #2d3148;border-radius:6px;padding:0.4rem 0.75rem;color:#e2e8f0;font-size:0.85rem" />
-                        <button id="btn-missed-call" style="background:#4ECDC4;color:#0b0d12;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Enviar</button>
-                      </div>
-                    </div>
-
-                    <!-- Mini-web — activo en Pro/Total -->
-                    <div style="background:#1a1d2e;border-radius:10px;padding:1rem">
-                      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:0.5rem">🌐 <strong style="color:#e2e8f0">Mini-web</strong> — Página con tus servicios y horarios optimizada para Google</p>
-                      <div style="display:flex;gap:0.5rem;align-items:center">
-                        <span id="web-url-display" style="flex:1;font-size:0.82rem;color:#64748b;font-style:italic">No generada aún</span>
-                        <button id="btn-regen-web" style="background:#2d3148;color:#e2e8f0;font-weight:600;border:none;border-radius:6px;padding:0.4rem 1rem;cursor:pointer;font-size:0.85rem">Generar web</button>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-              </div>
-            </div>
-          </div>}
         </section>
 
         <!-- ── CITAS ──────────────────────────────────────── -->
@@ -2657,50 +2616,6 @@ function renderAppointmentDate(item: Appointment) {
     if (dpPrev) dpPrev.addEventListener('click', function () { dpMonth--; if (dpMonth < 0) { dpMonth = 11; dpYear--; } renderDatePicker(); });
     if (dpNext) dpNext.addEventListener('click', function () { dpMonth++; if (dpMonth > 11) { dpMonth = 0; dpYear++; } renderDatePicker(); });
 
-
-    // ── Missed call ────────────────────────────────────────────────────
-    var missedBtn = document.getElementById('btn-missed-call');
-    if (missedBtn) {
-      missedBtn.addEventListener('click', async function () {
-        var phone = document.getElementById('missed-call-phone').value.trim().replace(/\s/g, '');
-        if (!phone) { showToast('Introduce el teléfono'); return; }
-        missedBtn.disabled = true; missedBtn.textContent = 'Enviando...';
-        try {
-          var r = await fetch('/portal-api/missed-call', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clientId: clientId, phone: phone }),
-          });
-          var d = await r.json();
-          if (d.ok) {
-            showToast(d.channel === 'whatsapp' ? '✅ Lara le ha escrito por WhatsApp' : '✅ Propietario notificado por Telegram');
-            document.getElementById('missed-call-phone').value = '';
-          } else { showToast('Error: ' + (d.error || 'no disponible')); }
-        } catch (_) { showToast('Error de conexión'); }
-        missedBtn.disabled = false; missedBtn.textContent = 'Enviar';
-      });
-    }
-
-    // ── Regenerate web ─────────────────────────────────────────────────
-    var regenBtn = document.getElementById('btn-regen-web');
-    if (regenBtn) {
-      regenBtn.addEventListener('click', async function () {
-        regenBtn.disabled = true; regenBtn.textContent = 'Generando...';
-        try {
-          var r = await fetch('/portal-api/regenerate-web', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clientId: clientId }),
-          });
-          var d = await r.json();
-          if (d.ok && d.url) {
-            document.getElementById('web-url-display').innerHTML = '<a href="' + d.url + '" target="_blank" style="color:#4ECDC4">' + d.url + '</a>';
-            showToast('✅ Mini-web generada');
-          } else { showToast('Error generando la web: ' + (d.error || '')); }
-        } catch (_) { showToast('Error de conexión'); }
-        regenBtn.disabled = false; regenBtn.textContent = 'Generar web';
-      });
-    }
 
     // El boton del portal de Stripe se quito: cancelar no es autoservicio.
     // ── Invoices loader ────────────────────────────────────────────────
