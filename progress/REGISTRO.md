@@ -831,3 +831,43 @@ el catalogo **nace vacio a proposito** y `assert.ok([])` pasa siempre. Cambiada 
 ### Privacidad
 Anadida una linea en `privacidad.astro`: *"Direccion IP, que podemos recoger para prevenir el fraude
 y procesar los pagos. No la usamos para identificarte ni para elaborar perfiles."*
+
+---
+
+## Dashboard: los numeros salen de las citas, no de un contador aparte (8-sep, 13:25)
+
+`22ef14e` en `nexux-clients` + `bcdf1bc` en `nexux-pro`. **nexux.pro sin push: pendiente de Ricardo.**
+
+Ricardo creo dos citas a mano y el dashboard seguia diciendo 0. Eran **dos fallos distintos** en los
+mismos numeros.
+
+**1. "Total reservadas" no contaba las citas: contaba lo que reservan los bots.** Leia
+`metrics.currentMonth.appointmentsBooked`, un contador que solo suben `whatsapp.js` y `telegram.js`.
+Una cita creada desde el CRM —o desde la pagina publica de reservas— no lo tocaba nunca. Nadie mas
+lee ese contador, asi que la salida no era sumarle mas sitios que lo incrementen (el mismo problema
+con mas superficie), sino **contar las citas de donde estan**. Igual para las canceladas.
+
+**2. "Citas hoy" se borraba sola.** Salia de filtrar las citas **futuras**: a las 18:00, la cita de
+las 15:30 de hoy dejaba de contar. El numero iba bajando segun avanzaba la tarde. Ahora la Pi manda
+`citasHoy` con **todas** las del dia. "Proximas citas" sigue siendo solo lo que queda por delante:
+son dos cosas distintas y ahora se dicen por separado.
+
+El dia y el mes se calculan **en la zona horaria del salon**. Con la del servidor, a un cliente de
+Canarias las citas de despues de las 22:00 le cambiarian de dia.
+
+**Comprobado en vivo**, tras reiniciar, con las citas de verdad de Ricardo:
+- `prueba-equipo-79-mostoles-dca1db`: antes 0 → ahora **2 hoy**, 12 reservadas este mes, 2 proximas.
+- `prueba-funcional-...-42f095`: **1 hoy** y **0 proximas** — la cita de las 08:00 ya paso. Ese es
+  justo el caso que antes daba 0.
+
+5 pruebas nuevas contra la ruta real, 4 sabotajes que muerden, **360/360**, verificador 5/5.
+
+**Fuera "Herramientas rapidas"** (llamada perdida y mini-web) del dashboard, y tambien el javascript
+que la manejaba: codigo enganchado a botones que ya no existen no falla, pero es basura que el
+siguiente tiene que leer para descubrir que no hace nada. **Los endpoints
+`/portal-api/missed-call` y `/portal-api/regenerate-web` NO se tocan**: siguen ahi para quien los
+llame.
+
+**Efecto lateral que conviene saber:** la tarjeta de ROI usa ese mismo numero de reservadas, asi que
+ahora tambien cuenta las citas creadas a mano. Es mas exacto, pero el ROI de las cuentas de prueba
+subira de golpe.
