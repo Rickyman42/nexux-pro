@@ -103,12 +103,18 @@ const customerTelegramUrl = data.channels.telegram.customerDeepLink
   || `https://t.me/NexuxProAssistantBot?start=c_${data.clientId}`;
 const showWhatsApp = !!data.channels.whatsapp?.provider;
 
-const booked = data.metrics.appointmentsBooked;
-const avgPrice = data.services?.length
-  ? data.services.reduce((s, sv) => s + (sv.price || 0), 0) / data.services.length
-  : 30;
-const roiRevenue = Math.round(booked * avgPrice);
-const roiTimeSaved = booked * 5;
+// Solo lo que ha reservado el BOT. La tarjeta se llama "ROI del bot": contar
+// ahi las citas que el negocio apunta a mano es inventarse el resultado, y es
+// lo que hacia -- decia 638 EUR con el bot apagado y cero conversaciones.
+//
+// El importe lo suma la Pi con el precio REAL de cada servicio. Antes se
+// multiplicaban las citas por la MEDIA del catalogo, asi que una cita de 68 EUR
+// valia lo mismo que una de 251. Ademas los dos numeros de la tarjeta no
+// cuadraban entre si (638 arriba, "4 x ~160" abajo).
+const roiCitas = data.roi?.citas ?? 0;
+const roiRevenue = data.roi?.ingresos ?? 0;
+const roiSinPrecio = data.roi?.sinPrecio ?? 0;
+const roiTimeSaved = roiCitas * 5;
 
 // Contador regresivo de conversaciones (plan starter)
 const convCount = data.metrics.conversationCount ?? 0;
@@ -403,18 +409,25 @@ const weekdayLabels: [string, string][] = [
             </div>
             <div class="crm-card crm-roi-card">
               <h2 class="crm-card-title">ROI del bot</h2>
-              <div class="crm-roi-grid">
-                <div class="crm-roi-item">
-                  <span class="crm-kpi-lbl">Ingresos generados</span>
-                  <strong class="crm-roi-val crm-roi-green">~{roiRevenue}€</strong>
-                  <span class="crm-roi-sub">{booked} cita{booked !== 1 ? 's' : ''} × ~{Math.round(avgPrice)}€ ticket medio</span>
+              {roiCitas === 0 ? (
+                <p class="crm-empty">Tu bot todavía no ha reservado ninguna cita. Cuando lo haga, aquí verás lo que te ha traído.</p>
+              ) : (
+                <div class="crm-roi-grid">
+                  <div class="crm-roi-item">
+                    <span class="crm-kpi-lbl">Reservado por el bot</span>
+                    <strong class="crm-roi-val crm-roi-green">{roiRevenue}€</strong>
+                    <span class="crm-roi-sub">
+                      {roiCitas} cita{roiCitas !== 1 ? 's' : ''} este mes
+                      {roiSinPrecio > 0 && `, ${roiSinPrecio} sin precio en tu catálogo (no suman)`}
+                    </span>
+                  </div>
+                  <div class="crm-roi-item">
+                    <span class="crm-kpi-lbl">Tiempo ahorrado</span>
+                    <strong class="crm-roi-val">{roiTimeSaved} min</strong>
+                    <span class="crm-roi-sub">~5 min de llamada por reserva</span>
+                  </div>
                 </div>
-                <div class="crm-roi-item">
-                  <span class="crm-kpi-lbl">Tiempo ahorrado</span>
-                  <strong class="crm-roi-val">{roiTimeSaved} min</strong>
-                  <span class="crm-roi-sub">~5 min de llamada por reserva</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 

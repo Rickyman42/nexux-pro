@@ -26,6 +26,9 @@ export interface ClientData {
   botStatus: 'connected' | 'disconnected' | 'pending_qr';
   qrPngBase64?: string;
   nextAppointments: Appointment[];
+  /** Lo que ha reservado el BOT este mes, con el precio real de cada servicio.
+   *  Opcional porque una Pi que aun no se haya actualizado no lo manda. */
+  roi?: { citas: number; ingresos: number; sinPrecio: number };
   /** Todas las citas de hoy, hayan pasado o no, contadas en la zona horaria del salon.
    *  Opcional porque una Pi que aun no se haya actualizado no lo manda. */
   citasHoy?: number;
