@@ -356,7 +356,20 @@ export interface Professional {
   active?: boolean;
   color?: string | null;
   priority?: number;
+  calendar_id?: string | null;
+  service_ids?: string[];
+  schedule?: PortalSchedule | null;
 }
+
+export interface PortalScheduleInterval {
+  open: string;
+  close: string;
+  lunch_close?: string;
+  lunch_open?: string;
+  breaks?: Array<{ open: string; close: string }>;
+}
+
+export type PortalSchedule = Record<string, PortalScheduleInterval | PortalScheduleInterval[] | null>;
 
 export interface GoogleCalendarStatus {
   ok: boolean;
@@ -434,6 +447,7 @@ export interface Resource {
   name: string;
   capacity: number;
   active?: boolean;
+  schedule?: PortalSchedule | null;
 }
 
 export async function fetchResources(
@@ -472,7 +486,14 @@ export async function saveResources(
 export async function fetchProfessionals(
   clientId: string,
   token: string,
-): Promise<{ ok: boolean; mode?: string; professionals?: Professional[]; error?: string }> {
+): Promise<{
+  ok: boolean;
+  mode?: string;
+  professionals?: Professional[];
+  services?: Array<{ id: string; name: string; active?: boolean }>;
+  capacidades?: { agenda_por_profesional?: boolean };
+  error?: string;
+}> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/professionals`, {
       headers: { Authorization: `Bearer ${token}` },
