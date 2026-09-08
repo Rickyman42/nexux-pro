@@ -175,6 +175,46 @@ export async function getFacturacion(
   }
 }
 
+/** Que cambios de plan puede hacer este negocio y cuanto le costaria cada uno. */
+export async function getOpcionesDePlan(
+  clientId: string,
+  token: string,
+): Promise<{ ok: boolean; datos: Record<string, unknown> | null }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/plan/opciones`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return { ok: false, datos: null };
+    return { ok: true, datos: (await response.json()) as Record<string, unknown> };
+  } catch {
+    return { ok: false, datos: null };
+  }
+}
+
+/**
+ * Hacer el cambio de plan.
+ *
+ * Se devuelve el codigo de estado tal cual: un 400 (no se puede) y un 502 (la
+ * pasarela no contesta) no significan lo mismo para el dueno, y taparlos los
+ * dos con un "error" le dejaria sin saber si le han cobrado o no.
+ */
+export async function cambiarDePlan(
+  clientId: string,
+  token: string,
+  plan: string,
+): Promise<{ estado: number; cuerpo: Record<string, unknown> }> {
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/plan`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan }),
+    });
+    return { estado: response.status, cuerpo: (await response.json()) as Record<string, unknown> };
+  } catch {
+    return { estado: 0, cuerpo: { ok: false } };
+  }
+}
+
 export async function getBillingPortalUrl(clientId: string, token: string): Promise<string | null> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/billing-portal`, {

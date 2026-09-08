@@ -830,7 +830,9 @@ function renderAppointmentDate(item: Appointment) {
                     <li>✅ Agenda y reservas automáticas</li>
                     <li>✅ Sin permanencia ni comisión por cita</li>
                   </ul>
-                  {isRecepcionista && <span class="bpc-current-tag">Plan actual</span>}
+                  {isRecepcionista
+                    ? <span class="bpc-current-tag">Plan actual</span>
+                    : <button class="bpc-cambiar crm-hidden" data-plan="recepcionista">Cambiar a este plan</button>}
                 </div>
                 <div class={`billing-plan-card ${isEquipo ? 'current' : ''}`}>
                   <div class="bpc-header">
@@ -843,7 +845,9 @@ function renderAppointmentDate(item: Appointment) {
                     <li>✅ Ficha de cliente con su historial</li>
                     <li>✅ Sin permanencia ni comisión por cita</li>
                   </ul>
-                  {isEquipo && <span class="bpc-current-tag">Plan actual</span>}
+                  {isEquipo
+                    ? <span class="bpc-current-tag">Plan actual</span>
+                    : <button class="bpc-cambiar crm-hidden" data-plan="equipo">Cambiar a este plan</button>}
                 </div>
               </div>
             ) : (
@@ -889,6 +893,16 @@ function renderAppointmentDate(item: Appointment) {
               </div>
             </div>
             )}
+            <div class="plan-confirma crm-hidden" id="plan-confirma">
+              <h3 class="plan-confirma-tit" id="plan-confirma-tit"></h3>
+              <p class="plan-confirma-det" id="plan-confirma-det"></p>
+              <div class="plan-confirma-btns">
+                <button class="crm-btn-primary" id="plan-confirma-si">Confirmar el cambio</button>
+                <button class="plan-confirma-no" id="plan-confirma-no">Ahora no</button>
+              </div>
+            </div>
+            <p class="billing-hint crm-hidden" id="plan-aviso" style="margin-top:14px"></p>
+
             {data.billing?.stripe !== false && (
               <p class="billing-hint" style="margin-top:16px">Desde “Gestionar suscripción” puedes <strong>cambiar de plan</strong>, <strong>actualizar tu tarjeta</strong>, <strong>descargar tus facturas</strong> y <strong>cancelar la suscripción</strong>. Si cancelas, sigues teniendo el servicio hasta el final del periodo que ya has pagado.</p>
             )}
@@ -2774,9 +2788,91 @@ function renderAppointmentDate(item: Appointment) {
       document.getElementById('fact-pie').textContent = '';
     }
 
+    // ── Cambiar de plan ──────────────────────────────────────────────────
+    // Regla: el botón de confirmar sólo se enciende si la Pi ha podido decir
+    // el importe exacto. Nadie paga una sorpresa.
+    var opcionesDePlan = {};
+
+    function avisoDePlan(texto) {
+      var p = document.getElementById('plan-aviso');
+      p.textContent = texto;
+      p.classList.toggle('crm-hidden', !texto);
+    }
+
+    function cierraConfirmacion() {
+      document.getElementById('plan-confirma').classList.add('crm-hidden');
+    }
+
+    function cargaOpcionesDePlan() {
+      fetch('/portal-api/plan?clientId=' + clientId)
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (!res || !res.ok || !res.datos) return;
+          (res.datos.opciones || []).forEach(function(o) { opcionesDePlan[o.plan] = o; });
+          document.querySelectorAll('.bpc-cambiar').forEach(function(b) {
+            var o = opcionesDePlan[b.getAttribute('data-plan')];
+            if (o) b.classList.remove('crm-hidden');
+          });
+        })
+        .catch(function() { /* sin opciones, las tarjetas se quedan como estaban */ });
+    }
+
+    document.querySelectorAll('.bpc-cambiar').forEach(function(boton) {
+      boton.addEventListener('click', function() {
+        var o = opcionesDePlan[boton.getAttribute('data-plan')];
+        if (!o) return;
+        avisoDePlan('');
+        document.getElementById('plan-confirma-tit').textContent = o.titulo;
+        document.getElementById('plan-confirma-det').textContent = o.detalle;
+        var si = document.getElementById('plan-confirma-si');
+        si.disabled = !o.sePuedeConfirmar;
+        si.textContent = o.direccion === 'baja' ? 'Programar el cambio' : 'Confirmar y pagar';
+        si.setAttribute('data-plan', o.plan);
+        var caja = document.getElementById('plan-confirma');
+        caja.classList.remove('crm-hidden');
+        caja.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+
+    document.getElementById('plan-confirma-no').addEventListener('click', cierraConfirmacion);
+
+    document.getElementById('plan-confirma-si').addEventListener('click', function() {
+      var si = this;
+      var plan = si.getAttribute('data-plan');
+      if (!plan || si.disabled) return;
+      // Se apaga el botón antes de salir: dos pulsaciones seguidas no pueden
+      // convertirse en dos peticiones. En la Pi hay un segundo seguro.
+      si.disabled = true;
+      si.textContent = 'Un momento…';
+      fetch('/portal-api/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: clientId, plan: plan }),
+      })
+        .then(function(r) { return r.json().then(function(c) { return { estado: r.status, cuerpo: c }; }); })
+        .then(function(res) {
+          cierraConfirmacion();
+          if (res.cuerpo && res.cuerpo.ok) {
+            avisoDePlan(res.cuerpo.titulo + '. ' + res.cuerpo.detalle);
+            factCargado = false;
+            setTimeout(cargaFacturacion, 2500);
+          } else {
+            avisoDePlan(res.cuerpo && res.cuerpo.error
+              ? res.cuerpo.error
+              : 'No hemos podido hacer el cambio y no se te ha cobrado nada. Vuelve a intentarlo en un momento; si sigue igual, escríbenos por Soporte.');
+          }
+        })
+        .catch(function() {
+          cierraConfirmacion();
+          avisoDePlan('No hemos podido contactar con el servidor. Comprueba tu conexión y vuelve a intentarlo; si el cambio se hubiera hecho, lo verás al recargar.');
+        })
+        .then(function() { si.disabled = false; si.textContent = 'Confirmar el cambio'; });
+    });
+
     function cargaFacturacion() {
       if (factCargado) return;
       factCargado = true;
+      cargaOpcionesDePlan();
       fetch('/portal-api/facturacion?clientId=' + clientId)
         .then(function(r) { return r.json(); })
         .then(function(res) {
@@ -3528,6 +3624,26 @@ function renderAppointmentDate(item: Appointment) {
       padding: 3px 8px; border-radius: 999px;
     }
     /* ── Invoice table ─────────────────────────────────────────────── */
+    .bpc-cambiar {
+      margin-top: 12px; width: 100%; padding: 10px 14px;
+      border: 1px solid var(--crm-border, #d9d9e0); border-radius: 9px;
+      background: #fff; color: #1c1c22; font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .bpc-cambiar:hover { border-color: #2f9e5e; color: #2f9e5e; }
+    .plan-confirma {
+      margin-top: 18px; padding: 18px;
+      border: 1px solid #b9d4ef; border-radius: 12px; background: #f5faff;
+    }
+    .plan-confirma-tit { margin: 0; font-size: 15.5px; font-weight: 700; }
+    .plan-confirma-det { margin: 8px 0 0; font-size: 14px; line-height: 1.55; color: #40404c; }
+    .plan-confirma-btns { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+    .plan-confirma-no {
+      border: 0; background: none; color: #6a6a76; font-size: 14px;
+      cursor: pointer; font-family: inherit; text-decoration: underline;
+    }
+    #plan-confirma-si[disabled] { opacity: .55; cursor: not-allowed; }
+
     /* Tarjeta de estado de facturacion. El color no decora: verde solo
        cuando el dueno no tiene que hacer NADA. */
     .fact-estado {
