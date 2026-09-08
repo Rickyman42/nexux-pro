@@ -2065,6 +2065,29 @@ function renderAppointmentDate(item: Appointment) {
         editAptModal.showModal();
       }
 
+      // Por que no se ha podido. El servidor manda un codigo; la frase se
+      // escribe aqui para que el negocio lea siempre lo mismo y sepa que hacer.
+      // Antes todo esto era "No se pudo modificar la cita", que no distingue un
+      // domingo cerrado de un corte de internet: parecia que el panel no iba.
+      var MOTIVOS_RECHAZO = {
+        appointment_conflict: 'Ahí ya hay otra cita con esa persona',
+        outside_business_hours: 'A esa hora no atendéis: mirad el horario en Configuración',
+        resource_unavailable: 'No queda sitio ni material libre a esa hora',
+        professional_not_allowed: 'Esa persona no hace ese servicio',
+        horizon_violation: 'Esa fecha queda demasiado lejos',
+        lead_time_violation: 'Esa hora ya ha pasado',
+        cancelled_appointment: 'Esa cita está cancelada: no se puede mover',
+        appointment_not_found: 'Esa cita ya no existe. Recarga la página',
+        version_conflict: 'Alguien la ha cambiado a la vez. Recarga la página',
+        invalid_service: 'Ese servicio ya no está en el catálogo',
+        invalid_duration: 'La duración tiene que estar entre 15 y 480 minutos',
+        no_changes: 'No has cambiado nada',
+      };
+
+      function motivoDelRechazo(codigo, porDefecto) {
+        return MOTIVOS_RECHAZO[codigo] || porDefecto;
+      }
+
       async function updateAppointment(aptId, changes) {
         try {
           var response = await fetch('/portal-api/appointments', {
@@ -2074,7 +2097,7 @@ function renderAppointmentDate(item: Appointment) {
           });
           var payload = await response.json().catch(function () { return {}; });
           if (!response.ok) {
-            showToast(payload.error === 'appointment_conflict' ? 'Ese horario ya está ocupado' : 'No se pudo modificar la cita');
+            showToast(motivoDelRechazo(payload.error, 'No se pudo modificar la cita'));
             return false;
           }
           showToast('Cita actualizada');
@@ -2516,9 +2539,12 @@ function renderAppointmentDate(item: Appointment) {
             if (!r.ok) {
               // 409 = esa hora ya está cogida. Antes se decía "error" a secas.
               var detalle = await r.json().catch(function () { return {}; });
-              var texto = r.status === 409
-                ? (detalle.message || 'Esa hora ya está ocupada. Elige otra o cambia de persona.')
-                : 'No se pudo crear la cita.';
+              var texto = motivoDelRechazo(
+                detalle.error,
+                r.status === 409
+                  ? (detalle.message || 'Esa hora no se puede. Elige otra o cambia de persona.')
+                  : 'No se pudo crear la cita.',
+              );
               if (errBox) { errBox.textContent = texto; errBox.classList.remove('crm-hidden'); }
               showToast(texto);
               return;
