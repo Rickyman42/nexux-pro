@@ -182,7 +182,7 @@ function renderAppointmentDate(item: Appointment) {
     <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   </Fragment>
 
-  <div id="crm" class="crm-light" data-clientid={clientId} data-inbox-token={token}>
+  <div id="crm" class="crm-light" data-clientid={clientId} data-inbox-token={token} data-stripe-key={import.meta.env.PUBLIC_STRIPE_KEY || ''}>
 
     <!-- SIDEBAR -->
     <aside class="crm-sidebar" id="crm-sidebar">
@@ -782,6 +782,18 @@ function renderAppointmentDate(item: Appointment) {
               <div class="fact-dato"><span class="fact-dato-lbl">Tarjeta</span><span class="fact-dato-val" id="fact-tarjeta">—</span></div>
             </div>
             <p class="fact-pie" id="fact-pie"></p>
+            <button class="fact-cambiar-tarjeta crm-hidden" id="btn-tarjeta">Cambiar la tarjeta</button>
+
+            <div class="tarjeta-caja crm-hidden" id="tarjeta-caja">
+              <h3 class="tarjeta-tit">Cambiar la tarjeta</h3>
+              <p class="tarjeta-sub">Los datos los recoge <strong>Stripe</strong>, la pasarela de pago, dentro de esta misma página. Nexux no ve ni guarda el número de tu tarjeta en ningún momento: sólo la marca y los cuatro últimos dígitos, para que puedas reconocerla.</p>
+              <div id="tarjeta-elemento"></div>
+              <p class="tarjeta-error crm-hidden" id="tarjeta-error"></p>
+              <div class="tarjeta-btns">
+                <button class="crm-btn-primary" id="tarjeta-guardar">Guardar la tarjeta</button>
+                <button class="plan-confirma-no" id="tarjeta-cancelar">Ahora no</button>
+              </div>
+            </div>
           </div>
 
           <div class="crm-section">
@@ -2769,6 +2781,8 @@ function renderAppointmentDate(item: Appointment) {
         ? (d.tarjeta.marca ? d.tarjeta.marca.toUpperCase() : 'Tarjeta') + ' ···· ' + d.tarjeta.ultimos4
         : (d.tienePasarela ? 'Todavía no lo sabemos' : 'Ninguna');
       datos.classList.remove('crm-hidden');
+      // Sin pasarela de pago no hay ninguna tarjeta que cambiar.
+      document.getElementById('btn-tarjeta').classList.toggle('crm-hidden', !d.tienePasarela);
 
       // El pie es lo que da tranquilidad de verdad: dice que esto se mira, y
       // cuando se miro por ultima vez. Sin eso, "todo en orden" es una frase
@@ -2788,10 +2802,112 @@ function renderAppointmentDate(item: Appointment) {
       document.getElementById('fact-pie').textContent = '';
     }
 
+    // ── Cambiar la tarjeta ───────────────────────────────────────────────
+    // El formulario lo pinta Stripe dentro de un marco suyo: la tarjeta va del
+    // navegador a Stripe directamente. Por nuestro servidor no pasa nunca.
+    var stripeJs = null;
+    var elementosTarjeta = null;
+
+    function esperaAStripe() {
+      // Stripe.js se carga con `async` en el layout, asi que puede no estar
+      // todavia cuando el dueno pulsa. Se espera un poco en vez de fallar.
+      return new Promise(function(listo, falla) {
+        var intentos = 0;
+        (function mira() {
+          if (typeof Stripe === 'function') return listo();
+          if (++intentos > 40) return falla(new Error('stripe_no_carga'));
+          setTimeout(mira, 150);
+        })();
+      });
+    }
+
+    function errorDeTarjeta(texto) {
+      var p = document.getElementById('tarjeta-error');
+      p.textContent = texto || '';
+      p.classList.toggle('crm-hidden', !texto);
+    }
+
+    function abreFormularioDeTarjeta() {
+      var caja = document.getElementById('tarjeta-caja');
+      var boton = document.getElementById('btn-tarjeta');
+      boton.disabled = true;
+      errorDeTarjeta('');
+
+      fetch('/portal-api/tarjeta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: clientId, accion: 'sesion' }),
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (!res || !res.ok || !res.claveDeUnUso) {
+            throw new Error(res && res.error ? res.error : 'no_se_pudo_abrir');
+          }
+          return esperaAStripe().then(function() {
+            stripeJs = stripeJs || Stripe(CLAVE_STRIPE);
+            elementosTarjeta = stripeJs.elements({
+              clientSecret: res.claveDeUnUso,
+              // Sin esto Stripe pinta el formulario en ingles en medio de una
+              // pantalla en castellano.
+              locale: 'es',
+              appearance: { theme: 'stripe', variables: { colorPrimary: '#2f9e5e', borderRadius: '9px' } },
+            });
+            elementosTarjeta.create('payment', { layout: 'tabs' }).mount('#tarjeta-elemento');
+            caja.classList.remove('crm-hidden');
+            caja.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
+        })
+        .catch(function(err) {
+          caja.classList.remove('crm-hidden');
+          errorDeTarjeta(err && err.message && err.message.length > 25
+            ? err.message
+            : 'No hemos podido abrir el formulario de la tarjeta. Vuelve a intentarlo en un momento; si sigue igual, escríbenos por Soporte.');
+        })
+        .then(function() { boton.disabled = false; });
+    }
+
+    document.getElementById('btn-tarjeta').addEventListener('click', abreFormularioDeTarjeta);
+    document.getElementById('tarjeta-cancelar').addEventListener('click', function() {
+      document.getElementById('tarjeta-caja').classList.add('crm-hidden');
+      errorDeTarjeta('');
+    });
+
+    document.getElementById('tarjeta-guardar').addEventListener('click', function() {
+      var boton = this;
+      if (!stripeJs || !elementosTarjeta || boton.disabled) return;
+      boton.disabled = true;
+      boton.textContent = 'Guardando…';
+      errorDeTarjeta('');
+
+      // confirmSetup manda la tarjeta a Stripe. Si el banco pide confirmacion,
+      // Stripe la resuelve aqui mismo sin sacar al dueno de la pagina.
+      stripeJs.confirmSetup({ elements: elementosTarjeta, redirect: 'if_required' })
+        .then(function(r) {
+          if (r.error) throw new Error(r.error.message || 'No hemos podido guardar la tarjeta.');
+          return fetch('/portal-api/tarjeta', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: clientId, accion: 'guardar', permisoId: r.setupIntent.id }),
+          }).then(function(x) { return x.json(); });
+        })
+        .then(function(res) {
+          if (!res || !res.ok) {
+            throw new Error(res && res.error ? res.error : 'No hemos podido dejar puesta la tarjeta.');
+          }
+          document.getElementById('tarjeta-caja').classList.add('crm-hidden');
+          avisoDePlan(res.titulo + '. ' + res.detalle);
+          factCargado = false;
+          cargaFacturacion();
+        })
+        .catch(function(err) { errorDeTarjeta(err.message); })
+        .then(function() { boton.disabled = false; boton.textContent = 'Guardar la tarjeta'; });
+    });
+
     // ── Cambiar de plan ──────────────────────────────────────────────────
     // Regla: el botón de confirmar sólo se enciende si la Pi ha podido decir
     // el importe exacto. Nadie paga una sorpresa.
     var opcionesDePlan = {};
+    var CLAVE_STRIPE = document.getElementById('crm').dataset.stripeKey || '';
 
     function avisoDePlan(texto) {
       var p = document.getElementById('plan-aviso');
@@ -3624,6 +3740,23 @@ function renderAppointmentDate(item: Appointment) {
       padding: 3px 8px; border-radius: 999px;
     }
     /* ── Invoice table ─────────────────────────────────────────────── */
+    .fact-cambiar-tarjeta {
+      margin-top: 14px; padding: 9px 16px;
+      border: 1px solid var(--crm-border, #d9d9e0); border-radius: 9px;
+      background: #fff; color: #1c1c22; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .fact-cambiar-tarjeta:hover { border-color: #2f9e5e; color: #2f9e5e; }
+    .tarjeta-caja {
+      margin-top: 16px; padding: 18px;
+      border: 1px solid #d9d9e0; border-radius: 12px; background: #fff;
+    }
+    .tarjeta-tit { margin: 0; font-size: 15.5px; font-weight: 700; }
+    .tarjeta-sub { margin: 8px 0 16px; font-size: 13px; line-height: 1.55; color: #5a5a66; }
+    .tarjeta-error { margin: 12px 0 0; font-size: 13.5px; color: #b3391f; line-height: 1.5; }
+    .tarjeta-btns { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+    #tarjeta-guardar[disabled] { opacity: .55; cursor: not-allowed; }
+
     .bpc-cambiar {
       margin-top: 12px; width: 100%; padding: 10px 14px;
       border: 1px solid var(--crm-border, #d9d9e0); border-radius: 9px;

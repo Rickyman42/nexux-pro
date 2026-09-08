@@ -215,6 +215,33 @@ export async function cambiarDePlan(
   }
 }
 
+/**
+ * Llama a la Pi para lo de la tarjeta. `accion` es 'sesion' (abrir el
+ * formulario) o '' (dejar puesta la tarjeta que el navegador acaba de guardar).
+ *
+ * El estado vuelve tal cual: para el dueño no es lo mismo "no se puede" que
+ * "la pasarela no contesta", y taparlos los dos igual le dejaría sin saber si
+ * su tarjeta ha quedado guardada.
+ */
+export async function llamarTarjeta(
+  clientId: string,
+  token: string,
+  accion: 'sesion' | 'guardar',
+  cuerpo: Record<string, unknown> = {},
+): Promise<{ estado: number; cuerpo: Record<string, unknown> }> {
+  const ruta = accion === 'sesion' ? 'tarjeta/sesion' : 'tarjeta';
+  try {
+    const response = await fetch(`${BASE_URL}/client/${clientId}/${ruta}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(cuerpo),
+    });
+    return { estado: response.status, cuerpo: (await response.json()) as Record<string, unknown> };
+  } catch {
+    return { estado: 0, cuerpo: { ok: false } };
+  }
+}
+
 export async function getBillingPortalUrl(clientId: string, token: string): Promise<string | null> {
   try {
     const response = await fetch(`${BASE_URL}/client/${clientId}/billing-portal`, {
