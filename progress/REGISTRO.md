@@ -779,3 +779,55 @@ Media docena de copias de "avisar por Telegram" repartidas por el repo se tragan
 silencio (`stripe-webhook.js`, `whatsapp.js`, `roi-report.js`, `twilio.js`, `scheduler.js`,
 `lemon.js`). La nueva (`lib/aviso-telegram.js`) devuelve si ha salido y, si no, deja el texto entero
 en el log. Migrar las viejas hoy —sobre todo la del webhook de Stripe— es mas riesgo que valor.
+
+---
+
+## Alta a mano: un creador que produce la cuenta de HOY (8-sep, 12:45)
+
+`190c20c` en `nexux-clients` + `9da3159` en `nexux-pro`.
+
+El caso: alguien le dice a Ricardo *"creame el CRM para mi clinica y te hago transferencia todos los
+meses"*. Eso es un alta de **pago** (`manual_paid`), no una demo: no caduca a los 7 dias y no tiene
+suscripcion de Stripe **por diseno**.
+
+`provision.js` escribia la carpeta del cliente **a mano** y por eso se quedo viejo sin que nadie lo
+notara: creaba cuentas con `plan: 'total'` —retirado el 21-ago— sin `accountMode` y sin plantillas.
+De las 22 cuentas, solo `demo` salio de ahi.
+
+**Un segundo generador de cuentas siempre acaba asi.** Por eso el sustituto
+(`scripts/crear-cliente-manual.mjs`) **no escribe ningun fichero**: le pide el alta a `/provision`,
+la misma puerta por la que entran las de Stripe. Lo que salga de ahi tendra la forma correcta hoy y
+la que tenga manana, sin volver a tocar el creador.
+
+### Lo que arrastraba, y estaba mal
+
+- **El vigilante diario.** Eximia a quien no tiene `stripeCustomerId`. Funcionaba, pero por
+  accidente: la regla de verdad es *"esta cuenta no paga por Stripe por diseno"*. Un rescate que
+  paso de Stripe a transferencia **conserva su id** y le habria gritado todos los dias hasta que
+  alguien silenciara el aviso — y el dia de un descuadre real, nadie lo mira. Ahora se exime por
+  `accountMode`.
+- **Su panel.** Decia "se dio de alta a mano, sin pasarela de pago". Verdad, pero al que paga el dia
+  1 por transferencia no le dice lo unico que necesita. Ahora dice **"Pagas por transferencia 79 € al
+  mes"**. Si no consta como paga, **no se lo inventa**: se queda la frase de antes.
+- **El creador solo interactivo no se podia probar.** Con la entrada por tuberia, `readline` contesta
+  la primera pregunta y deja colgadas las demas. Acepta argumentos ademas de preguntar.
+- **"NO se ha creado nada" era mentira** cuando fallaba el correo: la cuenta se crea **antes** del
+  correo. Decirlo asi haria que se creara dos veces. Ahora dice que la cuenta existe y que no la
+  vuelva a crear.
+
+### Comprobado
+- **8 pruebas nuevas** (355/355 en la suite). **6 sabotajes**, cada uno lo caza al menos una prueba.
+- **El creador ejecutado de verdad** (`scripts/prueba-cli-en-vivo.sh`), contra una instancia aparte
+  con su propia carpeta y un servidor de correo de mentira: cuenta creada con `manual_paid`, plan
+  `equipo`, `isTrial: false`, sin fecha de caducidad, sin suscripcion, con `pagoManual` y
+  `altaManual` escritos, y pasando por las plantillas. Su panel: *"Pagas por transferencia 79 € al
+  mes"*. El vigilante: **ningun descuadre**. **Produccion sin tocar: 22 clientes antes y despues.**
+- **Verificador 9/9.**
+
+Una prueba mia que no mordia: comprobaba `services` para saber si habian corrido las plantillas, pero
+el catalogo **nace vacio a proposito** y `assert.ok([])` pasa siempre. Cambiada a `features`,
+`limits` y `slot_duration`, que solo salen de las plantillas.
+
+### Privacidad
+Anadida una linea en `privacidad.astro`: *"Direccion IP, que podemos recoger para prevenir el fraude
+y procesar los pagos. No la usamos para identificarte ni para elaborar perfiles."*
