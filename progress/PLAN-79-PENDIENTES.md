@@ -475,8 +475,56 @@ verdad, y probar el cobro con él.
 
 **De paso**: `lib/stripe-session.js` llevaba una **tercera copia** de la tabla de precios (2900/7900 a
 mano). Hoy coincide con el catálogo. Hay una prueba nueva que salta si algún día deja de coincidir.
+---
 
-### Pasos 4 a 6, pendientes
-4. Actualizar tarjeta con Stripe Elements embebido (PCI: la tarjeta nunca toca la Pi).
+## Paso 4 — Cambiar la tarjeta desde dentro de Nexux — HECHO, LO GRAVE PROBADO CONTRA STRIPE REAL (8-sep, 02:30)
+
+`81579a4` en `nexux-clients` · `687bad4` en `nexux-pro`. **Sin push: lo autoriza Ricardo.**
+
+**Cómo funciona, en llano**: la Pi le pide a Stripe un permiso de un solo uso y le da al navegador una
+llave temporal. El formulario lo pinta **Stripe** dentro de nuestra página. La tarjeta va del
+navegador a Stripe directamente. **Por la Pi no pasa el número, ni el CVV, ni nada que haya que
+proteger** — sólo un identificador y, al final, la etiqueta (VISA ···· 4242). Eso es lo que pediste:
+integrado en Nexux, pero sin que la tarjeta toque nuestro servidor.
+
+**Lo delicado no es el formulario, es el paso siguiente.** Cuando el navegador dice "usa este
+permiso", se comprueba: (1) que el permiso es de **este** cliente; (2) que Stripe lo da por bueno, no
+a medias; (3) que hay tarjeta. Y se pone por defecto **en el cliente Y en la suscripción**: si sólo se
+pusiera en uno, la próxima factura podría seguir intentando la tarjeta vieja.
+
+**🟢 Probado contra Stripe de verdad** (clave `sk_live`, aquí sí se pudo):
+- Se crea un permiso real (`seti_1UDCil…`) para un cliente real. **Cancelado al terminar.**
+- **Un permiso de otro cliente se rechaza**: `ese permiso de tarjeta no es de este cliente`. Éste es
+  el agujero grave del paso 4 y está tapado y comprobado contra la pasarela, no sólo con un simulacro.
+- Un permiso inventado se rechaza (`No such setupintent`).
+- Sin pasarela de pago, ni siquiera se abre: 400 y un mensaje que lo explica.
+
+**En el navegador** (`nexux-pro/scripts/mira-tarjeta.py`): sin pasarela el botón **no aparece**; con
+pasarela se monta un formulario **servido por js.stripe.com** (comprobado el origen del marco: si
+fuera nuestro, la tarjeta pasaría por nosotros) y **en castellano**.
+
+**Corregido mirando la pantalla**: el formulario salía **en inglés** ("Card number", "Expiry date") en
+mitad de una pantalla en español, justo en el momento de teclear una tarjeta. Ahora `locale: 'es'`, y
+la comprobación entra dentro del marco de Stripe a leer las etiquetas: si vuelve a salir en inglés,
+salta.
+
+**La frase del impago ya puede decir la verdad.** En el paso 2 se le prohibió decir "aquí abajo"
+porque no había formulario, con una prueba puesta para que no se olvidara. Ahora lo hay: frase y
+prueba cambiadas a la vez, en el mismo commit.
+
+**Pruebas**: 8 nuevas. **8 sabotajes, los 8 cazados**: quitar la comprobación de a quién pertenece el
+permiso · dar por buena una tarjeta a medias · dejar pasar un permiso sin tarjeta · no ponerla en la
+suscripción · guardarla sin permiso para cobrar el mes que viene · devolver el método de pago entero
+en vez de sólo la etiqueta · perder el cero del mes de caducidad · dejar de decir dónde se cambia.
+Restaurado idéntico por md5. Regresión: 305 de 306.
+
+**Lo único que falta por probar**: teclear una tarjeta de verdad y ver el cobro. En modo producción no
+se puede usar la 4242, así que eso sigue esperando a la **`sk_test_…`** que pedí en el paso 3.
+
+**Apuntado, no tocado**: el `.env` de la Pi tiene 5 líneas con retorno de carro de Windows (las de
+Google OAuth). La aplicación va bien porque dotenv lo limpia, pero cualquier script en bash que haga
+`. ./.env` se lleva el `\r` pegado al valor. Es una trampa para el futuro, no un fallo de hoy.
+
+### Pasos 5 y 6, pendientes
 5. Cancelación solo por el bot de soporte, nunca autoservicio en dos clics.
 6. Quitar el botón "Gestionar suscripción" que abre el portal de Stripe.
