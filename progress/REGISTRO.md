@@ -871,3 +871,44 @@ llame.
 **Efecto lateral que conviene saber:** la tarjeta de ROI usa ese mismo numero de reservadas, asi que
 ahora tambien cuenta las citas creadas a mano. Es mas exacto, pero el ROI de las cuentas de prueba
 subira de golpe.
+
+---
+
+## Contadores en vivo, sin recargar y sin machacar el servidor (8-sep, 14:20)
+
+`5ada852` en `nexux-clients` (ya vivo) + `ed0d113` en `nexux-pro` (**sin push**).
+
+Para ver subir el contador al crear una cita habia que recargar la pagina.
+
+**Como NO se ha hecho:** un temporizador preguntando cada pocos segundos. Con las pestanas abiertas
+de todos los clientes serian miles de peticiones al dia para no enterarse de nada casi nunca.
+
+**Como se ha hecho:** se pregunta cuando hay **motivo** para creer que el numero ha cambiado.
+- Despues de crear, mover, editar o cancelar una cita. Va enganchado al repintado del calendario,
+  que ya ocurre en los cuatro casos: asi no hay que acordarse de llamarlo en cada uno.
+- Al volver a la pestana, y solo si ha pasado mas de un minuto, por si la cita la metio otra persona
+  o el bot.
+
+**Medido en el navegador:** crear una cita cuesta **una** peticion; la pagina quieta hace **cero**.
+Y el numero pasa de 5 a 6 sin tocar F5.
+
+La ruta nueva (`/client/:id/contadores`) solo cuenta. Pedir `/status` para esto seria caro: ese mira
+el socket de WhatsApp, lee la carpeta de credenciales y calcula capacidades.
+
+**El conteo vive en un solo sitio** (`lib/contadores-citas.js`). Lo piden dos rutas, y si cada una
+lo hiciera por su cuenta acabarian diciendo cosas distintas — que es como empezo este fallo. Hay una
+prueba que compara las dos: si dejan de coincidir, se pone roja.
+
+### Dos cosas que fallaron por el camino
+- **El navegador reutilizaba la respuesta anterior** y el numero no se movia aunque la cita ya
+  estuviera creada. Se ve solo mirandolo en un navegador de verdad. Arreglado con `no-store` en los
+  dos lados.
+- **Anadi la ruta y no reinicie la Pi**, asi que no existia. El panel degrado bien —dejo los numeros
+  como estaban en vez de poner ceros—, que es justo lo que se le pidio: un cero inventado se lee
+  como "no tienes citas".
+
+8 pruebas en el fichero, 4 sabotajes que muerden, **363/363**, verificador 7/7.
+
+### 🔴 La tarjeta de "Herramientas rapidas" sigue en produccion
+No es que no se quitara: **esta quitada en el codigo desde `bcdf1bc` y ese commit no se ha subido.**
+`nexux.pro` vive en Vercel y no cambia hasta que se hace push. Pendiente de Ricardo.
