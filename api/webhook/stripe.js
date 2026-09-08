@@ -142,6 +142,9 @@ async function provisionClient(session) {
     email: session.customer_details?.email || null,
     canal: md.canal || null,
     trabajadoras: md.trabajadoras || null,
+    // Para el control de altas repetidas. Se recogio al abrir el checkout: aqui
+    // ya no hay visitante que mirar, solo el aviso de Stripe.
+    ip: md.ip || null,
   };
 
   if (!payload.plan || !payload.salon || !payload.telefono) {

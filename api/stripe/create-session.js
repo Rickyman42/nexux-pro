@@ -46,6 +46,13 @@ export default async function handler(req, res) {
   // Sin telefono, el asistente no puede arrancar el onboarding solo.
   params.append('phone_number_collection[enabled]', 'true');
 
+  // La IP del visitante. Es la unica de las cuatro senales que solo se ve
+  // aqui: la Pi, que es quien tiene el historial, solo ve a Vercel. Viaja con
+  // la sesion para que el alta pueda cruzarla. La lista trae varias y la del
+  // visitante es la primera.
+  const ipVisitante = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  if (ipVisitante) params.append('metadata[ip]', ipVisitante.slice(0, 60));
+
   const metadataFields = ['nombre', 'salon', 'telefono', 'ciudad', 'canal', 'trabajadoras'];
   for (const key of metadataFields) {
     const value = body[key];
