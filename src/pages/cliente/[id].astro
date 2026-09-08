@@ -208,10 +208,6 @@ const weekdayLabels: [string, string][] = [
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Citas
         </button>
-        <button class="crm-nav-btn" data-view="conversaciones">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Chats
-        </button>
         <button class="crm-nav-btn" data-view="clientes">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Clientes
@@ -229,6 +225,14 @@ const weekdayLabels: [string, string][] = [
           Facturación
         </button>
       </nav>
+
+      <div class="crm-bot-switch" id="crm-bot-switch">
+        <button type="button" class="crm-bot-toggle" id="crm-bot-toggle" role="switch" aria-checked="true">
+          <span class="crm-bot-toggle-track"><span class="crm-bot-toggle-knob"></span></span>
+          <span class="crm-bot-toggle-label">Lara responde</span>
+        </button>
+        <small class="crm-bot-hint" id="crm-bot-hint"></small>
+      </div>
 
       <div class="crm-sidebar-foot">
         <span class="crm-plan-chip">{planLabel}</span>
@@ -469,15 +473,6 @@ const weekdayLabels: [string, string][] = [
         </section>
 
         <!-- ── CANALES ────────────────────────────────────── -->
-        <section class="crm-view crm-hidden" id="v-conversaciones">
-          <iframe
-            id="inbox-iframe"
-            src=""
-            style="width:100%;height:calc(100vh - 60px);border:none;display:block"
-            allow="same-origin"
-          ></iframe>
-        </section>
-
         <section class="crm-view crm-hidden" id="v-canales">
           <div class="crm-view-hdr">
             <h1 class="crm-view-title">Canales</h1>
@@ -1046,7 +1041,7 @@ const weekdayLabels: [string, string][] = [
     </form>
   </dialog>
 
-  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: !hasLegacyAdvancedTools, customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []), scheduleJson: JSON.stringify(data.schedule ?? {}) }}>
+  <script define:vars={{ clientId, currentProvider: data.channels.whatsapp.provider, isStarter: !hasLegacyAdvancedTools, customerTelegramUrl, servicesJson: JSON.stringify(data.services ?? []), scheduleJson: JSON.stringify(data.schedule ?? {}), botAutoInicial: data.botAuto !== false }}>
   (function () {
 
     // ── Theme ─────────────────────────────────────────────────────────
@@ -1091,24 +1086,60 @@ const weekdayLabels: [string, string][] = [
       crm.classList.remove('sidebar-open');
     }
 
-    // Inbox iframe — lazy load on first click
-    var inboxLoaded = false;
-    var piBase = 'https://pi.nexux.pro';
-    var inboxToken = document.getElementById('crm').dataset.inboxToken || '';
-    var inboxUrl = piBase + '/client/' + clientId + '/inbox?t=' + encodeURIComponent(inboxToken);
-
     navBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         showView(btn.dataset.view);
         if (btn.dataset.view === 'clientes' && !clientesCargados) cargarClientes();
-        if (btn.dataset.view === 'conversaciones' && !inboxLoaded) {
-          var iframe = document.getElementById('inbox-iframe');
-          if (iframe) { iframe.src = inboxUrl; inboxLoaded = true; }
-        }
       });
     });
 
-    showView(localStorage.getItem(viewStorageKey) || localStorage.getItem('crm-view') || 'dashboard');
+    // Si la ultima vista guardada ya no existe (se quito la de Chats), no dejar
+    // el portal en blanco: volver al dashboard.
+    (function () {
+      var guardada = localStorage.getItem(viewStorageKey) || localStorage.getItem('crm-view') || 'dashboard';
+      if (guardada === 'conversaciones') { guardada = 'dashboard'; localStorage.removeItem(viewStorageKey); }
+      showView(guardada);
+    })();
+
+    // ── Interruptor "Lara responde" (siempre visible en el menu lateral) ──
+    var botToggle = document.getElementById('crm-bot-toggle');
+    var botHint = document.getElementById('crm-bot-hint');
+    var botAuto = botAutoInicial !== false;
+
+    function pintarBotAuto() {
+      if (!botToggle) return;
+      botToggle.setAttribute('aria-checked', String(botAuto));
+      botToggle.classList.toggle('crm-bot-toggle-off', !botAuto);
+      if (botHint) {
+        botHint.textContent = botAuto ? 'Respondiendo automáticamente' : 'Apagada: atiendes tú a mano';
+      }
+    }
+
+    if (botToggle) {
+      pintarBotAuto();
+      botToggle.addEventListener('click', async function () {
+        botAuto = !botAuto;
+        pintarBotAuto();
+        botToggle.disabled = true;
+        try {
+          var rBot = await fetch('/portal-api/update-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId: clientId, config: { bot_auto: botAuto } }),
+          });
+          if (!rBot.ok) throw new Error('http ' + rBot.status);
+          showToast(botAuto ? 'Lara vuelve a responder automáticamente' : 'Lara ya no responde: atiendes tú a mano');
+        } catch (eBot) {
+          // Si no se pudo guardar, volver al estado anterior: un interruptor
+          // que miente es peor que no tenerlo.
+          botAuto = !botAuto;
+          pintarBotAuto();
+          showToast('No se pudo guardar el cambio. Inténtalo de nuevo.');
+        } finally {
+          botToggle.disabled = false;
+        }
+      });
+    }
 
     // ── Toast ─────────────────────────────────────────────────────────
     var toast = document.getElementById('portal-toast');
@@ -3360,6 +3391,67 @@ const weekdayLabels: [string, string][] = [
     }
 
     .crm-support-link:hover { color: var(--crm-accent); }
+
+    /* Interruptor "Lara responde" — siempre visible en el menu lateral */
+    .crm-bot-switch {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--crm-border, rgba(255, 255, 255, 0.08));
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .crm-bot-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+    }
+    .crm-bot-toggle-track {
+      width: 38px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--crm-accent, #4ecdc4);
+      position: relative;
+      flex: none;
+      transition: background 0.2s ease;
+      display: inline-block;
+    }
+    .crm-bot-toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s ease;
+    }
+    .crm-bot-toggle-off .crm-bot-toggle-track {
+      background: #64748b;
+    }
+    .crm-bot-toggle-off .crm-bot-toggle-knob {
+      transform: translateX(0);
+    }
+    .crm-bot-toggle[aria-checked="true"] .crm-bot-toggle-knob {
+      transform: translateX(16px);
+    }
+    .crm-bot-toggle:disabled { opacity: 0.6; cursor: wait; }
+    .crm-bot-toggle-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--crm-text, inherit);
+    }
+    .crm-bot-hint {
+      font-size: 11px;
+      color: var(--crm-muted);
+      line-height: 1.3;
+    }
 
     /* ── Mobile overlay + burger ────────────────────────────────────── */
     .crm-overlay {

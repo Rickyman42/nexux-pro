@@ -24,6 +24,8 @@ export interface ClientData {
   plan: 'starter' | 'pro' | 'total' | 'recepcionista' | 'equipo';
   active: boolean;
   botStatus: 'connected' | 'disconnected' | 'pending_qr';
+  /** Interruptor "Lara responde" del portal: apagado = el bot no responde. */
+  botAuto?: boolean;
   qrPngBase64?: string;
   nextAppointments: Appointment[];
   /** Lo que ha reservado el BOT este mes, con el precio real de cada servicio.
@@ -71,6 +73,8 @@ export interface ClientConfig {
   schedule?: Record<string, { open: string; close: string } | null>;
   services?: unknown;
   botName?: string;
+  /** Interruptor "Lara responde": true = responde sola, false = atiende el dueño a mano. */
+  bot_auto?: boolean;
   channels?: {
     whatsapp?: {
       provider?: 'baileys' | 'twilio';
