@@ -1602,6 +1602,26 @@ const weekdayLabels: [string, string][] = [
       return String(t || '').replace(/(\d{3})(?=\d)/g, '$1 ').trim();
     }
 
+    var PALETA_AVATAR = ['#2A9D97', '#C2683F', '#5C6BC0', '#8E6BA8', '#4A8F5B', '#B5804A', '#C05B8A', '#3E7CB1'];
+
+    function colorAvatar(nombre) {
+      var suma = 0;
+      for (var i = 0; i < (nombre || '').length; i++) suma += nombre.charCodeAt(i);
+      return PALETA_AVATAR[suma % PALETA_AVATAR.length];
+    }
+
+    function inicial(nombre) {
+      return ((nombre || '').trim().charAt(0) || '?').toUpperCase();
+    }
+
+    function fechaHoraCorta(iso) {
+      if (!iso) return null;
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return null;
+      return d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
+        + ' · ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    }
+
     function renderClientes() {
       var lista = document.getElementById('cli-lista');
       if (!lista) return;
@@ -1623,18 +1643,29 @@ const weekdayLabels: [string, string][] = [
         return;
       }
 
-      lista.innerHTML = '<div class="crm-table-wrap"><table class="crm-table">'
-        + '<thead><tr><th>Cliente</th><th>Citas</th><th>Última</th><th>Próxima</th><th>Suele pedir</th></tr></thead><tbody>'
-        + visibles.map(function (c) {
-            return '<tr class="cli-fila" data-tel="' + esc(c.telefono) + '" style="cursor:pointer">'
-              + '<td><strong>' + esc(c.nombre) + '</strong><br><span class="crm-empty">' + esc(telefonoBonito(c.telefono)) + '</span>'
-              + (c.nota ? ' <span title="Tiene nota">📝</span>' : '') + '</td>'
-              + '<td>' + c.citas + (c.canceladas ? ' <span class="crm-empty">(' + c.canceladas + ' canc.)</span>' : '') + '</td>'
-              + '<td>' + esc(fechaCorta(c.ultima)) + '</td>'
-              + '<td>' + (c.proxima ? '<strong>' + esc(fechaCorta(c.proxima)) + '</strong>' : '—') + '</td>'
-              + '<td>' + esc(c.servicio_habitual || '—') + '</td>'
-              + '</tr>';
-          }).join('') + '</tbody></table></div>';
+      lista.innerHTML = visibles.map(function (c) {
+        var proxima = fechaHoraCorta(c.proxima);
+        var chips = '';
+        chips += proxima
+          ? '<span class="cli-chip cli-chip-prox">🗓 Próxima: ' + esc(proxima) + '</span>'
+          : '<span class="cli-chip cli-chip-muted">Sin próxima cita</span>';
+        if (c.servicio_habitual) {
+          chips += '<span class="cli-chip cli-chip-svc">⭐ Suele pedir: ' + esc(c.servicio_habitual) + '</span>';
+        }
+        var telLimpio = String(c.telefono || '').replace(/[^\d+]/g, '');
+        return '<div class="cli-fila" data-tel="' + esc(c.telefono) + '">'
+          + '<div class="cli-avatar" style="background:' + colorAvatar(c.nombre) + '">' + inicial(c.nombre) + '</div>'
+          + '<div class="cli-main">'
+          +   '<div class="cli-nombre">' + esc(c.nombre)
+          +     (c.nota ? ' <span class="cli-nota-ico" title="Tiene nota">📝</span>' : '') + '</div>'
+          +   '<a class="cli-tel" href="tel:' + esc(telLimpio) + '">📞 ' + esc(telefonoBonito(c.telefono)) + '</a>'
+          +   '<div class="cli-stats">' + c.citas + ' cita' + (c.citas === 1 ? '' : 's')
+          +     (c.canceladas ? ' · ' + c.canceladas + ' cancelada' + (c.canceladas === 1 ? '' : 's') : '') + '</div>'
+          + '</div>'
+          + '<div class="cli-chips">' + chips + '</div>'
+          + '<div class="cli-flecha" aria-hidden="true">›</div>'
+          + '</div>';
+      }).join('');
 
       lista.querySelectorAll('.cli-fila').forEach(function (fila) {
         fila.addEventListener('click', function () { abrirFicha(fila.dataset.tel); });
@@ -1654,24 +1685,43 @@ const weekdayLabels: [string, string][] = [
           return;
         }
         var c = data.cliente;
-        caja.innerHTML = '<div class="crm-view-hdr"><h2 class="crm-view-title">' + esc(c.nombre) + '</h2>'
-          + '<button type="button" class="crm-btn-ghost" id="cli-cerrar">Cerrar</button></div>'
-          + '<p class="crm-empty">' + esc(telefonoBonito(c.telefono)) + ' · ' + c.citas + ' citas'
-          + (c.profesional_habitual ? ' · suele atenderle ' + esc(c.profesional_habitual) : '') + '</p>'
-          + '<label class="crm-team-help" for="cli-nota">Nota</label>'
-          + '<textarea id="cli-nota" class="crm-input" rows="2" placeholder="Lo que convenga recordar de esta persona">' + esc(c.nota || '') + '</textarea>'
-          + '<label class="crm-team-help" for="cli-pref">Preferencias</label>'
-          + '<textarea id="cli-pref" class="crm-input" rows="2" placeholder="Cómo le gusta que le atiendan">' + esc(c.preferencias || '') + '</textarea>'
+        var telLimpio = String(c.telefono || '').replace(/[^\d+]/g, '');
+        var proxima = fechaHoraCorta(c.proxima);
+        var chipsFicha = '<span class="cli-chip cli-chip-prox">🗓 Próxima: ' + (proxima ? esc(proxima) : '—') + '</span>';
+        if (c.servicio_habitual) chipsFicha += '<span class="cli-chip cli-chip-svc">⭐ Suele pedir: ' + esc(c.servicio_habitual) + '</span>';
+        if (c.profesional_habitual) chipsFicha += '<span class="cli-chip">👤 ' + esc(c.profesional_habitual) + '</span>';
+        chipsFicha += '<span class="cli-chip">📅 ' + c.citas + ' cita' + (c.citas === 1 ? '' : 's') + (c.canceladas ? ' · ' + c.canceladas + ' canc.' : '') + '</span>';
+
+        var historialHtml = (c.historial && c.historial.length)
+          ? c.historial.map(function (h) {
+              return '<div class="cli-hist-row">'
+                + '<span class="cli-hist-fecha">' + esc(fechaCorta(h.datetime)) + '</span>'
+                + '<span class="cli-hist-serv">' + esc(h.servicio || '—') + '</span>'
+                + '<span class="cli-hist-pro">' + esc(h.profesional || '') + '</span>'
+                + (h.estado === 'cancelled' ? '<span class="cli-hist-canc">cancelada</span>' : '<span class="cli-hist-ok">✔</span>')
+                + '</div>';
+            }).join('')
+          : '<p class="crm-empty">Sin citas todavía.</p>';
+
+        caja.innerHTML = '<div class="cli-ficha-head">'
+          + '<div class="cli-avatar cli-avatar-lg" style="background:' + colorAvatar(c.nombre) + '">' + inicial(c.nombre) + '</div>'
+          + '<div class="cli-ficha-id">'
+          +   '<h2 class="crm-view-title">' + esc(c.nombre) + '</h2>'
+          +   '<a class="cli-tel" href="tel:' + esc(telLimpio) + '">📞 ' + esc(telefonoBonito(c.telefono)) + ' — llamar</a>'
+          + '</div>'
+          + '<button type="button" class="crm-btn-ghost" id="cli-cerrar">Cerrar</button>'
+          + '</div>'
+          + '<div class="cli-ficha-chips">' + chipsFicha + '</div>'
+          + '<div class="cli-ficha-grid">'
+          +   '<div><label class="crm-team-help" for="cli-nota">Nota</label>'
+          +     '<textarea id="cli-nota" class="crm-input" rows="3" placeholder="Lo que convenga recordar de esta persona">' + esc(c.nota || '') + '</textarea></div>'
+          +   '<div><label class="crm-team-help" for="cli-pref">Preferencias</label>'
+          +     '<textarea id="cli-pref" class="crm-input" rows="3" placeholder="Cómo le gusta que le atiendan">' + esc(c.preferencias || '') + '</textarea></div>'
+          + '</div>'
           + '<div class="crm-team-add-row"><button type="button" class="crm-btn-primary" id="cli-guardar">Guardar</button>'
           + '<span id="cli-msg" class="crm-empty"></span></div>'
           + '<h3 class="crm-team-help" style="margin-top:18px">Historial</h3>'
-          + '<div class="crm-table-wrap"><table class="crm-table"><tbody>'
-          + (c.historial || []).map(function (h) {
-              return '<tr><td>' + esc(fechaCorta(h.datetime)) + '</td>'
-                + '<td>' + esc(h.servicio || '—') + '</td>'
-                + '<td>' + esc(h.profesional || '—') + '</td>'
-                + '<td>' + (h.estado === 'cancelled' ? '<span class="crm-empty">cancelada</span>' : '') + '</td></tr>';
-            }).join('') + '</tbody></table></div>';
+          + historialHtml;
 
         document.getElementById('cli-cerrar').addEventListener('click', function () {
           caja.classList.add('crm-hidden');
@@ -3455,6 +3505,130 @@ const weekdayLabels: [string, string][] = [
       line-height: 1.3;
     }
     .crm-bot-hint-off { color: #dc2626; font-weight: 600; }
+
+    /* ── Clientes: tarjetas ── */
+    .cli-fila {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 0.85rem;
+      border: 1px solid var(--crm-border, rgba(255, 255, 255, 0.07));
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+      background: transparent;
+    }
+    .cli-fila:hover {
+      border-color: var(--crm-accent, #4ecdc4);
+      background: rgba(78, 205, 196, 0.06);
+    }
+    .cli-fila:active { transform: scale(0.995); }
+
+    .cli-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      flex: none;
+      letter-spacing: 0.02em;
+    }
+    .cli-avatar-lg { width: 52px; height: 52px; font-size: 20px; }
+
+    .cli-main { flex: 1; min-width: 0; }
+    .cli-nombre { font-weight: 600; font-size: 14px; color: var(--crm-text, inherit); }
+    .cli-nota-ico { font-size: 12px; }
+    .cli-tel {
+      display: inline-block;
+      font-size: 12.5px;
+      color: var(--crm-muted);
+      text-decoration: none;
+    }
+    .cli-tel:hover { color: var(--crm-accent); text-decoration: underline; }
+    .cli-stats { font-size: 11.5px; color: var(--crm-muted); margin-top: 2px; }
+
+    .cli-chips {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3rem;
+      flex: none;
+      max-width: 45%;
+    }
+    .cli-chip {
+      font-size: 11.5px;
+      padding: 0.22rem 0.55rem;
+      border-radius: 999px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--crm-text, inherit);
+      border: 1px solid var(--crm-border, rgba(255, 255, 255, 0.08));
+    }
+    .cli-chip-prox {
+      background: rgba(78, 205, 196, 0.12);
+      border-color: rgba(78, 205, 196, 0.35);
+      color: var(--crm-accent, #4ecdc4);
+      font-weight: 600;
+    }
+    .cli-chip-svc {
+      background: rgba(240, 177, 88, 0.12);
+      border-color: rgba(240, 177, 88, 0.35);
+      color: #f0b158;
+    }
+    .cli-chip-muted { color: var(--crm-muted); }
+
+    .cli-flecha { font-size: 20px; color: var(--crm-muted); flex: none; }
+
+    /* Ficha */
+    .cli-ficha-head {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.75rem;
+    }
+    .cli-ficha-id { flex: 1; min-width: 0; }
+    .cli-ficha-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .cli-ficha-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-bottom: 0.6rem;
+    }
+    @media (max-width: 640px) { .cli-ficha-grid { grid-template-columns: 1fr; } }
+
+    .cli-hist-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid var(--crm-border, rgba(255, 255, 255, 0.06));
+      font-size: 13px;
+    }
+    .cli-hist-fecha { flex: none; color: var(--crm-muted); font-size: 12px; }
+    .cli-hist-serv { flex: 1; font-weight: 500; }
+    .cli-hist-pro { flex: none; color: var(--crm-muted); font-size: 12px; }
+    .cli-hist-canc {
+      flex: none;
+      font-size: 11px;
+      color: #f0a1a1;
+      border: 1px solid rgba(240, 161, 161, 0.4);
+      padding: 0.05rem 0.4rem;
+      border-radius: 999px;
+    }
+    .cli-hist-ok { flex: none; color: var(--crm-accent, #4ecdc4); }
 
     /* ── Mobile overlay + burger ────────────────────────────────────── */
     .crm-overlay {
