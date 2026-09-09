@@ -1155,3 +1155,80 @@ reproduce.
   arreglo con las reglas ya compiladas: fila en `flex`, avatar de 38px redondo, y en movil los chips
   en su linea.
 - **Queda por comprobar en produccion despues del push**, que autoriza Ricardo.
+
+# 2026-09-09 · El interruptor de Lara solo apagaba WhatsApp
+
+Ricardo pidio revisarlo al 100%: *"no quiero que de error y no haga su funcion, creo que es
+importante ya que incluso dara seguridad a los clientes"*. Tenia razon en preocuparse.
+
+## Lo que estaba pasando
+
+El interruptor se puso solo en WhatsApp. **Telegram y las llamadas no lo miraban.** El dueño lo
+ponia en rojo, leia "Lara desconectada", y Lara seguia atendiendo por Telegram y seguia
+escribiendo sola a quien llamaba por telefono.
+
+Y Telegram no es un canal secundario: es el que el propio bot de ventas recomienda primero, porque
+WhatsApp puede bloquear numeros que automatizan.
+
+Un interruptor que no apaga es peor que no tenerlo: el dueño cree que atiende el y no atiende
+nadie, o contestan los dos a la vez delante del cliente.
+
+## Telegram no se arregla igual que WhatsApp
+
+En WhatsApp basta con callarse: el mensaje le llega al movil del dueño, lo ve sin leer y contesta
+el. **En Telegram el bot es de Nexux y el dueño no puede responder a una clienta por ese canal**
+(no hay modo humano para clientas de salon; el que existe es para los leads de NOA). Si Lara se
+callara sin mas, la clienta escribiria al vacio y el dueño no se enteraria: apagar el interruptor
+seria una trampa.
+
+Asi que con el interruptor apagado, en Telegram: Lara **no atiende** (no agenda, no decide, no
+sigue el guion), a la clienta se le dice que le atiende una persona, y **al dueño le llega el
+mensaje** con quien escribe y que dice, para que le escriba el.
+
+## Las llamadas ademas mentian
+
+La locucion decia *"Lara, nuestra asistente, te esta escribiendo por WhatsApp en este momento"* —
+con el interruptor apagado no le iba a escribir nadie. Ahora dice que se ha anotado la llamada y
+que le contestan en cuanto puedan. Al dueño le llega el aviso igual, y mas claro: **esa llamada
+solo la recupera el**.
+
+## Lo que destapo el sabotaje
+
+**La puerta principal de WhatsApp no la vigilaba ningun test.** Se podia borrar la linea y todo
+seguia en verde. Y es la que mas importa de las tres: sin ella el bot vuelve a **marcar el mensaje
+como leido**, asi que el dueño pierde el "no leido" en su movil, que es como se entera de que tiene
+a alguien esperando.
+
+No se podia probar porque vivia dentro de `startBot`, que necesita Baileys, la sesion y la red. Se
+saca a `procesaEntrantes` y ya se le puede hacer pasar un mensaje con un socket de mentira.
+
+De paso, **una copia menos** de "avisar por Telegram": `twilio.js` tenia la suya con `catch` vacio,
+o sea que un aviso de llamada perdida que no saliera no lo sabia nadie.
+
+## Verificacion
+
+- **12 pruebas nuevas** que hacen pasar mensajes por los manejadores **de verdad** (el bot de
+  grammY contra un Telegram de mentira, y la entrada real de las llamadas). Comprobar que la linea
+  esta escrita no prueba que se ejecute.
+- **9 sabotajes, los 9 se cazan.** Uno de los que escribi no rompia nada (metia un comentario
+  detras de un `continue`): un sabotaje que no rompe no prueba nada, se rehizo.
+- **421 pruebas en verde.** Verificador **9/9**.
+- **En vivo, contra el servicio real**: apagar deja `active: true` (apagar a Lara **no** es dar de
+  baja), `/status` lo refleja, con un token invalido devuelve 401 sin tocar nada, y el boton del
+  portal pasa a rojo con "Lara desconectada" **sin un solo error en consola**. Verificado tambien
+  que el cambio se guarda en la Pi, no solo en pantalla. La cuenta quedo **encendida**, como estaba.
+
+## Un fallo mio, dicho tal cual
+
+La prueba en vivo de esta madrugada **dejo un bot de WhatsApp corriendo**. `/provision` arranca uno
+para las cuentas baileys, mi limpieza borraba la carpeta y el bot seguia vivo recreandola. Es el
+mismo patron del incidente del 8-sept. **No llego a pasar nada**: `auth/` estaba vacio, sin
+`creds.json`, o sea que nunca se escaneo ningun QR y no estaba enganchado a ningun numero. Borrado,
+y comprobado que no vuelve a aparecer. El script de prueba se corrigio: ahora la cuenta se crea con
+un canal que no arranca Baileys, y avisa si la carpeta reaparece.
+
+## Lo que NO se ha tocado, a proposito
+
+Los **recordatorios de citas** (24h y 1h antes) siguen saliendo con el interruptor apagado. El
+interruptor dice "Lara responde": apagar las respuestas no deberia cancelar los recordatorios de
+citas que el cliente ya tiene confirmadas. **Si Ricardo lo quiere de otra forma, se cambia.**
