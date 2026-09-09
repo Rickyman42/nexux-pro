@@ -1716,7 +1716,13 @@ const weekdayLabels: [string, string][] = [
         var c = data.cliente;
         var telLimpio = String(c.telefono || '').replace(/[^\d+]/g, '');
         var proxima = fechaHoraCorta(c.proxima);
-        var chipsFicha = '<span class="cli-chip cli-chip-prox">🗓 Próxima: ' + (proxima ? esc(proxima) : '—') + '</span>';
+        var chipsFicha = proxima
+          ? '<span class="cli-chip cli-chip-prox">🗓 Próxima: ' + esc(proxima) + '</span>'
+          : (c.ultima
+            ? '<span class="cli-chip cli-chip-muted">Sin próxima cita</span>'
+            : '<span class="cli-chip cli-chip-muted">Aún no ha venido</span>');
+        var desdeFicha = haceCuanto(c.ultima);
+        if (desdeFicha) chipsFicha += '<span class="cli-chip cli-chip-ultima">🕘 ' + esc(desdeFicha) + '</span>';
         if (c.servicio_habitual) chipsFicha += '<span class="cli-chip cli-chip-svc">⭐ Suele pedir: ' + esc(c.servicio_habitual) + '</span>';
         if (c.profesional_habitual) chipsFicha += '<span class="cli-chip">👤 ' + esc(c.profesional_habitual) + '</span>';
         chipsFicha += '<span class="cli-chip">📅 ' + c.citas + ' cita' + (c.citas === 1 ? '' : 's') + (c.canceladas ? ' · ' + c.canceladas + ' canc.' : '') + '</span>';
