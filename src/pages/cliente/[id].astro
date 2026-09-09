@@ -1111,7 +1111,8 @@ const weekdayLabels: [string, string][] = [
       botToggle.setAttribute('aria-checked', String(botAuto));
       botToggle.classList.toggle('crm-bot-toggle-off', !botAuto);
       if (botHint) {
-        botHint.textContent = botAuto ? 'Respondiendo automáticamente' : 'Apagada: atiendes tú a mano';
+        botHint.classList.toggle('crm-bot-hint-off', !botAuto);
+        botHint.textContent = botAuto ? 'Respondiendo automáticamente' : 'Lara desconectada';
       }
     }
 
@@ -3433,7 +3434,7 @@ const weekdayLabels: [string, string][] = [
       transition: transform 0.2s ease;
     }
     .crm-bot-toggle-off .crm-bot-toggle-track {
-      background: #64748b;
+      background: #dc2626;
     }
     .crm-bot-toggle-off .crm-bot-toggle-knob {
       transform: translateX(0);
@@ -3447,11 +3448,13 @@ const weekdayLabels: [string, string][] = [
       font-weight: 600;
       color: var(--crm-text, inherit);
     }
+    .crm-bot-toggle-off .crm-bot-toggle-label { color: #dc2626; }
     .crm-bot-hint {
       font-size: 11px;
       color: var(--crm-muted);
       line-height: 1.3;
     }
+    .crm-bot-hint-off { color: #dc2626; font-weight: 600; }
 
     /* ── Mobile overlay + burger ────────────────────────────────────── */
     .crm-overlay {
