@@ -999,3 +999,159 @@ compra de prueba con `cus_VCHnSFwP5PjSkz` — la tarjeta real.
 **Importa mas de lo que parece:** con la cuenta inactiva, el bot **no contesta** aunque conecte
 WhatsApp (`lib/telegram.js` y el resto comprueban `config.active`). Conectar el canal no lo va a
 arreglar. **Decision de Ricardo:** o se reactiva esa cuenta a mano, o se prueba con otra.
+2026-09-08 | verificador | interruptor "Lara responde" en menu lateral + fuera pestana Chats | Pi: test bot-auto 3/3 (sabotaje muerde), /status botAuto:true; web: build OK, commits locales | OK
+
+# 2026-09-09 · Baja a fin de periodo, texto del bot, y devolverle su cuenta al que vuelve
+
+Tres tareas de Ricardo. **Sin push: el commit esta hecho en local (`d8beb3e`) y espera su
+verificacion.** El codigo de la Pi ya esta vivo, porque la Pi corre desde el propio arbol de
+trabajo y se ha reiniciado el servicio.
+
+## El problema de dinero que habia debajo
+
+Cancelar **no devuelve nada** — en esta cuenta de Stripe no hay ni un reembolso, y la factura de
+29 € del test sigue pagada y sin devolver. Y la baja se hacia con `cancel_at_period_end: false`,
+o sea **hoy mismo**. Las dos cosas juntas significan quitarle a alguien un mes que ya ha pagado
+sin darle nada a cambio. El resultado previsible es un cliente pidiendo su dinero.
+
+## Tarea 1 — la baja se programa, no corta
+
+`scripts/dar-de-baja.mjs` cancela ahora con `cancel_at_period_end: true`. El cliente sigue usando
+Lara hasta el ultimo dia que ya pago, que es **exactamente lo que le promete el correo** que
+recibe al cancelar. `--ahora` sigue existiendo para cuando haga falta cortar de verdad, y avisa
+por escrito de que Stripe no devuelve nada por su cuenta.
+
+El webhook (`lib/stripe-webhook.js`) aprendio a distinguir las dos cosas: al **programarse** la
+baja, la cuenta **sigue encendida** y se anota `cancelaAlFinal` + hasta cuando; se avisa a Ricardo
+y al cliente **una sola vez**, ahi, que es cuando lo pide. Cuando de verdad se acaba el periodo,
+entonces si se apaga, y **no se le repite el correo**. Si se echa atras, se limpia todo.
+
+## Tarea 2 — el bot ya no promete un boton que no existe
+
+`lib/bot-prompt.js` decia *"Sin permanencia: cancelan cuando quieran, con un clic"*. Ese clic se
+quito a proposito (la baja escala a Ricardo). El bot estaba vendiendo algo que el cliente no puede
+hacer: cuando lo intentara, la culpa seria de esa frase. Ahora manda a soporte y **sigue dejando
+claro que no hay permanencia**, que es lo que en realidad esta preguntando quien pregunta esto.
+
+## Tarea 3 — al que vuelve se le devuelve SU cuenta
+
+Quien cancelaba y volvia a pagar entraba por `/provision` y se le creaba **una cuenta nueva vacia**:
+sus citas, sus clientes y su equipo se quedaban huerfanos en la vieja. Mientras tanto, el correo de
+baja le prometia poder reactivar cuando quisiera.
+
+Ahora, si las senales de la compra coinciden con una cuenta suya apagada por cancelacion, se
+**reactiva la misma carpeta**: mismas citas, mismos clientes, mismo enlace de acceso. Se le ponen
+los limites del plan que paga **ahora** (si se fue con el de 29 y vuelve con el de 79, tiene lo de
+79) y se borran los restos de la baja anterior.
+
+No choca con la puerta giratoria: **solo se reactiva a quien paga**. Al que vuelve pidiendo cuenta
+gratis lo sigue parando la puerta giratoria unas lineas antes, que es justo el mes que se intenta
+no regalar. Y hace falta una senal **fuerte** (WhatsApp, Telegram o email): compartir la wifi no le
+da a nadie la cuenta de otro.
+
+## Un fallo que solo aparecio al probarlo en vivo
+
+La primera vez que se probo el caso real, la reactivacion hacia lo suyo **pero el alta devolvia un
+500**: `Cannot read properties of undefined (reading 'whatsapp')`. Los canales no los pone el
+normalizador sino **la plantilla del plan**, y la reactivacion solo cogia de la plantilla los
+limites y las funciones. Una cuenta a la que le falte ese bloque — hoy hay una asi, `demo` —
+dejaba al cliente que **acababa de pagar** viendo un error, aunque su cuenta ya estuviera
+reactivada por dentro. Corregido: se rellena lo que falte sin tocar lo que ya tenia conectado (su
+sesion de WhatsApp y su chat de avisos se quedan como estaban).
+
+Los tests no lo cazaron porque ninguno comprobaba la **forma** de la cuenta reactivada. Ahora si.
+
+## Como se probo, y con que
+
+- **409 pruebas en verde** (`node --test 'test/*.test.mjs'`).
+- **14 sabotajes, los 14 se cazan** (`scripts/sabotaje-cancelacion.py`): se rompe el codigo a
+  proposito una vez por sabotaje y se exige que la prueba correspondiente falle.
+- **Caso real contra el servicio vivo** (`scripts/prueba-en-vivo-baja.sh`): no toca Stripe; manda
+  al webhook los mismos eventos firmados con el secreto de verdad. Verificado que al programar la
+  baja la cuenta **sigue en `active: true`**, que al acabarse el periodo pasa a `false`, y que al
+  volver a pagar responde con **el clientId de siempre**, conservando la cita y el token, **sin
+  crear ninguna carpeta nueva**. Borra todo lo que crea, carpeta e indice.
+- Verificador: **16/16 OK**.
+
+Tres costuras nuevas para poder probar sin mandar correos ni mover dinero: `BREVO_API_URL` y
+`TELEGRAM_API_URL` en el webhook, `STRIPE_API_BASE` en el CLI (la clave de esta Pi es `sk_live`:
+sin la costura, probar la baja exigiria cancelar una suscripcion de verdad). En produccion no
+existen y todo va como siempre.
+
+## Lo que queda encima de la mesa para Ricardo
+
+El prompt del bot **sigue prometiendo** *"30 dias de garantia total: si Lara no les trae mas citas
+de las que cuesta, se les devuelve cada euro"*. No hay ningun mecanismo de reembolso y **nunca se
+ha devuelto un euro**. Es una promesa comercial viva, dicha a cada cliente potencial. No se ha
+tocado: es decision suya.
+
+# 2026-09-09 · La seccion Clientes no se veia: ni una regla de estilo le llegaba
+
+Ricardo pidio revisar el rediseño de Clientes y que **funcionara de verdad**, no solo que fuera
+bonito. Lo que habia era peor de lo que parecia. **Sin push: commit local, pendiente de su OK.**
+
+## Lo que estaba pasando
+
+El rediseño se subio a produccion **sin aplicar ni una sola regla**. En la captura de Ricardo se ve
+el sintoma: los avatares salen como barras de color a todo lo ancho y el texto amontonado debajo.
+
+La causa: Astro reescribe las reglas del `<style>` normal como `.cli-fila[data-astro-cid-2vbugmdw]`,
+y ese atributo **solo se lo pone a lo que esta escrito en la plantilla**. Las tarjetas de Clientes
+las pinta el JavaScript con `innerHTML`, asi que no lo llevan y las reglas no les alcanzan.
+
+Comprobado en el portal de verdad, no deducido: la fila tiene solo los atributos `class` y
+`data-tel`, con `display: block` y el avatar a `0px`; el interruptor del menu lateral (que si esta
+en la plantilla) tiene su `data-astro-cid` y mide sus 38px.
+
+El build pasaba, la pagina cargaba y nadie se entero hasta verlo. **Un `pnpm build` en verde no
+dice nada sobre si los estilos llegan a su elemento.**
+
+## Que se ha arreglado
+
+1. **Las 25 reglas de Clientes**, al bloque `<style is:global>`, que es el que si alcanza a lo que
+   pinta el JavaScript. El resto del CRM (Citas, Configuracion) ya las tenia ahi y por eso se ve
+   bien; estas se pusieron sin querer en el otro.
+2. **Otros dos sitios con el mismo fallo**, encontrados por el test nuevo, no a ojo: los botones de
+   borrar de Servicios/Equipo/Recursos (`.crm-btn-del`, salian sin color ni tamaño) y la etiqueta
+   "Confirmada" de la tabla de citas (`.chip-green`).
+3. **Movil.** Estaba roto: el telefono se partia en dos lineas y los chips peleaban por el sitio con
+   el nombre. Ahora los chips bajan a su propia linea y el telefono no se parte.
+4. **La regla de movil estaba mal puesta y no hacia nada.** Al mirarlo en el navegador se seguia
+   viendo amontonado con la regla ya escrita: un `@media` no añade especificidad, y estaba ANTES de
+   las reglas normales, que la pisaban. Movida al final del bloque. **Esto solo se ve mirandolo.**
+5. **"Cuando vino por ultima vez" se calculaba y no se pintaba.** La tabla vieja tenia esa columna y
+   el rediseño la perdio. Es el dato con el que un negocio recupera a alguien. Vuelve en cristiano:
+   "Vino hace 3 semanas".
+6. **Quien no ha venido nunca ya no dice lo mismo que quien se fue.** Antes los dos ponian "Sin
+   proxima cita"; ahora el que no ha pisado el negocio dice "Aun no ha venido".
+7. **Pulsar el telefono llama y ya esta.** El clic subia hasta la tarjeta y encima se abria la ficha.
+
+## Lo que NO estaba mal
+
+Los datos. Se comprobo sembrando citas reales de una clienta con el telefono escrito de tres formas
+distintas (`600999001`, `+34 600 999 001`, `34600999001`): salen **3 visitas** (la cancelada no
+cuenta, a proposito), su ultima visita, su proxima cita, "suele pedir: Corte", quien la atiende, y
+sale la primera de la lista. El historial de la ficha trae las 4 citas con su estado.
+
+Lo que Ricardo veia en ceros era por sus datos de prueba, que son casi todo cancelaciones. Su
+sospecha era correcta.
+
+## La vacuna
+
+`test/estilos-del-portal.test.mjs`: compara lo que pinta el JavaScript con donde estan sus reglas y
+falla si alguna se queda en el bloque que no le llega. Es lo que encontro los otros dos sitios rotos.
+`scripts/sabotaje-estilos-portal.py` devuelve las reglas al bloque equivocado y exige que el test lo
+cace: **2 de 2**.
+
+Nota de como se hizo el sabotaje: mover UNA regla no bastaba, porque quedaban otras (`.cli-fila:hover`)
+en el bloque bueno y el test se callaba. La regresion de verdad se llevo el bloque entero, y asi se
+reproduce.
+
+## Verificacion
+
+- 22 pruebas del repo en verde, 3 de ellas nuevas.
+- 2 sabotajes, los 2 se cazan.
+- Comprobado en el navegador contra el portal real (escritorio y movil de 375px), simulando el
+  arreglo con las reglas ya compiladas: fila en `flex`, avatar de 38px redondo, y en movil los chips
+  en su linea.
+- **Queda por comprobar en produccion despues del push**, que autoriza Ricardo.

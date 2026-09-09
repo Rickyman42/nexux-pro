@@ -1614,6 +1614,22 @@ const weekdayLabels: [string, string][] = [
       return ((nombre || '').trim().charAt(0) || '?').toUpperCase();
     }
 
+    /** "hoy", "ayer", "hace 3 semanas": como lo diria una persona. */
+    function haceCuanto(iso) {
+      if (!iso) return null;
+      var t = Date.parse(iso);
+      if (!t) return null;
+      var dias = Math.floor((Date.now() - t) / 86400000);
+      if (dias < 0) return null;
+      if (dias === 0) return 'Vino hoy';
+      if (dias === 1) return 'Vino ayer';
+      if (dias < 14) return 'Vino hace ' + dias + ' días';
+      if (dias < 60) return 'Vino hace ' + Math.round(dias / 7) + ' semanas';
+      var meses = Math.round(dias / 30);
+      if (meses < 24) return 'Vino hace ' + meses + ' meses';
+      return 'Vino hace ' + Math.floor(meses / 12) + ' años';
+    }
+
     function fechaHoraCorta(iso) {
       if (!iso) return null;
       var d = new Date(iso);
@@ -1648,7 +1664,15 @@ const weekdayLabels: [string, string][] = [
         var chips = '';
         chips += proxima
           ? '<span class="cli-chip cli-chip-prox">🗓 Próxima: ' + esc(proxima) + '</span>'
-          : '<span class="cli-chip cli-chip-muted">Sin próxima cita</span>';
+          : (c.ultima
+            // Distinguir al que se fue del que aun no ha venido: no es lo mismo
+            // para quien mira esta lista buscando a quien llamar.
+            ? '<span class="cli-chip cli-chip-muted">Sin próxima cita</span>'
+            : '<span class="cli-chip cli-chip-muted">Aún no ha venido</span>');
+        // La ultima visita se calculaba y no se pintaba en ningun sitio. Es el
+        // dato con el que se recupera a alguien.
+        var desde = haceCuanto(c.ultima);
+        if (desde) chips += '<span class="cli-chip cli-chip-ultima">🕘 ' + esc(desde) + '</span>';
         if (c.servicio_habitual) {
           chips += '<span class="cli-chip cli-chip-svc">⭐ Suele pedir: ' + esc(c.servicio_habitual) + '</span>';
         }
@@ -1669,6 +1693,11 @@ const weekdayLabels: [string, string][] = [
 
       lista.querySelectorAll('.cli-fila').forEach(function (fila) {
         fila.addEventListener('click', function () { abrirFicha(fila.dataset.tel); });
+      });
+      // Pulsar el telefono llama, y nada mas: sin esto el clic sube hasta la
+      // tarjeta y encima se abre la ficha.
+      lista.querySelectorAll('.cli-tel').forEach(function (tel) {
+        tel.addEventListener('click', function (e) { e.stopPropagation(); });
       });
     }
 
@@ -3505,131 +3534,6 @@ const weekdayLabels: [string, string][] = [
       line-height: 1.3;
     }
     .crm-bot-hint-off { color: #dc2626; font-weight: 600; }
-
-    /* ── Clientes: tarjetas ── */
-    .cli-fila {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.7rem 0.85rem;
-      border: 1px solid var(--crm-border, rgba(255, 255, 255, 0.07));
-      border-radius: 12px;
-      margin-bottom: 0.5rem;
-      cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
-      background: transparent;
-    }
-    .cli-fila:hover {
-      border-color: var(--crm-accent, #4ecdc4);
-      background: rgba(78, 205, 196, 0.06);
-    }
-    .cli-fila:active { transform: scale(0.995); }
-
-    .cli-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-weight: 700;
-      font-size: 15px;
-      flex: none;
-      letter-spacing: 0.02em;
-    }
-    .cli-avatar-lg { width: 52px; height: 52px; font-size: 20px; }
-
-    .cli-main { flex: 1; min-width: 0; }
-    .cli-nombre { font-weight: 600; font-size: 14px; color: var(--crm-text, inherit); }
-    .cli-nota-ico { font-size: 12px; }
-    .cli-tel {
-      display: inline-block;
-      font-size: 12.5px;
-      color: var(--crm-muted);
-      text-decoration: none;
-    }
-    .cli-tel:hover { color: var(--crm-accent); text-decoration: underline; }
-    .cli-stats { font-size: 11.5px; color: var(--crm-muted); margin-top: 2px; }
-
-    .cli-chips {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.3rem;
-      flex: none;
-      max-width: 45%;
-    }
-    .cli-chip {
-      font-size: 11.5px;
-      padding: 0.22rem 0.55rem;
-      border-radius: 999px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--crm-text, inherit);
-      border: 1px solid var(--crm-border, rgba(255, 255, 255, 0.08));
-    }
-    .cli-chip-prox {
-      background: rgba(78, 205, 196, 0.12);
-      border-color: rgba(78, 205, 196, 0.35);
-      color: var(--crm-accent, #4ecdc4);
-      font-weight: 600;
-    }
-    .cli-chip-svc {
-      background: rgba(240, 177, 88, 0.12);
-      border-color: rgba(240, 177, 88, 0.35);
-      color: #f0b158;
-    }
-    .cli-chip-muted { color: var(--crm-muted); }
-
-    .cli-flecha { font-size: 20px; color: var(--crm-muted); flex: none; }
-
-    /* Ficha */
-    .cli-ficha-head {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 0.75rem;
-    }
-    .cli-ficha-id { flex: 1; min-width: 0; }
-    .cli-ficha-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-bottom: 1rem;
-    }
-    .cli-ficha-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-      margin-bottom: 0.6rem;
-    }
-    @media (max-width: 640px) { .cli-ficha-grid { grid-template-columns: 1fr; } }
-
-    .cli-hist-row {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0.45rem 0.6rem;
-      border-bottom: 1px solid var(--crm-border, rgba(255, 255, 255, 0.06));
-      font-size: 13px;
-    }
-    .cli-hist-fecha { flex: none; color: var(--crm-muted); font-size: 12px; }
-    .cli-hist-serv { flex: 1; font-weight: 500; }
-    .cli-hist-pro { flex: none; color: var(--crm-muted); font-size: 12px; }
-    .cli-hist-canc {
-      flex: none;
-      font-size: 11px;
-      color: #f0a1a1;
-      border: 1px solid rgba(240, 161, 161, 0.4);
-      padding: 0.05rem 0.4rem;
-      border-radius: 999px;
-    }
-    .cli-hist-ok { flex: none; color: var(--crm-accent, #4ecdc4); }
-
     /* ── Mobile overlay + burger ────────────────────────────────────── */
     .crm-overlay {
       display: none;
@@ -4001,8 +3905,6 @@ const weekdayLabels: [string, string][] = [
       text-transform: uppercase;
     }
 
-    .chip-green { background: rgba(34,197,94,0.12); color: #16a34a; }
-    .crm-dark .chip-green { color: #4ade80; }
     .chip-red { background: rgba(239,68,68,0.1); color: #dc2626; }
     .crm-dark .chip-red { color: #f87171; }
     .chip-yellow { background: rgba(245,158,11,0.12); color: #d97706; }
@@ -4045,17 +3947,6 @@ const weekdayLabels: [string, string][] = [
 
     .crm-btn-ghost:hover { background: var(--crm-nav-hover); border-color: var(--crm-accent); }
 
-    .crm-btn-del {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 0.15rem 0.3rem;
-      opacity: 0.55;
-      transition: opacity 0.14s;
-    }
-
-    .crm-btn-del:hover { opacity: 1; }
 
     /* ── Inputs ─────────────────────────────────────────────────────── */
     .crm-input {
@@ -5211,5 +5102,182 @@ const weekdayLabels: [string, string][] = [
     @media (min-width: 1800px) {
       .crm-main { padding: 2rem 4rem; }
     }
+
+  /* ── Clientes: tarjetas y ficha ──────────────────────────────────
+     Van AQUI, en el bloque global, y no en el <style> de arriba: estas
+     tarjetas las pinta el JavaScript con innerHTML, y a esos elementos
+     Astro no les pone el atributo `data-astro-cid`, asi que las reglas
+     del bloque normal no les llegan. Ya paso una vez: el rediseño
+     entero quedo sin aplicar y se veian barras de color con el texto
+     amontonado. Lo vigila test/estilos-del-portal.test.mjs. */
+  /* ── Clientes: tarjetas ── */
+  .cli-fila {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--crm-border, rgba(255, 255, 255, 0.07));
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+    background: transparent;
+  }
+  .cli-fila:hover {
+    border-color: var(--crm-accent, #4ecdc4);
+    background: rgba(78, 205, 196, 0.06);
+  }
+  .cli-fila:active { transform: scale(0.995); }
+
+  .cli-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    flex: none;
+    letter-spacing: 0.02em;
+  }
+  .cli-avatar-lg { width: 52px; height: 52px; font-size: 20px; }
+
+
+  .cli-main { flex: 1; min-width: 0; }
+  .cli-nombre { font-weight: 600; font-size: 14px; color: var(--crm-text, inherit); }
+  .cli-nota-ico { font-size: 12px; }
+  .cli-tel {
+    display: inline-block;
+    font-size: 12.5px;
+    color: var(--crm-muted);
+    text-decoration: none;
+    /* Un telefono partido en dos lineas no se lee de un vistazo. */
+    white-space: nowrap;
+  }
+  .cli-tel:hover { color: var(--crm-accent); text-decoration: underline; }
+  .cli-stats { font-size: 11.5px; color: var(--crm-muted); margin-top: 2px; }
+
+  .cli-chips {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    flex: none;
+    max-width: 45%;
+  }
+  .cli-chip {
+    font-size: 11.5px;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--crm-text, inherit);
+    border: 1px solid var(--crm-border, rgba(255, 255, 255, 0.08));
+  }
+  .cli-chip-prox {
+    background: rgba(78, 205, 196, 0.12);
+    border-color: rgba(78, 205, 196, 0.35);
+    color: var(--crm-accent, #4ecdc4);
+    font-weight: 600;
+  }
+  .cli-chip-svc {
+    background: rgba(240, 177, 88, 0.12);
+    border-color: rgba(240, 177, 88, 0.35);
+    color: #f0b158;
+  }
+  .cli-chip-muted { color: var(--crm-muted); }
+  .cli-chip-ultima { color: var(--crm-muted); }
+
+  .cli-flecha { font-size: 20px; color: var(--crm-muted); flex: none; }
+
+  /* Ficha */
+  .cli-ficha-head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.75rem;
+  }
+  .cli-ficha-id { flex: 1; min-width: 0; }
+  .cli-ficha-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+  .cli-ficha-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+  @media (max-width: 640px) { .cli-ficha-grid { grid-template-columns: 1fr; } }
+
+  .cli-hist-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid var(--crm-border, rgba(255, 255, 255, 0.06));
+    font-size: 13px;
+  }
+  .cli-hist-fecha { flex: none; color: var(--crm-muted); font-size: 12px; }
+  .cli-hist-serv { flex: 1; font-weight: 500; }
+  .cli-hist-pro { flex: none; color: var(--crm-muted); font-size: 12px; }
+  .cli-hist-canc {
+    flex: none;
+    font-size: 11px;
+    color: #f0a1a1;
+    border: 1px solid rgba(240, 161, 161, 0.4);
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+  }
+  .cli-hist-ok { flex: none; color: var(--crm-accent, #4ecdc4); }
+
+  /* Movil. Va al FINAL a proposito: un @media no añade especificidad, asi que
+     si se pone antes de las reglas normales, esas ganan y no cambia nada. Ya
+     paso: con la regla escrita, en el movil se seguia viendo amontonado.
+     En una pantalla estrecha los chips no caben al lado del nombre. */
+  @media (max-width: 620px) {
+    .cli-fila { flex-wrap: wrap; align-items: flex-start; }
+    .cli-avatar { margin-top: 2px; }
+    .cli-main { flex: 1 1 auto; }
+    .cli-chips {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      max-width: 100%;
+      flex: 1 0 100%;
+      margin-left: calc(38px + 0.75rem);
+      margin-top: 0.35rem;
+    }
+    .cli-flecha { position: absolute; right: 0.85rem; }
+    .cli-fila { position: relative; padding-right: 1.8rem; }
+  }
+
+
+  /* Estos dos los pinta el JavaScript (los botones de borrar de
+     Servicios/Equipo/Recursos, y la etiqueta "Confirmada" de la tabla de
+     citas), asi que sus reglas tienen que estar aqui y no en el <style>
+     de arriba, que no alcanza a lo que se crea con innerHTML. */
+  .chip-green { background: rgba(34,197,94,0.12); color: #16a34a; }
+  .crm-dark .chip-green { color: #4ade80; }
+  .crm-btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0.15rem 0.3rem;
+    opacity: 0.55;
+    transition: opacity 0.14s;
+  }
+
+  .crm-btn-del:hover { opacity: 1; }
+
 </style>
 </Layout>
