@@ -190,9 +190,40 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
       justify-content: flex-end;
     }
     .cookie-btn { padding: 0.55rem 1rem !important; font-size: 0.85rem !important; }
+    /* En movil el aviso ocupaba 258px: un tercio de la pantalla de un telefono,
+       fijo y tapando la zona donde estan los botones de compra. Con el 83% del
+       trafico de la campana entrando desde movil y un 79% yendose sin tocar
+       nada, ese bloque es lo primero que ve y lo primero que estorba.
+       Se compacta SIN quitar informacion ni esconder el rechazo: los dos
+       botones siguen igual de visibles y del mismo tamano, uno al lado del
+       otro en vez de apilados. (medido 13-sep-2026) */
     @media (max-width: 600px) {
-      .cookie-actions { flex-direction: column-reverse; }
-      .cookie-btn { width: 100%; justify-content: center; }
+      .cookie-banner {
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        padding: 0.7rem 0.85rem;
+        gap: 0.55rem;
+        border-radius: 14px;
+      }
+      .cookie-text { font-size: 0.78rem; line-height: 1.35; }
+      /* El titulo deja de robar una linea entera para el solo. */
+      .cookie-text strong { display: inline; margin-bottom: 0; }
+      .cookie-text br { display: none; }
+      .cookie-actions { flex-direction: row; gap: 0.5rem; }
+      /* Mitad y mitad para cada uno: aceptar no puede pesar mas que rechazar,
+         ni al reves. Va con el aviso por delante en el selector porque la regla
+         de arriba (.cookie-btn, linea ~192) lleva !important y si no, gana ella
+         aunque esta venga despues. Comprobado midiendo: sin esto los botones
+         salian de 135 y 118 px. */
+      .cookie-banner .cookie-btn {
+        flex: 1 1 0 !important;
+        width: auto !important;
+        justify-content: center;
+        padding: 0.5rem 0.4rem !important;
+        font-size: 0.78rem !important;
+        white-space: nowrap;
+      }
     }
   </style>
 <script>
