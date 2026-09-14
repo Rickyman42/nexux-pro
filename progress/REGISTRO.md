@@ -1565,3 +1565,51 @@ cero eventos checkout_form_* registrados. Si han quedado unas 7 sesiones de pago
 NO HECHO, a decidir con el dato delante: el carrito abandonado (casilla de promociones +
 after_expiration[recovery] + avisar en checkout.session.expired). Solo merece la pena si resulta que
 la gente SI llega al formulario y se va.
+
+## 2026-09-14 — La ficha de cliente se veia como texto tirado en la pagina (Opus, commit 8c5d78c, SIN desplegar)
+
+Ricardo mando una captura: la etiqueta "Nota" montada encima del texto de ayuda, los recuadros sin
+borde, "Guardar" estirado de lado a lado y "Cerrar" como texto suelto.
+
+CAUSA, una sola para casi todo: la ficha la pinta el JavaScript con innerHTML. Astro reescribe las
+reglas del <style> normal como `.clase[data-astro-cid-xxx]`, y ese atributo solo se lo pone a lo que
+esta escrito en la plantilla. La ficha usaba crm-view-title, crm-input, crm-btn-primary,
+crm-btn-ghost, crm-empty y crm-team-help: todas con su regla en ese bloque, ninguna le llegaba. Por
+eso el <label> y el <textarea> se quedaban uno al lado del otro (cada uno con su comportamiento de
+fabrica) y los botones salian como botones del navegador.
+
+SEGUNDA CAUSA, mas silenciosa: --crm-border, --crm-text-muted, --crm-danger y --crm-accent-soft se
+usaban por todo el CSS sin estar definidas en ningun tema. Donde habia respaldo era blanco
+translucido, pensado para el tema oscuro: sobre el tema claro, invisible. De ahi que los chips y las
+filas del historial salieran sin borde. Una variable que no existe no da ningun error.
+
+HECHO: clases propias de la ficha en el bloque global, las cuatro variables definidas en los dos
+temas, y repaso del conjunto (etiquetas encima de su recuadro, recuadros estirables, boton de
+guardar de verdad, separador antes del historial, filas que se iluminan al pasar por encima).
+
+COMPROBADO VIENDOLO: se monta una pagina con los estilos REALES del portal (solo el bloque global,
+que es lo unico que le llega a este HTML) y se compara antes/despues en claro, oscuro y movil. El
+"antes" reproduce la captura de Ricardo clavada. Probado ademas con un nombre de 66 letras y con uno
+de 52 sin un solo espacio: se parten dentro de la tarjeta y no desbordan.
+
+DOS ERRORES MIOS, los dos encontrados midiendo:
+- Mi maqueta metia 24 px de margen por todos lados que el portal no tiene: la tarjeta salia 64 px
+  mas estrecha que en la realidad y me puse a "arreglar" un nombre partido que en el portal de
+  verdad no se parte. Con los margenes reales (.crm-main lleva 1rem en movil) el apaño sobraba y se
+  quito.
+- El test de estilos tenia un agujero: se saltaba las clases que ADEMAS aparecen en la plantilla, y
+  crm-input y crm-btn-primary se usan en los dos sitios. Por eso no cazo esto. Y comprobaba solo que
+  el nombre de la clase apareciera en el CSS, lo que se lo tragaba todo: al borrar la regla
+  principal, la clase seguia apareciendo en `:focus` y en el bloque de movil. Ahora exige una regla
+  base, con propiedades y fuera de los @media, y dentro de la ficha no perdona ninguna.
+
+Con la version anterior del test, de los 6 sabotajes solo se cazaban 2. Ahora, 6 de 6.
+Comprobado: 62/62 tests, nexux-verify 4/4.
+
+APUNTADO, no hecho: otras 6 clases del portal (crm-input, crm-btn-primary, crm-empty, crm-muted-p,
+crm-table, crm-table-wrap) siguen igual de rotas en OTRAS secciones que tambien pinta el JavaScript,
+y hay 9 clases mas sin regla en ningun sitio (crm-day-*, crm-team-cal, crm-team-service,
+crm-schedule-inherit-check). Estan apuntadas una a una en el test: si aparece una nueva, salta. No
+se tocan ahora porque no es lo que se pidio y cada una hay que mirarla en su pantalla.
+
+PENDIENTE: autorizacion de Ricardo para desplegar, y verlo en el portal de verdad despues.
