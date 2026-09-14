@@ -1495,7 +1495,7 @@ antes de tocarlo.
 
 PENDIENTE DE MEDIR manana: si baja el 42% que se iba sin bajar ni tocar nada.
 
-## 2026-09-14 — La pantalla de pago podia quedarse girando para siempre (Opus, commit 0c28dc6, SIN desplegar)
+## 2026-09-14 — La pantalla de pago podia quedarse girando para siempre (Opus)
 
 Ricardo pregunto si se podia recuperar a los que llegan al pago, como un carrito abandonado. Al
 mirarlo aparecio algo peor.
@@ -1540,10 +1540,27 @@ Un test que se cuelga no avisa de nada. Ahora tiene su propio limite y falla dic
 detector de sabotajes leia el resumen final, que cuando la tanda se cancela no llega a imprimirse:
 contaba un sabotaje cazado como "no rompe nada".
 
-PENDIENTE: autorizacion de Ricardo para desplegar. Despues, comprobar en produccion que el
-formulario SI sale (checkout_form_shown con su tiempo real) y forzar un atasco para ver el error a
-los 20 s. Y en un dia de datos, saber por fin cuantos de los que pulsan comprar llegan a ver el
-formulario.
+DESPLEGADO con autorizacion de Ricardo (commit 0c28dc6, en main como 0141daf). Comprobado en
+produccion, en un movil:
+
+  camino normal  -> el formulario de Stripe sale a los 1,3 s y llega
+                    checkout_form_shown {ms: 1481}
+  atasco forzado -> colgando (que no cortando) las peticiones a Stripe, sale el error a los 21,6 s
+                    con checkout_form_failed {motivo: tardo_demasiado, ms: 21532}
+
+Y EL CONTROL, que es lo que hace que lo de arriba signifique algo: la MISMA pagina de produccion,
+las MISMAS condiciones, interceptando un fichero para deshacer solo el arreglo (volver a
+`await A.initEmbeddedCheckout(...)` sin limite). Resultado: 40 segundos y la ruedecita seguia
+girando, sin error y sin formulario. Confirmado: sin el limite, se queda esperando para siempre.
+
+Antes hubo DOS intentos de control fallidos, y merece la pena dejarlo escrito para no repetirlos:
+servir la compilacion vieja en local no vale, porque se hizo sin la clave publica de Stripe (la pone
+Vercel) y alli el pago no abre nunca; y poner la trampa a Stripe antes de que su guion haya cargado
+atrapa al propio guion, con lo que el fallo que sale es otro.
+
+Las visitas de estas pruebas no han ensuciado nada: 10 visitas mias en Umami antes y 10 despues, y
+cero eventos checkout_form_* registrados. Si han quedado unas 7 sesiones de pago sin pagar en Stripe
+(lo mismo que hace cualquiera que pulse comprar y no termine); caducan solas en 24 h.
 
 NO HECHO, a decidir con el dato delante: el carrito abandonado (casilla de promociones +
 after_expiration[recovery] + avisar en checkout.session.expired). Solo merece la pena si resulta que
