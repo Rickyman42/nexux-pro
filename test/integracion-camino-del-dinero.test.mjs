@@ -216,4 +216,69 @@ describe('camino del dinero de punta a punta', { skip: HAY_PI ? false : `no encu
     assert.equal(r.status, 400, 'sin firma no se acepta');
     assert.equal(configDe(id).active, true, 'y el cliente sigue activo');
   });
+
+  // ── El nombre del negocio ya no se pregunta antes de pagar ────────────────
+  //
+  // Hasta el 14-sep-2026, pulsar "comprar" abria un formulario pidiendolo y
+  // solo despues se veia el pago. Medido: de 7 personas que pulsaron comprar,
+  // 2 llegaron a la pantalla de pago. Ahora se pregunta DENTRO de Stripe.
+  //
+  // El peligro de ese cambio es este: el alta EXIGE el nombre del salon. Si el
+  // webhook no supiera leerlo de su sitio nuevo, el cliente pagaria y no
+  // recibiria nada. Eso es lo que se vigila aqui.
+  test('quien paga sin haber dado antes el nombre se da de alta igual', async () => {
+    const evento = {
+      id: 'evt_e2e_campo',
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          id: 'cs_e2e_campo',
+          customer: 'cus_e2e_campo',
+          subscription: 'sub_e2e_campo',
+          amount_total: 2900,
+          customer_details: { email: 'sinformulario@ejemplo.invalid', name: 'Luis Soto', phone: '+34600333444' },
+          // Sin `salon` en metadata: no paso por ningun formulario previo.
+          metadata: { plan: 'recepcionista', telefono: '+34600333444' },
+          custom_fields: [{ key: 'salon', type: 'text', text: { value: 'Barberia del Campo' } }],
+        },
+      },
+    };
+
+    const antes = clientes().length;
+    const r = await mandarAStripeWebhook(evento);
+    assert.equal(r.status, 200, 'el webhook no ha dado el alta por buena');
+    assert.equal(clientes().length, antes + 1, 'no se ha creado la cuenta');
+
+    const id = clientes().find(c => configDe(c).stripeSubscriptionId === 'sub_e2e_campo');
+    assert.ok(id, 'no encuentro la cuenta creada');
+    const cfg = configDe(id);
+    assert.equal(cfg.name || cfg.nombre, 'Barberia del Campo',
+      'la cuenta no se quedo con el nombre que escribio en la pantalla de pago');
+    assert.equal(cfg.active, true);
+  });
+
+  test('si no da el nombre en ningun sitio, NO se da de alta a ciegas', async () => {
+    // Mejor que Stripe reintente y salte el aviso, a crear una cuenta llamada
+    // "undefined" con la que Lara saludaria a sus clientas.
+    const evento = {
+      id: 'evt_e2e_sin_nombre',
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          id: 'cs_e2e_sin_nombre',
+          customer: 'cus_e2e_sin_nombre',
+          subscription: 'sub_e2e_sin_nombre',
+          amount_total: 2900,
+          customer_details: { email: 'nadie@ejemplo.invalid', name: 'Sin Nombre', phone: '+34600555666' },
+          metadata: { plan: 'recepcionista', telefono: '+34600555666' },
+          custom_fields: [{ key: 'salon', type: 'text', text: { value: '   ' } }],
+        },
+      },
+    };
+
+    const antes = clientes().length;
+    const r = await mandarAStripeWebhook(evento);
+    assert.notEqual(r.status, 200, 'ha dado por bueno un alta sin nombre de negocio');
+    assert.equal(clientes().length, antes, 'ha creado una cuenta sin nombre');
+  });
 });

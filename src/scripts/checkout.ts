@@ -84,27 +84,20 @@ export async function openCheckout(plan: string) {
   document.body.style.overflow = 'hidden';
   label.textContent = PLAN_LABELS[plan] || plan;
 
-  // Si Lara ya sabe el nombre del negocio, no se vuelve a preguntar.
+  // Al pago directo. El nombre del negocio se pregunta DENTRO de la pantalla de
+  // Stripe (lo monta api/stripe/create-session.js), no antes.
+  //
+  // Hasta el 14-sep-2026 aqui salia un formulario pidiendolo. Medido: de 7
+  // personas que pulsaron comprar, solo 2 llegaron al pago. Cinco se cayeron en
+  // esa pregunta -- que ademas se les vuelve a hacer despues, porque Lara la
+  // hace en el alta.
+  //
+  // Si Lara ya lo sabe, se manda y Stripe no lo pregunta.
   const yaSabido = (leerLaraData().salon || '').trim();
-  if (yaSabido) {
-    loading.removeAttribute('hidden');
-    return abrirPagoStripe(plan, yaSabido);
-  }
-
-  if (!datos || !negocio) {
-    // Sin el formulario no podemos conseguir el dato: mejor no cobrar a ciegas.
-    loading.setAttribute('hidden', '');
-    errorEl.removeAttribute('hidden');
-    console.error('[checkout] falta el formulario del nombre del negocio');
-    return;
-  }
-
-  loading.setAttribute('hidden', '');
-  datos.removeAttribute('hidden');
-  datos.dataset.plan = plan;
-  negocio.value = '';
-  negocio.removeAttribute('aria-invalid');
-  negocio.focus();
+  datos?.setAttribute('hidden', '');
+  negocio?.setAttribute('aria-invalid', 'false');
+  loading.removeAttribute('hidden');
+  return abrirPagoStripe(plan, yaSabido);
 }
 
 async function abrirPagoStripe(plan: string, salon: string) {

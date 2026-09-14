@@ -121,6 +121,20 @@ async function notifyTelegram(session, clientId) {
   }
 }
 
+/**
+ * Lee un campo que el cliente relleno DENTRO de la pantalla de pago de Stripe.
+ *
+ * Desde el 14-sep-2026 el nombre del negocio ya no se pregunta antes de pagar
+ * (se caian 5 de cada 7 ahi), sino dentro. Se sigue mirando primero en
+ * `metadata` porque las sesiones abiertas antes de ese cambio lo traen ahi, y
+ * porque a quien ya se lo dijo a Lara no se le vuelve a preguntar.
+ */
+function campoDelPago(session, clave) {
+  const campo = (session.custom_fields || []).find((c) => c && c.key === clave);
+  const valor = campo && campo.text && campo.text.value;
+  return valor ? String(valor).trim() || null : null;
+}
+
 async function provisionClient(session) {
   const provisionUrl = process.env.NEXUX_CLIENTS_URL;
   const secret = process.env.PROVISION_SECRET;
@@ -136,7 +150,7 @@ async function provisionClient(session) {
     stripeSubscriptionId: session.subscription || null,
     plan: md.plan,
     nombre: md.nombre || session.customer_details?.name || null,
-    salon: md.salon || null,
+    salon: md.salon || campoDelPago(session, 'salon') || null,
     telefono: md.telefono || session.customer_details?.phone || null,
     ciudad: md.ciudad || null,
     email: session.customer_details?.email || null,

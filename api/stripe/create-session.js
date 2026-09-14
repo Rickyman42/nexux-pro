@@ -61,6 +61,26 @@ export default async function handler(req, res) {
     }
   }
 
+  // Si no sabemos como se llama el negocio, se pregunta DENTRO de la pantalla
+  // de pago, como un campo mas al lado de la tarjeta.
+  //
+  // Antes se preguntaba ANTES: pulsabas "quiero recuperar esas citas" y en vez
+  // del pago salia un formulario. Medido el 14-sep-2026: de 7 personas que
+  // pulsaron comprar, solo 2 llegaron a la pantalla de pago. Cinco se cayeron
+  // ahi. Y el dato se vuelve a pedir despues, porque Lara lo pregunta en el
+  // alta -- lo dice la propia pagina en las preguntas frecuentes.
+  //
+  // No se puede quitar sin mas: el alta lo exige (api/webhook/stripe.js) y sin
+  // el, el cliente paga y no recibe nada.
+  const salonConocido = typeof body.salon === 'string' && body.salon.trim() !== '';
+  if (!salonConocido) {
+    params.append('custom_fields[0][key]', 'salon');
+    params.append('custom_fields[0][label][type]', 'custom');
+    params.append('custom_fields[0][label][custom]', 'Nombre de tu negocio');
+    params.append('custom_fields[0][type]', 'text');
+    params.append('custom_fields[0][text][maximum_length]', '60');
+  }
+
   if (priceId) {
     params.append('line_items[0][price]', priceId);
     params.append('line_items[0][quantity]', '1');
