@@ -1,3 +1,5 @@
+import { conLimite } from './espera-limitada.mjs';
+
 declare const Stripe: undefined | ((key: string) => any);
 
 const PLAN_LABELS: Record<string, string> = {
@@ -6,6 +8,47 @@ const PLAN_LABELS: Record<string, string> = {
 
 let stripeInstance: any = null;
 let embeddedCheckout: any = null;
+
+// Cuanto se espera a que Stripe pinte su formulario antes de dar la espera por
+// perdida. Hasta el 14-sep-2026 no habia limite: si Stripe tardaba o se
+// atascaba, la persona se quedaba mirando la ruedecita para siempre, sin error,
+// sin aviso y sin que nosotros nos enterasemos de nada.
+//
+// El numero no es a ojo: el guion de Stripe tardaba entre 4,8 y 7,2 segundos en
+// llegar, medido el 14-sep en la Pi con buena conexion. Con datos flojos puede
+// ser bastante mas, asi que 20 s da margen de sobra a una conexion lenta pero
+// sana. Y como ahora se manda cuanto tardo cada vez que SI sale, el numero se
+// podra ajustar con datos en vez de con la intuicion.
+const ESPERA_MAXIMA_MS = 20000;
+
+// Cada intento lleva su numero. Si el de vuelta ya no es el ultimo, es que la
+// persona cerro la ventana o volvio a pulsar: lo que llegue tarde se tira en vez
+// de montarse en una ventana que ya no existe.
+let intentoActual = 0;
+let ultimoIntento: { plan: string; salon: string } | null = null;
+
+/** Manda una senal de medicion. Medir NUNCA puede romper el pago. */
+function senal(nombre: string, datos: Record<string, unknown> = {}) {
+  try {
+    (window as any).nxMeasure?.(nombre, datos);
+  } catch {
+    // Si la medicion falla, el pago sigue.
+  }
+}
+
+/** Cierra una pantalla de Stripe que ya no va a usar nadie. */
+function tirar(instancia: any) {
+  try {
+    instancia?.destroy();
+  } catch {
+    // Si ya estaba cerrada, da igual.
+  }
+}
+
+function motivoDe(error: unknown): string {
+  const mensaje = (error as any)?.message;
+  return typeof mensaje === 'string' && mensaje ? mensaje.slice(0, 40) : 'desconocido';
+}
 
 function getStripe() {
   if (!import.meta.env.PUBLIC_STRIPE_KEY || typeof Stripe !== 'function') {
@@ -104,6 +147,11 @@ async function abrirPagoStripe(plan: string, salon: string) {
   const { loading, errorEl, mount, datos } = getElements();
   if (!loading || !errorEl || !mount) return;
 
+  const miIntento = ++intentoActual;
+  ultimoIntento = { plan, salon };
+  const arrancado = Date.now();
+  const yaNoImporta = () => miIntento !== intentoActual;
+
   datos?.setAttribute('hidden', '');
   loading.removeAttribute('hidden');
   errorEl.setAttribute('hidden', '');
@@ -125,12 +173,36 @@ async function abrirPagoStripe(plan: string, salon: string) {
     if (!clientSecret) throw new Error('missing_client_secret');
 
     const stripe = getStripe();
-    embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret });
+    const instancia = await conLimite(
+      stripe.initEmbeddedCheckout({ clientSecret }),
+      ESPERA_MAXIMA_MS,
+      tirar,
+    );
+
+    // Si mientras cargaba cerraron la ventana o volvieron a pulsar, esta
+    // pantalla ya no le sirve a nadie: cerrarla en vez de montarla.
+    if (yaNoImporta()) {
+      tirar(instancia);
+      return;
+    }
+
+    embeddedCheckout = instancia;
     loading.setAttribute('hidden', '');
-    embeddedCheckout.mount('#stripe-checkout-mount');
+    instancia.mount('#stripe-checkout-mount');
+
+    // La senal que faltaba. Hasta ahora solo sabiamos quien PULSABA comprar, no
+    // a quien le llegaba a salir el formulario: un pago atascado y un cliente
+    // que se lo piensa daban exactamente el mismo dato.
+    senal('checkout_form_shown', { plan, ms: Date.now() - arrancado });
   } catch (error) {
+    if (yaNoImporta()) return;
     loading.setAttribute('hidden', '');
     errorEl.removeAttribute('hidden');
+    senal('checkout_form_failed', {
+      plan,
+      motivo: motivoDe(error),
+      ms: Date.now() - arrancado,
+    });
     console.error('[checkout] open failed', error);
   }
 }
@@ -138,6 +210,10 @@ async function abrirPagoStripe(plan: string, salon: string) {
 export function closeCheckout() {
   const { modal, loading, errorEl, mount, datos } = getElements();
   if (!modal || !loading || !errorEl || !mount) return;
+
+  // Cualquier carga que siga en marcha deja de importar: si llega despues, se
+  // tira. Antes se montaba igual, en una ventana ya cerrada.
+  intentoActual += 1;
 
   modal.setAttribute('hidden', '');
   document.body.style.overflow = '';
@@ -172,6 +248,14 @@ function showSuccessMessage() {
 
 function initCheckout() {
   document.getElementById('checkout-close')?.addEventListener('click', closeCheckout);
+
+  // Volver a intentarlo sin tener que cerrar y buscar otra vez el boton.
+  document.getElementById('checkout-reintentar')?.addEventListener('click', () => {
+    const intento = ultimoIntento;
+    if (!intento) return;
+    senal('checkout_form_retried', { plan: intento.plan });
+    void abrirPagoStripe(intento.plan, intento.salon);
+  });
 
   document.getElementById('checkout-datos')?.addEventListener('submit', event => {
     event.preventDefault();

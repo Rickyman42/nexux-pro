@@ -11,7 +11,9 @@
     </div>
 
     <div id="checkout-error" class="checkout-error" hidden>
-      <p>No hemos podido cargar el pago. <button type="button" class="checkout-error-link" data-open-lara>Pregúntale a Lara</button> y te echa una mano.</p>
+      <p>No hemos podido cargar el pago. Puede ser cosa de la conexión.</p>
+      <button type="button" id="checkout-reintentar" class="checkout-reintentar">Volver a intentarlo</button>
+      <p class="checkout-error-alterna">Si sigue sin salir, <button type="button" class="checkout-error-link" data-open-lara>pregúntale a Lara</button> y te echa una mano.</p>
     </div>
 
     <form id="checkout-datos" class="checkout-datos" hidden>
@@ -221,6 +223,22 @@
       align-items: flex-start;
     }
   }
+  .checkout-reintentar {
+    background: var(--nx-magnet);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.7rem 1.6rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .checkout-error-alterna {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
   .checkout-error-link {
     background: none;
     border: none;
