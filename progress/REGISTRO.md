@@ -1438,7 +1438,7 @@ va del boton al pago sin parada intermedia. Las sesiones de mis pruebas quedaron
 Commit f1823d4, desplegado con autorizacion de Ricardo.
 PENDIENTE DE MEDIR manana: si sube la proporcion de 7 -> 2. Ese es el numero a batir.
 
-## 14-sep-2026 - La pagina tardaba un segundo de mas en verse (commit 29f4006, SIN desplegar)
+## 2026-09-14 — La pagina tardaba un segundo de mas en verse (Opus)
 
 De 269 personas que entraron desde el anuncio, 113 (el 42%) se fueron sin bajar ni tocar nada. La
 pagina estaba en blanco 2,9 segundos y tardaba lo mismo con wifi buena que con 4G flojo, asi que no
@@ -1472,4 +1472,25 @@ ERROR MIO CORREGIDO: mis mediciones metieron 10 visitas falsas en Umami (ayer 20
 10:08-10:10). No tocan el embudo, que se filtra por los que llegan del anuncio. Los scripts de medir
 ya bloquean la analitica y se comprobo: 10 visitas antes, 2 cargas reales de produccion, 10 despues.
 
-PENDIENTE: autorizacion de Ricardo para desplegar; despues, volver a medir y mirar si baja el 42%.
+DESPLEGADO con autorizacion de Ricardo (commit 29f4006, en main como 3b5d299). Vercel publico en
+unos 40 segundos y se comprobo en vivo: el <link> de las tipografias esta en la pagina servida, la
+webp se sirve con 68.492 bytes y tipo image/webp, y en los DOS CSS construidos que se sirven no
+queda ni un @import de Google.
+
+Medido en produccion con el mismo script, antes y despues del despliegue:
+  wifi bueno  ve algo  3.316 -> 1.600 ms
+  4G flojo    ve algo  4.100 -> 1.692 ms
+  peso                   789 -> 388 KB
+Cinco tomas mas de comprobacion dan mediana de 1.548 ms. Umami sigue con 10 visitas mias: el bloqueo
+de la analitica en el navegador de prueba aguanta.
+
+El tiempo de "cargado del todo" salio peor en una tanda (8.708 ms) y se miro en vez de darlo por
+bueno: lo que lo estira es el SDK de Stripe, que tarda entre 4,8 y 7,2 segundos y hace bailar el
+total entre 4.571 y 11.002 ms de una toma a otra. No tiene que ver con este cambio, estaba antes.
+
+PARA RICARDO, sin hacer: el SDK de Stripe se carga nada mas entrar, en una pagina donde de cada 261
+visitas solo 7 pulsan comprar. Cargarlo solo al pulsar ahorraria esos 5-7 segundos a todo el mundo a
+cambio de que al que compra la pantalla de pago le tarde ~1 segundo mas en salir. Hay que medirlo
+antes de tocarlo.
+
+PENDIENTE DE MEDIR manana: si baja el 42% que se iba sin bajar ni tocar nada.
