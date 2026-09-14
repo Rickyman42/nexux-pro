@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Las tipografias ya NO se piden desde aqui: van en un <link> en la cabecera de
+   Layout.astro. Un @import obliga al navegador a bajar este CSS, leerlo,
+   descubrir que necesita otro CSS de Google e ir a por el: tres viajes uno
+   detras de otro antes de pintar una sola letra.
+   Medido el 14-sep-2026 en un movil sin cache: con el @import se veia algo a
+   los 2.552 ms; bloqueando las tipografias, a los 1.492 ms. Un segundo entero.
+   Y con el @import las tomas bailaban entre 2,0 y 2,7 s; sin el, entre 1,42 y
+   1,52. Si se vuelve a meter aqui, vuelve el segundo. */
 @import "tailwindcss";
 @import "tailwind-animations";
 
