@@ -1232,3 +1232,244 @@ un canal que no arranca Baileys, y avisa si la carpeta reaparece.
 Los **recordatorios de citas** (24h y 1h antes) siguen saliendo con el interruptor apagado. El
 interruptor dice "Lara responde": apagar las respuestas no deberia cancelar los recordatorios de
 citas que el cliente ya tiene confirmadas. **Si Ricardo lo quiere de otra forma, se cambia.**
+
+## 2026-09-10 — Video de verificacion OAuth de Google Calendar
+Montado `progress/video-google/nexux-google-calendar-verification.mp4` (3:07, 5,5 MB) a partir
+de la grabacion real de 9:22. Receta reproducible en `monta-google.sh`.
+- Se quita la franja con la barra de marcadores y el aviso "Claude comenzo a depurar este
+  navegador". La barra de direcciones se conserva: es donde se lee el client_id completo.
+- Se tapa la columna de cuentas del selector de Google (8 correos personales, el video va a YouTube).
+- Voz en ingles en 6 bloques, colocada en el segundo en que ocurre cada cosa.
+- Rotulos con el client_id y con para que sirve cada permiso.
+Comprobado: verificador 5/5; zona censurada medida fotograma a fotograma (YMAX<=162 en 247
+fotogramas, control positivo sobre el original = 236); franja superior revisada en 31 puntos.
+PENDIENTE DE RICARDO: la pantalla de consentimiento ensena TRES permisos y la app pide DOS.
+
+## 2026-09-10 — Quitado include_granted_scopes de la conexion con Google
+`nexux-clients/lib/google-oauth.js:105`. Ese ajuste hacia que Google sacara en la pantalla de
+consentimiento los permisos que la cuenta hubiera concedido en el pasado. En la cuenta de la demo
+aparecia un tercer permiso, `calendar.readonly`, que la app ya no pide y que NO esta declarado en
+Google Cloud (comprobado en la consola: solo `calendar.events` y `calendar.calendarlist.readonly`).
+Ensenar un permiso que no declaras es motivo de rechazo en la verificacion.
+La app no hace autorizacion por fases, asi que el ajuste no aportaba nada.
+Comprobado: 4 tests nuevos en `test/google-oauth.test.mjs` (10/10), suite completa 431/431,
+3 sabotajes y los 3 rompen, verificador 4/4, y la URL VIVA que devuelve /google/connect ya no
+lo lleva. Servicio reiniciado.
+Tambien: el boton Desconectar del panel solo borra el token local, NO revoca el permiso en Google.
+
+## 2026-09-10 — Video de verificacion, v2 (la buena)
+La v1 ensenaba TRES permisos en la pantalla de consentimiento. Tras quitar include_granted_scopes
+se regrabo el tramo del permiso (toma3) y se remonto: ahora salen los DOS declarados.
+Receta: `monta-google-v2.sh`. Dura 3:30. La demo (calendario, cita, cancelacion) es la misma
+grabacion de antes; lo regrabado es el selector de cuentas, el aviso de app no verificada, el
+consentimiento, la lista de permisos y la vuelta al panel.
+Comprobado sobre el MP4 final: censura del selector medida fotograma a fotograma (YMAX<=161 en
+285 fotogramas; control sobre el bruto = 245), franja superior revisada en 35 puntos sin
+marcadores ni aviso de depuracion, los 5 tramos de voz caen donde toca, verificador 5/5.
+Estado del salon de pruebas restaurado: conectado a arteenpixel@gmail.com, calendario Centro Lena.
+
+## 2026-09-12 — Verificacion de Google ENVIADA
+Video subido al canal Nexux Intelligence en oculto: https://youtu.be/okpLdTMW6qY
+(comprobado accesible: oembed HTTP 200, canal Nexux Intelligence).
+Solicitud enviada desde la consola (proyecto neon-rampart-506307-t6, cuenta arteenpixel).
+Estado que devuelve la consola tras recargar: "El acceso a los datos de tu app esta en proceso
+de revision". Branding ya estaba verificado.
+Lo enviado: dos permisos (calendar.events y calendar.calendarlist.readonly), justificacion de
+818 caracteres, enlace del video, y 530 caracteres de informacion adicional aclarando que no
+hacen falta credenciales de prueba y que el proyecto tiene un unico cliente OAuth.
+Cuestionario: las 4 preguntas respondidas NO (no es de uso personal, ni interno, ni de pruebas,
+ni complemento SMTP de WordPress). Comprobado antes de enviar que nexux.pro, /privacidad y /legal
+responden 200.
+
+## 2026-09-13 — Desconectar ahora revoca de verdad en Google (tarea 1 de 3)
+El boton Desconectar solo borraba el token local; el permiso seguia vivo en la cuenta del salon.
+Ahora el endpoint llama al revoke de Google ANTES de borrar el token, y borra igual aunque Google
+falle. Se manda el refresh_token (el de acceso caduca solo y revocarlo no retira el permiso).
+Comprobado: 441/441 tests (10 nuevos), 6 sabotajes y los 6 cazados, verificador 4/4, y prueba en
+vivo con control positivo sobre prueba-funcional-nexux-5-septiembre: antes del desconectar el
+refresh_token daba HTTP 200 en Google, despues invalid_grant. Token local borrado tambien.
+Efecto secundario a saber: ese salon de PRUEBAS (hola.optimalnutri@gmail.com) queda desconectado.
+Commit d368401, subido a GitHub el 13-sep.
+
+## 2026-09-13 — Limpieza del repositorio nexux-clients (Opus)
+El repositorio tenia 1 fichero modificado sin commitear y 17 sin rastrear, varios de otros
+agentes. Objetivo: que `git status` quede limpio SIN tirar nada ajeno.
+Lo primero fue lo peligroso: `scripts/vigila-bots-prueba.mjs` (cada 15 min) y
+`scripts/vigilante-campana-ads.mjs` (9:15) llevaban meses corriendo en cron y NO estaban en git.
+Un `git clean` habria apagado los dos avisos sin que nadie se enterara. Commiteados tal cual (83bb201).
+`conversa-rodaje.mjs`, de otro agente, llevaba desde agosto modificado y sin subir: guardado (5a2b8ef).
+Los 13 guiones sueltos del rodaje se movieron a `scripts/tmp-otros-agentes/` con un LEEME que dice
+de quien son y cuales borran o publican en calendarios de verdad (34160ed). Ninguno borrado.
+Al bajarlos de carpeta sus `import` dejaban de encontrar `lib/`: se corrigio la ruta y se comprobaron
+las 9 una a una contra el disco, rompiendo una a proposito para ver que el comprobador la cazaba.
+Mi `ensayo-calendario.sh` se guarda (la verificacion de Google sigue abierta) y `__pycache__/` al
+.gitignore (ac04269). Meterlos en git puso en rojo el guard de la carpeta de clientes: solo miraba
+ficheros trackeados, usando "esta en git" como sinonimo de "es del producto", y eso dejo de ser
+cierto. Se excluyo la carpeta y se comprobo que el guard sigue sirviendo (0d882c4).
+Comprobado: 441/441 tests, verificador 7/7, `git status` limpio, servicio online y /health 200,
+y el vigilante de bots corrio a las 19:00, despues del movimiento.
+Cinco commits, subidos a GitHub el 13-sep (origin/main en 0d882c4, comprobado en el remoto). Aviso aparte: el log del servicio repite "409 Conflict - another instance
+running" en Telegram; no es de esta tarea, pero apunta a dos instancias del bot a la vez.
+
+## 2026-09-13 — El bot de Telegram estaba sordo y el registro decia que no (Opus)
+Ricardo pidio mirar los 409 del registro. No eran dos copias peleandose: los DOS bots llevaban
+sin escuchar a nadie. Medido de tres formas: el proceso no tenia ni una conexion abierta con
+Telegram, las ultimas lineas del registro eran las del 409 y despues silencio, y el aviso
+"✅ Telegram bot started" salia 135 veces.
+Dos fallos. Uno: al reiniciar, la copia vieja tarda unos segundos en soltar la linea; la nueva se
+lleva un 409, se reintentaba UNA vez y el fallo del reintento se lo tragaba un `.catch(() => {})`.
+Sordo para siempre y sin rastro; el servicio lleva 57 reinicios. Dos, peor: el ✅ se escribia sin
+comprobar si el arranque habia funcionado, asi que el aviso decia que si mientras nadie oia.
+Arreglado con `arrancarEscuchando`: reintenta hasta conseguirlo (5s, 15s, 30s y luego cada minuto),
+escribe cada fallo, y el aviso sale de `onStart` (la libreria confirmando). Con token invalido NO
+reintenta. NOA queda apagada: Ricardo confirmo que ya no se manda WhatsApp con bots.
+Lo que NO se promete: grammy llama a onStart antes de la primera peticion, asi que ese aviso puede
+fallar un instante despues. Lo garantizado es que ningun fallo se pierde y que no deja de intentarlo.
+Comprobado: 449/449 tests (8 nuevos, uno con grammy real midiendo que tras un 409 se marca parada),
+6/6 sabotajes cazados con restauracion md5, verificador 6/6, y en produccion el bot escuchando
+(2 conexiones abiertas, medidas con ss). Commit 0a4c8ce.
+
+**FALLO MIO, contado entero.** Al empezar a investigar cargue el .env en mi terminal y reinicie con
+`--update-env` en el mismo comando. El .env tiene finales de linea de Windows en 6 lineas, asi que
+metí un caracter invisible (retorno de carro) dentro del proceso en produccion: GOOGLE_OAUTH_CLIENT_ID,
+CLIENT_SECRET, REDIRECT y OPENAI_ADS_API_KEY. Google dejo de reconocer el cliente ("The OAuth client
+was not found") y la renovacion de calendarios estuvo rota unos 40 minutos. Lo vi de refilon en el
+registro, lo persegui y lo arregle: `--update-env` NO borra variables, solo anade, asi que hubo que
+volver a cargarlas quitando el retorno y reiniciar. Comprobado despues: los dos salones conectados
+responden conectado=true, cero errores nuevos, y el arranque automatico de pm2 (dump del 3-sep) estaba
+limpio, o sea que no habria sobrevivido a un reinicio de la maquina. Solo afectaba a los dos salones
+de prueba: ningun cliente real tiene calendario conectado.
+**Sigue pendiente y lo decide Ricardo:** el .env tiene finales de linea de Windows. Mientras siga asi,
+cualquiera que haga lo mismo que hice yo vuelve a romperlo.
+Tambien aprendido: sondear el bot con getUpdates NO mide si escucha, lo ROBA (Telegram corta al que
+estaba y sirve al nuevo). Lo que mide de verdad es mirar las conexiones abiertas del proceso.
+
+## 2026-09-13 — Limpiados los finales de linea de Windows del .env (Opus)
+Ricardo lo autorizo. Era la causa de fondo del incidente de hace un rato: 6 de las lineas del .env
+de nexux-clients acababan en retorno de carro, y cualquiera que cargara el fichero en su terminal y
+reiniciara con --update-env metia ese caracter invisible dentro del proceso (es lo que hice yo).
+Copia de seguridad antes: .env.bak-antes-limpiar-crlf-1789323366. Se comprobo que lo unico que
+cambia es el caracter: 25 variables antes y 25 despues, y la huella sha256 de CADA valor (calculada
+sin el retorno) identica en las 25. El fichero pasa de 1921 a 1915 bytes: exactamente los 6 caracteres.
+Comprobado despues del reinicio: ni una variable con caracteres raros en el entorno del proceso,
+/health 200, el bot de Telegram con 2 conexiones abiertas, los dos salones con Google conectado,
+y la clave sk_live respondiendo en Stripe (lectura, sin mover un euro). Verificador 5/5.
+Commit 0a4c8ce (el arreglo de Telegram) subido a GitHub; el .env no va a git, esta en .gitignore.
+Ricardo pidio limpiar tambien el del arbol de revision: nexux-clients-wt-rev/.env, hecho con el
+mismo procedimiento (copia .env.bak-antes-limpiar-crlf-1789323647, 25 variables antes y despues con
+la misma huella, 1921 -> 1915 bytes). Se comprobo antes que de ahi no corre nada: ni proceso ni cron.
+Y se barrieron los 14 ficheros de configuracion en uso de la Pi: no queda ninguno con retornos de
+Windows. Las copias .env.bak-* se dejan como estan, que para eso son copias.
+
+## 2026-09-13 — El aviso de cookies se comia un tercio del movil (Opus)
+Viene de revisar el trabajo de Codex sobre la campana. Midiendo en Umami y en la pagina real
+aparecio algo que no habia mirado nadie: el 83% del trafico de la campana entra desde movil
+(94 de 113 visitantes), el 79% se va sin tocar nada, y el aviso de cookies ocupaba 258 px fijos
+en un telefono de 375x812 (el 32% de la pantalla), tapando la zona de los botones de compra.
+Ahora ocupa 122 px (15%). No se ha quitado informacion ni se ha escondido el rechazo: los dos
+botones pasan de apilados a lado con lado y salen exactamente del mismo tamano (161 px cada uno).
+Detalle que costo: la regla necesita `.cookie-banner .cookie-btn` porque la de arriba lleva
+!important. Se comprobo quitandolo (vuelven a 135 y 118 px), no se supuso.
+Comprobado sobre la COMPILACION, no sobre el servidor de desarrollo, que daba medidas distintas
+segun cuando se mirara: 320 px -> 121 (17%), 375 -> 122 (15%), 600 -> 104 (13%), y a 1280 px
+identico a produccion (165 de alto, 540 de ancho). Los dos botones siguen guardando la decision,
+ocultando el aviso y avisando a los medidores al aceptar.
+Commit 82e17a9. DESPLEGADO con autorizacion de Ricardo: fusionado a main, subido, y Vercel lo
+publico en 20 segundos. Comprobado EN VIVO en nexux.pro, no en local: movil 375x812 -> 121 px (15%)
+con los dos botones a 161 px; los dos siguen guardando la decision y ocultando el aviso, y aceptar
+sigue emitiendo nx:consent-granted; escritorio 1280 -> 165 de alto, 540 de ancho, relleno 20px 24px
+y botones 135/118, exactamente igual que antes del cambio.
+Queda por medir dentro de un dia o dos: si baja el 79% de rebote del trafico de campana. Antes del
+cambio: 113 visitantes unicos, 108 rebotes de 137 visitas, 94 de 113 desde movil.
+
+## 2026-09-13 — Mapa de calor de las paginas publicas (Opus)
+Ricardo pidio sacar la medicion de scroll de detras del consentimiento y, a poder ser, un mapa de
+calor completo. Se parte del trabajo de Codex del mismo dia (se quedo sin cuota hasta el 13-oct):
+se mantiene su arreglo del boton "Quiero verla responder" --se mandaba a Google, Meta y Plausible
+pero NO a Umami-- y la base de su generador.
+Que se mide: donde pulsan, hasta donde bajan, donde se para el raton, y los clics que NO dan en
+nada pulsable, que es el dato que no se ve de ninguna otra forma. Todo a Umami y solo a Umami:
+un heatmap_click en el pixel de OpenAI seria ruido en la campana.
+NO va detras del aviso de cookies, a proposito: no se guarda nada en el aparato, no hay
+identificadores ni texto ni recorridos, solo la casilla de una cuadricula de 12 x 24. Misma
+categoria que Umami, que ya mide a todo el mundo. Atarlo al consentimiento mediria solo a quien
+acepta todo y los numeros mentirian. Los pixeles de Google/Meta/OpenAI SIGUEN pidiendo permiso.
+Lo delicado era donde se mide: Layout.astro lo usan TODAS las paginas, incluidas /admin, el portal
+de cada salon y la pagina de reserva de una clienta. La lista es de PERMITIDAS, en su propio
+fichero, para que una pagina privada nueva no se mida sola.
+Comprobado: 34/34 tests (12 nuevos), 8/8 sabotajes cazados, y en un navegador de verdad sobre la
+compilacion -- clic, scroll 25/50/75 y `sobre: "nada"` en un clic que cayo en texto, todo sin
+aceptar cookies. Control negativo con LA MISMA pagina copiada a /cliente/prueba-del-control: cargo
+igual y dio CERO senales. El generador probado con un docker de mentira, sin tocar la base real.
+Commit 3787892 DESPLEGADO con autorizacion de Ricardo. Comprobado en vivo en nexux.pro: un clic
+sobre texto devolvio `sobre: "nada"` y el scroll marco el 25%, todo sin aceptar cookies (con
+umami.track interceptado, para no ensuciar los datos con mis pruebas).
+AVISO sobre mi propia comprobacion: di el despliegue por fallido durante 5 minutos porque solo
+buscaba en los .js que cita el HTML, y este va DENTRO de otro (Layout importa el trozo de Medicion).
+Estaba desplegado desde el primer intento. La comprobacion era mala, no el despliegue.
+YA HAY DATOS REALES: en los primeros 40 minutos, 24 llegadas del anuncio, 6 scroll_depth_reached,
+4 heatmap_click, 2 cta_clicked y 1 checkout_started. Ese checkout es el PRIMERO desde que arranco
+la campana el 8-sep. Se comprobo que no era mio: esa sesion trae `chatgpt_ads_landing`, o sea que
+entro por el anuncio, y yo entre directo. La sesion entera, que antes no se podia ver: llega a las
+21:26:33 y a las 21:26:37 --cuatro segundos despues-- pulsa el boton de comprar.
+NO se puede decir que lo haya causado el arreglo del aviso de cookies: es UN dato. Lo que si es
+cierto es que ahora se ve, y antes no.
+
+## 2026-09-14 — El formulario que se comia 5 de cada 7 compras (Opus)
+Ricardo: "hay muchos clicks y ninguna conversion". Medido con el mapa de calor recien puesto, en
+las primeras 12 horas y con 261 llegadas del anuncio: 132 personas bajan del 25% de la pagina, 72
+pulsan algo, 13 pulsan un boton, 7 pulsan COMPRAR, 2 llegan a la pantalla de pago y 0 pagan.
+La premisa habia que corregirla en una parte: 7 personas llegaron a comprar en 12 horas cuando en
+los cinco dias anteriores fueron CERO. No es que nadie quiera; es que se caen.
+Donde se caen: pulsabas "Quiero recuperar esas citas" esperando pagar y salia un formulario
+preguntando el nombre del negocio. 5 de 7 se quedaban ahi. Y ese dato se vuelve a pedir despues,
+porque Lara lo pregunta en el alta: lo dice la propia pagina en sus preguntas frecuentes.
+Comprobado que NO estaba roto, probandolo a mano en un movil: el formulario se abre bien, la
+pantalla de Stripe carga (nada de quedarse girando) y el boton de pagar se alcanza bajando. Era
+friccion, no averia.
+No se podia quitar sin mas: api/webhook/stripe.js EXIGE el nombre del salon, y sin el, el cliente
+paga y no recibe nada. Solucion: se pregunta DENTRO de la pantalla de Stripe (custom_fields) y el
+alta lo lee de ahi, mirando primero metadata por las sesiones viejas y por quien ya se lo dijo a
+Lara. Se comprobo que Stripe aceptaba el campo ANTES de escribir codigo.
+Comprobado: 43/43 tests (3 nuevos en el camino del dinero de punta a punta + 7 sobre lo que se le
+pide a Stripe), 7/7 sabotajes cazados, verificador 5/5. Ya en produccion: la sesion que crea el
+endpoint desplegado trae el campo "Nombre de tu negocio" como obligatorio, 29 EUR, y en el movil se
+va del boton al pago sin parada intermedia. Las sesiones de mis pruebas quedaron caducadas.
+Commit f1823d4, desplegado con autorizacion de Ricardo.
+PENDIENTE DE MEDIR manana: si sube la proporcion de 7 -> 2. Ese es el numero a batir.
+
+## 14-sep-2026 - La pagina tardaba un segundo de mas en verse (commit 29f4006, SIN desplegar)
+
+De 269 personas que entraron desde el anuncio, 113 (el 42%) se fueron sin bajar ni tocar nada. La
+pagina estaba en blanco 2,9 segundos y tardaba lo mismo con wifi buena que con 4G flojo, asi que no
+era su conexion: se frenaba sola.
+
+Dos causas. Una, las tipografias se pedian con un @import dentro del CSS: el navegador tenia que
+bajar nuestro CSS, leerlo, enterarse de que hacia falta otro de Google e ir a por el, tres viajes en
+fila antes de pintar una letra. Ahora van en un <link> en la cabecera. Dos, la captura del CRM era un
+PNG de 467 KB de los 781 KB de la pagina; pasada a webp son 68 KB (calidad 90, comparada pixel a
+pixel contra 95/85/82/78 y a doble aumento sobre un recorte de texto: no se distingue). El PNG se
+deja donde estaba.
+
+Medido comparando el build de antes (f1823d4) contra el de ahora en la MISMA maquina y alternando
+uno y otro, para que si la Pi va lenta un rato la penalizacion caiga igual en los dos:
+  wifi bueno  ve algo   3.092 -> 1.700 ms (9 tomas de cada)
+  4G flojo    ve algo   4.244 -> 3.284 ms (7 tomas de cada)
+  4G flojo    cargado   6.999 -> 5.486 ms
+  peso                    932 -> 531 KB
+En 4G la mejora del primer pintado baila entre 140 y 960 ms segun la tanda, y lo digo tal cual: el
+CSS de Google SIGUE frenando el pintado, lo que se ha quitado es que ademas espere su turno. El peso
+y la carga completa si son firmes.
+
+Comprobado: 49/49 tests (6 nuevos), 5/5 sabotajes cazados con los ficheros restaurados identicos,
+nexux-verify 4/4 sobre lo que se va a SERVIR (no sobre el fuente). El arbol de prueba de la version
+vieja se borro al terminar.
+
+Linea de salida de produccion medida hoy, todavia sin el arreglo: ve algo 3.316 ms con wifi y
+4.100 ms en 4G, 789 KB.
+
+ERROR MIO CORREGIDO: mis mediciones metieron 10 visitas falsas en Umami (ayer 20:48-21:29 y hoy
+10:08-10:10). No tocan el embudo, que se filtra por los que llegan del anuncio. Los scripts de medir
+ya bloquean la analitica y se comprobo: 10 visitas antes, 2 cargas reales de produccion, 10 despues.
+
+PENDIENTE: autorizacion de Ricardo para desplegar; despues, volver a medir y mirar si baja el 42%.
