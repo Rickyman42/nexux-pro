@@ -637,6 +637,19 @@ const weekdayLabels: [string, string][] = [
           </div>
 
           <div class="crm-card crm-mb">
+            <h2 class="crm-card-title">Tus datos</h2>
+            <p class="crm-team-help">
+              Tus clientas son tuyas. Puedes descargarte tu lista y tu historial de citas
+              cuando quieras, en un fichero que se abre con Excel o con Hojas de cálculo.
+            </p>
+            <div class="datos-botones">
+              <button type="button" class="crm-btn-ghost" data-exportar="clientes">⬇️ Mis clientas</button>
+              <button type="button" class="crm-btn-ghost" data-exportar="citas">⬇️ Mis citas</button>
+              <span id="exportar-msg" class="datos-msg"></span>
+            </div>
+          </div>
+
+          <div class="crm-card crm-mb">
             <h2 class="crm-card-title">Mis servicios</h2>
             <div id="services-list-wrap"></div>
             <div class="crm-svc-add-row">
@@ -3287,6 +3300,47 @@ const weekdayLabels: [string, string][] = [
     }
 
     // Load invoices when billing nav button is clicked
+    // ── Llevarse sus datos ────────────────────────────────────────────
+    // No se usa un <a download> porque la descarga necesita la cookie de sesion
+    // y hay que poder ensenar un error si algo falla: con un enlace suelto, un
+    // fallo del servidor se le abre al dueño como una pagina en blanco.
+    document.querySelectorAll('[data-exportar]').forEach(function (boton) {
+      boton.addEventListener('click', async function () {
+        var que = boton.getAttribute('data-exportar');
+        var msg = document.getElementById('exportar-msg');
+        var antes = boton.textContent;
+        boton.disabled = true;
+        boton.textContent = 'Preparando…';
+        if (msg) { msg.textContent = ''; msg.removeAttribute('data-mal'); }
+        try {
+          var r = await fetch('/portal-api/exportar?clientId=' + encodeURIComponent(clientId)
+                              + '&que=' + encodeURIComponent(que));
+          if (!r.ok) throw new Error('http ' + r.status);
+          var blob = await r.blob();
+          // El nombre del fichero lo decide el servidor: asi el que se guarda en
+          // Descargas lleva el nombre del salon y la fecha.
+          var cab = r.headers.get('Content-Disposition') || '';
+          var m = cab.match(/filename="?([^"]+)"?/);
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = m ? m[1] : (que + '.csv');
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          // Sin esto el navegador se queda el fichero en memoria hasta recargar.
+          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          if (msg) msg.textContent = 'Descargado ✅';
+        } catch (e) {
+          console.error('[exportar]', e);
+          if (msg) { msg.textContent = 'No se ha podido descargar. Inténtalo otra vez.'; msg.setAttribute('data-mal', ''); }
+        } finally {
+          boton.disabled = false;
+          boton.textContent = antes;
+        }
+      });
+    });
+
     var billingNavBtn = document.querySelector('.crm-nav-btn[data-view=billing]');
     if (billingNavBtn) {
       billingNavBtn.addEventListener('click', function() {
@@ -5219,6 +5273,19 @@ const weekdayLabels: [string, string][] = [
   .cli-chip-ultima { color: var(--crm-muted); }
 
   .cli-flecha { font-size: 20px; color: var(--crm-muted); flex: none; }
+
+  /* Llevarse sus datos */
+  .datos-botones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .datos-msg {
+    font-size: 12.5px;
+    color: var(--crm-muted);
+  }
+  .datos-msg[data-mal] { color: var(--crm-danger); }
 
   /* Ficha */
   .cli-ficha-head {

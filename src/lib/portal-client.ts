@@ -568,6 +568,38 @@ export interface ClienteFicha {
   }>;
 }
 
+/**
+ * Trae el fichero de datos del salon desde la Pi.
+ *
+ * A diferencia del resto, lo que vuelve NO es JSON: es un CSV. Por eso se lee
+ * como texto y se arrastra la cabecera del nombre del fichero, que es la que
+ * hace que en Descargas se vea "clientes-peluqueria-lena-2026-09-14.csv".
+ */
+export async function exportarDatos(
+  clientId: string,
+  token: string,
+  que: "clientes" | "citas",
+): Promise<{ ok: boolean; status: number; csv?: string; disposition?: string; error?: string }> {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/client/${clientId}/exportar?que=${encodeURIComponent(que)}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok) {
+      const texto = await response.text().catch(() => "");
+      return { ok: false, status: response.status, error: texto || "error" };
+    }
+    return {
+      ok: true,
+      status: 200,
+      csv: await response.text(),
+      disposition: response.headers.get("Content-Disposition") ?? undefined,
+    };
+  } catch (error) {
+    return { ok: false, status: 502, error: (error as Error).message };
+  }
+}
+
 export async function fetchCustomers(
   clientId: string,
   token: string,
