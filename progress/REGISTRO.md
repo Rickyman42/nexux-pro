@@ -1494,3 +1494,57 @@ cambio de que al que compra la pantalla de pago le tarde ~1 segundo mas en salir
 antes de tocarlo.
 
 PENDIENTE DE MEDIR manana: si baja el 42% que se iba sin bajar ni tocar nada.
+
+## 2026-09-14 — La pantalla de pago podia quedarse girando para siempre (Opus, commit 0c28dc6, SIN desplegar)
+
+Ricardo pregunto si se podia recuperar a los que llegan al pago, como un carrito abandonado. Al
+mirarlo aparecio algo peor.
+
+LO QUE SE VIO EN STRIPE (solo lectura, autorizado por Ricardo): de las ultimas 100 pantallas de pago
+abiertas, 96 caducadas, 2 abiertas y 2 completadas -- y las 2 completadas son nuestras (@nexux.pro).
+Cero clientes de verdad. Las 96 caducadas vienen con los datos del cliente COMPLETAMENTE vacios.
+
+Eso ultimo no significa que nadie escriba su correo: significa que Stripe no nos lo ensena. Su
+documentacion lo dice literal: el correo solo se devuelve al caducar si ya existe un cliente creado
+(el nuestro se crea al confirmar el pago, no antes) o si la persona marco una casilla de promociones
+que nunca hemos puesto. Asi que hoy no se puede saber, y activar la recuperacion seria a la vez la
+unica forma de averiguarlo.
+
+LOS DOS FALLOS ENCONTRADOS, los dos mudos:
+
+1. `await stripe.initEmbeddedCheckout({ clientSecret })` sin limite de espera. Si Stripe tardaba o
+   se atascaba, ese await esperaba para siempre: ruedecita girando, ningun error en pantalla,
+   ningun aviso para nosotros. Encaja con lo medido esta manana: el guion de Stripe tarda entre
+   4.800 y 7.200 ms en cargar en la Pi con buena conexion.
+2. Si cerraban la ventana mientras cargaba, la pantalla de Stripe llegaba despues y se montaba
+   igual, en una ventana ya cerrada.
+
+Arreglado: 20 s de limite (numero elegido con la medida de Stripe, no a ojo), error con boton de
+volver a intentarlo, y cada intento con su numero para que lo que llegue tarde se cierre.
+
+LA MEDICION QUE FALTABA: hasta hoy solo se sabia quien PULSABA comprar. Un pago atascado y un
+cliente que se lo piensa daban exactamente el mismo dato. Se anaden checkout_form_shown (con cuanto
+tardo en salir), checkout_form_failed (con el motivo) y checkout_form_retried.
+
+Comprobado: 59/59 tests (10 nuevos), 10/10 sabotajes cazados con restauracion md5, nexux-verify 5/5
+(uno de ellos sobre el HTML construido, no sobre el fuente). Los tests NO leen el codigo: compilan
+checkout.ts con esbuild y lo EJECUTAN contra un navegador de mentira.
+
+En navegador de verdad sobre la compilacion, con la version que hay hoy en produccion como control:
+  hoy   -> sale el error, SIN boton de reintentar y SIN ninguna senal
+  ahora -> sale el error, el boton reintenta de verdad, y llega checkout_form_failed
+           {motivo: session_failed, ms: 212}
+
+ERROR MIO CORREGIDO: el primer sabotaje (devolver el await sin limite) no fallaba, COLGABA el test.
+Un test que se cuelga no avisa de nada. Ahora tiene su propio limite y falla diciendo que pasa. Y el
+detector de sabotajes leia el resumen final, que cuando la tanda se cancela no llega a imprimirse:
+contaba un sabotaje cazado como "no rompe nada".
+
+PENDIENTE: autorizacion de Ricardo para desplegar. Despues, comprobar en produccion que el
+formulario SI sale (checkout_form_shown con su tiempo real) y forzar un atasco para ver el error a
+los 20 s. Y en un dia de datos, saber por fin cuantos de los que pulsan comprar llegan a ver el
+formulario.
+
+NO HECHO, a decidir con el dato delante: el carrito abandonado (casilla de promociones +
+after_expiration[recovery] + avisar en checkout.session.expired). Solo merece la pena si resulta que
+la gente SI llega al formulario y se va.
