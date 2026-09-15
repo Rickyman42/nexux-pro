@@ -1708,8 +1708,32 @@ salia. En produccion no se notaba porque la fecha es un numero enorme, pero la r
 HUECO QUE DESTAPO EL SABOTAJE: se comprobaba el formato de fecha en el fichero de citas pero no en
 el de clientas, y llegan a la fecha por caminos distintos. Añadido.
 
-PENDIENTE: autorizacion de Ricardo. Ojo, esto son DOS despliegues: el de nexux-pro (Vercel, como
-siempre) y un REINICIO de nexux-clients en la Pi, que es lo que sirve el portal y los bots.
+DESPLEGADO con autorizacion de Ricardo, en dos pasos y en este orden (el boton depende de la Pi):
+  1. Reinicio de nexux-clients (15-sep 12:11). Limpio: /health 200, el endpoint nuevo responde 401
+     (existe y pide sesion), Telegram volvio a escuchar solo con sus 2 conexiones de siempre, y los
+     22 clientes cargados. Los invalid_client de Google que salian en el registro eran de las 06:00,
+     ANTES del reinicio, y el vigilante del calendario de las 06:20 dio 0 agendas con problemas.
+  2. nexux-pro a Vercel (commits 1995b1f y 77756ef).
+
+🔴 FALLO ENCONTRADO EN PRODUCCION, nada mas desplegar, y de los que no se ven de otra forma:
+el puente del portal leia la respuesta de la Pi con `.text()`, y al decodificar, la norma de fetch
+QUITA la marca de UTF-8 del principio. El fichero llegaba al navegador 3 bytes mas corto, y sin esa
+marca Excel abre "Maria Ñañez" como "MarÃ­a Ã‘Ã¡Ã±ez": justo el fallo para el que habia escrito un
+test, reintroducido una capa mas arriba. Los tests no lo veian porque prueban la Pi, y ahi el
+fichero sale bien. Arreglado pasando BYTES (arrayBuffer) sin decodificar en ningun punto
+(commit 77756ef).
+
+Por eso queda scripts/prueba-descarga-en-vivo.sh dentro del repo: comprueba el camino COMPLETO en
+produccion (la Pi, el portal, que los dos ficheros sean identicos byte a byte, que sin sesion
+responda 401 y que los botones esten en la pagina). Es lo unico que ve esta clase de fallo.
+
+Comprobado en vivo despues del arreglo: 14/14 correctas. El fichero que baja el portal es identico
+byte a byte al que sale de la Pi, con su marca de UTF-8, su punto y coma y su nombre
+"clientes-centro-lena-2026-09-15.csv".
+
+AVISO A RICARDO: mis pruebas en produccion han disparado el aviso de Telegram de verdad, a nombre de
+"Centro Lena" (que es el salon de demo, carpeta estudio-ricardo-demo-mostoles-946279). No es un
+salon real llevandose sus datos: soy yo comprobando que el aviso funciona.
 
 APUNTADO, no hecho: lo de pago. Clientas que no vuelven desde hace tres meses con un boton para que
 Lara les escriba, informe mensual, envio automatico cada semana a su Excel o a su gestoria. Eso es
