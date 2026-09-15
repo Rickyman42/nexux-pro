@@ -1613,3 +1613,104 @@ crm-schedule-inherit-check). Estan apuntadas una a una en el test: si aparece un
 se tocan ahora porque no es lo que se pidio y cada una hay que mirarla en su pantalla.
 
 PENDIENTE: autorizacion de Ricardo para desplegar, y verlo en el portal de verdad despues.
+
+## 2026-09-14 — Copia de seguridad FUERA de la Pi, y un vigilante que avise si deja de hacerse (Opus)
+
+Ricardo pregunto donde se guardan los datos de los clientes de sus clientes. Respuesta: no hay base
+de datos. Son ficheros JSON, una carpeta por negocio, en ~/nexux-clients/clients/. 22 negocios, 896
+KB en total. El portal de Vercel no guarda nada: se lo pide todo a la Pi.
+
+La pestaña Clientes no es una agenda que nadie rellene: los clientes se deducen de las citas,
+agrupados POR TELEFONO (por nombre la misma persona sale tres veces). Lo unico que se guarda aparte
+es la nota y las preferencias que escribe el dueño. Hoy solo 1 de los 22 tiene ese fichero.
+
+Habia copia diaria a las 4:00 al disco externo, verificada y con prueba de restauracion. Pero ese
+disco esta enchufado a la MISMA Pi: cubria que se corrompiera la tarjeta de memoria, no un incendio,
+un robo ni que la Pi muriera del todo.
+
+HECHO: ~/scripts/nexux-copia-fuera.sh (cron 4:30, despues de la copia local). Coge el paquete del
+dia, lo CIFRA con AES256 y lo manda al otro equipo de la casa (nexux-server, 192.168.0.156). Se
+cifra porque dentro va el .env con la sk_live y datos personales de las clientas de los salones.
+
+Se comprueba de verdad, no de palabra:
+  - que el paquete del dia no sea viejo (mas de 30 h = la copia local esta parada)
+  - que lo cifrado se pueda volver a abrir AQUI antes de mandarlo
+  - que el sha256 de alla coincida con el de aqui
+  - y la que importa: se descifra ALLI y se cuentan los ficheros de clientes que se leen
+Primera ejecucion real: 22 MB, y 129 ficheros de clientes leidos en la otra maquina.
+
+HECHO TAMBIEN: ~/scripts/vigilante-copias.sh (cron 9:10). El riesgo de una copia automatica no es
+que falle, es que falle EN SILENCIO. Avisa por Telegram solo cuando cambia el estado (nada de un
+mensaje al dia, que se acaba silenciando) y avisa tambien cuando se recupera, porque un silencio no
+distingue "ya va bien" de "el vigilante tambien se ha muerto". Detecta: parte que no existe, parte
+en FALLO, parte que dice OK pero lleva dias sin renovarse, y el caso traicionero de que el fichero
+este pero NO se pueda abrir.
+
+Comprobado: 6/6 sabotajes de la copia (control positivo incluido, y el rastro borrado del otro
+equipo), 8/8 del vigilante, nexux-verify 6/6. El cron paso de 37 a 41 lineas sin perder ninguna.
+
+🔴 PENDIENTE DE RICARDO, y sin esto la copia no sirve de nada: la contrasena de cifrado esta en
+~/.nexux-copia-fuera.pass, SOLO en la Pi. Si el unico sitio donde vive es la Pi, el dia que la Pi
+desaparezca esa copia son 22 MB de ruido que no puede abrir nadie. Tiene que estar en su gestor de
+contrasenas.
+
+AVISADO, no hecho: el destino esta en la misma casa. Cubre que la Pi se estropee, que es lo mas
+probable con diferencia. NO cubre incendio ni robo. Para eso hace falta un destino fuera de casa, y
+eso es una cuenta y un gasto: lo decide Ricardo.
+
+Y LO QUE DE VERDAD PREGUNTABA: hoy un salon NO se puede llevar sus datos. Lo unico descargable del
+portal son los QR y las facturas de Stripe. Ni lista de clientes, ni citas, ni notas. Ni si se da de
+baja. Apuntado para decidir.
+
+## 2026-09-14 — Un salon ya se puede llevar sus datos, y avisa cuando lo hace (Opus, SIN desplegar)
+
+Commits: nexux-clients 7918507 (genera el fichero y avisa) · nexux-pro 1995b1f (el boton).
+
+Hasta hoy un salon NO podia sacar sus datos: lo unico descargable del portal eran los QR y las
+facturas de Stripe. Ni lista de clientas, ni citas, ni notas, ni al darse de baja.
+
+Ricardo planteo cobrarlo, y luego el miedo de fondo: "si les facilitamos los datos, se van". Se
+decidio: descarga gratis + aviso a Telegram cuando alguien la usa. Razones, por orden de peso:
+  1. Lo que se llevan es una lista de nombres y telefonos. Lo que los retiene es que Lara conteste
+     el WhatsApp en tres segundos, y eso no se lo lleva ningun CSV ni lo puede importar nadie.
+  2. Esos datos no son nuestros: la dueña del salon responde de ellos ante la ley y nosotros solo se
+     los guardamos.
+  3. Retener porque no pueden salir es lo que le criticamos a Booksy, y tenemos una pagina que se
+     llama alternativa-a-booksy. Es el argumento para que se cambien.
+  4. Medido: el fichero de citas mas grande son 36 KB y los 22 negocios juntos 896 KB. La descarga
+     lee el MISMO fichero que ya lee la pestaña Clientes, y hace menos trabajo. El coste de
+     infraestructura no era el problema.
+  5. Y el contexto: de los 22, los 7 con suscripcion son pruebas nuestras ("Peluqueria Carmen E2E").
+     Los de nombre real estan en periodo de prueba. NO hay ni un salon pagando. Se estaba discutiendo
+     como evitar que se vayan antes de que llegue el primero.
+
+EL AVISO, que fue lo que convencio: quien se descarga TODA su lista suele estar pensando en irse, y
+ese aviso llega ANTES de que cancele. Con friccion no se sabria: copiaria los telefonos a mano.
+Maximo un aviso cada 6 h por salon y tipo, que un vigilante que repite se acaba silenciando.
+
+EL FORMATO, donde estaban los fallos de verdad, y ninguno da error:
+punto y coma (con comas Excel en español lo abre todo en UNA columna), marca de UTF-8 (sin ella
+"Maria Ñañez" sale "MarÃ­a Ã‘Ã¡Ã±ez"), cada celda entrecomillada siempre (las notas son texto libre:
+un punto y coma, un salto de linea o unas comillas parten el fichero y descolocan las columnas),
+fechas dd/mm/aaaa y estados en español, y el telefono tal cual (los trucos para que Excel no se lo
+coma meten basura y lo vuelven inutil para importarlo en otro programa, que es justo para lo que se
+lo lleva).
+
+Comprobado: 466/466 en nexux-clients (18 nuevos) y 62/62 en nexux-pro, 12/12 sabotajes con ficheros
+restaurados identicos, nexux-verify 6/6, y de punta a punta contra el servidor de VERDAD levantado
+aparte (otro puerto, su propia carpeta, sin tocar produccion): sin sesion 401, con la de otro 401,
+con la suya el fichero llega entero con su nombre, sus acentos y su nota, y el aviso sale UNA vez.
+
+BUG ENCONTRADO ESCRIBIENDO LOS TESTS: "nunca se ha avisado" se leia como "se aviso en 1970"
+(`ultimos.get(clave) || 0`), asi que con un reloj que empezara cerca de cero el PRIMER aviso no
+salia. En produccion no se notaba porque la fecha es un numero enorme, pero la regla estaba mal.
+
+HUECO QUE DESTAPO EL SABOTAJE: se comprobaba el formato de fecha en el fichero de citas pero no en
+el de clientas, y llegan a la fecha por caminos distintos. Añadido.
+
+PENDIENTE: autorizacion de Ricardo. Ojo, esto son DOS despliegues: el de nexux-pro (Vercel, como
+siempre) y un REINICIO de nexux-clients en la Pi, que es lo que sirve el portal y los bots.
+
+APUNTADO, no hecho: lo de pago. Clientas que no vuelven desde hace tres meses con un boton para que
+Lara les escriba, informe mensual, envio automatico cada semana a su Excel o a su gestoria. Eso es
+el plan de 79, y es donde esta el dinero: no en la copia, en lo que se hace con ella.
