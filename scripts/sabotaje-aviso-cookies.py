@@ -95,6 +95,13 @@ def main():
         io.open(p, 'w', encoding='utf-8').write(ORIG[p])
         if hashlib.md5(io.open(p, 'rb').read()).hexdigest() != FIRMA[p]:
             bien = False
+    # Reconstruir con el fuente bueno. Si no, la pagina construida se queda con
+    # el ultimo sabotaje dentro y el siguiente que mida vera un fallo que no
+    # existe en el codigo.
+    print('')
+    print('Reconstruyendo con el codigo bueno para no dejar trampas...')
+    construye_y_mide()
+
     print('')
     print('Ficheros restaurados igual que estaban: %s' % ('si' if bien else 'NO'))
     print('Cazados %d de %d' % (cazados, len(SABOTAJES)))

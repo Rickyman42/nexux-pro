@@ -24,6 +24,16 @@ from playwright.sync_api import sync_playwright
 MOVILES = [('movil pequeno', 360, 640), ('movil comun', 375, 667), ('movil grande', 390, 844)]
 PAGINAS = ['/paquetes/recepcionista', '/paquetes/equipo']
 
+def corta_la_analitica(pagina):
+    """Que abrir la pagina para medirla no cuente como una visita.
+
+    Sin esto, cada pasada contra produccion mete 9 visitas falsas en Umami. Hay
+    dias con 2 visitas reales: mis comprobaciones pesarian mas que la gente.
+    """
+    pagina.route('**/stats/**', lambda ruta: ruta.abort())
+    pagina.route('**/plausible.io/**', lambda ruta: ruta.abort())
+
+
 MEDIDA = """() => {
   const boton = document.querySelector('.plan-action-primary');
   if (!boton) return { error: 'no hay boton de comprar en la pagina' };
@@ -61,6 +71,7 @@ def main():
             for nombre, ancho, alto in MOVILES:
                 pagina = navegador.new_page(viewport={'width': ancho, 'height': alto},
                                             device_scale_factor=1)
+                corta_la_analitica(pagina)
                 try:
                     pagina.goto(base + ruta, wait_until='networkidle', timeout=60000)
                     m = pagina.evaluate(MEDIDA)

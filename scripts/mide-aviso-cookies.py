@@ -26,6 +26,16 @@ MOVILES = [('movil pequeno', 360, 640), ('movil comun', 375, 667), ('movil grand
 TOPE_ALTO = 105
 PAGINA = '/paquetes/recepcionista'
 
+def corta_la_analitica(pagina):
+    """Que abrir la pagina para medirla no cuente como una visita.
+
+    Sin esto, cada pasada contra produccion mete 9 visitas falsas en Umami. Hay
+    dias con 2 visitas reales: mis comprobaciones pesarian mas que la gente.
+    """
+    pagina.route('**/stats/**', lambda ruta: ruta.abort())
+    pagina.route('**/plausible.io/**', lambda ruta: ruta.abort())
+
+
 MEDIDA = """() => {
   const b = document.querySelector('#nx-cookie-banner');
   if (!b || b.hasAttribute('hidden')) return { error: 'el aviso no sale' };
@@ -64,6 +74,7 @@ def main():
         for nombre, ancho, alto in MOVILES:
             ctx = navegador.new_context(viewport={'width': ancho, 'height': alto})
             pg = ctx.new_page()
+            corta_la_analitica(pg)
             pg.goto(base + PAGINA, wait_until='networkidle', timeout=60000)
             pg.wait_for_timeout(1800)  # el aviso entra con una animacion de 1s
             m = pg.evaluate(MEDIDA)
