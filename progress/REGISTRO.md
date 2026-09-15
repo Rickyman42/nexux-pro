@@ -1738,3 +1738,66 @@ salon real llevandose sus datos: soy yo comprobando que el aviso funciona.
 APUNTADO, no hecho: lo de pago. Clientas que no vuelven desde hace tres meses con un boton para que
 Lara les escriba, informe mensual, envio automatico cada semana a su Excel o a su gestoria. Eso es
 el plan de 79, y es donde esta el dinero: no en la copia, en lo que se hace con ella.
+
+---
+
+## 15-sep-2026 — Las tres medidas de hoy no se pueden dar: el anuncio dejo de traer gente
+
+Ayer quedamos en que hoy miraria tres cosas: si bajo el 42% que se iba al instante despues del
+arreglo de velocidad, si mejoraba la proporcion 7 de cada 100 que llegaban al pago, y cuantos de
+los que pulsan comprar llegan a ver el formulario. Ninguna de las tres tiene respuesta, y la razon
+no es tecnica: **no hay gente que medir**.
+
+Lo que dicen los numeros de Umami (llegadas desde el anuncio, por hora, en horario de Madrid):
+
+    13-sep tarde/noche      entre 16 y 71 por hora
+    14-sep 08:00 - 10:00    24, 24
+    14-sep 11:00             4     <- aqui se cae
+    14-sep 12:00             1
+    14-sep 13:00 en adelante 0 o 1 por hora
+    ultima llegada          14-sep 19:42
+    15-sep (hoy)            CERO llegadas del anuncio, 2 visitas en todo el dia
+
+No es que se rompiera la señal: se cayo el trafico entero. Las visitas totales de la web bajaron
+igual que las del anuncio, y las visitas totales las cuenta el contador de Umami, que es otro
+programa distinto del mio. Ademas, las pocas personas que si han entrado desde el anuncio despues
+de la caida quedaron registradas correctamente, una a una.
+
+Dato que conviene tener claro: **casi toda la visita de nexux.pro era el anuncio**. En cada hora,
+el numero de llegadas del anuncio era practicamente igual al de visitas totales. Sin anuncio, la
+web recibe una visita por hora. No hay trafico propio que amortigue.
+
+### Descartado que sea culpa de mis despliegues
+
+La caida (11:00 del 14-sep) coincide casi en el minuto con un despliegue mio (10:57). Comprobado
+uno por uno:
+
+- Lo unico que toque de la plantilla comun ese dia fue añadir un `<link>` de tipografias en la
+  cabecera. Una hoja de estilos no puede reducir la gente que pulsa un anuncio en OpenAI.
+- El codigo que reconoce al que viene del anuncio SIGUE VIVO en produccion. Lo he buscado dentro
+  del fichero real que sirve la web (`Medicion...BQeNzMe6.js`, 4.997 bytes) y ahi esta la regla
+  entera: si la fuente contiene "openai" o "chatgpt", se marca la llegada.
+- La pagina a la que apunta el anuncio (`/paquetes/recepcionista`) responde hoy correcta y en
+  95 milisegundos, tambien con los parametros exactos del anuncio pegados detras.
+- Las otras dos webs que usan el mismo Umami siguen registrando visitas esos mismos dias.
+
+Un despliegue mio puede romper lo que se mide. No puede apagar el grifo de quien entra.
+
+### Lo que si se puede decir de las medidas, con su tamaño de muestra
+
+    13-sep (dia completo de anuncio):  290 llegadas -> 14 pulsaron comprar -> 6 llegaron al pago
+    14-sep (medio dia):                123 llegadas ->  3 pulsaron comprar -> 2 llegaron al pago
+
+El arreglo de velocidad entro a las 10:57 y el anuncio murio a las 11:00: hay unas 12 llegadas
+despues del arreglo. Sacar un porcentaje de 12 personas seria inventar. El aviso nuevo
+(`checkout_form_shown`) entro a las 12:53, ya sin trafico: cero registros, como era de esperar. El
+aparato esta probado (ayer se demostro en produccion quitandole el limite y viendo los 40 segundos
+de rueda girando), lo que falta es gente que pase por delante.
+
+### Lo unico que hay que mirar, y lo tiene que mirar Ricardo
+
+En el panel de OpenAI Ads: si la campaña `nexux_recepcionista_29` ha tenido impresiones despues
+del 14-sep a las 19:42. Dice que la cuenta ya esta en servicio, pero la web no ha recibido ni una
+sola llegada hoy. O sigue parada, o esta en servicio pero sin entregar.
+
+En cuanto vuelva a entrar gente, las tres medidas salen solas: ya estan los tres contadores puestos.
