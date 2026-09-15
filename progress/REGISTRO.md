@@ -2138,3 +2138,73 @@ configuracion sirve o tira el dinero, y sale de Umami sin depender de nadie.
 
     21:00-03:00    240 llegadas   16 clics   7 al pago     6,7%
     resto del dia  173 llegadas    1 clic    1 al pago     0,6%
+
+---
+
+## 15-sep-2026 (tarde) — Horario movido a las 22:00, y una campana pausada por error mio
+
+### Lo primero, el error
+
+El historial de cambios de la cuenta dice, literal:
+
+    15 sept 2026, 18:19:05   estado de Campaign   Activo -> En pausa
+
+A esa hora el unico que estaba pulsando en esa tabla era yo, buscando el menu de "Acciones" a
+base de coordenadas en un panel que se congelaba cada dos por tres. El interruptor de pausar esta
+pegado a la casilla que yo intentaba marcar. **La campana esta en pausa y lo mas probable es que
+la pausara yo.** No lo puedo demostrar, pero no me voy a esconder detras de la duda.
+
+Coste: desde las 18:23 no entra nadie. Hoy ya se habia gastado el presupuesto del dia, asi que el
+dano es que no arranca sola mañana hasta que alguien la vuelva a activar.
+
+### Lo que si quedo hecho
+
+    15 sept 2026, 18:29:09   actualizada fecha de inicio de Campaign
+
+Hora de inicio de la campana: **10:00 AM -> 10:00 PM (22:00) GMT+2**. Presupuesto diario 15 EUR,
+fin 22 sept. El historial solo enseña la fecha, no la hora, pero la entrada confirma que se guardo.
+
+### Por que las 22:00
+
+El presupuesto diario no se reparte por el dia: se quema en una rafaga. Hoy, medido en Umami al
+minuto: **21 llegadas entre las 18:11:24 y las 18:23:29, y CERO clics.** Doce minutos y a la calle.
+El panel confirma el mismo numero (419 -> 440 clics): la medicion cuadra al clic.
+
+O sea que lo unico que importa es A QUE HORA cae esa rafaga. Con los datos del 13 y 14:
+
+    hora   llegadas   clics          al pago
+    19:00     32       0 ( 0,0%)       0
+    20:00     34       0 ( 0,0%)       0
+    21:00     47       2 ( 4,3%)       1
+    22:00     51       3 ( 5,9%)       2
+    23:00     71       5 ( 7,0%)       1
+    00:00     29       3 (10,3%)       1
+    01:00     16       1 ( 6,2%)       1
+    02:00     26       2 ( 7,7%)       1
+    10:00     16       0 ( 0,0%)       0
+
+Las 19:00 y 20:00 traen 66 llegadas y cero clics: empezar ahi seria tirar el dinero. El bloque
+22:00-01:00 son 151 llegadas, 11 clics y 4 llegadas al pago.
+
+Ademas la hora de inicio es la unica apuesta que sale bien en los dos casos posibles, porque no
+sabemos si el dia de la plataforma abre a la hora de inicio o a medianoche:
+
+    si abre a la hora de inicio -> la rafaga cae a las 22:00, el mejor bloque
+    si abre a medianoche        -> cae a las 00:00, la mejor tasa de clic (10,3%)
+    dejandolo en las 10:00      -> podia caer a las 10:00, donde hay CERO clics
+
+### Dos cosas del historial que nadie habia mirado
+
+1. **La puja del grupo de anuncios paso de 1,80 EUR a 15,00 EUR el 9-sep a las 4:26, y el autor es
+   "API", no Ricardo.** Hay una clave de API con permisos de administrador creada el 2-sep
+   (`nexux.pro_chatgpt-anuncios`). Algo automatico esta tocando la campana de madrugada. Hay que
+   saber que es: una puja maxima de 15 EUR por clic es un techo enorme.
+
+2. **El evento de conversion era "Cita confirmada" (`appointment_scheduled`) y se cambio a
+   "Checkout Started" el 8-sep.** El primero es el que de verdad indica negocio. El de la campana
+   actual esta bloqueado y no se puede volver a cambiar.
+
+### Pendiente de Ricardo
+
+Reactivar la campana (es dinero, no lo hago yo). Y decidir que se hace con la clave de API que
+sube pujas sola.
