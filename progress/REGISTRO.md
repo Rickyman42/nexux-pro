@@ -2093,3 +2093,48 @@ solo se imprimiria y una vuelta atras pasaria por buena.
 
 Ni un dato menos: los tres pixeles siguen detras del permiso y la cuenta de quien acepta sigue
 funcionando. Escritorio sin tocar.
+
+---
+
+## 15-sep-2026 — Campaña reactivada: 15 EUR/dia hasta el 22-sep (y lo que se aprendio del panel)
+
+Lo configuro Ricardo a mano: mi guardian de permisos me bloqueo al ir a escribir el importe
+("Real-World Transactions"), y esta bien que lo hiciera. Yo recorri la ruta, comprobe que el minimo
+diario son 15 EUR (10 no lo acepta) y le pase los pasos; el guardo.
+
+Estado comprobado en el panel, recargando: **15,00 EUR/dia, fin 22 sept 2026, En servicio.**
+
+### Lo que se aprendio leyendo el panel (no habia forma de saberlo desde fuera)
+
+    campana "Conversiones..."   11.810 impresiones  419 clics  4 conversiones  74,99 EUR  CPC 0,18
+    campana "Clics" (apagada)    2.200 impresiones   15 clics  0 conversiones  25,09 EUR  CPC 1,67
+
+- **Se gastaron 100,08 EUR, no 75.** La segunda campana se llevo 25 EUR a 1,67 el clic para cero
+  conversiones. Sigue apagada y tiene que seguir asi.
+- **El panel dice 419 clics y Umami conto 452 llegadas.** Nuestra medicion NO pierde gente y no nos
+  cobran de mas. Esto valida toda la cadena de medida.
+- **El evento de conversion es "Checkout Started" y esta BLOQUEADO**: no se puede cambiar en una
+  campana ya creada. El algoritmo optimiza hacia "abrir el pago", que llevamos 8 y 0 ventas.
+- **El panel marca 4 conversiones y Umami vio 8 llegadas al pago** -> acepta las cookies
+  aproximadamente la MITAD de la gente, no el 15% que temia. El panel cuenta de menos por dos, no
+  por seis.
+- **NO existe franja horaria (dayparting)** en el panel. Solo una fecha+hora de inicio y una de fin
+  para toda la campana. La idea de "solo de noche" no se puede configurar hoy.
+
+### El aviso importante: el presupuesto diario se quema en media hora
+
+Nada mas reactivarse, Umami registra **3 llegadas por minuto**. A 0,18 EUR el clic eso son ~32 EUR
+la hora: los 15 EUR del dia se gastan en **menos de 30 minutos**.
+
+Es decir, el presupuesto diario no reparte el gasto por el dia: compra media hora de anuncio a la
+hora en que al plataforma abra el dia. Si esa media hora cae de madrugada (00:00-00:30) estamos en
+la franja buena por casualidad; si cae a las 10:00 (la hora de inicio de la campana) cae en horas
+muertas, donde historicamente hay 0 clics.
+
+**Eso se comprueba mañana mirando A QUE HORA entran las llegadas.** Es el dato que decide si esta
+configuracion sirve o tira el dinero, y sale de Umami sin depender de nadie.
+
+### Franja buena, recordada aqui para cuando haya con que compararla
+
+    21:00-03:00    240 llegadas   16 clics   7 al pago     6,7%
+    resto del dia  173 llegadas    1 clic    1 al pago     0,6%
