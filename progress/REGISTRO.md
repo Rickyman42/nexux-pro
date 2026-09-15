@@ -2208,3 +2208,46 @@ sabemos si el dia de la plataforma abre a la hora de inicio o a medianoche:
 
 Reactivar la campana (es dinero, no lo hago yo). Y decidir que se hace con la clave de API que
 sube pujas sola.
+
+---
+
+## 15-sep-2026 (noche) — Las 22:00 no abrieron ninguna ventana, y el vigilante ya mira la hora
+
+**La apuesta de la hora de inicio ha fallado.** Son las 22:57 y no ha entrado nadie desde las 20:37.
+Poner la hora de inicio de la campana a las 22:00 NO hace que el presupuesto diario se abra a las
+22:00. Queda descartado ese camino.
+
+Lo que paso hoy, medido al minuto:
+
+    18:11 - 18:23    21 llegadas   0 clics   0 al pago
+    19:23 - 19:56    35 llegadas   1 clic    1 AL PAGO
+    20:37             1 llegada
+    21:00 en adelante nada
+
+Cuarenta y cinco minutos de anuncio. Eso es lo que compran 15 EUR. Y cayeron enteros fuera de la
+franja que convierte.
+
+### Lo que ahora se encarga solo
+
+Ya existia `vigilante-campana-ads.mjs` (cron 09:15, solo lectura) que junta panel + Umami + Stripe y
+avisa por Telegram. **Le faltaba lo unico que hoy decide: la hora.** Ahora dice la hora pico, cuantos
+cayeron dentro de 21:00-03:00 y se pone en rojo si mas de la mitad se gasto fuera.
+
+Ademas se ha puesto una linea de cron **solo para esta noche** (`40 0 16 9 *`) que manda el mismo
+aviso a las 00:40, para saber si el dia de la plataforma abre a medianoche sin esperar a las 9:15.
+**Hay que quitarla despues del 16-sep.**
+
+FALLO CAZADO ANTES DE SUBIRLO: la primera consulta agrupaba por una expresion con el count() dentro.
+Eso mata el vigilante entero (codigo 1) y **no manda ningun aviso**, que se parece muchisimo a "no
+hay novedades". Queda `scripts/prueba-hora-rafaga.mjs` (corre la consulta sin avisar y comprueba que
+la suma por horas cuadra con el total) y `scripts/sabotaje-hora-rafaga.py`, 2 de 2.
+
+### Lo que NO se encarga solo, y hace falta decidir
+
+Encender y apagar la campana a las horas buenas. Es lo unico que daria un horario de verdad. La
+mitad del camino ya esta: la clave `OPENAI_ADS_API_KEY` existe en `~/nexux-clients/.env` y el
+vigilante ya la usa para LEER. Falta confirmar que la API permite cambiar el estado, y el visto
+bueno de Ricardo, porque seria un script gastando dinero sin que nadie mire.
+
+Nota: el vigilante actual es de solo lectura, asi que **NO es el "API" que subio la puja de 1,80 a
+15 EUR el 9-sep a las 4:26**. Eso sigue sin identificar.
