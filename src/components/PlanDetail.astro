@@ -635,9 +635,39 @@ const { plan, slug } = Astro.props as Props;
   }
 
   @media (max-width: 768px) {
+    /* La primera pantalla de un movil son 667px y el aviso de cookies se come
+       los 121 de abajo. Todo lo que importa tiene que caber en los 530 de
+       arriba, y lo que importa es el boton. Medido, no estimado:
+       el boton estaba en 802 y no se veia. */
     .plan-detail {
-      padding: 5.5rem 0 4rem;
+      /* Estos 88px no tapaban ninguna cabecera: no hay cabecera fija aqui. */
+      padding: 1.75rem 0 4rem;
     }
+
+    .plan-hero {
+      gap: 1.1rem;
+    }
+
+    /* Deshace la caja para poder ordenar titulo, gancho y parrafo por separado
+       sin tocar el HTML (y sin que el escritorio se entere). */
+    .plan-copy {
+      display: contents;
+    }
+
+    /* Menta sobre menta: en el movil no se lee, y costaba 34px de pantalla. */
+    .plan-copy .eyebrow {
+      display: none;
+    }
+
+    .plan-badge { order: 0; }
+    .plan-title { order: 1; font-size: 2.3rem; }
+    .plan-hook { order: 2; margin-top: 0; }
+    .plan-purchase-card { order: 3; }
+    /* El parrafo largo dice lo mismo que el gancho, peor. Pasa a despues de la
+       tarjeta: sigue estando, deja de estorbar. */
+    .plan-sub { order: 4; margin-top: 0; }
+    /* Y la puerta de salida, la ultima. Era lo primero que se podia pulsar. */
+    .plan-back { order: 5; font-size: 0.86rem; }
 
     .plan-panel,
     .plan-final-cta {

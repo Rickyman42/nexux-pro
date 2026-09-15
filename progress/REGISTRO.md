@@ -1865,3 +1865,94 @@ tocar ese tramo es pagar otra vez por lo mismo.
 Mirar cuantos CLICS dice el panel de OpenAI Ads. Si dice entre 450 y 550, nuestra medicion es fiable
 de punta a punta y todos los numeros de arriba valen. Si dice el doble, la mitad de la gente por la
 que pagamos nunca llego a cargar la pagina, y eso es un problema distinto (y mas caro).
+
+---
+
+## 15-sep-2026 — La primera pantalla del movil no ensenaba el boton de comprar
+
+Ricardo: "arregla el primer tramo de la pagina antes de meter mas dinero, se supone que ya se
+optimizo ayer". Ayer se arreglo lo que TARDA en aparecer (2,9 -> 1,7 s). Esto es otra cosa: lo que
+aparece. Las dos hacian falta.
+
+Medido en la pagina de produccion, en un movil de 375x667 (el tamano mas comun):
+
+       0-173  nada. 88px de relleno que no tapan ninguna cabecera (no hay cabecera
+              fija en esta pagina), el enlace "Volver a paquetes" -- la primera cosa
+              pulsable de la pagina era una puerta de SALIDA -- y los huecos.
+     173-538  lo unico que se veia: el badge, un "NEXUX PRO" en menta sobre fondo
+              menta que no se lee, el titulo a 48px en dos lineas y un parrafo.
+     538-659  el aviso de cookies, tapando el quinto de abajo.
+         802  el boton "Quiero recuperar esas citas" -- 135px FUERA de la pantalla.
+
+De las 452 personas que trajo el anuncio: 96 de cada 100 venian en movil, 6 de cada 10 se fueron
+sin bajar ni un cuarto, y de los 17 que pulsaron algo, **7 lo hicieron en ESE boton y solo 1 en el
+de abajo del todo**. El boton que usa casi todo el mundo estaba donde casi nadie lo veia.
+
+### Lo que se ha hecho
+
+Solo el movil (<=768px). El escritorio no se toca: sus reglas viven en otro @media (>=960px) y no
+se solapan. Se deshace la caja del texto con `display: contents` para poder ordenar las piezas sin
+tocar el HTML:
+
+    badge -> titulo -> gancho -> TARJETA DE COMPRA -> parrafo largo -> enlace de salida
+
+Ademas: el relleno de arriba de 88px a 28px, el titulo de 48px a 2,3rem (ahora cabe en una linea),
+los huecos de 32px a 1,1rem, y el "Nexux Pro" en menta sobre menta se esconde en movil (no se leia
+y costaba 34px de pantalla).
+
+### Medido, no estimado
+
+Comparando el build de antes contra el de ahora en la misma maquina, con Chromium del tamano de un
+movil de verdad (`scripts/mide-primera-pantalla.py`):
+
+                             ANTES            DESPUES
+    movil 360x640      boton en 803      boton en 432   (sobran 64px hasta el aviso)
+    movil 375x667      boton en 803      boton en 432   (sobran 91px)
+    movil 390x844      boton en 803      boton en 432   (sobran 268px)
+    plan de 79, 375    boton en 761      boton en 396   (sobran 126px)
+
+    escritorio 1440    boton en 333      boton en 333   <- IDENTICO, no se ha movido nada
+    tablet 820         sin cambios                         (el @media no llega ahi)
+
+En movil ahora entra en la primera pantalla la tarjeta ENTERA: precio, el aviso del precio de
+lanzamiento, los dos botones y la linea de "30 dias o te devolvemos el dinero".
+
+La medida suspende 12 veces con el build de antes y 0 con el de ahora. Vigila dos cosas: que el
+boton entero quede por encima del aviso de cookies, y que la puerta de salida no vaya por delante
+del boton.
+
+### Los sabotajes, y lo que ensenaron
+
+`scripts/sabotaje-primera-pantalla.py`: 7 de 7 salen como deben, y el fichero queda igual que
+estaba (comprobado por huella). Pero la primera tanda salio 3 de 6, y eso hizo falta mirarlo en vez
+de taparlo. El arreglo tiene dos clases de pieza:
+
+  - **Las que cambian el ORDEN** (display:contents, el orden del parrafo y el de la puerta de
+    salida). Cada una sola tira el boton fuera: la medida se pone roja ella sola. 3 de 3.
+  - **Las que solo ganan SITIO** (relleno de arriba, tamano del titulo, huecos). Cada una por
+    separado se come margen pero deja el boton visible por los pelos, asi que la medida dice OK --
+    y hace bien, porque el boton SE VE. No es un agujero de la medida.
+
+Para no dejarlo en el aire se anadio un septimo sabotaje que aplica las tres a la vez, que es lo
+que pasa de verdad cuando alguien "limpia" el CSS. Juntas suman 159px y si tiran el boton:
+
+    movil 360x640   boton de 432 a 591  -> tapado por 95px
+    movil 375x667   boton de 432 a 591  -> tapado por 68px
+    plan 79, 360    boton de 396 a 567  -> tapado por 71px
+
+Asi que ninguna de las seis piezas sobra, y ahora esta escrito por que.
+
+### Lo que NO se ha tocado, a proposito
+
+- **El titular sigue siendo el nombre del producto** ("Nexux Recepcionista IA"). Lo que vende es la
+  linea de debajo ("Cada mensaje que no contestas es una cita que no vuelve"). Cambiar el titular es
+  decision de Ricardo, no mia.
+- **El aviso de cookies se come 121px de la primera pantalla de TODAS las paginas**, no solo de
+  esta. Es un arreglo aparte y de mas riesgo (toca el sitio entero).
+
+### Lo honesto
+
+Esto esta razonado con 452 sesiones reales, pero **no esta demostrado que venda mas**: con el
+anuncio parado no hay nadie que pase por delante. Los contadores de bajada de pagina y de clic ya
+estan puestos desde antes, asi que en cuanto vuelva a entrar gente se compara contra el 13-sep sin
+tener que preparar nada.
