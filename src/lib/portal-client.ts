@@ -579,7 +579,7 @@ export async function exportarDatos(
   clientId: string,
   token: string,
   que: "clientes" | "citas",
-): Promise<{ ok: boolean; status: number; csv?: string; disposition?: string; error?: string }> {
+): Promise<{ ok: boolean; status: number; csv?: ArrayBuffer; disposition?: string; error?: string }> {
   try {
     const response = await fetch(
       `${BASE_URL}/client/${clientId}/exportar?que=${encodeURIComponent(que)}`,
@@ -589,10 +589,14 @@ export async function exportarDatos(
       const texto = await response.text().catch(() => "");
       return { ok: false, status: response.status, error: texto || "error" };
     }
+    // Bytes, NO texto. Con `.text()` la norma de fetch se lleva por delante la
+    // marca de UTF-8 del principio del fichero, y sin ella Excel abre
+    // "Maria Ñañez" como "MarÃ­a Ã‘Ã¡Ã±ez". El fichero llegaba 3 bytes mas corto
+    // que el que sale de la Pi.
     return {
       ok: true,
       status: 200,
-      csv: await response.text(),
+      csv: await response.arrayBuffer(),
       disposition: response.headers.get("Content-Disposition") ?? undefined,
     };
   } catch (error) {

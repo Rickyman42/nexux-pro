@@ -32,6 +32,9 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   // El nombre del fichero lo decide la Pi, que es quien sabe como se llama el
   // salon. Se deja pasar tal cual para que en la carpeta de Descargas se vea
   // "clientes-peluqueria-lena-2026-09-14.csv" y no "exportar".
+  //
+  // Y el contenido se devuelve en bytes, sin pasarlo por texto en ningun punto:
+  // en cuanto se decodifica, se pierde la marca de UTF-8 y con ella los acentos.
   return new Response(result.csv, {
     status: 200,
     headers: {
