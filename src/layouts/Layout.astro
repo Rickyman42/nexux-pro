@@ -153,13 +153,13 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
     <slot />
   </main>
 
-  {/* En las fichas de producto no va: ocupa 121px de la primera pantalla de un
-      movil, que es justo donde cae el anuncio. El precio de quitarlo es que a
-      quien llega por el anuncio no se le pregunta nunca, y sin permiso no se
-      cargan los pixeles de Google, Meta ni OpenAI Ads: la campana deja de ver
-      sus conversiones. Decision de Ricardo, 15-sep-2026.
-      Umami y Plausible no dependen de esto y siguen midiendo. */}
-  {!Astro.url.pathname.startsWith('/paquetes/') && <AvisoCookies />}
+  {/* Va en TODAS las paginas, fichas de producto incluidas. Se probo a quitarlo
+      de /paquetes/ el 15-sep-2026 y se deshizo el mismo dia: el permiso se
+      guarda por navegador, no por pagina, y el anuncio aterriza justo ahi. Sin
+      aviso en esa pagina, a nadie que venga del anuncio se le pregunta nunca, y
+      sin permiso no se cargan Google, Meta ni OpenAI Ads: el panel del anuncio
+      se queda a cero conversiones. No vale la pena por 121px. */}
+  <AvisoCookies />
 
 
   <style is:global>

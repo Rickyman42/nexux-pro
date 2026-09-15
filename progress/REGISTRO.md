@@ -2017,3 +2017,37 @@ el aviso y dejar los pixeles.
 **Lo que NO esta comprobado en local:** el pixel de OpenAI solo se pinta si esta puesta
 `PUBLIC_OPENAI_ADS_PIXEL_ID`, y en local no lo esta. Ese trozo hay que volver a correrlo contra
 produccion despues de desplegar; el script avisa solo cuando no lo encuentra.
+
+---
+
+## 15-sep-2026 — Deshecho lo de quitar el aviso de cookies: se perdia dato
+
+Lo quite esta manana entendiendo que el objetivo era ganar sitio. No lo era. Ricardo: "lo del
+banner era para que no molestara" y "no quiero perder nada de data". Son dos cosas distintas y yo
+hice la equivocada.
+
+Quitarlo SI pierde dato, y del gordo: el permiso se guarda por navegador, no por pagina. El anuncio
+aterriza en /paquetes/... y el pago ocurre en esa misma pagina, asi que al que viene del anuncio no
+se le preguntaba en ningun momento. Sin permiso no se cargan Google, Meta ni OpenAI Ads, y el panel
+del anuncio se habria quedado a CERO conversiones para siempre. Eso no son 121px, es quedarse sin
+saber si la campana funciona.
+
+Deshecho: el aviso vuelve a salir en todas las paginas. Retirado tambien
+`scripts/prueba-sin-aviso-en-ficha.py`, que comprobaba un cambio que ya no existe.
+
+Lo que SI se queda, porque no pierde nada y se pidio aparte: la cuenta de cuanta gente acepta
+(12 comprobaciones en verde, sabotajes 4 de 4).
+
+Comprobado despues de deshacerlo, con el aviso puesto otra vez:
+
+    aviso en la ficha de producto                si (2 apariciones en el HTML)
+    boton visible en los 3 moviles               si, 0 fallos (sobran 64 / 91 / 268 px)
+    la cuenta de cookies                         0 fallos
+
+**Lo que molestaba de verdad ya estaba arreglado antes de todo esto** (commit 02a8817): el aviso
+tapaba el boton de comprar. Ahora el boton esta en 432 y el aviso empieza en 577: no se tocan. Lo
+unico que queda es que el aviso ocupa el quinto de abajo de la pantalla, que es sitio perdido pero
+no estorba a nada.
+
+APUNTADO, no hecho: encoger el aviso en movil a una sola linea. Recupera 60-70px, mantiene los
+pixeles y no pierde ni un dato. Es la unica forma de que "no moleste" sin pagar con informacion.
