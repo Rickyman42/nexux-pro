@@ -1801,3 +1801,67 @@ del 14-sep a las 19:42. Dice que la cuenta ya esta en servicio, pero la web no h
 sola llegada hoy. O sigue parada, o esta en servicio pero sin entregar.
 
 En cuanto vuelva a entrar gente, las tres medidas salen solas: ya estan los tres contadores puestos.
+
+---
+
+## 15-sep-2026 — Que compraron los 75 euros del anuncio (452 visitas ya pagadas, sin leer)
+
+Ricardo dice que la campaña se ha parado por agotar el presupuesto de 75 EUR. Encaja con los datos:
+hoy no ha entrado NADIE del anuncio, asi que el dinero no se ha gastado hoy; se gasto el 13 y el 14.
+Lo que compro, contado entero desde el primer dia (3-sep) hasta la ultima llegada (14-sep 19:42):
+
+    452 personas llegaron a la pagina        0,17 EUR cada una
+    17 pulsaron un boton                     4,41 EUR cada uno   (3,8 de cada 100)
+     8 llegaron a la pantalla de pago        9,38 EUR cada uno   (1,8 de cada 100)
+     0 salones pagando
+
+El reparto por dia: 2 el 3-sep, 14 el 8, 23 el 9, 290 el 13, 123 el 14.
+
+### Donde se pierde la gente (13 y 14-sep, 413 llegadas)
+
+    llegan                      413
+    bajan un cuarto de pagina   167   (40 de cada 100)
+    bajan la mitad               74   (18)
+    bajan tres cuartos           39   ( 9)
+    llegan al final              16   ( 4)
+
+**Seis de cada diez se van sin bajar ni un cuarto de la pagina.** No es el pago lo que falla: se
+pierden antes de leer nada. Ahi estan los 75 EUR.
+
+### Dos cosas que no sabiamos
+
+**1. Es publico de movil, no de ordenador.** 324 de 340 sesiones en español eran moviles; en total,
+96 de cada 100. Y en movil la pagina estaba 2,9 segundos en blanco. El arreglo de velocidad (1,7 s)
+entro el 14 a las 10:57 y el anuncio murio a las 11:00: **no ha pasado ni una persona de verdad por
+la pagina rapida**. Es justo la medida que no se puede dar hoy.
+
+**2. La mitad de los que pulsan no quieren comprar, quieren probar.** De los 17 clics:
+
+    comprar (arriba)            7        hablar con Lara          5
+    comprar (abajo)             1        hablar (otro boton)      3
+                                         secundario del hero      1
+
+Ocho quieren pagar y ocho quieren verla funcionar antes. Eso es informacion de producto, no de
+anuncio.
+
+Aparte: 48 de 223 clics (21 de cada 100) cayeron sobre algo que no es pulsable — la gente toca
+sitios donde no pasa nada. Concentrados en la fila de arriba del todo y en la de abajo del todo.
+
+El idioma descarta que estemos pagando por publico equivocado: 345 de 407 sesiones son de España
+(es-ES, ca-ES, gl). Fuera del castellano solo hay unas 30 (ingles, frances, rumano): el 7%. El pais
+que dice Umami es FR para el 100%, otra vez: ese campo NO sirve, ya estaba apuntado.
+
+### Lo que significa para decidir
+
+A 0,17 EUR la visita, hay que vender un plan de 29 EUR por cada 175 visitas solo para empatar el
+primer mes. Han pasado 452 sin ninguna. Si un salon aguanta un año son 348 EUR, y entonces haria
+falta una venta cada 2.050 visitas: eso con 452 todavia NO esta descartado.
+
+Lo que si esta demostrado es que la pagina pierde al 96% antes del boton. Meter otros 75 EUR sin
+tocar ese tramo es pagar otra vez por lo mismo.
+
+### Cruce que puede hacer Ricardo en 10 segundos
+
+Mirar cuantos CLICS dice el panel de OpenAI Ads. Si dice entre 450 y 550, nuestra medicion es fiable
+de punta a punta y todos los numeros de arriba valen. Si dice el doble, la mitad de la gente por la
+que pagamos nunca llego a cargar la pagina, y eso es un problema distinto (y mas caro).
