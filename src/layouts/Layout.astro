@@ -194,6 +194,7 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
       line-height: 1.5;
     }
     .cookie-text strong { color: var(--nx-ink); display: block; margin-bottom: 0.2rem; }
+    .cookie-mas { color: var(--nx-ink); text-decoration: underline; }
     .cookie-actions {
       display: flex;
       gap: 0.6rem;
@@ -208,14 +209,21 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
        botones siguen igual de visibles y del mismo tamano, uno al lado del
        otro en vez de apilados. (medido 13-sep-2026) */
     @media (max-width: 600px) {
+      /* Segunda vuelta (15-sep-2026): de 121px a lo que mida
+         scripts/mide-aviso-cookies.py. Pegado al borde de abajo en vez de
+         flotando: los 8px de cada lado y las esquinas redondeadas costaban
+         altura y no aportaban nada en una pantalla de 375px. */
       .cookie-banner {
-        bottom: 8px;
-        left: 8px;
-        right: 8px;
-        padding: 0.7rem 0.85rem;
-        gap: 0.55rem;
-        border-radius: 14px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.5rem 0.7rem calc(0.5rem + env(safe-area-inset-bottom));
+        gap: 0.4rem;
+        border-radius: 12px 12px 0 0;
       }
+      /* La letra NO se toca: 0.78rem se lee. Encoger un texto legal para que
+         ocupe menos es esconderlo, y es justo lo que se multa. Lo que se quita
+         es adorno: margenes, esquinas y huecos. */
       .cookie-text { font-size: 0.78rem; line-height: 1.35; }
       /* El titulo deja de robar una linea entera para el solo. */
       .cookie-text strong { display: inline; margin-bottom: 0; }
@@ -234,6 +242,8 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
         font-size: 0.78rem !important;
         white-space: nowrap;
       }
+      /* El enlace al detalle, visible pero sin robar linea. */
+      .cookie-mas { white-space: nowrap; }
     }
   </style>
 <script>

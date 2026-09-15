@@ -2051,3 +2051,45 @@ no estorba a nada.
 
 APUNTADO, no hecho: encoger el aviso en movil a una sola linea. Recupera 60-70px, mantiene los
 pixeles y no pierde ni un dato. Es la unica forma de que "no moleste" sin pagar con informacion.
+
+---
+
+## 15-sep-2026 — El aviso de cookies, mas estrecho en movil (y con el enlace que le faltaba)
+
+    movil 360x640   122px -> 96px      18% de la pantalla -> 15%
+    movil 375x667   122px -> 96px      18% -> 14%
+    movil 390x844   122px -> 96px      14% -> 11%
+
+El boton de comprar pasa de tener 91px de margen a 125.
+
+**Prometi 60-70px y he sacado 26. Queda dicho.** Para bajar de 96 solo quedan tres caminos y los
+tres son trampa: letra mas pequena (encoger un texto legal es esconderlo), botones mas pequenos
+(rechazar tiene que costar lo mismo que aceptar) o quitar los nombres de GA4 y Meta (decir
+"cookies" a secas es peor practica, no mejor). Se probo con la letra a 0.72rem y se llegaba a 89px:
+deshecho, 7px no valen eso.
+
+Lo que si se ha quitado es **adorno**: el aviso flotaba con 8px de margen a cada lado y esquinas
+redondeadas; ahora va pegado abajo. Y una frase de relleno ("Usamos cookies para mejorar la
+experiencia") que no informaba de nada. Lo que informa se queda entero, y los nombres de los
+terceros tambien.
+
+**Tapado de paso un agujero real que llevaba dias apuntado: el aviso no tenia enlace a la politica
+de privacidad.** Ahora lo tiene y la medida lo comprueba. Eso estaba mal de verdad.
+
+`scripts/mide-aviso-cookies.py`, 0 fallos en los tres moviles:
+
+    no ocupa mas de 105px                 OK (96px)
+    el boton de rechazar se ve            OK
+    aceptar no pesa mas que rechazar      OK (0% de diferencia)
+    hay enlace a la politica              OK (/privacidad)
+    no tapa el boton de comprar           OK
+
+El tope de 105px no es un numero redondo porque si: antes median 122 y ahora 96, asi que suspende
+si alguien devuelve el adorno y aguanta que el texto se reparta en una linea mas. Sin tope, el alto
+solo se imprimiria y una vuelta atras pasaria por buena.
+
+`scripts/sabotaje-aviso-cookies.py`: 4 de 4. Las tres primeras son las trampas que se multan
+(esconder el rechazo, hacerlo mas pequeno, quitar el enlace) y la cuarta es la vuelta atras.
+
+Ni un dato menos: los tres pixeles siguen detras del permiso y la cuenta de quien acepta sigue
+funcionando. Escritorio sin tocar.
