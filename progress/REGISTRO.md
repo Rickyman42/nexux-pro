@@ -1956,3 +1956,64 @@ Esto esta razonado con 452 sesiones reales, pero **no esta demostrado que venda 
 anuncio parado no hay nadie que pase por delante. Los contadores de bajada de pagina y de clic ya
 estan puestos desde antes, asi que en cuanto vuelva a entrar gente se compara contra el 13-sep sin
 tener que preparar nada.
+
+---
+
+## 15-sep-2026 — Cuanta gente acepta las cookies, y fuera el aviso de la ficha de producto
+
+Dos cosas pedidas por Ricardo en el mismo paso. La primera es medir; la segunda es una decision
+suya que se ejecuta con su precio escrito.
+
+### 1. Ahora se mide quien acepta
+
+Hasta hoy no se sabia, y es un numero que decide cosas: el aviso sujeta los pixeles de Google, Meta
+y **OpenAI Ads**. Si acepta el 15%, el panel del anuncio solo ve 15 de cada 100 conversiones y nos
+esta contando de menos sin avisar.
+
+Se miden TRES cosas, no dos, y la tercera es la que importa:
+
+    cookies_mostrado    a cuanta gente se le enseno
+    cookies_respondido  cuantos contestaron, y que
+    la resta            los que NO contestan nada. Cuentan como "no", y son la mayoria.
+
+Sin el "mostrado" no hay porcentaje posible: se verian respuestas sueltas sin saber sobre cuantos.
+Va SOLO a Umami, que es sin cookies y no necesita permiso; mandarlo a Google o Meta seria justo lo
+que el aviso esta preguntando.
+
+Detalle que no es un detalle: Umami llega con retraso (su script va con `defer`). Sin esperarlo, los
+avisos que salen nada mas cargar la pagina no se contarian NUNCA y el porcentaje saldria inflado
+--solo quedaria la gente que tarda en contestar--. `scripts/prueba-medida-cookies.py` lo prueba
+con un Umami de mentira que aparece a los 2 segundos: 12 comprobaciones en verde.
+
+`scripts/sabotaje-medida-cookies.py`: 4 de 4 cazados (no esperar a Umami, dejar de contar el
+"mostrado", cambiar las dos respuestas, y contar el aviso tambien a quien ya contesto).
+
+**Pega honesta:** con 2 visitas al dia este numero tarda semanas. La forma de tenerlo HOY, con datos
+ya recogidos, es de Ricardo: mirar usuarios en GA4 (`G-GS6BCN6TMJ`) el 13-sep y dividir entre las
+290 llegadas que vio Umami. Sale por lo bajo, porque a GA4 ademas lo bloquean los antianuncios.
+
+### 2. El aviso ya no sale en /paquetes/
+
+Se gana: 121px de la primera pantalla del movil, que es donde aterriza el anuncio. El boton pasa de
+tener 64px de margen a tener 154 en el movil pequeno.
+
+Se paga, y queda escrito porque no se ve por ningun lado: **el permiso se guarda por navegador, no
+por pagina**. El anuncio aterriza en /paquetes/... y el pago ocurre en esa misma pagina. Sin aviso
+ahi, al que viene del anuncio no se le pregunta en ningun momento antes de comprar, asi que los
+pixeles de Google, Meta y OpenAI Ads no se cargan para NADIE que venga del anuncio. La campana deja
+de ver sus propias conversiones. Umami y Plausible siguen midiendo igual: nunca dependieron del
+aviso, y por eso los numeros de casa no cambian.
+
+Legal si es: sin aviso tampoco se carga nada de terceros. Lo que no se puede hacer nunca es quitar
+el aviso y dejar los pixeles.
+
+`scripts/prueba-sin-aviso-en-ficha.py` comprueba las cuatro cosas que van juntas, 0 fallos:
+
+    en la ficha no esta el aviso                                  OK
+    y no se pide nada a Google, Meta ni OpenAI                    OK
+    en el blog el aviso SIGUE saliendo (control)                  OK
+    a quien ya dijo que si, en la ficha se le cargan igual        OK
+
+**Lo que NO esta comprobado en local:** el pixel de OpenAI solo se pinta si esta puesta
+`PUBLIC_OPENAI_ADS_PIXEL_ID`, y en local no lo esta. Ese trozo hay que volver a correrlo contra
+produccion despues de desplegar; el script avisa solo cuando no lo encuentra.

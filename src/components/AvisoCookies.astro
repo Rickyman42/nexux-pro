@@ -20,16 +20,40 @@
   (function() {
     var banner = document.getElementById('nx-cookie-banner');
     var stored = localStorage.getItem('nx_cookie_consent');
-    if (!stored) banner.removeAttribute('hidden');
+
+    // Umami llega con retraso (el script va con defer). Sin esperarlo, los
+    // avisos que se enseñan nada mas cargar no se contarian nunca, y el
+    // porcentaje saldria inflado: solo quedarian los de la gente que tarda.
+    function medir(evento, datos) {
+      var intentos = 0;
+      (function reintenta() {
+        if (window.umami && typeof window.umami.track === 'function') {
+          window.umami.track(evento, datos || {});
+          return;
+        }
+        if (intentos++ < 40) window.setTimeout(reintenta, 500);
+      })();
+    }
+
+    if (!stored) {
+      banner.removeAttribute('hidden');
+      // Sin esto no hay porcentaje posible: se verian respuestas sueltas sin
+      // saber sobre cuanta gente. Y los que no contestan nada --que son la
+      // mayoria-- no dejarian ni rastro, cuando son justo los que mas cuentan:
+      // no contestar es que no, y el pixel del anuncio no se carga.
+      medir('cookies_mostrado', { pagina: location.pathname });
+    }
 
     document.getElementById('cookie-accept').addEventListener('click', function() {
       localStorage.setItem('nx_cookie_consent', 'accepted');
       document.dispatchEvent(new CustomEvent('nx:consent-granted'));
       banner.setAttribute('hidden', '');
+      medir('cookies_respondido', { respuesta: 'acepta', pagina: location.pathname });
     });
     document.getElementById('cookie-reject').addEventListener('click', function() {
       localStorage.setItem('nx_cookie_consent', 'rejected');
       banner.setAttribute('hidden', '');
+      medir('cookies_respondido', { respuesta: 'solo_necesarias', pagina: location.pathname });
     });
   })();
 </script>
