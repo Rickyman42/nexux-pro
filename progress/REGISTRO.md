@@ -2251,3 +2251,51 @@ bueno de Ricardo, porque seria un script gastando dinero sin que nadie mire.
 
 Nota: el vigilante actual es de solo lectura, asi que **NO es el "API" que subio la puja de 1,80 a
 15 EUR el 9-sep a las 4:26**. Eso sigue sin identificar.
+
+
+## 16-sep — La conversion que compraba la campana era un toque de boton
+
+Lo que la campana de OpenAI perseguia no era una venta: era el dedo tocando el boton. El aviso
+`checkout_started` salia dentro del escuchador del clic, antes de llamar a Stripe. Comprobado
+leyendo el fichero que EJECUTA en produccion, no el fuente.
+
+Lo que eso ha comprado, medido en Umami: 18 avisos repartidos en 11 visitas (una persona lo mando
+siete veces) y 4 de los 8 supuestos pagos pulsados en menos de 10 segundos, tres sin bajar ni un
+cuarto de la pagina. Se le estaba ensenando al sistema a comprar gente que toca rapido.
+
+Ahora el aviso sale cuando la pasarela de Stripe ya esta montada en la pantalla
+(`checkout_form_shown`), y solo una vez por visita. El nombre que viaja a OpenAI sigue siendo
+`checkout_started` porque ese evento esta bloqueado en la campana: lo que cambia es CUANDO sale.
+Umami y Plausible siguen guardando todo igual, y Google y Meta se quedan como estaban.
+
+Probado en navegador sobre la compilacion (`scripts/prueba-aviso-conversion.py`), 5 de 5, y
+sabotaje 4 de 4 (`scripts/sabotaje-aviso-conversion.py`). Commit 09e0554. **Sin subir**: hasta que
+Ricardo autorice el push, produccion sigue contando toques.
+
+### Dos cosas que yo habia dicho mal, corregidas con el registro de la cuenta
+
+Los 15,00 EUR de puja NO son un techo por clic: en una campana de conversiones es la puja de coste
+por conversion. La campana vieja, con puja de 1,20 EUR, pago 1,67 EUR por clic; esta, con puja de
+15 EUR, paga 0,15. La puja no gobierna el precio.
+
+El tope de 15 EUR/dia se creo el 15-sep a las 18:09:42 (antes habia un bote de 75 EUR para toda la
+campana, sin limite por dia). Asi que los 35,93 EUR del 13-sep y los 33,90 del 14-sep no incumplian
+nada. El unico dia completo con tope dio 16,15 EUR: se pasa 1,15.
+
+### Lo que dicen las horas, y lo unico que queda por decidir
+
+El 15-sep, de los 16,15 EUR, **15,61 se gastaron entre las 18:00 y las 20:00**. A las 21:00, cuando
+empieza la franja donde la gente pulsa, ya no quedaba dinero. Eso no lo arregla ninguna puja: la
+plataforma no tiene horarios (comprobado por cuatro vias), y la unica palanca es un cron que apague
+y encienda la campana desde fuera. Ya esta confirmado que la API lo permite
+(POST /v1/campaigns/{id}/pause y /activate). Falta el visto bueno de Ricardo, porque es un script
+moviendo su dinero sin que nadie mire.
+
+### Quien fue el "API" que subio la puja
+
+El registro de auditoria de la cuenta tiene 24 entradas. Veintitres las firma el usuario de Ricardo.
+La unica que no es justo esa: 9-sep 04:26:30, puja 1,80 -> 15,00, firmada por otro identificador de
+usuario. Diecinueve minutos antes Codex habia recomendado exactamente 15 EUR, y cinco minutos
+despues Ricardo escribio "ya esta cambiado". Ningun cron, temporizador ni script de la Pi puede
+escribir en esa cuenta. Queda sin cerrar por que el panel lo firma con otro identificador: eso se
+mira en la pantalla de claves o de miembros del panel.
