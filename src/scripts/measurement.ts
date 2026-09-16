@@ -16,6 +16,9 @@ const ATTRIBUTION_KEY = 'nx_attribution';
 const PENDING_QUERY_KEY = 'nx_pending_query';
 const CHATGPT_LANDING_KEY = 'nx_chatgpt_landing_measured';
 const LAST_CHECKOUT_RETURN_KEY = 'nx_last_checkout_return';
+// Una sola conversion por visita hacia OpenAI: si alguien cierra la pasarela
+// y la vuelve a abrir, sigue siendo la misma persona comprando una vez.
+const OPENAI_CONVERSION_KEY = 'nx_openai_conversion_sent';
 // El mapa divide la pagina en una cuadricula de 12 x 24. Se guarda la CASILLA,
 // nunca el punto exacto: asi no se puede reconstruir el recorrido de nadie.
 const MAPA_COLUMNAS = 12;
@@ -135,7 +138,11 @@ function openAiEvent(eventName: string, properties: NxProperties):
     return { name: 'appointment_scheduled', data: { type: 'customer_action' } };
   }
 
-  if (eventName === 'checkout_started') {
+  // OJO al nombre: lo que se manda a OpenAI se sigue llamando 'checkout_started'
+  // porque ese evento esta bloqueado en la campana y no se puede cambiar. Lo que
+  // cambia es CUANDO sale: antes salia al pulsar el boton, ahora sale cuando la
+  // pasarela de Stripe ya esta montada en la pantalla. Pulsar no es comprar.
+  if (eventName === 'checkout_form_shown') {
     return {
       name: 'checkout_started',
       data: {
@@ -161,6 +168,12 @@ function sendOpenAiTracker(eventName: string, properties: NxProperties): void {
   if (localStorage.getItem('nx_cookie_consent') !== 'accepted' || !nxWindow.oaiq) return;
   const event = openAiEvent(eventName, properties);
   if (!event) return;
+
+  if (event.name === 'checkout_started') {
+    if (safeSessionGet(OPENAI_CONVERSION_KEY)) return;
+    safeSessionSet(OPENAI_CONVERSION_KEY, '1');
+  }
+
   nxWindow.oaiq('measure', event.name, event.data, {
     ...(event.options || {}),
     event_id: `nx_${eventName}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
