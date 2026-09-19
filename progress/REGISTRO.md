@@ -2474,3 +2474,57 @@ primera pregunta), no con mas texto en el prompt.
 La promesa "hasta 1.000 conversaciones al mes... si te pasas te avisamos antes de
 cobrarte" aparece en los dos prompts y **no hay ningun contador detras**: ni limite,
 ni aviso, ni codigo que cuente conversaciones.
+
+## 2026-09-19 — Lara de la web ya vende los DOS productos
+
+**Comprobado primero:** `LARA_PLANS` en `provision-http.js` solo tenia
+`recepcionista`, y el prompt decia literalmente "EL PRODUCTO — UNO SOLO... No hay
+planes ni versiones". **Lara no tenia ni idea de que existiera el de 79 €.**
+La sospecha de Ricardo era correcta.
+
+**Fuente de verdad usada:** `nexux-pro/src/data/plans.ts` (no memoria, no suposicion).
+
+| | Recepcionista IA — 29 € | Recepcionista Equipo — 79 € |
+|---|---|---|
+| contestar y reservar 24 h | si | si |
+| recordatorios y resumen diario | si | si |
+| **reparto de citas entre varias personas** | **si, ya incluido** | si |
+| cada persona ve SOLO sus citas en su calendario | no | **si** |
+| ficha de cliente (historial, notas, preferencias) | no | **si** |
+| coste por empleado | ninguno | ninguno |
+
+**🔴 La trampa que se le ha enseñado a NO cometer:** tener equipo NO obliga a pagar
+79 €. El reparto de citas ya va en el de 29. Lo que justifica el de 79 es (a) que
+cada profesional necesite ver solo lo suyo, o (b) que haga falta el historial del
+cliente. Lara tiene orden de PREGUNTARLO antes de recomendar.
+
+**Cambios:**
+- `lib/bot-prompt-lara.js`: los dos productos, sus diferencias, la trampa, la
+  pregunta que decide, orientacion por tipo de negocio, y el precio del plan
+  recomendado obligatorio en el cierre. Dos etiquetas de cierre en vez de una.
+- `provision-http.js`: `LARA_PLANS.equipo` + la etiqueta `[DONE:equipo]`.
+- **El front NO se ha tocado**: comprobado que `renderPlanCard` es generico (pinta
+  el emoji/nombre/precio/puntos que le llegan y navega a `/paquetes/<plan>`), y que
+  `/paquetes/equipo` responde HTTP 200.
+
+**Evidencia:** `scripts/prueba-dos-planes.py`, **6/6 en dos pasadas seguidas**:
+conoce los dos, no empuja al caro por tener equipo (pregunta), recomienda 79 € a
+quien necesita agenda propia y a quien necesita historial, 29 € al que trabaja solo,
+y explica bien la diferencia. Emite la tarjeta `equipo` correctamente.
+
+## 2026-09-19 — Una sola pregunta por mensaje, ahora en codigo
+
+Lo que quedaba pendiente. El prompt lo pedia desde siempre y se rompia en **9 de 30**
+respuestas; reforzarlo con mas texto no basto (2, 4 y 3 de 10 en tres pasadas, y la
+primera pasada estuvo a punto de colarse como "arreglado").
+
+`lib/una-sola-pregunta.js` deja la ULTIMA pregunta (la primera suele ser retorica) y
+conserva el resto del texto, respetando los saltos de linea y borrando las lineas que
+se quedan vacias. Se aplica en `/api/lara-web/chat`.
+
+**Evidencia:** 11 pruebas en verde · **4 de 4 sabotajes cazados** (uno destapo que una
+prueba mentia con su nombre: no dejaba nada vacio, asi que la guarda de longitud no la
+vigilaba nadie) · **en vivo: 0 de 30 respuestas con mas de una pregunta** (antes 9/30).
+
+**Sigue abierto:** la longitud. Entre 1 y 5 de cada 10 respuestas pasan de 4 lineas.
+No lo he forzado en codigo porque recortar contenido si puede estropear la respuesta.
