@@ -2299,3 +2299,42 @@ usuario. Diecinueve minutos antes Codex habia recomendado exactamente 15 EUR, y 
 despues Ricardo escribio "ya esta cambiado". Ningun cron, temporizador ni script de la Pi puede
 escribir en esa cuenta. Queda sin cerrar por que el panel lo firma con otro identificador: eso se
 mira en la pantalla de claves o de miembros del panel.
+
+## 2026-09-19 — La demo guarda las conversaciones
+
+**Por que:** el panel de OpenAI no dice a quien entrega el anuncio (5 desgloses
+probados, los ignora en silencio). Lo que la gente ESCRIBE en la demo si lo dice, y
+hasta hoy se tiraba. Con la demo de pagina de aterrizaje, esto pasa a ser nuestro
+propio informe de entrega.
+
+**Que se ha tocado (2 ficheros):**
+- `nexux-clients/provision-http.js` — `guardaTurnoDemo()` + llamada en `/demo/chat`.
+  Escribe `demo-conversaciones.jsonl`: ts, visita, ip, device, ref, turno,
+  utm_source/campaign/content, mensaje, respuesta, reservo, cancelo. Commit `86fe4da`.
+- `nexux-pro/src/pages/demo.astro` — manda `visita` (id de pestana) y `campana`
+  (leida de la URL o de `nx_pending_query`, porque measurement.ts limpia la URL).
+  Commit `fea1298`. Build Astro en verde.
+
+**Evidencia:**
+- Peticion real a `/demo/chat`: HTTP 200 en 2,8s, turno guardado con su campana.
+- **Sabotaje** (`JSON.parse('{{')` dentro de `guardaTurnoDemo`): con el registro
+  reventando, la demo devolvio **HTTP 200** con respuesta normal, el fichero **no**
+  crecio (3 -> 3) y salio el aviso `[demo/chat] no se pudo guardar el turno:`.
+  Es decir: si el registro falla, el visitante no se entera. Restaurado despues.
+  - ⚠️ El primer intento de sabotaje fue invalido: las comillas se perdieron al pasar
+    por el shell, `node --check` lo freno y pm2 nunca llego a arrancar el fichero roto.
+    El "HTTP 200" de entonces era del codigo bueno. Repetido con fichero por scp.
+- `nexux-verify.py`: **6/6 OK**.
+
+**Coste:** cero. `lib/ai.js` encadena 12 proveedores gratuitos; en 596 llamadas
+historicas todas las atendio `qwen-plus` y DeepSeek (el de pago) no ha entrado nunca.
+
+**Pendiente / avisos:**
+- **Sin aviso de privacidad en la pagina**, por decision expresa de Ricardo (19-sep).
+  Se guarda texto escrito por visitantes: conviene ponerlo antes de escalar trafico.
+- Nunca probado por encima de ~600 llamadas historicas. Con el anuncio en la demo se
+  superaria en un dia. Falta un vigilante que avise si la cascada empieza a caer.
+- `nexux-pro` tiene 32 ficheros sin commitear (`tmp/publicidad/`, `progress/`,
+  `output/`) que **no son de esta tarea**; no se han tocado.
+- Mis sondas sueltas de la API de anuncios se han **apartado, no borrado**, a
+  `~/scratch-claude/20260918-sondas-ads/` (10 ficheros).
