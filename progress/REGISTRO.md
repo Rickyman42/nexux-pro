@@ -2767,3 +2767,95 @@ que pague. Todas las carpetas de `clients/` son altas manuales o de prueba.
 Deduje "cliente real" de que la carpeta tuviera nombre de peluqueria y limite 300,
 en vez de mirar quien paga. La fuente de verdad de "quien es cliente" es Stripe y
 `clients/index.json`, no el nombre de un directorio.
+
+# 2026-09-19 — AUDITORIA DE SISTEMA (5 puntos) + regla de rigor
+
+Regla nueva de Ricardo, ya en vigor: **nada se afirma de memoria**. Cada frase
+sobre codigo, configuracion, clientes o datos va con el comando que la demuestra.
+Y si se dice que algo NO existe, se dice con que comando se busco.
+
+Todo lo de abajo se puede volver a comprobar con:
+`cd ~/nexux-clients && node scripts/audita-sistema.mjs`
+
+## 1. Conversaciones: 300 vs 1.000
+
+**Lo que habia** (y es peor de lo que se creia):
+- `lib/stripe-webhook.js`, `createClientDir()`: **no escribia `limits` en absoluto**.
+  Y `lib/data.js:186` lee `config.limits?.conversationsPerMonth ?? null`, donde
+  null significa SIN LIMITE. **El primer cliente real no habria tenido 300 ni
+  1.000: habria tenido infinitas.** Los 300 son del plan `starter`, retirado.
+- El aviso del 90% (`lib/whatsapp.js:309`, `lib/telegram.js:164`) iba a
+  `sendTelegram`/`notifyAdmin`, o sea a Ricardo. El dueno no se enteraba de nada
+  hasta que su bot dejaba de contestar. Y ofrecia "upgrade a Pro", plan retirado.
+- La ficha prometia "te avisamos antes de cobrarte cualquier importe adicional".
+  **No hay importe adicional**: al llegar al tope el bot para hasta el dia 1.
+
+**Decision y arreglo:** se mantiene la promesa publica de 1.000 y se hace que el
+codigo la cumpla (cambiarla a la baja con cero ventas es peor negocio).
+- `LIMITE_CONVERSACIONES_MES = 1000` y `limits: { conversationsPerMonth: ... }`
+  en el alta.
+- El aviso del 90% va al DUENO (`notifyOwnerTelegram` / `notifyOwner`) con copia
+  para nosotros, y dice la verdad: al llegar al tope Lara para hasta el dia 1.
+- La FAQ de `nexux-pro/src/data/plans.ts` ya no promete un cobro que no existe.
+
+## 2. Nombres de plan duplicados
+
+**Habia TRES listas de precios y las tres estaban mal:**
+```
+provision-http.js:1953            PLAN_MRR = { starter:39, pro:79, total:129 }
+nexux-pro .../[clientId].astro:55 'Starter 249€ / Pro 449€ / Total 749€'
+lib/stripe-session.js:6           starter: 24900
+```
+Ninguna coincide con lo que se cobra. El catalogo que EJECUTA es
+`nexux-pro/api/stripe/create-session.js`: **recepcionista 2900 y equipo 7900**.
+
+**Arreglo:** la verdad vive en `lib/planes.js` → `CATALOGO`, `precioDe()`,
+`nombreDe()`, `conversacionesDe()`, `PLAN_POR_DEFECTO`. El MRR del panel y las
+etiquetas del CRM salen de ahi. `lib/onboarding.js` daba de alta en `starter`
+(retirado): ahora usa `PLAN_POR_DEFECTO` = `recepcionista`.
+
+**Queda pendiente** (dicho, no hecho): siguen existiendo cadenas sueltas de los
+planes viejos en `lib/lemon.js`, `lib/facturacion.js`, `lib/stripe-session.js`,
+`lib/twilio.js` y varias pantallas de `nexux-pro`. No las toco en este pase: son
+caminos que hoy no ejecutan y mezclarlos aqui era arriesgar sin necesidad.
+
+## 3. Horarios en dos idiomas
+
+`lib/config-normalizer.js` mapea los dos idiomas a la clave inglesa y **el ingles
+siempre gana** (la rama canonica escribe al final pase lo que pase). El espanol se
+tiraba con un `console.warn` que no lee nadie.
+
+Limpiados **8 configs** (copias en `~/nexux-clients/_copias-horarios-*`). El peor:
+```
+new-look   viernes  es 09:00-19:00 / en 09:00-20:00  -> valia 20:00
+           sabado   es 09:00-20:00 / en 09:00-14:00  -> valia 14:00  (6 horas perdidas)
+```
+Y el aviso deja de ser invisible: ahora es `console.error` y **queda escrito** en
+`~/nexux-clients/horarios-en-conflicto.jsonl`. Probado con control positivo.
+
+## 4. Cero clientes reales
+
+```
+Stripe (sk_live): 2 suscripciones, las dos de Ricardo. 30 EUR cobrados en total.
+clients/index.json: 30 clientes, 8 sesiones, 2 suscripciones
+   sub_1UBtEa...  -> prueba-nexux-pro-c43c20   (la de Ricardo, cancelada)
+   sub_test_p6    -> peluqueria-de-prueba      (id de prueba)
+configs con correo de un tercero: 0 de 22
+```
+Los 22 configs quedan marcados `interno: true` con su motivo, y el MRR del panel
+**deja de contarlos: 166 EUR -> 0 EUR**, que es la verdad.
+
+> Correccion mia: esta manana dije que `index.json` estaba vacio. **Era falso** y
+> el error fue de mi propio script: filtraba campos que no existen a ese nivel e
+> imprimia `{}`. El fichero es del 9-sep y tenia 30 entradas.
+
+## 5. owner_email
+
+`createClientDir()` guardaba `email` pero **no** `owner_email`, y hay dos sitios
+que solo miran `owner_email`:
+- `provision-http.js:1048` (reenviar el enlace de acceso) → el dueno **no podria
+  recuperar su acceso nunca**.
+- `lib/roi-report.js:237` (informe mensual) → **no se enviaria a nadie**.
+
+Arreglado en el origen (el alta guarda los dos) y con respaldo en `email` en los
+dos lectores. Los 5 configs que no tenian ningun correo ya tienen el interno.

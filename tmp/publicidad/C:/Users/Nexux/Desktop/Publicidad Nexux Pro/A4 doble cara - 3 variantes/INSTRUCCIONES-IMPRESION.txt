@@ -1,0 +1,22 @@
+NEXUX PRO - IMPRESION A4 DOBLE CARA
+
+Hoja: A4 vertical 210 x 297 mm
+Imposicion: 4 folletos por hoja
+Folleto final: 93 x 136 mm
+Sangre individual: 3 mm
+Zona segura: 5 mm
+Resolucion: 300 ppp
+Color: CMYK
+
+IMPRESORA
+- Doble cara y voltear por el borde largo.
+- Tamano real / escala 100 %.
+- No usar Ajustar, Encoger ni Ampliar.
+- Centrar la pagina. No activar impresion sin bordes.
+
+GUILLOTINA
+- Usa las marcas negras de la cara 1.
+- Retira primero margenes exteriores y despues calles centrales.
+- Haz una prueba antes del lote completo.
+
+Las dos caras usan coordenadas identicas. La sangre tolera pequenas desviaciones, pero si la prueba duplex se desplaza mas de 1 mm hay que ajustar el registro mecanico en la impresora o su controlador.

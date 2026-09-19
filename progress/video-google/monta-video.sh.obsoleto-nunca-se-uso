@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# Monta el video de verificacion de Google: tomas de pantalla + voz + rotulos.
+#
+# Las tomas son grabaciones REALES de la pantalla. Aqui solo se juntan, se les
+# pone la voz encima y se añaden los rotulos que Google necesita leer (el client
+# ID y el nombre de cada permiso). Nada se recrea ni se simula.
+#
+#   bash monta-video.sh tomaA.mp4 tomaB.mp4 tomaC.mp4 tomaD.mp4
+#
+# Cada toma se ajusta a la voz que le toca: si la imagen se queda corta, se
+# congela el ultimo fotograma; si sobra, se deja (mejor que se vea de mas).
+set -eu
+
+BASE=/home/nexux/nexux-pro/progress/video-google
+VOZ="$BASE/voz"
+TRABAJO="$BASE/trabajo"
+SALIDA="$BASE/nexux-google-calendar-verification.mp4"
+mkdir -p "$TRABAJO"
+
+if [ $# -lt 4 ]; then
+  echo "Uso: bash monta-video.sh tomaA.mp4 tomaB.mp4 tomaC.mp4 tomaD.mp4"
+  exit 1
+fi
+
+# Que bloques de voz lleva cada toma.
+#   A -> 1 y 2   B -> 3 y 4   C -> 5   D -> 6
+declare -A BLOQUES=( [A]="1 2" [B]="3 4" [C]="5" [D]="6" )
+TOMAS=("$1" "$2" "$3" "$4")
+LETRAS=(A B C D)
+
+dur() { ffprobe -v error -show_entries format=duration -of csv=p=0 "$1"; }
+
+echo "== 1. Se junta la voz de cada toma =="
+for i in 0 1 2 3; do
+  L=${LETRAS[$i]}
+  lista="$TRABAJO/voz-$L.txt"; : > "$lista"
+  for b in ${BLOQUES[$L]}; do echo "file '$VOZ/bloque-$b.mp3'" >> "$lista"; done
+  ffmpeg -y -loglevel error -f concat -safe 0 -i "$lista" -c copy "$TRABAJO/voz-$L.mp3"
+  printf "  toma %s: voz %5.1f s | imagen %5.1f s\n" "$L" "$(dur "$TRABAJO/voz-$L.mp3")" "$(dur "${TOMAS[$i]}")"
+done
+
+echo "== 2. Cada toma se ajusta a su voz =="
+for i in 0 1 2 3; do
+  L=${LETRAS[$i]}
+  DV=$(dur "$TRABAJO/voz-$L.mp3")
+  DI=$(dur "${TOMAS[$i]}")
+  FALTA=$(node -e "console.log(Math.max(0, ($DV - $DI + 0.4)).toFixed(2))")
+
+  if [ "$(node -e "console.log($FALTA > 0.1 ? 1 : 0)")" = "1" ]; then
+    # La imagen se queda corta: se congela el ultimo fotograma lo que falte.
+    echo "  toma $L: se congela el final $FALTA s"
+    ffmpeg -y -loglevel error -i "${TOMAS[$i]}" \
+      -vf "tpad=stop_mode=clone:stop_duration=$FALTA" -an \
+      -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$TRABAJO/img-$L.mp4"
+  else
+    echo "  toma $L: la imagen ya da de si"
+    ffmpeg -y -loglevel error -i "${TOMAS[$i]}" -an \
+      -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$TRABAJO/img-$L.mp4"
+  fi
+
+  ffmpeg -y -loglevel error -i "$TRABAJO/img-$L.mp4" -i "$TRABAJO/voz-$L.mp3" \
+    -c:v copy -c:a aac -b:a 192k -shortest "$TRABAJO/con-voz-$L.mp4"
+done
+
+echo "== 3. Se pegan las cuatro =="
+: > "$TRABAJO/orden.txt"
+for L in A B C D; do echo "file '$TRABAJO/con-voz-$L.mp4'" >> "$TRABAJO/orden.txt"; done
+ffmpeg -y -loglevel error -f concat -safe 0 -i "$TRABAJO/orden.txt" -c copy "$TRABAJO/sin-rotulos.mp4"
+
+echo "== 4. Los rotulos que Google tiene que poder leer =="
+# El client ID durante los primeros segundos, y el nombre de cada permiso
+# cuando toca. Fondo negro translucido para que se lea sobre cualquier pantalla.
+FUENTE=$(fc-match -f '%{file}' 'DejaVu Sans:style=Bold' 2>/dev/null || echo /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf)
+CID="OAuth Client ID: 839053342621-q5g6uo97vfgae4ghaikcsug49j10hjkm.apps.googleusercontent.com"
+
+DA=$(dur "$TRABAJO/con-voz-A.mp4")
+DB=$(dur "$TRABAJO/con-voz-B.mp4")
+DC=$(dur "$TRABAJO/con-voz-C.mp4")
+FIN_A=$DA
+FIN_B=$(node -e "console.log(($DA + $DB).toFixed(2))")
+FIN_C=$(node -e "console.log(($DA + $DB + $DC).toFixed(2))")
+
+ffmpeg -y -loglevel error -i "$TRABAJO/sin-rotulos.mp4" -vf "\
+drawtext=fontfile=$FUENTE:text='$CID':fontcolor=white:fontsize=20:box=1:boxcolor=black@0.75:boxborderw=12:x=(w-text_w)/2:y=h-70:enable='between(t,2,20)',\
+drawtext=fontfile=$FUENTE:text='Scope\: calendar.events — create and manage appointments':fontcolor=white:fontsize=22:box=1:boxcolor=black@0.75:boxborderw=12:x=(w-text_w)/2:y=h-70:enable='between(t,$FIN_B,$FIN_C)',\
+drawtext=fontfile=$FUENTE:text='Scope\: calendar.calendarlist.readonly — list calendars to choose one':fontcolor=white:fontsize=22:box=1:boxcolor=black@0.75:boxborderw=12:x=(w-text_w)/2:y=h-70:enable='between(t,$FIN_A,$FIN_B)'" \
+  -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p -c:a copy "$SALIDA"
+
+echo
+echo "Listo: $SALIDA"
+printf "  dura %.1f s\n" "$(dur "$SALIDA")"
+ls -lh "$SALIDA" | awk '{print "  pesa "$5}'

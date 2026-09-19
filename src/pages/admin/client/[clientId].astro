@@ -52,7 +52,17 @@ try {
 
 if (!client) error = error || `Cliente "${clientId}" no encontrado`;
 
-const PLAN_LABEL: Record<string, string> = { starter: 'Starter 249€', pro: 'Pro 449€', total: 'Total 749€' };
+// Catalogo vigente (el mismo que decide el checkout en api/stripe/create-session.js).
+// Los starter/pro/total se retiraron el 21-ago-2026 y sus precios de aqui (249/449/749)
+// no han existido nunca en Stripe: se quedan solo para leer configs antiguos.
+const PLAN_LABEL: Record<string, string> = {
+  recepcionista: 'Recepcionista IA 29€',
+  equipo: 'Recepcionista Equipo 79€',
+  starter: 'Starter (retirado)',
+  pro: 'Pro (retirado)',
+  total: 'Total (retirado)',
+  demo: 'Demo',
+};
 const fmt = (d: string | null) => d ? new Date(d).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 const fmtDt = (d: string) => new Date(d).toLocaleString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 const upcoming  = appointments.filter((a: any) => a.status === 'confirmed' && new Date(a.datetime) >= new Date());

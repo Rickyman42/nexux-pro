@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# Monta el video de verificacion OAuth de Google a partir de la grabacion real.
+#
+# Lo que hace y por que:
+#  1. Quita una franja de la parte de arriba (barra de marcadores + el aviso de
+#     "Claude comenzo a depurar este navegador"). La barra de direcciones se
+#     conserva porque Google necesita leer ahi el client_id.
+#  2. Tapa la columna de cuentas de Google en el selector: son 8 correos
+#     personales y el video va a YouTube. La URL de esa pantalla se mantiene
+#     visible, que es donde se lee el client_id completo.
+#  3. Recorta los tiempos muertos y acelera lo que no aporta. Ningun PASO se
+#     elimina: se ve el flujo entero de principio a fin.
+#  4. Pone la voz en off en el momento en que ocurre cada cosa.
+#  5. Anade los rotulos que el revisor tiene que poder leer.
+set -eu
+
+BASE="$(cd "$(dirname "$0")" && pwd)"
+SRC="$BASE/toma-google-reparada.mp4"
+VOZ="$BASE/voz"
+TR="$BASE/trabajo"
+OUT="$BASE/nexux-google-calendar-verification.mp4"
+FUENTE="$BASE/fuente.ttf"
+mkdir -p "$TR"
+
+[ -f "$FUENTE" ] || cp /c/Windows/Fonts/arialbd.ttf "$FUENTE"
+
+# La franja que se quita: de y=60 a y=158. Arriba queda la barra de
+# direcciones (60 px) y debajo la pagina (664 px). Total 1536x724.
+LIMPIA="[0:v]crop=1536:60:0:0,setpts=PTS-STARTPTS[a];[0:v]crop=1536:664:0:158,setpts=PTS-STARTPTS[b];[a][b]vstack=inputs=2"
+
+# entrada  duracion  velocidad  que se ve
+CLIPS="
+0    19   0.85  panel en Canales, Google Calendar SIN CONECTAR, se pulsa Conectar
+21   10   1.0   accounts.google.com con el client_id en la URL
+74   20   2.0   aviso Google no ha verificado, Configuracion avanzada, Ir a Nexux
+99   12   1.0   pantalla de consentimiento con el nombre de la app y la cuenta
+136  20   1.0   los permisos que pide la app, uno a uno
+166  11   2.0   se acepta y se vuelve al panel
+179  15   2.0   el panel ya dice CONECTADO
+206  18   1.2   desplegable con la lista de calendarios del usuario
+280  14   2.0   seccion Citas, se abre Nueva cita
+301  22   2.0   formulario, cliente Laura Gomez, servicio Corte
+341  24   2.0   fecha 11 de septiembre, 11:30, 60 min, Ana, Reservar
+375  12   2.0   la cita ya aparece en el CRM
+399  33   2.0   Google Calendar, el evento creado y su detalle
+447  20   2.0   vuelta al CRM, se cancela la cita
+548  14   1.0   Google Calendar, el viernes 11 ha quedado vacio
+"
+
+echo "== 1. Se corta cada trozo, se limpia la franja privada y se ajusta la velocidad =="
+: > "$TR/orden.txt"
+N=0
+ACUM=0
+: > "$TR/tiempos.txt"
+while read -r IN DUR VEL RESTO; do
+  [ -z "${IN:-}" ] && continue
+  N=$((N+1))
+  F=$(printf "%s/c%02d.mp4" "$TR" "$N")
+  EXTRA=""
+  if [ "$N" = "2" ]; then
+    # La columna de cuentas de Google, tapada. Va con etiqueta para que se vea
+    # que es una censura deliberada y no un fallo de la grabacion.
+    EXTRA=",drawbox=x=955:y=245:w=581:h=479:color=0x101114@1.0:t=fill\
+,drawtext=fontfile=fuente.ttf:text='Other Google accounts':fontcolor=0x9aa0a6:fontsize=22:x=985:y=430\
+,drawtext=fontfile=fuente.ttf:text='hidden for privacy':fontcolor=0x9aa0a6:fontsize=22:x=985:y=462"
+  fi
+  # Los trozos ya cortados se reaprovechan. Si cambias la tabla de arriba,
+  # borra la carpeta trabajo/ o los cambios no se aplicaran.
+  [ -f "$F" ] || ffmpeg -nostdin -y -loglevel error -ss "$IN" -t "$DUR" -i "$SRC" \
+    -filter_complex "${LIMPIA},setpts=PTS/${VEL}${EXTRA},fps=25[v]" \
+    -map "[v]" -an -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$F"
+  D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$F" < /dev/null)
+  printf "  c%02d  empieza en %6.1f s  dura %5.1f s   %s\n" "$N" "$ACUM" "$D" "$RESTO"
+  printf "%d %s %s\n" "$N" "$ACUM" "$D" >> "$TR/tiempos.txt"
+  ACUM=$(node -e "console.log(($ACUM + $D).toFixed(2))")
+  echo "file 'c$(printf %02d $N).mp4'" >> "$TR/orden.txt"
+done <<< "$CLIPS"
+
+# Tarjeta final. El bloque 6 de la voz habla de la politica de datos y de que
+# el dueño puede desconectar cuando quiera; en pantalla, a esas alturas, se ve
+# el calendario. Esto lo pone por escrito, que es como lo lee el revisor si ve
+# el video sin sonido.
+ffmpeg -nostdin -y -loglevel error -f lavfi -i color=c=0x0f1115:s=1536x724:d=8:r=25 \
+  -vf "drawtext=fontfile=fuente.ttf:text='Calendar data stays between the salon and their own Google account.':fontcolor=white:fontsize=30:x=(w-text_w)/2:y=210\
+,drawtext=fontfile=fuente.ttf:text='We do not sell it, we do not share it, and we do not use it for advertising or to train models.':fontcolor=white:fontsize=30:x=(w-text_w)/2:y=270\
+,drawtext=fontfile=fuente.ttf:text='Owners can disconnect at any time from the Channels screen. We then delete the stored token.':fontcolor=white:fontsize=30:x=(w-text_w)/2:y=330\
+,drawtext=fontfile=fuente.ttf:text='Nexux Recepcionista IA  —  nexux.pro':fontcolor=0x8ab4f8:fontsize=27:x=(w-text_w)/2:y=430\
+,drawtext=fontfile=fuente.ttf:text='839053342621-q5g6uo97vfgae4ghaikcsug49j10hjkm.apps.googleusercontent.com':fontcolor=0x9aa0a6:fontsize=23:x=(w-text_w)/2:y=474" \
+  -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$TR/c16.mp4"
+echo "file 'c16.mp4'" >> "$TR/orden.txt"
+printf "  c16  empieza en %6.1f s  dura   8.0 s   tarjeta final con la politica de datos\n" "$ACUM"
+ACUM=$(node -e "console.log(($ACUM + 8).toFixed(2))")
+echo "  total de imagen: $ACUM s"
+
+echo
+echo "== 2. Se pegan los trozos =="
+ffmpeg -y -loglevel error -f concat -safe 0 -i "$TR/orden.txt" -c copy "$TR/mudo.mp4"
+
+echo "== 3. La voz, cada bloque donde toca =="
+# bloque -> segundo en que entra (sobre el video ya montado)
+ffmpeg -y -loglevel error \
+  -i "$TR/mudo.mp4" \
+  -i "$VOZ/bloque-1.mp3" -i "$VOZ/bloque-2.mp3" -i "$VOZ/bloque-3.mp3" \
+  -i "$VOZ/bloque-4.mp3" -i "$VOZ/bloque-5.mp3" -i "$VOZ/bloque-6.mp3" \
+  -filter_complex "\
+[1:a]adelay=200|200[v1];\
+[2:a]adelay=23000|23000[v2];\
+[3:a]adelay=43500|43500[v3];\
+[4:a]adelay=88500|88500[v4];\
+[5:a]adelay=118000|118000[v5];\
+[6:a]adelay=171000|171000[v6];\
+[v1][v2][v3][v4][v5][v6]amix=inputs=6:normalize=0:duration=longest,aresample=48000[voz]" \
+  -map 0:v -map "[voz]" -c:v copy -c:a aac -b:a 192k "$TR/con-voz.mp4"
+
+echo "== 4. Los rotulos que el revisor tiene que leer =="
+cat > "$TR/rotulos.txt" <<'ROT'
+drawtext=fontfile=fuente.ttf:text='OAuth Client ID  839053342621-q5g6uo97vfgae4ghaikcsug49j10hjkm.apps.googleusercontent.com':fontcolor=white:fontsize=21:box=1:boxcolor=black@0.8:boxborderw=12:x=(w-text_w)/2:y=h-64:enable='between(t,1,32)',
+drawtext=fontfile=fuente.ttf:text='Requested scopes  —  calendar.events  and  calendar.calendarlist.readonly':fontcolor=white:fontsize=23:box=1:boxcolor=black@0.8:boxborderw=12:x=(w-text_w)/2:y=h-64:enable='between(t,54,75)',
+drawtext=fontfile=fuente.ttf:text='calendar.calendarlist.readonly  —  we read only the names of the calendars, so the owner can pick one':fontcolor=white:fontsize=23:box=1:boxcolor=black@0.8:boxborderw=12:x=(w-text_w)/2:y=h-64:enable='between(t,88,103)',
+drawtext=fontfile=fuente.ttf:text='calendar.events  —  create, update and delete the appointments booked through Nexux':fontcolor=white:fontsize=23:box=1:boxcolor=black@0.8:boxborderw=12:x=(w-text_w)/2:y=h-64:enable='between(t,110,155)',
+drawtext=fontfile=fuente.ttf:text='Appointment cancelled in Nexux  —  the event is deleted from Google Calendar':fontcolor=white:fontsize=23:box=1:boxcolor=black@0.8:boxborderw=12:x=(w-text_w)/2:y=h-64:enable='between(t,165,178.5)'
+ROT
+tr -d '\n' < "$TR/rotulos.txt" > "$TR/rotulos-1linea.txt"
+
+cd "$BASE"
+ffmpeg -y -loglevel error -i "$TR/con-voz.mp4" \
+  -filter_complex_script "$TR/rotulos-1linea.txt" \
+  -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p -c:a copy "$OUT"
+
+echo
+D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUT")
+printf "Listo: %s\n  dura %.0f s (%d min %02d s)\n" "$OUT" "$D" "$(node -e "console.log(Math.floor($D/60))")" "$(node -e "console.log(Math.round($D%60))")"
+ls -lh "$OUT" | awk '{print "  pesa "$5}'

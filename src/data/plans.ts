@@ -92,7 +92,7 @@ export const PLANS: Record<PlanSlug, PlanData> = {
       },
       {
         q: '¿Y si me escriben más de la cuenta?',
-        a: 'El precio incluye hasta 1.000 conversaciones al mes. Si algún mes te pasas, te avisamos antes de cobrarte cualquier importe adicional.',
+        a: 'El precio incluye hasta 1.000 conversaciones al mes. Te avisamos al llegar al 90 % para que no te pille por sorpresa. No hay cobros extra: si se alcanza el tope, Lara deja de contestar hasta el día 1 y nadie te cobra de más.',
       },
       {
         q: '¿Puedo probarlo antes de pagar?',
