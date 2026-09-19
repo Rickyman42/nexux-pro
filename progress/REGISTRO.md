@@ -2338,3 +2338,53 @@ historicas todas las atendio `qwen-plus` y DeepSeek (el de pago) no ha entrado n
   `output/`) que **no son de esta tarea**; no se han tocado.
 - Mis sondas sueltas de la API de anuncios se han **apartado, no borrado**, a
   `~/scratch-claude/20260918-sondas-ads/` (10 ficheros).
+
+## 2026-09-19 — Vigilante de la cascada de IA
+
+**Por que:** hoy el 100% de las respuestas de la demo las da `qwen-plus` (gratis) y
+DeepSeek (el de pago) no ha entrado nunca en 601 llamadas. Con el anuncio apuntando
+a la demo eso puede cambiar en una tarde. El vigilante avisa cuando los gratuitos
+empiezan a caerse, ANTES de que cueste dinero o de que alguien se lleve un error.
+
+**Ficheros (commit `37a9f3a`):**
+- `lib/salud-cascada.js` — `decideAviso()`. Aparte a proposito: dentro del script
+  solo se podria probar la rama que toque al estado real de la Pi.
+- `scripts/vigilante-cascada-ia.mjs` — lee SOLO los bytes nuevos del log desde la
+  ultima vez (`~/.nexux-cascada.json`). Si el fichero encoge, empieza de cero.
+- `scripts/prueba-salud-cascada.mjs` — 11 casos. `scripts/sabotaje-salud-cascada.py` — 5 sabotajes.
+- Cron: `*/15 * * * *` → `~/logs/vigilante-cascada-ia.log`.
+
+**Niveles:** 🔴 cascada agotada · 🔴 contesta DeepSeek (de pago) · 🔴 ni una respuesta
+· 🟠 `qwen-plus` falla o responden los de repuesto · callado si todo va bien.
+
+**Evidencia:**
+- Pruebas **11/11**. Sabotaje **5/5 cazados**.
+- El sabotaje encontro DOS fallos reales: (1) con cero respuestas el aviso decia
+  "han respondido los de repuesto" cuando no habia respondido nadie — arreglado
+  subiendo esa comprobacion por delante del ambar; (2) faltaba el caso que
+  distingue la guarda de "sin trafico nuevo", sin el cual quitarla no rompia nada.
+- **Entrega probada de verdad:** aviso de prueba enviado a Telegram, `ok: true`.
+- Lectura incremental probada: 1a pasada 30.934 lineas, 2a pasada 0.
+- `nexux-verify.py`: **7/7 OK**.
+
+**Cadena completa probada en produccion (19-sep 12:32):** desde el navegador, en
+`https://nexux.pro/demo` con etiquetas de anuncio, se escribio a Lara y quedo
+guardado con `visita=51zqzepzz8kf`, `utm_campaign=prueba_cadena_completa`,
+`utm_content=ad_e2e`. Front y back funcionando juntos en vivo.
+
+## 🔴 HALLAZGO del primer dia de registro (no arreglado)
+
+La primera conversacion real capturada dice esto:
+
+> **Visitante:** "Buenas, tengo una barberia de dos sillas en Mostoles, esto me valdria?"
+> **Lara:** "Salon Elite es un espacio *solo para clientes*, no trabajamos con
+> franquicias ni colaboraciones externas."
+
+Lara hace de recepcionista del salon ficticio, asi que **al dueno de negocio que
+pregunta si el producto le sirve, lo despacha.** Si la demo pasa a ser la pagina de
+aterrizaje del anuncio, esa es la pregunta MAS probable de quien llega. Hay que
+decidir que responde Lara cuando detecta que quien escribe no es un cliente sino un
+posible comprador. Tarea aparte.
+
+**Campanas de prueba a excluir de las cuentas:** `prueba_landing_demo`,
+`prueba_landing_demo2`, `prueba_cadena_completa`, `prueba_guardado`.
