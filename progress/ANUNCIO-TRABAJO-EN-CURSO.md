@@ -304,3 +304,55 @@ que ni llegaron a teclear el email.
 los 8 REFUTADOS con evidencia. No se ha ejecutado ninguno. Quedan 19 sin verificar
 (instrumentacion y horario-multifranja). El analisis se retoma con
 `Workflow({scriptPath: <el guion>, resumeFromRunId: "wf_8948324a-ef9"})`.
+
+---
+
+## 🔴 CORRECCION IMPORTANTE (19-sep): SI hay un contacto del anuncio
+
+Ricardo lo vio y yo lo habia contado mal. **Hay 1 prospecto cualificado del anuncio.**
+
+Sesion `cf6c8900`, **14-sep 03:02:10** (Madrid), movil Android 412x924, idioma en-ES:
+llego del anuncio A02 -> bajo por la pagina -> pulso **"Ver como responde"**
+(`hero_cta_secondary`, el boton SECUNDARIO) -> fue a `/demo` -> escribio a Lara ->
+**completo una reserva en la demo**. Tres minutos de principio a fin.
+
+Las UTMs estan EN los datos del evento (`utm_campaign: nexux_recepcionista_29`).
+**Mi error:** filtre por la COLUMNA `utm_campaign` de la tabla, que Umami solo rellena
+en el primer evento de la visita; al navegar a `/demo` la URL ya no lleva UTMs y la
+columna sale vacia. La atribucion funciona perfectamente; la consulta era mia y estaba mal.
+
+### Lo que esto cambia
+
+El camino que SI funciona es la demo, y la campana optimiza hacia el que NO:
+
+| camino | llegadas del anuncio | resultado |
+|---|---|---|
+| "Quiero recuperar esas citas" (pagar) | 577 | 12 toques, 4 pantallas de pago, **0 pagos** |
+| "Ver como responde" (demo) | 577 | 1 persona fue, escribio y **reservo** |
+
+Embudo de la demo, todo el historico (20 visitas distintas por IP):
+50% escriben un mensaje, 15% completan reserva. Frente a 0 de 577 del checkout.
+
+**Y la campana persigue `Checkout Started`.** O sea: lleva 112 EUR comprando gente que
+toca "pagar" (que no ha producido nada) e ignorando la unica accion que produjo un
+prospecto.
+
+### El agujero que hay que tapar
+
+La demo **no guarda ningun contacto**. `demo-visitors.jsonl` solo apunta IP, navegador,
+hora y evento. Esa persona hizo todo bien y lo unico que tenemos de ella es una IP
+(91.230.55.62). No se le puede escribir.
+
+Ricardo tiene su propia herramienta para verlo: `GET /demo/visitors?key=<SECRET>&geo=1`
+en provision-http.js (da ciudad por IP).
+
+### Propuesta revisada
+
+1. **Que la demo capture un contacto** (telefono o correo). Es el cambio de mas valor:
+   convierte visitas en gente a la que se puede escribir. Hoy se pierde entera.
+2. **Que el evento de conversion de la campana sea la demo, no el checkout.** No se
+   puede cambiar en esta campana (esta bloqueado): es razon justificada para crear una
+   nueva cuando se reactive.
+3. **Dar peso al boton de la demo en la pagina.** Hoy "Ver como responde" es el
+   secundario y el de pagar es el principal. Los datos dicen lo contrario.
+   Aviso honesto: esto se apoya en UN caso. Pero el otro camino tiene 0 de 577.
