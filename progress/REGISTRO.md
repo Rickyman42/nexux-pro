@@ -2728,3 +2728,42 @@ sabado   09:00-20:00   |  saturday  09:00-14:00   -> vale 14:00
 cree tener abierto hasta las 20:00 y el bot dice que cierra a las 14:00: citas que se
 rechazan solas. Afecta tambien a 6 clientes mas, todos de prueba o demo.
 No lo he tocado: es dato de un cliente real y lo decide Ricardo.
+
+## 🔴 CORRECCION (19-sep): NO HAY NINGUN CLIENTE REAL
+
+Lo apunto Ricardo: **New Look no es un cliente real.** Fui a la fuente de verdad en
+vez de deducirlo del nombre de la carpeta, y es peor de lo que corregia:
+
+```
+clients/index.json  ->  { "clients": {}, "bySession": {}, "bySubscription": {} }   VACIO
+
+Stripe (sk_live), 10 suscripciones en toda la vida de la cuenta:
+   1 active             0,00 EUR   ricmanpla23@hotmail.com   (RICARDO MANSILLA)
+   1 canceled          29,00 EUR   info@nexux.pro            (RICARDO MANSILLA)
+   7 incomplete_expired 9,99 EUR   (abril-mayo, nunca llegaron a pagar)
+   1 paused             9,99 EUR
+
+Dinero cobrado y no devuelto en toda la vida de la cuenta: 30 EUR
+   2026-09-04   29 EUR   (la de Ricardo, luego cancelada)
+   2026-07-13    1 EUR   (prueba)
+```
+
+**Las dos unicas suscripciones que existen son de Ricardo.** No hay ni un cliente
+que pague. Todas las carpetas de `clients/` son altas manuales o de prueba.
+
+### Que queda mal de lo que escribi antes en este mismo documento
+
+- "Los clientes que PAGAN tienen 300 conversaciones, no 1.000" → **falso**: no hay
+  clientes que paguen. El descuadre entre lo que promete Lara (1.000) y lo que se
+  provisiona (300) sigue siendo real, pero es algo que hay que cuadrar **antes de la
+  primera venta**, no una deuda con nadie.
+- "New Look esta perdiendo citas, yo lo miraria hoy" → **falso**: no hay nadie
+  perdiendo citas. El bug de los horarios SI es real (las claves en espanol se
+  ignoran en silencio y el sabado se comen 6 horas), pero es una mina pisada para el
+  dia que entre el primero, no una urgencia de hoy.
+
+### La leccion, que es la misma de todo el dia
+
+Deduje "cliente real" de que la carpeta tuviera nombre de peluqueria y limite 300,
+en vez de mirar quien paga. La fuente de verdad de "quien es cliente" es Stripe y
+`clients/index.json`, no el nombre de un directorio.
