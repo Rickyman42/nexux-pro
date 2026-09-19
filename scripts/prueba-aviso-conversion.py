@@ -35,7 +35,11 @@ def sirve():
 def main():
     from playwright.sync_api import sync_playwright
 
-    srv = sirve()
+    en_vivo = len(sys.argv) > 1 and sys.argv[1] == 'produccion'
+    base = 'https://nexux.pro' if en_vivo else f'http://127.0.0.1:{PUERTO}'
+    print('Probando contra: %s' % base)
+
+    srv = None if en_vivo else sirve()
     resultados = {}
     try:
         with sync_playwright() as p:
@@ -48,6 +52,9 @@ def main():
             pagina.route('**/googletagmanager.com/**', lambda r: r.abort())
             pagina.route('**/facebook.net/**', lambda r: r.abort())
             pagina.route('**/js.stripe.com/**', lambda r: r.abort())
+            # En produccion la clave de Stripe es de COBRO: ni una sesion de pago.
+            if en_vivo:
+                pagina.route('**/api/stripe/**', lambda r: r.abort())
 
             # El pixel falso y un Umami falso, puestos ANTES de que cargue la pagina.
             pagina.add_init_script("""
@@ -58,7 +65,7 @@ def main():
             """)
 
             # --- D. control: SIN consentimiento no puede salir nada ---
-            pagina.goto(f'http://127.0.0.1:{PUERTO}{RUTA}?utm_source=chatgpt&oppref=prueba',
+            pagina.goto(f'{base}{RUTA}?utm_source=chatgpt&oppref=prueba',
                         wait_until='networkidle')
             pagina.evaluate("window.nxMeasure('checkout_form_shown', {plan:'recepcionista'})")
             resultados['D_sin_consentimiento'] = pagina.evaluate(
@@ -94,7 +101,8 @@ def main():
                 "JSON.stringify((window.__oai.find(a => a[1]==='checkout_started')||[])[2] || null)")
             navegador.close()
     finally:
-        srv.shutdown()
+        if srv is not None:
+            srv.shutdown()
 
     esperado = {
         'D_sin_consentimiento': 0,
