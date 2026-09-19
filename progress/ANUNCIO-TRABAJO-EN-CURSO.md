@@ -356,3 +356,108 @@ en provision-http.js (da ciudad por IP).
 3. **Dar peso al boton de la demo en la pagina.** Hoy "Ver como responde" es el
    secundario y el de pagar es el principal. Los datos dicen lo contrario.
    Aviso honesto: esto se apoya en UN caso. Pero el otro camino tiene 0 de 577.
+
+---
+
+# 📏 REGLA DE SEPARACION DE FUENTES (obligatoria a partir del 19-sep-2026)
+
+Cada pregunta tiene UNA fuente. Mezclarlas es lo que ha producido una semana de
+numeros que no cuadraban.
+
+| pregunta | fuente unica | por que |
+|---|---|---|
+| Cuanto se ha gastado, cuantos clics, cuantas impresiones | **OpenAI Ads** | es quien cobra |
+| Que hizo la gente en la web, y cuantos contactos hay | **Umami + demo-visitors.jsonl + registro del bot** | es lo unico que ve a todos |
+| Cuanto dinero ha entrado de verdad | **Stripe** | es donde esta el dinero |
+
+**🔴 El panel de OpenAI NO sirve para contar conversiones reales.** Su pixel solo
+dispara si la persona tiene `nx_cookie_consent === 'accepted'` en el navegador
+(`measurement.ts`, funcion `sendOpenAiTracker`), y de 128 avisos mostrados solo han
+respondido 8. Ademas el evento de conversion de la campana es **Checkout Started**,
+asi que una reserva de demo NO cuenta como conversion por mucho que se acepten las
+cookies. Usar el panel para saber si alguien se interesa es contar con un ojo tapado.
+
+## Reglas de consulta que hay que respetar
+
+1. **Nunca filtrar por la columna `utm_campaign` de `website_event`.** Umami solo la
+   rellena en el primer evento de la visita; al cambiar de pagina se vacia. Hay que
+   filtrar **por sesion**: si la sesion tuvo algun `chatgpt_ads_landing`, todo lo que
+   hizo esa persona es del anuncio. (Este error me hizo cantar "0 contactos" cuando
+   habia 1.)
+2. **Al panel de anuncios se le pide siempre `date_range` con `timezone: Europe/Madrid`.**
+   Con ventanas desplazadas devuelve CEROS en silencio.
+3. **Separar siempre nuestras pruebas del trafico real.** Las sesiones con
+   `utm_campaign` = `prueba_conversion`, `prueba_limpia`, `prueba_medicion`,
+   `reparto-mostoles` son nuestras. Y las pantallas de pago creadas llamando a la API
+   sin pasar por el navegador no aparecen en Umami: son pruebas por definicion.
+4. **Nunca citar "ultimas 24/48 horas"** como si fuera un dato fijo: cambia cada
+   minuto. Se cita el dia natural.
+5. **Sin muestra no hay porcentaje.** Si el denominador es menor que ~30, se da el
+   numero crudo ("1 de 530"), no el tanto por ciento.
+
+---
+
+# 🔴 CORRECCIONES DEL 19-sep (segunda ronda, las pillo Ricardo)
+
+## 1. Contactos desde el anuncio: 1, no 0
+
+Contado por SESION y solo con fuentes internas:
+
+```
+530  sesiones que vinieron del anuncio
+  3  reservaron en la demo  -> de las cuales 2 son PRUEBAS NUESTRAS
+                               (831255d8 con prueba_conversion/prueba_medicion,
+                                2b85f63f con prueba_limpia/reparto-mostoles)
+  1  REAL: cf6c8900, 14-sep 03:02
+```
+
+Las reservas de demo de toda la base son **4**, no 5 (yo conte eventos, no personas):
+2 pruebas nuestras, 1 del 6-sep sin campana, y **1 del anuncio**.
+
+## 2. El telefono NO es recuperable, porque NO EXISTE
+
+Comprobado en el codigo que ejecuta:
+- La demo **no es un WhatsApp de verdad**: es un chat dentro de la pagina
+  (`demo.astro` llama a `/demo/chat`). El `channel: 'wa'` es solo la piel verde.
+- El calendario de la demo es un decorado: `getDemoApts()` en `provision-http.js`
+  devuelve citas inventadas en cada llamada (Ana Garcia, Laura M...). **Una reserva
+  hecha en la demo no se guarda en ningun sitio.**
+- La conversacion **no se registra**. El unico fichero de la demo es
+  `demo-visitors.jsonl`, que guarda IP, navegador, hora y evento. Nada mas.
+- El visitante hace de CLIENTE de una peluqueria ficticia: no hay ningun momento en
+  que se le pida su propio telefono.
+
+De ese prospecto solo existe: IP `91.230.55.62`, Android movil, y su rastro en Umami.
+**No se le puede escribir.** Y no es un fallo puntual: la demo esta construida para
+ensenar el producto, no para captar a nadie.
+
+## 3. Aritmetica de las pantallas de pago del 14-sep, corregida
+
+**12 de 13 eran pruebas nuestras, no 9.** (Escribi "nueve" y liste doce horas.)
+
+```
+PRUEBAS (12): 09:35, 09:41, 09:52, 09:53
+              13:03, 13:03, 13:04, 13:05, 13:06, 13:07, 13:07, 13:08
+REAL     (1): 02:33  <- coincide con un checkout_started de Umami
+```
+
+Y un hallazgo nuevo que sale de ahi: de los **4 toques reales** de "pagar" ese dia
+(00:55 y 01:00 de la misma persona, 02:33 y 08:53), **solo 1 llego a crear pantalla
+de pago en Stripe**. Tres personas pulsaron "pagar" y no paso nada.
+
+## 4. Lo que NO se sostiene de la explicacion del consentimiento
+
+Ricardo apunto que esa persona no respondio al aviso de cookies y por eso OpenAI no
+recibio su `appointment_scheduled`. La conclusion es correcta pero el camino no:
+- Esa sesion no tiene `cookies_mostrado` **porque la MEDICION del aviso no existia
+  hasta el 15-sep 18:11**, no porque no se le ensenara.
+- La puerta del consentimiento SI existia el 14-sep (`nx_cookie_consent` esta en
+  `measurement.ts` desde el 2-sep, commit d20e42b).
+- Y sobre todo: **aunque hubiera aceptado las cookies, tampoco habria contado**,
+  porque el evento de conversion de la campana es `Checkout Started`, no
+  `appointment_scheduled`.
+
+Tampoco se sostiene culpar al aviso de cookies del derrumbe de conversiones desde el
+15-sep: el aviso y la puerta ya estaban antes. Lo que se derrumbo fue el VOLUMEN
+(238 clics el 13-sep -> 55 el 15 -> 5 el 18). Con ~1% de conversion, 55 clics dan
+cero sin necesidad de ninguna averia.
