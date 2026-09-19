@@ -425,6 +425,35 @@ const API = 'https://pi.nexux.pro';
   var weekOffset = 0;
   var lastNewId = null;
 
+  // Identificador de ESTA pestana, para poder unir los turnos de una misma
+  // conversacion. No identifica a la persona: se pierde al cerrar la pestana.
+  var visitaDemo = (function () {
+    try {
+      var v = sessionStorage.getItem('nx_demo_visita');
+      if (!v) {
+        v = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+        sessionStorage.setItem('nx_demo_visita', v);
+      }
+      return v;
+    } catch (e) { return ''; }
+  })();
+
+  // De que anuncio viene. measurement.ts limpia la URL, y cuando ya ha pasado la
+  // direccion original queda guardada: sin este apano, todo el trafico de pago
+  // se registraria como si hubiera llegado solo.
+  function campanaDemo() {
+    try {
+      var busqueda = location.search;
+      if (!busqueda) { busqueda = sessionStorage.getItem('nx_pending_query') || ''; }
+      var p = new URLSearchParams(busqueda);
+      return {
+        utm_source: p.get('utm_source'),
+        utm_campaign: p.get('utm_campaign'),
+        utm_content: p.get('utm_content'),
+      };
+    } catch (e) { return {}; }
+  }
+
   document.getElementById('init-ts').textContent = hhmm(new Date());
 
   // ── Tracking invisible (sin params en URL) ──
@@ -740,7 +769,7 @@ const API = 'https://pi.nexux.pro';
     fetch(API + '/demo/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history: history.slice(-8), booked: apts.map(function(a){ return a.datetime; }) })
+      body: JSON.stringify({ message: text, history: history.slice(-8), booked: apts.map(function(a){ return a.datetime; }), visita: visitaDemo, campana: campanaDemo() })
     })
     .then(function(r){ return r.json(); })
     .then(function(data) {
