@@ -581,3 +581,53 @@ cualificado que controlemos nosotros (contacto a mano con salones). Si duenos de
 salon elegidos a dedo tampoco compran, el problema es la pagina/oferta (2). Si
 compran, era entrega o volumen (1 o 3). Es la unica prueba que separa las tres y
 cuesta tiempo, no dinero.
+
+---
+
+# LA DEMO COMO PAGINA DE ATERRIZAJE (idea de Ricardo, 19-sep) — comprobaciones
+
+## Verificado en lo que EJECUTA
+
+1. **La atribucion funciona en /demo.** `demo.astro:888` importa `measurement.ts`.
+   Probado en vivo con sesion limpia: `chatgpt_ads_landing` entro en la base a las
+   11:49:21 con `utm_source=openai`. Sin cambios de codigo.
+   ⚠️ El primer intento dio "no dispara" y era FALSO: mi navegador tenia la marca
+   `CHATGPT_LANDING_KEY` en sessionStorage de una visita anterior. Repetido limpio.
+2. **El precio ya esta en la demo:** "29 EUR/mes - Sin comisiones" junto a
+   "Quiero esto para mi negocio". Tres salidas a la ficha, con seguimiento de clic
+   ya puesto (`demo.astro:882`).
+3. **Interes comparado (medido):**
+   - aterrizando en la ficha de producto: **1 de 528** escribio a Lara (0,2%)
+   - visitas de la demo: **39 de 121** escribieron (32%)
+   Poblaciones distintas — el 32% NO es lo que dara el anuncio. La direccion si vale.
+
+## Coste por conversacion: CERO (medido)
+
+`lib/ai.js` encadena **12 proveedores gratuitos** antes del unico de pago
+(DeepSeek, el ultimo a proposito). En los registros de PM2:
+
+```
+596 llamadas atendidas -> TODAS por qwen-plus (gratis, el primero)
+  0 fallos de proveedor
+  0 veces "All providers exhausted"
+  0 veces ha entrado DeepSeek (el de pago)
+```
+
+**El riesgo no es el dinero, es el volumen.** 596 llamadas es el historico ENTERO.
+Con el anuncio en la demo (500 visitas/dia, ~1 de cada 3 escribiendo, ~4 mensajes)
+se superaria ese historico en un solo dia. Nunca se ha probado a esa escala; si el
+free tier se agota, la cascada cae hacia DeepSeek (pago) o devuelve 502 al visitante.
+
+## Sobre seguir o no en OpenAI Ads
+
+Ricardo: "si no podemos saber a quien nos muestra, no es el canal idoneo".
+**Correcto, y la razon exacta es esta:** la publicidad de pago funciona cortando lo
+que no convierte y ampliando lo que si. Sin saber a quien se entrega, no se puede
+cortar nada; solo se ve el total. Comprobado que la API no da NINGUN desglose
+(5 parametros probados, ignorados en silencio).
+
+**Matiz que si cambia la ecuacion:** con la demo de aterrizaje, lo que la gente
+ESCRIBE revela quien es. Seria nuestro propio informe de entrega, el que OpenAI no
+da. Hoy no sirve porque `/demo/chat` **no guarda las conversaciones**. Guardarlas es
+un cambio pequeno, pero exige avisarlo en la pagina (dato personal). Decision de
+Ricardo, no se toca sin su OK.
