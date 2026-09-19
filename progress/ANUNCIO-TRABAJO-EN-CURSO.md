@@ -524,3 +524,60 @@ apuntando a la MISMA pagina y el MISMO checkout: no hay nada que construir.
 - Campana actual: muere sola el 22-sep 10:00. Recomendacion: dejarla morir.
 - Siguiente paso recomendado: primera venta a mano + prueba de 50 EUR en busqueda
   por intencion. NO renovar ChatGPT Ads.
+
+---
+
+# 🔴 RETRACTACION (19-sep, misma tarde): LA CAMPANA SI ESTABA SEGMENTADA
+
+Lo escrito en la seccion anterior ("en ChatGPT Ads no existe segmentacion por tipo
+de negocio, se compra interrupcion") **ES FALSO**. Lo afirme sin mirar el objeto de
+la campana. Comprobado ahora contra la API que EJECUTA:
+
+```
+GET /v1/campaigns -> cmpn_deb163a3306c8198bb95b62f10afffb0
+  "targeting": { "locations": { "include": [ { "type":"country", "country_code":"ES" } ] } }
+
+GET /v1/ad_groups -> adgrp_d84276c1c0a48198a1d6f6b15b3d7618  (activo, puja 15 EUR)
+  "context_hints": [
+    "En Espana",
+    "propietarios y responsables de negocios con cita previa que estan comparando",
+    "buscando contratar o preguntando por el precio de una recepcionista IA o un
+     software para automatizar reservas por WhatsApp. Conversaciones con intencion
+     comercial: 'recepcionista virtual para mi negocio', 'software que responda
+     WhatsApp y reserve citas', 'precio de asistente IA para citas',
+     'alternativas a contratar recepcionista', 'automatizar agenda sin comisiones'",
+    "... peluquerias, centros de estetica, clinicas, talleres ..."
+  ]
+```
+
+**La campana estaba dirigida a publico cualificado y por intencion comercial, que es
+exactamente lo que Ricardo pidio desde el principio.** Queda retirada la conclusion
+de "cambiar a busqueda por intencion porque alli si hay segmentacion": la
+segmentacion ya estaba.
+
+## Lo que SI queda establecido, y es un limite duro
+
+**La API no ofrece NINGUN desglose de entrega.** Probados contra
+`/v1/ad_account/insights`: `breakdowns=query`, `breakdowns=placement`,
+`breakdowns=country`, `breakdowns=device`, `breakdown=query`. Los cinco devuelven
+HTTP 200 con **las mismas 2 filas** — el parametro se ignora en silencio.
+
+Consecuencia: **no se puede saber a quien se le entrego el anuncio.** Ni por su lado
+(no lo exponen) ni por el nuestro (nunca medimos si el visitante tenia un negocio
+con citas). Los 112,53 EUR no compraron esa informacion.
+
+## Estado honesto del diagnostico
+
+Medido: 17.654 impresiones · 530 visitas · 6 pantallas de pago · 0 tarjetas ·
+0 ventas · 112,53 EUR · segmentacion correcta sobre el papel.
+
+Tres explicaciones siguen vivas y **ninguna esta probada**:
+  1. el volumen fue diminuto (6 pantallas de pago no son una muestra);
+  2. la pagina/oferta no cierra;
+  3. la entrega no respeto las pistas de contexto.
+
+**Forma de distinguirlas sin gastar un euro:** llevar a la MISMA pagina trafico
+cualificado que controlemos nosotros (contacto a mano con salones). Si duenos de
+salon elegidos a dedo tampoco compran, el problema es la pagina/oferta (2). Si
+compran, era entrega o volumen (1 o 3). Es la unica prueba que separa las tres y
+cuesta tiempo, no dinero.
