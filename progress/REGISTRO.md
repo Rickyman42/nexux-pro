@@ -2388,3 +2388,40 @@ posible comprador. Tarea aparte.
 
 **Campanas de prueba a excluir de las cuentas:** `prueba_landing_demo`,
 `prueba_landing_demo2`, `prueba_cadena_completa`, `prueba_guardado`.
+
+## 2026-09-19 — Lara ya no despacha a los empresarios en la demo
+
+**El fallo:** la demo comparte cerebro con los bots de los clientes reales, asi que
+Lara hacia de recepcionista del salon ficticio tambien con quien venia a comprar.
+Al dueno de barberia que preguntaba "esto me valdria?" le contestaba que el salon
+"es solo para clientes" y "no trabajamos con franquicias". Despachaba al cliente.
+
+**Mapa de cerebros (comprobado, no supuesto):**
+
+| bot | prompt | quien lo usa |
+|---|---|---|
+| recepcionista de salon | `lib/bot-prompt.js` → `buildSystemPrompt` | la **demo**, el **WhatsApp** y el **Telegram** de los clientes reales, y el chat del **CRM** (`provision-http.js:1133`) |
+| asistente de la web | `lib/bot-prompt-lara.js` → `buildLaraPrompt` | `/api/lara-web/chat` |
+| NOA (ventas) | `buildNoaPrompt` | fuera de uso |
+
+O sea: **no son tres bots distintos.** La demo y los bots de los salones reales son
+el MISMO prompt con distinta configuracion. Por eso el arreglo NO se puede hacer en
+`bot-prompt.js`: la recepcionista de un cliente se pondria a vender Nexux a SUS
+clientes.
+
+**El arreglo:** un anadido que se suma SOLO en `/demo/chat`, igual que ya se suman
+`temporal`, `availability` y `misCitas`. Lara reconoce a quien habla de SU negocio
+o del producto, sale del papel dos frases (si te sirve / contesto y reservo sola /
+29 EUR al mes sin comisiones / pruebame como si fuera tu recepcionista) y vuelve.
+
+**Evidencia:**
+- Como comprador (barberia, taller, clinica dental): responde y da el precio.
+- Como cliente del salon (reservar corte, precio del tinte): igual que siempre.
+- **Sin contagio**, probado con `scripts/prueba-contagio-demo.mjs`: el prompt de un
+  cliente real NO contiene el anadido, solo lo suma `/demo/chat`, y ni `whatsapp.js`
+  ni `telegram.js` lo mencionan.
+- **Sabotaje** (`scripts/sabotaje-lara-comprador.py`): quitando el anadido,
+  **0 de 3** respuestas venden; con el, **3 de 3**. El arreglo es quien hace el trabajo.
+- Fuga de guion: en 1 de cada 4 respuestas el modelo escribia en voz alta
+  "(despues vuelvo a ser Lara del Salon Elite)". Anadida una linea que lo prohibe;
+  5 de 5 limpias despues.
