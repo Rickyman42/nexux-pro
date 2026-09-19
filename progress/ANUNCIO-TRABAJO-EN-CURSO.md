@@ -284,3 +284,23 @@ El pago devuelve a /gracias?plan=recepcionista, **sin identificador de compra**.
 codigo sabe avisar del retorno pero solo si llega `session_id`, y nunca llega: 0
 registros en toda la historia. Y la tabla que traduce eventos a OpenAI **no tiene
 ninguna entrada para una compra**.
+
+---
+
+## ARREGLADO Y DESPLEGADO (19-sep)
+
+**El parte diario ya no miente.** `date_range` con zona horaria en vez de ventana
+desplazada. Probado en vivo: verdad 6 clics / 2,89 EUR, ventana vieja 0 / 0,00,
+el vigilante arreglado 6 / 2,88. Sabotajes 2/2 + 1 hueco conocido. Commit e7905ae.
+Guardian nuevo: si el panel da cero y la web ve gente, aviso rojo.
+Y el aviso ya no promete "vuelve a las 21:00" con el freno echado.
+
+**Stripe, comprobado hoy:** 0 ventas. La factura del 19-sep 02:06 es de 0,00 EUR
+(renovacion de la suscripcion de prueba de ricmanpla23@hotmail.com). Las 20
+ultimas sesiones de pago del anuncio: todas unpaid/expired y SIN CORREO, o sea
+que ni llegaron a teclear el email.
+
+**Verificacion adversarial:** de los 8 cambios verificados (los de 'fuente-unica'),
+los 8 REFUTADOS con evidencia. No se ha ejecutado ninguno. Quedan 19 sin verificar
+(instrumentacion y horario-multifranja). El analisis se retoma con
+`Workflow({scriptPath: <el guion>, resumeFromRunId: "wf_8948324a-ef9"})`.
