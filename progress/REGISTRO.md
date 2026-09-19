@@ -2425,3 +2425,52 @@ o del producto, sale del papel dos frases (si te sirve / contesto y reservo sola
 - Fuga de guion: en 1 de cada 4 respuestas el modelo escribia en voz alta
   "(despues vuelvo a ser Lara del Salon Elite)". Anadida una linea que lo prohibe;
   5 de 5 limpias despues.
+
+## 2026-09-19 — El chat de la WEB: guardado y calidad de respuesta
+
+**Correccion previa, mia:** dije "nadie pregunta nunca al visitante a que se dedica".
+**Falso.** El widget `LaraWidget.astro` se monta en la portada y en
+`src/pages/paquetes/[plan].astro`, que es la ruta de `/paquetes/recepcionista`: la
+pagina donde aterrizaron las 532 visitas del anuncio. La pregunta estaba puesta.
+Lo que no habia era guardado: `/api/lara-web/chat` no escribia nada en ningun sitio.
+
+**Medido:** de 532 sesiones del anuncio, **6 abrieron el chat** (las 6 venian del
+anuncio). Seis respuestas a "que negocio tienes" que se tiraron.
+
+### 1. Guardado (commit del backend)
+`guardaTurnoLaraWeb()` escribe `lara-web-conversaciones.jsonl`: ts, sesion, ip,
+device, ref, turno, **nombre, negocio, equipo, dolor**, mensaje, respuesta, recomendo.
+Mismas precauciones que el de la demo (try propio, escritura asincrona). Probado en
+vivo: turno guardado.
+
+**🔴 Hueco que queda (NO arreglado):** el widget nunca rellena `sessionData` —
+arranca `{}` y solo reasigna lo que devuelve el servidor, que es lo mismo que
+recibio. Asi que `nombre/negocio/equipo/dolor` vendran **vacios** en trafico real, y
+el bloque "DATOS RECOLECTADOS" del prompt es codigo muerto. El texto crudo del
+mensaje SI queda guardado, que es lo que de verdad hacia falta. Extraer los campos
+requiere trabajo aparte.
+
+### 2. Calidad de respuesta (medida, no supuesta)
+
+**Bien — no se inventa nada.** Probadas las cinco trampas del propio prompt:
+precio, comision de Booksy, integracion con Booksy, llamadas de telefono e
+Instagram. **Ninguna fabricacion.** Da la respuesta prudente en las cinco.
+
+**Dos fallos reales encontrados y ARREGLADOS (verificados):**
+- El saludo hacia DOS preguntas ("como te llamas y que tipo de negocio tienes") —
+  es la captura que mando Ricardo. La gente contestaba a una y habia que repreguntar.
+  Ahora pregunta solo el nombre.
+- En una conversacion entera hasta "me interesa", **cerraba sin decir el precio**.
+  Ahora el cierre lleva siempre los 29 EUR.
+
+**Un fallo real NO resuelto:** rompe su propia regla de "una sola pregunta por
+mensaje" en **9 de 30** respuestas medidas (3 pasadas de 10), y se pasa de 4 lineas
+en 9 de 30. Reforce la regla en el prompt: la primera pasada dio 2 de 10 y estuve a
+punto de cantarlo como arreglado; las dos siguientes dieron 4 y 3. **El refuerzo no
+funciona.** Si se quiere cerrar, hay que hacerlo en codigo (recortar despues de la
+primera pregunta), no con mas texto en el prompt.
+
+### 3. Deuda confirmada con grep (no arreglada)
+La promesa "hasta 1.000 conversaciones al mes... si te pasas te avisamos antes de
+cobrarte" aparece en los dos prompts y **no hay ningun contador detras**: ni limite,
+ni aviso, ni codigo que cuente conversaciones.
