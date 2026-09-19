@@ -631,3 +631,54 @@ ESCRIBE revela quien es. Seria nuestro propio informe de entrega, el que OpenAI 
 da. Hoy no sirve porque `/demo/chat` **no guarda las conversaciones**. Guardarlas es
 un cambio pequeno, pero exige avisarlo en la pagina (dato personal). Decision de
 Ricardo, no se toca sin su OK.
+
+## 2026-09-19 — Las dos mediciones de keywords, juntas de una vez
+
+Se han citado mal dos veces (yo y una revision posterior). Estan las DOS y miden
+frases distintas; no se contradicen. Fuentes exactas:
+
+**A) `progress/REGISTRO.md:23-24` — 21-ago-2026, Google Ads Keyword Planner,
+Espana, ago-2025/jul-2026, cuenta Ytical. Las 9 keywords candidatas de SEO:**
+```
+recepcionista ia        100-1.000/mes  +900% interanual  competencia ALTA  CPC 3,78-15,92 EUR
+recepcionista virtual    10-100/mes                      Media             CPC 1,85-10,39 EUR
+recepcionista ia whatsapp 0-10/mes  (comprobada aparte el mismo dia)
+chatbot citas / bot whatsapp empresa / software citas peluqueria /
+agenda citas whatsapp / no perder llamadas / alternativa a booksy   TODAS 0-10/mes
+```
+
+**B) `PRPs/20260902_181500_nexux-plan-equipo-79.md:90` y
+`PRPs/20260902_224500_paginas-por-sector-nexux-pro.md:37` — 2-sep-2026, mismo
+planificador, mismo periodo. Terminos por SECTOR:**
+```
+programa de citas   100-1.000/mes   competencia BAJA    <- "la mejor oportunidad del estudio"
+fisioterapia        100-1.000/mes   media, +900%
+peluqueria          100-1.000/mes   ALTA (Booksy, Fresha)
+dental / taller / veterinaria / estetica / barberia   10-100 cada uno
+```
+
+### Lo que se puede afirmar y lo que no
+
+- `programa de citas` **SI esta medido** (tabla B, dos ficheros). No es un ejemplo
+  ilustrativo.
+- `software citas peluqueria` 0-10 (tabla A) **no contradice** `peluqueria`
+  100-1.000 (tabla B): son frases distintas.
+- **NO hay CPC medido para `programa de citas` en ningun sitio.** Lo comprobe con
+  grep en los dos PRPs y en el REGISTRO. Cualquier cifra de coste por clic para
+  esa keyword es inventada hasta que se mire en el planificador.
+- `recepcionista ia` cuesta **3,78-15,92 EUR por clic** y su competencia es ALTA.
+
+### Consecuencia para la publicidad de pago
+
+Con el techo de CAC pesimista (12 meses = 348 EUR de ingreso, techo ~115 EUR):
+```
+recepcionista ia a 3,78 EUR/clic  ->  30 clics por venta como maximo
+recepcionista ia a 15,92 EUR/clic ->   7 clics por venta como maximo
+```
+Con 530 visitas y cero ventas medidas, 7-30 clics por venta no es alcanzable.
+**`recepcionista ia` no sale a cuenta.** Y `programa de citas` no se puede decidir
+hasta tener su CPC.
+
+**Siguiente paso, y cuesta 0 EUR:** mirar en el Planificador de Palabras Clave el
+CPC de `programa de citas` (y de los terminos de sector). Sin ese numero, montar
+la campana es volver a apostar a ciegas.
