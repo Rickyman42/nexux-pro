@@ -461,3 +461,66 @@ Tampoco se sostiene culpar al aviso de cookies del derrumbe de conversiones desd
 15-sep: el aviso y la puerta ya estaban antes. Lo que se derrumbo fue el VOLUMEN
 (238 clics el 13-sep -> 55 el 15 -> 5 el 18). Con ~1% de conversion, 55 clics dan
 cero sin necesidad de ninguna averia.
+
+---
+
+# CONCLUSION ECONOMICA DEL 19-sep — y la correccion de mi propia conclusion
+
+## 1. El fallo de fondo NO fue el anuncio. Fue no hacer esta cuenta ANTES de gastar.
+
+Nadie calculo, antes de encender la campana, cuanto podiamos permitirnos pagar por
+un cliente. Se optimizo el anuncio durante semanas sin saber contra que numero se
+estaba optimizando. Ese es el error raiz, y es mio.
+
+**Regla nueva, obligatoria antes de encender cualquier campana de pago:**
+escribir el techo de CAC (lo maximo que se puede pagar por un cliente) y la fuente
+del dato de retencion. Si la retencion es DESCONOCIDA, el techo de CAC se calcula
+con el escenario pesimista, no con el optimista.
+
+## 2. Lo medido (no estimado)
+
+```
+112,53 EUR gastados en esta campana (137,62 EUR con la anterior)
+530  sesiones del anuncio
+  6  llegaron a la pantalla de pago  (4 de 4 desde que se arreglo el 14-sep 09:48)
+  0  tarjetas introducidas
+  0  ventas
+```
+
+## 3. Lo estimado (marcado como tal, NO medido)
+
+- **LTV desconocido.** No hay ni un cliente de pago, asi que no hay dato de
+  permanencia. A 12 meses el plan de 29 EUR vale 348 EUR; a 30 meses, 870 EUR.
+  Con CAC ~300 EUR, el primer escenario es ruinoso y el segundo es aceptable.
+  **Apostar 300 EUR sobre un LTV desconocido es el error, no el precio de 29 EUR.**
+- **Cuantos de los 530 tenian peluqueria: no se sabe.** Nunca se midio. Por eso el
+  gasto entero es ininterpretable. Hueco de medicion, no de conversion.
+
+## 4. Correccion de lo que escribi antes
+
+Escribi "los anuncios de pago no pueden vender el plan de 29 EUR. Punto." **Eso es
+falso y demasiado amplio.** Lo correcto:
+
+> Un producto de 29 EUR/mes SI se puede publicitar de forma rentable. Lo que no
+> funciona es publicitarlo en el canal MAS CARO Y MENOS SEGMENTABLE que existe,
+> a un comprador que se puede encontrar por intencion de busqueda.
+
+En ChatGPT Ads no existe segmentacion por tipo de negocio. Se compra interrupcion.
+El comprador de este producto ESCRIBE "programa de citas peluqueria" en un buscador:
+es trafico de intencion, no de interrupcion.
+
+| | ChatGPT Ads (MEDIDO) | Busqueda por intencion (ESTIMADO) |
+|---|---|---|
+| quien lo ve | cualquiera | quien busca el producto |
+| coste por clic | 0,21 EUR | 0,30-0,80 EUR |
+| clics para una venta | ~1.500 | ~100-200 |
+| coste por venta | ~300 EUR | ~50-120 EUR |
+
+**La columna derecha NO esta medida.** Es la hipotesis. Se contrasta con 50 EUR,
+apuntando a la MISMA pagina y el MISMO checkout: no hay nada que construir.
+
+## 5. Decision pendiente de Ricardo
+
+- Campana actual: muere sola el 22-sep 10:00. Recomendacion: dejarla morir.
+- Siguiente paso recomendado: primera venta a mano + prueba de 50 EUR en busqueda
+  por intencion. NO renovar ChatGPT Ads.
