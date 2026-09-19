@@ -2528,3 +2528,32 @@ vigilaba nadie) · **en vivo: 0 de 30 respuestas con mas de una pregunta** (ante
 
 **Sigue abierto:** la longitud. Entre 1 y 5 de cada 10 respuestas pasan de 4 lineas.
 No lo he forzado en codigo porque recortar contenido si puede estropear la respuesta.
+
+## 2026-09-19 (tarde) — CORRECCION: la demo ENSENA, no vende
+
+**Lo que me corrigio Ricardo:** "Lara en la demo no esta para vender, esta para que
+se pueda ver lo que hace el sistema y lo que tendria el cliente."
+
+Mi primer arreglo de esta manana se paso de frenada. Al quitar el rechazo la puse a
+soltar el precio y a empujar al boton de compra. Eso convierte la demostracion en un
+anuncio: el visitante deja de ver el producto funcionando y pasa a que le vendan.
+Vender es trabajo de la ficha de producto y del chat de la web; aqui no.
+
+**Como se comporta ahora con un dueno de negocio:**
+1. No le rechaza (el bug original: "el salon es solo para clientes").
+2. **No le vende, no le da el precio, no le habla de altas.**
+3. Le dice que lo que esta viendo es lo que tendria en su negocio y le invita a
+   comprobarlo el mismo: que le pida una cita como si fuera un cliente suyo, que la
+   cambie, que la anule, y que mire la pestana "Lo que ves tu".
+4. Solo si pregunta el precio a bocajarro: una linea remitiendo a la ficha, y vuelta
+   a la demostracion.
+
+**Evidencia (`scripts/prueba-demo-mostrar.py`, 6/6):**
+- Barberia, clinica dental y "como funciona": ni rechaza ni vende, e invita a probar.
+- Precio a bocajarro: remite a la ficha sin vender.
+- Cliente normal (reservar corte, precio del tinte): igual que siempre.
+
+**Sabotaje reescrito** (`scripts/sabotaje-lara-comprador.py`): antes media "vende /
+no vende", que era justo el criterio equivocado. Ahora mide lo que importa.
+Resultado: sin el anadido despacha (2 de 3, la tercera tambien rechaza con otras
+palabras); con el anadido, 3 de 3 sin rechazar y sin vender.
