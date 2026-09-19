@@ -682,3 +682,134 @@ hasta tener su CPC.
 **Siguiente paso, y cuesta 0 EUR:** mirar en el Planificador de Palabras Clave el
 CPC de `programa de citas` (y de los terminos de sector). Sin ese numero, montar
 la campana es volver a apostar a ciegas.
+
+---
+
+# 🔴 19-sep-2026 — LO QUE DECIAN LOS CORREOS DE OPENAI (y nadie habia leido)
+
+Fuente: buzon `arteenpixel@gmail.com` (la cuenta que administra el anuncio; lo dice el
+propio REGISTRO linea 153) + panel `ads.openai.com` leido en vivo hoy. Solo lectura.
+
+## 1. La cuenta estuvo BLOQUEADA en mitad de la campana
+
+Correos, en orden:
+
+```
+ 8-sep  Factura INV-...000001 pagada 18,15 EUR
+ 8-sep  "Your Ads payment failed ... ads serving has been paused"
+ 9-sep  "Your Ads payment failed ... ads serving has been paused"
+10-sep  Ricardo abre caso: saldo pendiente 15,25 EUR supera el umbral de 15 EUR
+11-sep  Soporte (caso 14783985, Uzair):
+        "ad delivery is currently blocked because the required threshold payment
+         has not completed successfully" ... "we have referred the account for
+         further billing review" ... proximo cobro automatico el 30 de septiembre
+12-sep  "Your Ads payment failed" (tercera vez)
+12-sep  Ricardo abre segundo caso
+13-sep  Facturas 000002 (18,15) y 000003 (36,30) pagadas
+14-sep  Factura 000004 pagada 36,30
+15-sep 13:45  Soporte (caso 14934138, Rui): "The account is active and eligible to
+        serve ... There is no current account-level billing or serving block"
+15-sep 14:33  OpenAI Ads Manager: "Your ads are currently paused because your ad
+        account still needs to be verified"   <- 48 minutos DESPUES de lo anterior
+15-sep 14:37  "Your Ad Account Has Been Verified"  <- 4 minutos despues
+```
+
+**La actividad de facturacion lo confirma: los dias 10, 11 y 12 de septiembre el
+gasto es CERO.** No hay ni una linea. El anuncio no se sirvio esos tres dias.
+
+## 2. El gasto real, dia a dia (panel > Facturacion > Actividad)
+
+```
+ 8-sep  25,09 EUR   (campana de Clics)
+ 9-sep   5,16
+10-sep   ---        BLOQUEADO
+11-sep   ---        BLOQUEADO
+12-sep   ---        BLOQUEADO
+13-sep  43,70
+14-sep  26,13
+15-sep  17,81
+16-sep  14,06
+17-sep   3,23
+18-sep   2,71
+        -------
+        137,89 EUR de coste
+```
+
+La caida de clics del 13 al 18 (238 -> 55 -> 5) sigue exactamente a la caida del
+gasto (43,70 -> 17,81 -> 2,71). No hace falta culpar al aviso de cookies.
+**No puedo demostrar POR QUE cayo el gasto**; solo que cayo, y que coincide en fecha
+con la pausa por verificacion del 15-sep.
+
+## 3. Son DOS campanas, no una
+
+```
+Conversiones de OPENAI_CPC_ES_NEXUX29_10D_202609  (tipo Conversiones)
+  17.654 impresiones | 542 clics | 4 "conversiones" | 112,80 EUR
+  CTR 3,07% | CPC medio 0,21 EUR | presupuesto 15 EUR/dia | 8-sep a 22-sep
+
+OPENAI_CPC_ES_NEXUX29_10D_202609  (tipo Clics)
+   2.200 impresiones |  15 clics | 0 conversiones |  25,09 EUR
+  CTR 0,68% | CPC medio 1,67 EUR | presupuesto 75 EUR total | 8-sep a 18-sep
+```
+
+Las dos estan hoy **apagadas**: "Campana desactivada" y la de Clics ademas
+"La campana ha finalizado".
+
+Las 4 "conversiones" son toques de `checkout_started`, que salta en el clic:
+no son ventas. Sigue siendo 0 ventas.
+
+**CPC real en ChatGPT Ads: 0,21 EUR.** Yo habia inventado 0,50 EUR/clic hablando de
+Google; en OpenAI el clic salio a 0,21. Son plataformas distintas y no se comparan,
+pero el dato real existe y hasta hoy no estaba escrito en ningun sitio.
+
+## 4. Dinero: queda un pendiente vivo
+
+Panel > Facturacion > Resumen, leido hoy:
+```
+Saldo pendiente        47,89 EUR
+Proximo pago automatico  30 sept  (o al alcanzar el umbral)
+Umbral de facturacion    65 EUR   <- antes era 15 EUR
+Ultimo pago              36,30 EUR el 14 sept, Visa ****7800
+```
+Cobrado hasta hoy en facturas: 18,15 + 18,15 + 36,30 + 36,30 = **108,90 EUR**.
+
+🔴 **DESCUADRE SIN EXPLICAR: 18,90 EUR.** Coste 137,89 - cobrado 108,90 = 28,99, pero
+el panel dice 47,89 de pendiente. No he podido ampliar el rango de fechas del panel
+para cuadrarlo. Queda abierto: no dar por buena ninguna de las dos cifras.
+
+## 5. Capacidades de OpenAI Ads que NO conociamos (correos de producto)
+
+Del correo del **3-sep**:
+- **Publicos personalizados** (custom audiences): anadir/quitar/reemplazar miembros,
+  mezclar tipos de identificador, usar publicos de menos de 25K para EXCLUIR, GAID.
+  → O sea que **si existe segmentacion de publico**, no solo pais. Pero se alimenta
+  con listas de identificadores (correos, telefonos) y nosotros **no tenemos lista**:
+  hoy no nos sirve para captar desconocidos.
+- Mas campos de emparejamiento de conversiones en el Pixel y la Conversions API.
+- **ChatGPT Ads se lanzo en Europa esa misma semana.** Anunciamos en los primeros
+  dias del mercado europeo.
+
+Del correo del **16-sep**:
+- **Segmentacion granular por plataforma** (Android app/web, iOS app/web, escritorio)
+  en Ads Manager y en la API, y "**Performance insights can also be segmented by
+  platform**". → Ya existe ALGUN desglose de entrega. Mi medicion de que
+  `breakdowns=query|placement|country|device` devolvia siempre la misma fila hay que
+  repetirla.
+- **Event Quality Score** en Herramientas > Conversiones: puntua de 1 a 10 la calidad
+  del pixel y da recomendaciones. Justo lo que necesita nuestra fuente de datos, que
+  llevaba 0 eventos.
+- Optimizacion por conversiones con cobro por impresion (ya general).
+- Ventanas de atribucion configurables: 7/14/30 dias de clic, 0/1 dia de vista.
+
+## 6. Que corrige esto de lo que yo habia dicho
+
+| dije | realidad |
+|---|---|
+| "una campana con 530 visitas" | son DOS campanas, 557 clics, 137,89 EUR |
+| "0,50 EUR/clic" (inventado) | 0,21 EUR real en la de conversiones, 1,67 en la de clics |
+| la caida de clics = volumen / aviso de cookies | la caida sigue al gasto, y hubo 3 dias a cero por bloqueo de pago |
+| "en OpenAI no se puede segmentar" | hay publicos personalizados y desglose por plataforma |
+
+**La campana nunca llego a correr una prueba limpia.** Eso no borra el 0 ventas de
+557 clics, pero si invalida cualquier conclusion sobre "el publico era malo" o
+"la pagina es mala" sacada de esta tanda.
