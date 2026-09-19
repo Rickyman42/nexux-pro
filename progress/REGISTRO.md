@@ -2609,3 +2609,53 @@ de declinar (preguntar "¿ascendente o descendente?" ya es haber empezado).
 - Sabe que es una demo y que se adapta: **5 de 5**.
 - **Sabotaje** (`scripts/sabotaje-rail-demo.py`): sin el bloque hace la tarea 3 de 4
   veces; con el bloque, **0 de 4**.
+
+## 2026-09-19 — Lo pillo Ricardo: la demo no puede hacer de recepcionista de OTRO negocio
+
+**El fallo, que introduje yo unas horas antes.** Al ensenarle a explicar que se
+adapta al tipo de negocio, Lara acababa invitando: *"hazme una cita como si fueras
+tu paciente"*. Ricardo lo vio venir: **¿con que datos?**
+
+Probado, y era peor de lo que parecia. Con un dueno de clinica dental:
+1. Se inventaba los servicios ("empastes, limpiezas, revisiones").
+2. **Le ofrecia los huecos del SALON como si fueran los de su clinica**
+   ("el martes 22 tenemos 09:00, 10:00, 11:00 y 12:00").
+3. Se disponia a **apuntar una cita de "limpieza dental"**. Comprobado en el codigo
+   que la habria aceptado: si el servicio no esta en `DEMO_CONFIG`, la cita entra
+   igual con `duration: 60, price: null`. O sea, una limpieza dental entre dos
+   tintes en la agenda de la peluqueria, delante del cliente al que queremos
+   impresionar.
+4. Y se le colaban los huecos del guion sin rellenar: *"a las [hora] a nombre de
+   [Tu Nombre]"*.
+
+**El arreglo (solo en la demo):** puede EXPLICAR que en su clinica haria lo mismo
+con sus servicios, pero tiene PROHIBIDO hacer de recepcionista de ese negocio:
+inventar sus servicios, ponerles precio o duracion, ofrecer los huecos del salon
+como suyos o apuntar una cita de algo que aqui no existe. Cuando le piden la cita
+del otro negocio, invita a probarlo AQUI como cliente del salon y explica que el
+mecanismo es identico.
+
+**Evidencia** (`scripts/prueba-no-simula-otro-negocio.py`, clinica dental y taller):
+- Ninguna cita ajena apuntada, en ninguna pasada.
+- Ningun precio ni duracion inventados para servicios que no existen.
+- Sigue explicando la adaptacion: 5 de 6 pasadas (la que fallo no se invento nada,
+  solo no dijo la frase de la adaptacion).
+
+## 🔴 Fallo MIO en la medicion, anotado para no repetirlo
+
+La regla que comprobaba los precios inventados salto tres pasadas seguidas y estuve
+a punto de acusar al bot. **El fallo era de mi expresion:** `serviciosAjenos` es una
+alternancia sin parentesis (`limpieza|empaste|...`), y al pegarle el trozo del precio
+quedaba "limpieza O empaste O ortodoncia<precio>", asi que saltaba con solo nombrar
+la palabra. Se agrupo con `(?:...)` y se le puso **control positivo y negativo** antes
+de volver a usarla como veredicto.
+
+Leccion: una regla de medicion tambien hay que probarla con un caso que DEBA saltar
+y otro que NO, igual que el codigo. Tres pasadas dando por hecho que el fallo era del
+bot es exactamente el vicio que Ricardo me senalo esta manana.
+
+## Nota: el limite de peticiones de la demo funciona
+
+Al encadenar las baterias salte el limite y la demo devolvio **HTTP 429**. No es un
+fallo: son las 25 peticiones por minuto y por IP que protegen el endpoint. Confirmado
+que esta vivo.
