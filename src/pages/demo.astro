@@ -431,7 +431,7 @@ const esVariante = sector !== 'generico';
 
 </div>
 
-<script define:vars={{ API }}>
+<script define:vars={{ API, NEGOCIO, SECTOR: sector }}>
   var history  = [];
   var sending  = false;
   var apts     = [];
@@ -441,8 +441,6 @@ const esVariante = sector !== 'generico';
 
   // Identificador de ESTA pestana, para poder unir los turnos de una misma
   // conversacion. No identifica a la persona: se pierde al cerrar la pestana.
-  var NEGOCIO = "" + JSON.stringify(NEGOCIO) + "";
-  var SECTOR  = "" + JSON.stringify(sector) + "";
   var visitaDemo = (function () {
     try {
       var v = sessionStorage.getItem('nx_demo_visita');
