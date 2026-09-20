@@ -2,15 +2,29 @@
 import Medicion from '../components/Medicion.astro';
 import AvisoCookies from '../components/AvisoCookies.astro';
 const API = 'https://pi.nexux.pro';
+
+// Un vertical por parametro, no una pagina por vertical.
+// Para anadir uno: una entrada aqui y otra en DEMO_CONFIGS del backend. Nada mas.
+const VERTICALES = {
+  generico:    { negocio: 'Tu negocio',                    titulo: 'Demo en vivo' },
+  veterinaria: { negocio: 'Clinica Veterinaria Arcadia',   titulo: 'Demo para clinicas veterinarias' },
+};
+const sectorPedido = String(Astro.url.searchParams.get('sector') || '').toLowerCase();
+const sector  = VERTICALES[sectorPedido] ? sectorPedido : 'generico';
+const V       = VERTICALES[sector];
+const NEGOCIO = V.negocio;
+// La generica se indexa; las variantes se reparten por enlace y no deben competir con ella.
+const esVariante = sector !== 'generico';
 ---
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo en vivo — Lara, tu asistente IA | Nexux.pro</title>
+  <title>{V.titulo} — Lara, tu asistente IA | Nexux.pro</title>
   <meta name="description" content="Habla con Lara en tiempo real y ve como gestiona citas automaticamente." />
   <link rel="canonical" href="https://nexux.pro/demo" />
+  {esVariante && <meta name="robots" content="noindex, follow" />}
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <style is:global>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -294,7 +308,7 @@ const API = 'https://pi.nexux.pro';
 
 <div class="top-bar">
   <a href="/" class="home-back" aria-label="Volver a la página principal" title="Volver a inicio">&#x2190;</a>
-  <span class="top-label">Demo en vivo &mdash; Salon Elite (simulado)</span>
+  <span class="top-label">Demo en vivo &mdash; {NEGOCIO} (simulado)</span>
   <span>¿Lo quieres para tu negocio?</span>
   <a href="/paquetes/recepcionista">Ver Recepcionista IA</a>
 </div>
@@ -319,7 +333,7 @@ const API = 'https://pi.nexux.pro';
     <div class="chat-header">
       <div class="ch-avatar" id="ch-avatar">&#x2702;</div>
       <div style="flex:1">
-        <div class="ch-name" id="ch-name">Salon Elite &middot; Lara</div>
+        <div class="ch-name" id="ch-name">{NEGOCIO} &middot; Lara</div>
         <div class="ch-status"><span class="dot-on"></span><span id="ch-sub">En línea &middot; Asistente IA</span></div>
       </div>
       <span class="badge-demo">DEMO</span>
@@ -334,7 +348,7 @@ const API = 'https://pi.nexux.pro';
     <div class="messages" id="messages">
       <div class="msg in">
         <div class="bubble">
-          Hola! Soy Lara, la asistente del Salon Elite &#x2702;&#xFE0F;<br><br>
+          Hola! Soy Lara, la asistente de {NEGOCIO}<br><br>
           Puedo ayudarte a reservar cita, informarte de precios y horarios, o gestionar tu reserva. En que puedo ayudarte hoy?
           <span class="ts" id="init-ts"></span>
         </div>
@@ -368,7 +382,7 @@ const API = 'https://pi.nexux.pro';
     <!-- TOP BAR (igual que el portal real) -->
     <div class="crm-topbar">
       <div class="crm-business">
-        Salon Elite <span class="badge-activo">Activo</span>
+        {NEGOCIO} <span class="badge-activo">Activo</span>
       </div>
       <div class="crm-nav">
         <button class="nav-btn" >&#x2190; Anterior</button>
@@ -427,6 +441,8 @@ const API = 'https://pi.nexux.pro';
 
   // Identificador de ESTA pestana, para poder unir los turnos de una misma
   // conversacion. No identifica a la persona: se pierde al cerrar la pestana.
+  var NEGOCIO = "" + JSON.stringify(NEGOCIO) + "";
+  var SECTOR  = "" + JSON.stringify(sector) + "";
   var visitaDemo = (function () {
     try {
       var v = sessionStorage.getItem('nx_demo_visita');
@@ -492,8 +508,8 @@ const API = 'https://pi.nexux.pro';
   function gcalLink(apt, iso) {
     var start=new Date(iso); var end=new Date(start.getTime()+((apt.duration||60)*60000));
     var dates=icsDate(start)+'/'+icsDate(end);
-    var text=encodeURIComponent((apt.service||'Cita')+' - Salon Elite');
-    var details=encodeURIComponent('Reserva en Salon Elite via Nexux.'+(apt.price?(' Precio: '+apt.price+' EUR.'):''));
+    var text=encodeURIComponent((apt.service||'Cita')+' - '+NEGOCIO);
+    var details=encodeURIComponent('Reserva en '+NEGOCIO+' via Nexux.'+(apt.price?(' Precio: '+apt.price+' EUR.'):''));
     var loc=encodeURIComponent('C/ Gran Via 45, Madrid');
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+text+'&dates='+dates+'&details='+details+'&location='+loc;
   }
@@ -506,9 +522,9 @@ const API = 'https://pi.nexux.pro';
       'DTSTAMP:'+icsDate(new Date()),
       'DTSTART:'+icsDate(start),
       'DTEND:'+icsDate(end),
-      'SUMMARY:'+(apt.service||'Cita')+' - Salon Elite',
+      'SUMMARY:'+(apt.service||'Cita')+' - '+NEGOCIO,
       'LOCATION:C/ Gran Via 45, Madrid',
-      'DESCRIPTION:Reserva en Salon Elite (demo Nexux)',
+      'DESCRIPTION:Reserva en '+NEGOCIO+' (demo Nexux)',
       'END:VEVENT','END:VCALENDAR'
     ].join(CRLF);
   }
@@ -702,11 +718,11 @@ const API = 'https://pi.nexux.pro';
 
     if (ch === 'wa') {
       avatar.textContent = '✂️';
-      name.textContent   = 'Salon Elite · Lara';
+      name.textContent   = NEGOCIO + ' · Lara';
       sub.textContent    = 'En línea · Asistente IA';
     } else {
       avatar.textContent = 'L';
-      name.textContent   = 'Lara — Salon Elite';
+      name.textContent   = 'Lara — ' + NEGOCIO;
       sub.textContent    = 'bot · En linea';
     }
   }
@@ -769,7 +785,7 @@ const API = 'https://pi.nexux.pro';
     fetch(API + '/demo/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history: history.slice(-8), booked: apts.map(function(a){ return a.datetime; }), visita: visitaDemo, campana: campanaDemo() })
+      body: JSON.stringify({ message: text, history: history.slice(-8), booked: apts.map(function(a){ return a.datetime; }), visita: visitaDemo, campana: campanaDemo(), sector: SECTOR })
     })
     .then(function(r){ return r.json(); })
     .then(function(data) {
