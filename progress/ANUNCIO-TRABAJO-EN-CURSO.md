@@ -940,3 +940,83 @@ El orden barato, y en este orden:
 
 **Lo que NO recomiendo:** tocar el vídeo ahora. Hasta que el punto 1 y el 2 no
 estén, el montaje nuevo no tiene dónde mandar a la gente ni con qué compararse.
+
+---
+
+# 20-sep-2026 — La cuenta de Google Ads SÍ existe (Ytical), y el CPC que faltaba
+
+## Corrección: ayer dije que no había cuenta y era falso
+
+`ads.google.com/aw/overview` me mandaba al alta de una cuenta nueva, y de ahí
+deduje que no teníamos ninguna. Estaba mal. Ricardo la señaló y la he verificado:
+
+```
+Cuenta:  872-237-5099  "Ytical"
+Usuario: arteenpixel@gmail.com  (la misma del anuncio de OpenAI)
+```
+
+Aprendido: **no tener acceso por la URL por defecto no significa no tener cuenta.**
+Hay que mirar el selector de cuentas, no la pantalla de bienvenida.
+
+## La respuesta a la pregunta de Ricardo: NO hay promoción
+
+Página **Facturación > Promociones**, leída hoy en la cuenta:
+
+```
+Historial de promociones ....... "Todavía no tienes ninguna entrada"
+Ofertas promocionales
+  (filtro Estado: OFFERED) ..... "No hay ofertas disponibles"
+```
+
+Nunca se ha canjeado ninguna, y **ahora mismo Google no ofrece ninguna a esta
+cuenta**. Encaja con el requisito oficial: las ofertas de anunciante nuevo piden
+que la cuenta tenga **menos de 14 días**, y ésta es antigua.
+
+Abrir una cuenta nueva tampoco es una salida limpia: el propio requisito dice
+"no puedes haberte anunciado con Google Ads antes de usar otra cuenta para la
+misma empresa".
+
+## Un bloqueo vivo que nadie había visto
+
+Aviso permanente en la cuenta:
+
+> **"Se requiere un nuevo método de pago — No se pueden aplicar cargos a tus
+> métodos de pago actuales."**
+
+Aunque mañana quisiéramos encender algo, **no se podría cobrar**. Facturación >
+Actividad de jul a sept 2026 está vacía: no hay gasto reciente. Hay 1 campaña.
+
+## 🎯 EL CPC QUE FALTABA (Planificador, España, sept-2025 a ago-2026)
+
+| palabra clave | búsquedas/mes | competencia | puja parte superior (bajo – alto) |
+|---|---|---|---|
+| **programa de citas** | **100 – 1.000** | **Baja** | **0,92 € – 5,31 €** |
+| recepcionista ia | 100 – 1.000 | Alta | 4,28 € – 20,23 € |
+| citas por whatsapp | 10 – 100 | Media | 0,45 € – 1,14 € |
+| agenda de citas online | sin datos | — | — |
+| programa de citas peluquería | sin datos | — | — |
+
+**Precisión obligatoria: esa columna es la PUJA para salir arriba, no el CPC que
+se paga.** El coste real por clic suele quedar por debajo. No confundirlos.
+
+Dos cosas que salen de aquí:
+
+1. `recepcionista ia` **ha subido** desde agosto (era 3,78 – 15,92 €, ahora
+   4,28 – 20,23 €). Con techo de 115 € por cliente y un 1 % de conversión serían
+   **428 € a 2.023 € por venta**. Descartada.
+2. `programa de citas` es **4 a 5 veces más barata y de competencia Baja**. Al
+   extremo bajo (0,92 €) y con un 1 % de conversión salen **92 € por venta**:
+   por debajo del techo de 12 meses (115 €) y por encima del de 6 meses (58 €).
+   Es la única de búsqueda que puede salir, y sólo si conseguimos ese 1 %, que
+   **nunca hemos demostrado** (557 visitas, 0 ventas).
+
+Y ojo: mi 0,50 €/clic inventado era **demasiado optimista** incluso para la
+keyword buena.
+
+## Lo que esto desbloquea
+
+Con acceso a la cuenta tenemos gratis y sin gastar un euro:
+- **Planificador de palabras clave** — ya usado, datos arriba.
+- **Planificador de cobertura** (Reach Planner) — da el CPM y el alcance
+  estimados de YouTube en España. **Es el número que falta del estudio de YouTube
+  y ahora se puede sacar.**
