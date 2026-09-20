@@ -813,3 +813,130 @@ Del correo del **16-sep**:
 **La campana nunca llego a correr una prueba limpia.** Eso no borra el 0 ventas de
 557 clics, pero si invalida cualquier conclusion sobre "el publico era malo" o
 "la pagina es mala" sacada de esta tanda.
+
+---
+
+# ESTUDIO: ¿sale a cuenta anunciarse en YouTube? (20-sep-2026)
+
+Pedido por Ricardo: saber el coste ANTES de tocar el vídeo. Aquí está separado lo
+que está **medido**, lo que es **aritmética** sobre esos datos, y lo que **no se
+puede saber** sin abrir la cuenta.
+
+## 0. Aclaración de nombres
+
+AdSense no es esto. AdSense es cobrar por poner anuncios de otros en tu web.
+Anunciarse en YouTube se hace **dentro de Google Ads**, con la misma cuenta y la
+misma tarjeta que los anuncios de búsqueda. Es un sistema, no dos.
+
+## 1. Cómo se paga en YouTube (fuente oficial, verificado)
+
+Ayuda de Google Ads, *Acerca de la puja de coste por visualización (CPV)*, literal:
+
+> "Anuncios in-stream: cuando un usuario ve **30 segundos** de tu anuncio de vídeo
+> (o lo ve hasta el final, si dura menos) **o interactúa con él**, lo que suceda
+> primero."
+
+Tres consecuencias directas para nosotros:
+
+1. **Si alguien salta el anuncio antes del segundo 30, NO se paga nada.** Esto
+   corrige lo que dije ayer: el arranque flojo del vídeo no nos cuesta dinero
+   directamente, nos cuesta que casi nadie llegue al final.
+2. Nuestro anuncio dura **55,75 s**, o sea más de 30. El cobro salta a los 30
+   segundos, no al final. Y la tarjeta con el QR está en el **segundo 54**.
+3. El CPV barato **solo existe en campañas de notoriedad** — el propio documento
+   dice que esa puja está disponible con el objetivo "Cobertura, visualizaciones e
+   interacciones de YouTube". **Para buscar ventas hay que irse a Demand Gen o
+   Máximo Rendimiento, que ya no se pagan por visualización barata sino por
+   conversión.** O sea: no se puede tener a la vez "vistas muy baratas" y
+   "optimizado para vender". Es lo uno o lo otro.
+
+## 2. Lo que YA hemos pagado por una visita (medido, nuestro)
+
+```
+ChatGPT Ads   137,89 EUR  /  557 clics  =  0,25 EUR por visita de media
+              (la campaña de conversiones sola: 0,21 EUR)
+Google búsqueda "recepcionista ia"     =  3,78 a 15,92 EUR por clic
+              (Planificador, España, ago-25/jul-26, cuenta Ytical, 21-ago)
+```
+
+## 3. La aritmética que decide, con nuestros números
+
+Techo de lo que podemos pagar por un cliente (y las dos cifras son suposiciones,
+porque no ha habido NUNCA un cliente que dure):
+```
+si aguanta 12 meses -> 348 EUR de ingreso -> techo ~115 EUR
+si aguanta  6 meses -> 174 EUR de ingreso -> techo  ~58 EUR
+```
+
+Cuánto puede costar como máximo una visita, según lo que convierta:
+```
+conversión    visitas por venta    techo 12 meses    techo 6 meses
+   1,0 %            100              1,15 EUR          0,58 EUR
+   0,5 %            200              0,58 EUR          0,29 EUR
+   0,2 %            500              0,23 EUR          0,12 EUR
+```
+
+**Y aquí está lo importante: la visita ya nos costaba 0,25 EUR, que está DENTRO de
+casi todos esos techos.** El precio de la visita no es lo que nos impide vender.
+
+Lo que no sabemos es la conversión, porque nunca hemos vendido. Con 557 visitas y
+cero ventas, lo único que se puede afirmar con rigor es que la conversión está
+**por debajo del 0,5 %** (regla de tres: 3/557). Ojo, eso no significa que sea
+cero: si fuera 0,5 % de verdad, lo esperable habrían sido ~3 ventas, y sacar 0
+tiene alrededor de un 6 % de probabilidad. Mala suerte posible. La muestra es
+demasiado pequeña para enterrar la oferta y demasiado grande para animarse.
+
+## 4. Respuesta a las tres preguntas de Ricardo
+
+**¿Sale más barato que Google Ads?** Por visualización, sí, mucho: en búsqueda
+pagas 3,78-15,92 EUR por clic para "recepcionista ia", y en YouTube no pagas nada
+si te saltan antes del segundo 30. **Pero la comparación no vale**, porque en
+búsqueda pagas por alguien que está buscando eso mismo y en YouTube pagas por
+alguien que estaba viendo otra cosa.
+
+**¿Convierte más YouTube?** Casi con seguridad **no**, y es de cajón: en búsqueda
+la persona ha escrito lo que quiere; en YouTube la has interrumpido. Lo que sí
+tiene YouTube y ChatGPT Ads no tenía: en Google Ads se puede segmentar por
+**"usuarios que han buscado esos términos en Google"** (verificado en *Acerca de
+los segmentos personalizados*), lo que acerca YouTube a la intención de búsqueda.
+Ese es el único argumento serio a favor.
+
+**¿Nos lo podemos permitir?** Por precio de la visita, sí. **El problema no es el
+precio.** Tuvimos 557 visitas a 0,25 EUR y 479 de 530 se fueron en la primera
+pantalla. Cambiar de canal para conseguir visitas más baratas no arregla nada
+cuando las visitas ya eran baratísimas.
+
+## 5. Lo que NO se puede saber hoy, y cuánto cuesta saberlo
+
+**No hay cuenta de Google Ads nuestra.** Comprobado hoy: `ads.google.com` con las
+dos sesiones de Chrome cae en "Crea tu primera campaña" (alta a medias, número
+255-412-7529, rellenada con Nexux Intelligence). Los datos de keywords del 21-ago
+salieron de una cuenta ajena (Ytical).
+
+Sin cuenta propia no hay acceso a las dos herramientas que dan los números
+oficiales para España, **y las dos son gratis y no obligan a gastar un euro**:
+
+- **Planificador de Rendimiento / Reach Planner** → estimación oficial de CPM y
+  alcance en YouTube España.
+- **Planificador de Palabras Clave** → el CPC que falta de `programa de citas`.
+
+Abrir la cuenta lleva identidad fiscal y tarjeta, así que **lo decide Ricardo**.
+No la he creado.
+
+## 6. Recomendación
+
+El orden barato, y en este orden:
+
+1. **Mandar el tráfico a la demo** en vez de a la ficha de producto. Coste 0 EUR.
+   Sin esto, cualquier canal repite la fuga del 90 %.
+2. **Conseguir volumen en el canal más barato que hemos medido** (0,25 EUR la
+   visita) hasta llegar a unas 1.000 visitas. Son 150-250 EUR y es lo único que
+   convierte "no sabemos si convierte" en un dato. Un canal nuevo no da esa
+   respuesta más rápido ni más barato.
+3. **Solo entonces** YouTube, y con un corte corto: gancho en los primeros
+   segundos y **enlace en vez de QR** (en el móvil no puedes escanear el código
+   que sale en tu propio móvil). Coincide con lo que dijo el director creativo:
+   más ritmo y sonido más dinámico.
+
+**Lo que NO recomiendo:** tocar el vídeo ahora. Hasta que el punto 1 y el 2 no
+estén, el montaje nuevo no tiene dónde mandar a la gente ni con qué compararse.
