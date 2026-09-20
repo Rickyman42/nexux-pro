@@ -6,8 +6,17 @@ const API = 'https://pi.nexux.pro';
 // Un vertical por parametro, no una pagina por vertical.
 // Para anadir uno: una entrada aqui y otra en DEMO_CONFIGS del backend. Nada mas.
 const VERTICALES = {
-  generico:    { negocio: 'Tu negocio',                    titulo: 'Demo en vivo' },
-  veterinaria: { negocio: 'Clinica Veterinaria Arcadia',   titulo: 'Demo para clinicas veterinarias' },
+  generico: {
+    negocio: 'Tu negocio',
+    titulo:  'Demo en vivo',
+    // REGLA: ni una palabra de otro sector. Salen de aqui, nunca del HTML.
+    sugerencias: ['¿Qué servicios tenéis?', 'Quiero reservar cita', '¿Cuánto cuesta una consulta?', '¿Tenéis hueco mañana?'],
+  },
+  veterinaria: {
+    negocio: 'Clinica Veterinaria Arcadia',
+    titulo:  'Demo para clinicas veterinarias',
+    sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir cita para mi perro', '¿Cuánto cuesta una vacunación?', '¿Tenéis hueco mañana?'],
+  },
 };
 const sectorPedido = String(Astro.url.searchParams.get('sector') || '').toLowerCase();
 const sector  = VERTICALES[sectorPedido] ? sectorPedido : 'generico';
@@ -356,10 +365,7 @@ const esVariante = sector !== 'generico';
     </div>
 
     <div class="suggestions" id="suggestions">
-      <button class="sug" >¿Qué servicios tenéis?</button>
-      <button class="sug" >Quiero reservar cita</button>
-      <button class="sug" >¿Cuánto cuesta un tinte?</button>
-      <button class="sug" >¿Tenéis hueco mañana?</button>
+      {V.sugerencias.map((s) => <button class="sug">{s}</button>)}
     </div>
 
     <div class="crm-mobile" id="crmMobile">

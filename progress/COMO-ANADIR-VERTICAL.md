@@ -16,6 +16,20 @@ Son **dos entradas en dos mapas**. No se toca ninguna otra línea de código.
    bio, los servicios y el horario del config: Lara se adapta sola. Si te ves
    escribiendo un prompt por sector, te has salido del molde.
 
+## 🔒 Regla del molde (no negociable)
+
+**Todo el texto visible de la demo y todas las citas de muestra —nombres Y
+servicios— salen del `config` del sector. Nunca del HTML.**
+
+Si al añadir un vertical te ves escribiendo un nombre o un servicio dentro de
+`demo.astro`, te has salido del molde. Ya pasó dos veces: los botones de
+sugerencia llevaban "¿Cuánto cuesta un tinte?" grabado, así que una clínica
+veterinaria pedía tintes; y las cuatro citas de muestra tenían los mismos
+nombres en todos los sectores.
+
+Ni "tinte", ni "corte", ni "manicura", ni nombres de otro sector. En una
+veterinaria, los clientes se llaman "Ana G. - Rex (perro)".
+
 **Comprobación mínima antes de darlo por bueno** (sustituye `<clave>`):
 
 ```bash
@@ -25,6 +39,16 @@ curl -s -X POST http://localhost:3460/demo/chat -H 'Content-Type: application/js
 ```
 
 Debe responder con los servicios de ESE vertical y no nombrar ningún otro negocio.
+
+Y estas dos, que son las que se saltaron y dieron el fallo:
+
+```bash
+# 1. Ni una palabra de otro sector en la demo renderizada. Tiene que salir VACIO.
+curl -s "https://nexux.pro/demo?sector=<clave>" | grep -oiE '(tinte|corte|manicura|mechas)'
+
+# 2. Las citas de muestra, con nombres Y servicios del vertical.
+curl -s "http://localhost:3460/demo/appointments?sector=<clave>"
+```
 
 ---
 
