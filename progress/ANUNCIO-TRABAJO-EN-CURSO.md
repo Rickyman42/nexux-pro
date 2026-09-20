@@ -1020,3 +1020,63 @@ Con acceso a la cuenta tenemos gratis y sin gastar un euro:
 - **Planificador de cobertura** (Reach Planner) — da el CPM y el alcance
   estimados de YouTube en España. **Es el número que falta del estudio de YouTube
   y ahora se puede sacar.**
+
+---
+
+# 20-sep-2026 — "Barato" y "gratis" en el planificador: el mercado de búsqueda es diminuto
+
+Planificador de palabras clave, cuenta 872-237-5099 Ytical, **España, sept-2025 a
+ago-2026**. Nombres leídos del árbol de la página, no de capturas recortadas.
+
+| palabra clave | búsquedas/mes | competencia | puja (bajo – alto) |
+|---|---|---|---|
+| programa de citas *(medido antes)* | **100 – 1.000** | Baja | 0,92 € – 5,31 € |
+| app para gestionar citas | 10 – 100 | Alta | 1,71 € – 4,09 € |
+| programa de citas gratis | 10 – 100 | Alta | sin puja |
+| programa para agendar citas | 10 – 100 | Media | 1,28 € – 9,98 € |
+| **programa de citas barato** | **sin datos** | — | — |
+| **software de citas barato** | **sin datos** | — | — |
+| agenda de citas gratuita | sin datos | — | — |
+| programa de gestion de citas | sin datos | — | — |
+| sistema de reservas para negocios | sin datos | — | — |
+| software citas peluqueria | sin datos | — | — |
+
+## 1. "Barato" no se busca. Las dos variantes están por debajo del umbral
+
+La idea de pescar al que busca precio bajo **no tiene dónde pescar**: en España
+nadie escribe "programa de citas barato" ni "software de citas barato" en
+cantidad suficiente para que Google ni siquiera dé un dato.
+
+## 2. Me retracto de lo de "gratis"
+
+Hace un rato dije, viendo las búsquedas relacionadas de DuckDuckGo, que la
+demanda detrás de este término "tira a gratis" y que eso podía explicar las 0
+ventas. **El volumen no lo respalda:** `programa de citas gratis` es 10-100 al
+mes y `agenda de citas gratuita` no llega ni a eso. Eran sugerencias del
+buscador, no demanda medida. Lo di como hipótesis y la hipótesis se cae.
+
+## 3. Lo que sí sale, y es más serio que todo lo anterior
+
+**Todo lo específico está en 0-100 búsquedas al mes.** Peluquería, reservas,
+gestión, barato, gratis, app: todo diminuto o sin datos. La única frase con
+volumen es la genérica `programa de citas`, 100-1.000.
+
+Aritmética con el punto medio (500 búsquedas/mes), y siendo generosos:
+
+```
+500 búsquedas/mes
+× 20 % que lográramos captar     = 100 clics/mes
+× 1 % de conversión (nunca demostrado) = 1 venta al mes
+= 29 € de MRR nuevo al mes
+```
+
+Y eso asumiendo que captamos una de cada cinco búsquedas y que convertimos al
+1 %, dos cosas optimistas.
+
+**Conclusión: el problema de Google Search para este producto en España no es el
+precio del clic, es que no hay suficiente gente buscándolo.** El canal es
+demasiado pequeño para construir sobre él, con promoción o sin ella.
+
+Esto no dice que el producto no valga. Dice que **quien lo necesita no lo está
+buscando**, que es un problema distinto y cambia la estrategia: si no te buscan,
+o te encuentran por otro sitio, o hay que ir a por ellos.
