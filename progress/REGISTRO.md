@@ -3103,3 +3103,55 @@ dos lectores. Los 5 configs que no tenian ningun correo ya tienen el interno.
 ### Error de metodo que cometi, para no repetirlo
 Di el despliegue por bueno esperando un HTTP 200. La pagina de error de Nexux devuelve
 200, asi que la comprobacion no podia fallar nunca. Hay que esperar al CONTENIDO.
+
+## 2026-09-22 · Skill nexux-leads empaquetada. Demo: veterinarias en Alcorcon
+
+De punta a punta y sin nadie delante: `python3 busca.py veterinarias "Alcorcon"` ->
+61 negocios -> puerta -> quejas -> CSV -> pestana propia en la hoja de Google.
+
+### Lo nuevo de esta tanda
+- **Puerta de capacidad** (paso 3b, no 5: el dato llega gratis en la misma lectura de
+  su web, y ponerlo antes ahorra la parte cara). Agenda cerrada -> fuera. Ya usa
+  Booksy/Calendly -> ETIQUETADO, no borrado: quien usa Booksy no esta lleno, tiene
+  agenda pero nadie le contesta el WhatsApp, que es lo que vendemos y para lo que
+  existe /alternativa-a-booksy.
+- **Reclasificacion con la web delante.** El nombre miente, el dominio no.
+- **Escritura en la hoja sola**, cuenta de servicio `nexux-hojas@nexux-hojas...`
+  (creada por Ricardo desde nexuxintelligence@gmail.com), llave en `~/.claves-sheets.json`
+  con permisos 600. Escribe solo en SU pestana y relee la hoja por la exportacion.
+- **El maestro cruza ciudades.** Se le anadio el fijo ademas del movil: en Alcorcon
+  paro a Barcelona y a Veracruz, que ya escribimos en Mostoles y volvian a salir.
+
+### Cinco fallos propios que saco la demo
+1. La web con guiones BAJOS no se normalizaba: `peluqueria_canina_...` no casaba, y
+   una peluqueria canina entraba como clinica veterinaria.
+2. Faltaban palabras en `fuera`: entraron un crematorio de mascotas, una tienda y un
+   TAXI. 15 -> 34 palabras.
+3. El filtro contaba la espera DENTRO de la clinica ("me tuvieron esperando fuera",
+   "hacerme esperar y repetirle la ficha"). Eso no lo arregla Lara: ella coge la cita,
+   no acorta la consulta del de delante.
+4. El comprobador de la hoja daba FALSO POSITIVO: buscaba "E+" a secas y casaba con
+   `PARQUE+GRANDE` de una URL. Lo que se busca es notacion cientifica: digito, E, +,
+   digito. La hoja estaba bien; lo roto era el comprobador.
+5. (De antes, cerrado hoy) `texto_csv` escribia un apostrofo en cada celda vacia.
+
+Controles: clasificacion 4/4, quejas 3/3, comprobador de hoja 4/4, capacidad 5+4,
+maestro entre ciudades 4/4.
+
+### El resultado honesto de Alcorcon
+61 negocios · 47 candidatas · 7 cadenas · 7 de otro negocio · **9 con WhatsApp** ·
+**1 con queja aprovechable** · 38 sin WhatsApp (visita en persona) · 2 ya contactados.
+
+El unico: CLINICA VETERINARIA TIMANFAYA 2, +34608521288 —
+"Segun ellos horario ininterrumpido... llegue a las 15 h con una urgencia y estaba
+cerrado. Habia gente dentro pero no abrieron."
+
+### Lo que esto ENSENA y hay que decir aunque no guste
+El gancho por queja rinde poco en clinicas veterinarias, y ya son dos medidas:
+Mostoles 3 de 20 clinicas (15%), Alcorcon 1 de 9 con WhatsApp. En cambio:
+veterinarios a DOMICILIO 4 de 8, y peluquerias de Villaviciosa 10 de 25.
+
+O sea: **el valor de la skill no esta en las quejas, esta en la puerta del WhatsApp y
+en no repetir contactos.** Y el mejor objetivo no es la clinica con local: es el
+autonomo con un movil, donde el que contesta es el que decide.
+Si se sigue atacando clinicas por queja, hay que contar con encontrar una por ciudad.
