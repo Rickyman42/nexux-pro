@@ -3045,3 +3045,61 @@ dos lectores. Los 5 configs que no tenian ningun correo ya tienen el interno.
 - Con gancho real de agenda: AnagaVets (162 op.), 1 Click Vet (177), Barvet (26). Vet2Go tiene WhatsApp pero su web NO lo ofrece para citas. VetFlow y los 3 pequenos: sin queja aprovechable.
 - Error corregido: dije "ninguno tiene web". Era el hueco de perrolia, no la realidad: 5 tienen web (anagavets.es, 1clickvet.com, barvet.es, vet2go.es, vetflow.es).
 - Entregable: progress/VETERINARIOS-DOMICILIO-MADRID.md
+
+## 2026-09-22 · Skill nexux-leads + pagina /veterinarias
+
+### Skill (vertical + ciudad, sin nadie delante)
+- `python3 busca.py <vertical> "<ciudad>"`. Orden fijo: Maps -> ficha -> PUERTA DEL
+  WHATSAPP -> quejas. Demo real: peluquerias en Villaviciosa de Odon -> 111 negocios,
+  25 con WhatsApp confirmado, 10 con queja aprovechable. La puerta ahorro leer 84
+  fichas: entre 4 y 7 horas que no se gastan.
+- `verticales.json`: dentistas y fisioterapia con `salud_humana: true` -> el script SE
+  NIEGA a correr (salida 3) hasta resolver el RGPD art. 9. Probado, no es un comentario.
+- `contactados.json` + `contactados.py`: maestro que persiste entre ciudades. Cruza por
+  telefono normalizado Y por nombre+municipio. Prueba saboteada 8/8 con DOS controles
+  negativos. Sembrados los 4 negocios que Ricardo ya habia contactado.
+- `ficha_vet.py` y `cierra.py`: Mostoles ya no esta grabada en el codigo (CAJAS_FILE /
+  FICHAS_DIR), con control positivo: sin variables, el comportamiento de siempre.
+- Skill instalada en Windows: `~/.claude/skills/nexux-leads/SKILL.md`.
+
+### Tres bugs propios, encontrados y corregidos en esta tarea
+1. La puerta del WhatsApp miraba solo la WEB. En veterinarias daba igual (el telefono de
+   Maps es el fijo del mostrador); en peluquerias la mitad publica el movil en Maps, asi
+   que se tiraba media lista. Ahora dos fuentes y una sola prueba: wa.me.
+2. El filtro de quejas marcaba "con queja" cualquier resena que MENCIONARA una cita.
+   Vet2Go salia marcado por un "les llamo... reservo la cita" dentro de una queja de
+   PRECIO. Corregido con `fuerza_queja()`: hace falta el fallo dicho con todas las
+   letras. Control 9 positivos / 6 negativos, incluido "no cogen ninguna muestra", que
+   no es el telefono. Las quejas flojas NO se tiran: van a `notas` para poder auditar
+   la separacion.
+3. `texto_csv` escribia un apostrofo suelto en CADA celda vacia, porque en Python la
+   cadena vacia esta contenida en cualquier cadena y la comparacion era contra un
+   string en vez de contra una tupla. En Sheets la celda se ve vacia, pero al leer el
+   CSV por codigo cuenta como llena: me dio un 100% falso de "clinicas con WhatsApp".
+   Lo real son 6 de 17. Los tres CSV regenerados, 0 celdas corruptas.
+
+### Pagina /veterinarias -- VIVA y verificada en produccion
+- https://nexux.pro/veterinarias sirve 921 / 423 / 20 clinicas, el FAQPage, el enlace a
+  /demo?sector=veterinaria (que responde y muestra la demo veterinaria) y CERO nombres
+  de clinica.
+- No lleva porcentaje de titular. El 67% anterior era falso: contaba como queja de
+  contacto cualquier resena con la palabra "cita", incluidas las de precio. Lo limpio
+  son 3 de 20 = 15%, y con n=20 eso no se publica como argumento de venta. La pagina
+  lleva las 3 resenas enteras, anonimizadas, y la muestra exacta debajo.
+- Comprobada la sospecha de sesgo por el orden que falla: NO lo hay. De esas 20 clinicas
+  se leyeron 921 resenas y el 46% son de 3 estrellas o menos. Si leimos lo peor. El dato
+  es pequeno porque es pequeno.
+- No es una jugada de SEO y no se mide asi: veterinaria tiene 10-100 busquedas al mes.
+  Es el aterrizaje del outreach. Se mide por cuantos de los que escribimos entran.
+
+### Coherencia de sector
+- legal.astro y privacidad.astro ya no dicen "para peluquerias" (verificado en vivo).
+- 17 cambios en total. Quedan 4 menciones a proposito, cada una con motivo:
+  la instruccion que dice nunca digas "salon" (es la solucion), la variable
+  sessionData.salon, el 73% de llamadas a una PELUQUERIA (dato con alcance propio:
+  SENALADO para Ricardo, no tocado) y la lista de sectores del Layout, que ya empieza
+  por clinicas veterinarias.
+
+### Error de metodo que cometi, para no repetirlo
+Di el despliegue por bueno esperando un HTTP 200. La pagina de error de Nexux devuelve
+200, asi que la comprobacion no podia fallar nunca. Hay que esperar al CONTENIDO.
