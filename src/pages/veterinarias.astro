@@ -1,109 +1,79 @@
 ---
-// Página de aterrizaje para clínicas veterinarias. Existe por una razón concreta:
+// Aterrizaje del WhatsApp que Ricardo manda a las clinicas veterinarias.
 //
-// Estamos escribiendo a veterinarias por WhatsApp. Cuando una nos busca, caía en una
-// web que le hablaba de peluquerías y se caía la conversación. Esta página es el
-// aterrizaje de ese mensaje, no una jugada de posiciones en Google (veterinaria tiene
-// 10-100 búsquedas al mes: por SEO no compensaría).
+// Esto NO es un documento. Es lo que ve un veterinario en el movil cuando toca el
+// enlace de un mensaje, con cinco segundos de paciencia y las manos a medias. La
+// primera version era un muro de texto con el sistema de diseno equivocado: azul de
+// Tailwind en una web verde menta, sin cabecera y sin un boton a la vista. Parecia
+// de otra empresa.
 //
-// EL DATO ES REAL Y ES PEQUEÑO, Y SE DICE ASÍ. Leímos 921 reseñas de 20 clínicas
-// veterinarias de Móstoles y solo 3 personas dicen que no les cogieron el teléfono.
-// Publicar "el 67% de las veterinarias no contesta" habría sido mentira: ese número
-// salía de contar como queja de contacto cualquier reseña que mencionara la palabra
-// "cita", incluidas las de precio. Una página que exagera no la cita ninguna IA, y
-// con razón.
+// Lo que manda en el orden: primero se entiende QUE es (la conversacion de ejemplo
+// se lee sola, sin leer), luego se prueba, y solo despues viene la letra. Lo honesto
+// -la muestra, lo que NO hace, las preguntas- sigue entero en la pagina, pero
+// plegado: asi lo encuentra quien lo busca y no aplasta al que solo quiere ver si
+// esto es real.
 //
-// Las reseñas van SIN nombre de clínica y sin nombres de personas. Son públicas, pero
-// señalar a un negocio concreto para venderle a otro es una guarrada.
+// El dato es real y es pequeno, y se dice asi: 921 resenas de 20 clinicas de
+// Mostoles, y solo 3 personas dicen que no les cogieron el telefono. Publicar "el
+// 67% no contesta" habria sido mentira: contaba como queja de contacto cualquier
+// resena con la palabra "cita", incluidas las de precio.
 //
-// Si se vuelve a medir, se actualiza AQUÍ y en lib/bot-prompt-lara.js.
+// Las resenas van SIN nombre de clinica ni de persona.
 import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 
 const MEDIDO = '22 de septiembre de 2026';
-const MUESTRA = {
-  clinicas: 20,
-  resenas: 921,
-  malas: 423,
-  deContacto: 3,
-};
+const MUESTRA = { clinicas: 20, resenas: 921, malas: 423, deContacto: 3 };
 
-// Literales de reseñas públicas de Google, recortados y anonimizados.
-const vocesReales = [
-  {
-    texto: 'La web está en construcción, el mail que aparece allí no funciona, y llevo ' +
-           'intentando llamar dos días y no me es posible; ayer no lo cogían…',
-    que: 'Tres puertas cerradas a la vez: web, correo y teléfono.',
-  },
-  {
-    texto: 'Desde hace un tiempo, no te cogen el teléfono, no te contestan al WhatsApp ' +
-           'hasta los tres días…',
-    que: 'El WhatsApp existe. Lo que falla es cuándo se contesta.',
-  },
-  {
-    texto: 'He llamado a primera hora de la mañana pidiendo por favor que atiendan a mi ' +
-           'perro, que estaba vomitando…',
-    que: 'La llamada que no puedes coger es la que más te importa.',
-  },
+const conversacion = [
+  { de: 'cliente', hora: '23:14', texto: 'Hola, mi perra lleva dos días vomitando. ¿Tenéis hueco mañana?' },
+  { de: 'lara', hora: '23:14', texto: 'Buenas noches. Siento lo de tu perra. Mañana tengo a las 10:30 y a las 17:00 — ¿cuál te viene mejor?' },
+  { de: 'cliente', hora: '23:15', texto: 'A las 10:30' },
+  { de: 'lara', hora: '23:15', texto: 'Hecho. Te espero mañana a las 10:30. ¿Me dices su nombre y la edad, para dejarlo apuntado?' },
 ];
 
-const cuandoNo = [
-  {
-    caso: 'Si buscas un programa de gestión veterinaria',
-    porque: 'Lara no lleva historia clínica, ni vacunas, ni recetas, ni inventario de ' +
-            'fármacos. Para eso están Qvet, Clinicloud o Geswin, y lo hacen mejor que ' +
-            'nosotros porque llevan años en ello. Nexux se ocupa del mensaje que entra, ' +
-            'no de la ficha del animal.',
-  },
-  {
-    caso: 'Si tu volumen de mensajes es bajo',
-    porque: 'Si recibes tres o cuatro mensajes al día y los contestas sin agobio, esto no ' +
-            'te va a cambiar la vida. Tiene sentido cuando el móvil suena mientras tienes ' +
-            'un animal en la mesa.',
-  },
-  {
-    caso: 'Si esperas que decida urgencias',
-    porque: 'Lara no hace triaje. No dice si un vómito puede esperar a mañana ni si hay ' +
-            'que venir corriendo. Esa decisión es del veterinario, siempre. Lo que hace es ' +
-            'recoger el caso, dar cita y avisarte.',
-  },
-  {
-    caso: 'Si quieres que suene como un veterinario',
-    porque: 'No va a hablar de sintomatología ni de dosis. Contesta horarios, precios de ' +
-            'consulta, qué llevar y cuándo venir. Si el cliente pregunta algo clínico, lo ' +
-            'pasa a una persona.',
-  },
+const loQueHace = [
+  { n: '01', q: 'Contesta en segundos', d: 'A cualquier hora. También el domingo por la noche, que es cuando más mensajes se pierden.' },
+  { n: '02', q: 'Deja la cita puesta', d: 'Pregunta qué animal, qué le pasa y desde cuándo, y lo escribe en el calendario de la clínica.' },
+  { n: '03', q: 'Para cuando toca', d: 'Si la pregunta es clínica o suena a urgencia, no improvisa: te avisa. No opina del animal.' },
+];
+
+const noHace = [
+  ['No lleva historia clínica', 'Ni vacunas, ni recetas, ni inventario. Para eso está tu programa de gestión, y lo hace mejor.'],
+  ['No hace triaje', 'No decide si un vómito espera a mañana. Esa decisión es tuya, siempre.'],
+  ['No habla de medicina', 'Horarios, precio de consulta, qué traer y cuándo venir. Lo demás lo pasa a una persona.'],
+  ['No te sirve si tienes poco lío', 'Si contestas tus mensajes sin agobio, esto no te cambia la vida.'],
 ];
 
 const faq = [
   {
-    q: '¿Lara puede diagnosticar o dar consejo clínico a los dueños?',
-    a: 'No, y está puesto a propósito. Lara coge la cita, responde horarios y precios y ' +
-       'avisa al veterinario. Cualquier pregunta sobre síntomas, medicación o urgencia la ' +
-       'deriva a una persona. En salud animal el criterio es del veterinario.',
+    q: '¿Puede diagnosticar o dar consejo clínico a los dueños?',
+    a: 'No, y está puesto a propósito. Coge la cita, responde horarios y precios y te avisa. ' +
+       'Cualquier pregunta sobre síntomas, medicación o urgencia la deriva a una persona. ' +
+       'En salud animal el criterio es del veterinario.',
   },
   {
     q: '¿Sustituye al programa de gestión de mi clínica?',
-    a: 'No. No lleva historia clínica, vacunas, recetas ni inventario. Convive con el ' +
-       'programa que ya uses: Lara se ocupa del WhatsApp y de la agenda de citas.',
+    a: 'No. No lleva historia clínica, vacunas, recetas ni inventario. Convive con el que ya ' +
+       'uses: Lara se ocupa del WhatsApp y de la agenda de citas.',
   },
   {
     q: '¿Cuántas clínicas veterinarias tienen de verdad problemas para contestar?',
-    a: `Menos de las que se suele decir. Leímos ${MUESTRA.resenas} reseñas de ` +
-       `${MUESTRA.clinicas} clínicas veterinarias de Móstoles el ${MEDIDO}: ` +
-       `${MUESTRA.malas} eran de tres estrellas o menos, y en ${MUESTRA.deContacto} de ` +
-       'ellas el cliente dice que no le cogieron el teléfono o que tardaron días en ' +
-       'contestarle. Son pocas. Lo que no sabemos —y no vamos a fingir que sí— es cuánta ' +
-       'gente se va a otra clínica sin dejar reseña.',
+    a: `Menos de las que se suele decir. Leímos ${MUESTRA.resenas} reseñas de ${MUESTRA.clinicas} ` +
+       `clínicas veterinarias de Móstoles el ${MEDIDO}: ${MUESTRA.malas} eran de tres estrellas ` +
+       `o menos, y en ${MUESTRA.deContacto} de ellas el cliente dice que no le cogieron el ` +
+       'teléfono o que tardaron días en contestarle. Son pocas. Lo que no sabemos —y no vamos ' +
+       'a fingir que sí— es cuánta gente se va a otra clínica sin dejar reseña.',
   },
   {
     q: '¿Qué pasa fuera del horario de la clínica?',
-    a: 'Es cuando más sirve. Lara contesta a las once de la noche y deja la cita puesta ' +
-       'para el día siguiente, en vez de que ese mensaje espere a que abráis.',
+    a: 'Es cuando más sirve. Contesta a las once de la noche y deja la cita puesta para el día ' +
+       'siguiente, en vez de que ese mensaje espere a que abráis.',
   },
   {
     q: '¿Cuánto cuesta?',
-    a: '29 € al mes la recepcionista, con todo el equipo incluido. Hay 7 días de prueba ' +
-       'sin tarjeta.',
+    a: '29 € al mes, con todo el equipo incluido. Siete días de prueba sin tarjeta.',
   },
 ];
 
@@ -125,8 +95,8 @@ const jsonLd = {
       url: 'https://nexux.pro/veterinarias',
       name: 'Recepcionista IA para clínicas veterinarias',
       description:
-        'Quién contesta el WhatsApp de tu clínica veterinaria cuando estás con un animal ' +
-        'en la mesa. Con datos medidos sobre reseñas reales y lo que Nexux no hace.',
+        'Lara contesta el WhatsApp de tu clínica veterinaria y deja la cita puesta, ' +
+        'mientras tú estás con un animal en la mesa. No opina del animal.',
       inLanguage: 'es',
       isPartOf: { '@id': 'https://nexux.pro/#website' },
       about: { '@type': 'Thing', name: 'Recepcionista IA para clínicas veterinarias' },
@@ -136,141 +106,308 @@ const jsonLd = {
 ---
 
 <Layout
-  title="Recepcionista IA para clínicas veterinarias | Nexux"
-  description="¿Quién contesta el WhatsApp de tu clínica cuando estás con un animal en la mesa? Lara coge la cita por ti — y no opina del animal. Con el dato medido sobre 921 reseñas reales."
+  title="El WhatsApp de tu clínica veterinaria, contestado | Nexux"
+  description="Lara coge la cita mientras tú estás con un animal en la mesa. Contesta a las once de la noche, deja la cita puesta y no opina del animal. 29 €/mes, 7 días de prueba."
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-  <main class="max-w-4xl mx-auto px-6 py-16">
+  <Nav />
 
-    <h1 class="text-4xl font-bold mb-6">
-      ¿Quién contesta el WhatsApp de tu clínica cuando estás con un animal en la mesa?
-    </h1>
-    <p class="text-xl text-gray-600 mb-4">
-      No es una pregunta retórica. Es el momento exacto en que se pierde una cita: tienes
-      las manos ocupadas, el móvil suena, y el que escribe no espera.
-    </p>
-    <p class="text-sm text-gray-500 mb-12">
-      Los datos de esta página salen de leer reseñas públicas de Google el {MEDIDO}.
-      Abajo está la muestra exacta para que la puedas comprobar.
-    </p>
+  <main>
 
-    <!-- ── Lo que NO vamos a decirte ────────────────────────────────── -->
-    <section class="mb-16 bg-gray-50 p-8 rounded-lg">
-      <h2 class="text-2xl font-bold mb-4">Lo que no te vamos a decir</h2>
-      <p class="text-gray-700 mb-4">
-        Que las clínicas veterinarias no cogen el teléfono. <strong>No es verdad</strong>, y
-        lo hemos medido: de <span class="tabular-nums">{MUESTRA.resenas}</span> reseñas de
-        <span class="tabular-nums">{MUESTRA.clinicas}</span> clínicas veterinarias de
-        Móstoles — <span class="tabular-nums">{MUESTRA.malas}</span> de ellas de tres
-        estrellas o menos — solo <strong class="tabular-nums">{MUESTRA.deContacto}</strong>
-        personas se quejan de que no las atendieran por teléfono o por WhatsApp.
-      </p>
-      <p class="text-gray-700">
-        Son pocas. Lo decimos aunque juegue en nuestra contra, porque una página que
-        exagera no vale para nada. Ahora bien: <strong>el que no consigue hablar contigo
-        casi nunca escribe una reseña. Se va a otra clínica y ya está.</strong> Eso no lo
-        hemos medido y no vamos a fingir que sí — pero es la razón por la que estas tres
-        reseñas importan más de lo que parece.
-      </p>
-    </section>
-
-    <!-- ── Las tres voces ───────────────────────────────────────────── -->
-    <section class="mb-16">
-      <h2 class="text-2xl font-bold mb-2">Las tres, enteras</h2>
-      <p class="text-gray-600 mb-6">
-        Reseñas públicas de Google, recortadas y sin el nombre de la clínica. No vamos a
-        señalar a un negocio para venderle a otro.
-      </p>
-      <div class="space-y-6">
-        {vocesReales.map((v) => (
-          <figure class="border-l-4 border-blue-600 pl-6 py-2">
-            <blockquote class="text-lg text-gray-800 italic">“{v.texto}”</blockquote>
-            <figcaption class="text-sm text-gray-500 mt-2">{v.que}</figcaption>
-          </figure>
-        ))}
+    <!-- ── Lo primero que se ve en el móvil ─────────────────────────── -->
+    <section class="hero">
+      <div class="container-nx hero-in">
+        <span class="eyebrow">Para clínicas veterinarias</span>
+        <h1 class="h-display">El WhatsApp de tu clínica, <em>contestado.</em></h1>
+        <p class="hero-sub">
+          Lara coge la cita mientras tú estás con un animal en la mesa.
+          También a las once de la noche.
+        </p>
+        <div class="acciones">
+          <a class="btn-primary" href="/demo?sector=veterinaria">Ver cómo contesta →</a>
+          <a class="btn-ghost" href="#que-no-hace">Qué no hace</a>
+        </div>
+        <p class="bajo-boton">29 € al mes · 7 días de prueba sin tarjeta</p>
       </div>
-      <p class="text-gray-700 mt-8">
-        Fíjate en lo que tienen en común: <strong>ninguna dice que no haya canal.</strong>
-        El teléfono está, el WhatsApp está, la web está. Lo que falla es
-        <strong>cuándo</strong> se contesta — dos días, tres días, o a primera hora
-        cuando ya no sirve.
-      </p>
     </section>
 
-    <!-- ── Qué hace Lara ────────────────────────────────────────────── -->
-    <section class="mb-16">
-      <h2 class="text-2xl font-bold mb-6">Qué hace exactamente</h2>
-      <ul class="space-y-4 text-gray-700">
-        <li class="flex gap-3">
-          <span class="text-blue-600 font-bold">1.</span>
-          <span>Contesta el WhatsApp de la clínica en segundos, a cualquier hora, también
-          el domingo por la noche.</span>
-        </li>
-        <li class="flex gap-3">
-          <span class="text-blue-600 font-bold">2.</span>
-          <span>Pregunta lo que necesitas saber —qué animal, qué le pasa, desde cuándo— y
-          <strong>deja la cita puesta</strong> en el calendario de la clínica.</span>
-        </li>
-        <li class="flex gap-3">
-          <span class="text-blue-600 font-bold">3.</span>
-          <span>Responde horarios, precio de consulta, dónde estáis y qué hay que traer.</span>
-        </li>
-        <li class="flex gap-3">
-          <span class="text-blue-600 font-bold">4.</span>
-          <span>Si la pregunta es clínica o suena a urgencia, <strong>para y te avisa.</strong>
-          No opina del animal.</span>
-        </li>
-      </ul>
+    <!-- ── Se entiende sin leer ─────────────────────────────────────── -->
+    <section class="section bg-deep">
+      <div class="container-nx">
+        <p class="eyebrow centrado">Un martes a las 23:14</p>
+        <div class="chat">
+          {conversacion.map((m) => (
+            <div class={`burbuja ${m.de}`}>
+              <p>{m.texto}</p>
+              <span class="hora">{m.hora}</span>
+            </div>
+          ))}
+          <div class="confirmado">Cita del jueves 10:30 puesta en el calendario</div>
+        </div>
+        <p class="pie-chat">Ese mensaje, sin Lara, lo lees mañana a las nueve.</p>
+      </div>
     </section>
 
-    <!-- ── Cuándo NO ────────────────────────────────────────────────── -->
-    <section class="mb-16 border border-gray-200 rounded-lg p-8">
-      <h2 class="text-2xl font-bold mb-2">Cuándo Nexux no es tu opción</h2>
-      <p class="text-gray-600 mb-6">
-        Cuatro casos en los que te decimos que no. Preferimos eso a que lo pruebes y te
-        lleves un chasco.
-      </p>
-      <dl class="space-y-6">
-        {cuandoNo.map((c) => (
-          <div>
-            <dt class="font-semibold text-gray-900 mb-1">{c.caso}</dt>
-            <dd class="text-gray-700">{c.porque}</dd>
-          </div>
-        ))}
-      </dl>
+    <!-- ── Tres cosas ───────────────────────────────────────────────── -->
+    <section class="section">
+      <div class="container-nx">
+        <div class="tres">
+          {loQueHace.map((c) => (
+            <div class="tarjeta">
+              <span class="num">{c.n}</span>
+              <h3>{c.q}</h3>
+              <p>{c.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
 
-    <!-- ── FAQ ──────────────────────────────────────────────────────── -->
-    <section class="mb-16">
-      <h2 class="text-2xl font-bold mb-6">Preguntas frecuentes</h2>
-      <dl class="space-y-6">
+    <!-- ── Una sola voz real ────────────────────────────────────────── -->
+    <section class="section bg-deep">
+      <div class="container-nx estrecho">
+        <blockquote class="cita">
+          “Desde hace un tiempo, no te cogen el teléfono, no te contestan al WhatsApp
+          hasta los tres días…”
+        </blockquote>
+        <p class="fuente">
+          Reseña pública de Google sobre una clínica veterinaria de Móstoles, leída el
+          {' '}{MEDIDO}. Sin el nombre de la clínica: no señalamos a un negocio para
+          venderle a otro.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── Qué NO hace ──────────────────────────────────────────────── -->
+    <section class="section" id="que-no-hace">
+      <div class="container-nx estrecho">
+        <h2 class="h-section">Lo que no hace</h2>
+        <p class="intro">Te lo decimos antes, no después de que lo pruebes.</p>
+        <dl class="nohace">
+          {noHace.map(([t, d]) => (
+            <div>
+              <dt>{t}</dt>
+              <dd>{d}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <!-- ── Cerrar ───────────────────────────────────────────────────── -->
+    <section class="section cierre">
+      <div class="container-nx estrecho centrado">
+        <h2 class="h-section">Escríbele como si fueras un cliente tuyo</h2>
+        <p class="intro">
+          Un perro con vómitos, un domingo por la noche. Mira qué contesta.
+          Sin registrarte.
+        </p>
+        <a class="btn-primary grande" href="/demo?sector=veterinaria">
+          Probar la demo para veterinarias →
+        </a>
+        <p class="bajo-boton">29 € al mes, todo el equipo incluido · 7 días de prueba sin tarjeta</p>
+      </div>
+    </section>
+
+    <!-- ── La letra, para quien la busque ───────────────────────────── -->
+    <section class="section letra">
+      <div class="container-nx estrecho">
+        <h2 class="h-section">Preguntas</h2>
         {faq.map((f) => (
-          <div class="border-b border-gray-200 pb-6">
-            <dt class="font-semibold text-lg text-gray-900 mb-2">{f.q}</dt>
-            <dd class="text-gray-700">{f.a}</dd>
-          </div>
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
         ))}
-      </dl>
-    </section>
 
-    <!-- ── CTA ──────────────────────────────────────────────────────── -->
-    <section class="bg-blue-600 text-white p-10 rounded-lg text-center">
-      <h2 class="text-2xl font-bold mb-3">Pruébala antes de decidir</h2>
-      <p class="mb-6 text-blue-50">
-        Escríbele como si fueras un cliente tuyo con un perro con vómitos y mira qué
-        contesta. Sin registrarte.
-      </p>
-      <a
-        href="/demo?sector=veterinaria"
-        class="inline-block bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg hover:bg-blue-50"
-      >
-        Probar la demo para veterinarias
-      </a>
-      <p class="mt-6 text-sm text-blue-100">
-        29 € al mes, todo el equipo incluido · 7 días de prueba sin tarjeta
-      </p>
+        <details class="muestra">
+          <summary>De dónde sale el dato de esta página</summary>
+          <p>
+            El {MEDIDO} leímos las reseñas de {MUESTRA.clinicas} clínicas veterinarias de
+            Móstoles donde conseguimos ordenarlas por las peores:
+            {' '}<strong>{MUESTRA.resenas}</strong> reseñas distintas, de las cuales
+            {' '}<strong>{MUESTRA.malas}</strong> son de tres estrellas o menos. En
+            {' '}<strong>{MUESTRA.deContacto}</strong> de esas {MUESTRA.clinicas} clínicas
+            un cliente dice que no le cogieron el teléfono o que tardaron días en
+            contestarle.
+          </p>
+          <p>
+            Son pocas, y lo decimos aunque juegue en nuestra contra: no vamos a escribir
+            que las clínicas veterinarias no cogen el teléfono, porque lo hemos medido y
+            no es verdad. Lo que no sabemos es cuánta gente no consigue hablar contigo y
+            se va a otra clínica sin escribir nada. Eso no lo hemos medido y no vamos a
+            fingir que sí.
+          </p>
+        </details>
+      </div>
     </section>
 
   </main>
+
+  <Footer />
 </Layout>
+
+<style>
+  .hero { padding: 4.5rem 0 3.5rem; }
+  @media (min-width: 768px) { .hero { padding: 7rem 0 5rem; } }
+  .hero-in { max-width: 760px; }
+  .hero h1 { margin: 1rem 0 1.25rem; }
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--nx-ink-muted);
+    max-width: 34ch;
+    line-height: 1.55;
+  }
+  @media (min-width: 768px) { .hero-sub { font-size: 1.3rem; max-width: 46ch; } }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .bajo-boton {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--nx-ink-faint);
+  }
+  .btn-primary.grande { padding: 1.1rem 2rem; font-size: 1.05rem; }
+
+  .estrecho { max-width: 640px; }
+  .centrado { text-align: center; }
+
+  /* ── conversación ─────────────────────────────────────────────── */
+  .chat {
+    max-width: 440px;
+    margin: 1.5rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .burbuja {
+    padding: 0.8rem 1rem 1.4rem;
+    border-radius: 1rem;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    max-width: 85%;
+  }
+  .burbuja.cliente {
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-line);
+    border-bottom-left-radius: 0.25rem;
+    align-self: flex-start;
+  }
+  .burbuja.lara {
+    background: var(--nx-magnet);
+    color: #fff;
+    border-bottom-right-radius: 0.25rem;
+    align-self: flex-end;
+  }
+  .burbuja .hora {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.5rem;
+    font-size: 0.68rem;
+    opacity: 0.65;
+    font-family: var(--nx-font-mono);
+  }
+  .confirmado {
+    align-self: center;
+    margin-top: 0.5rem;
+    background: var(--nx-magnet-halo);
+    border: 1px solid var(--nx-magnet);
+    color: var(--nx-magnet-deep);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .pie-chat {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+  }
+
+  /* ── tres tarjetas ────────────────────────────────────────────── */
+  .tres { display: grid; gap: 1.5rem; }
+  @media (min-width: 768px) { .tres { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
+  .tarjeta {
+    border-top: 2px solid var(--nx-magnet);
+    padding-top: 1.1rem;
+  }
+  .tarjeta .num {
+    font-family: var(--nx-font-mono);
+    font-size: 0.7rem;
+    color: var(--nx-magnet);
+    letter-spacing: 0.15em;
+  }
+  .tarjeta h3 {
+    font-family: var(--nx-font-serif);
+    font-size: 1.45rem;
+    font-weight: 400;
+    margin: 0.35rem 0 0.5rem;
+  }
+  .tarjeta p { color: var(--nx-ink-muted); font-size: 0.95rem; }
+
+  /* ── cita ─────────────────────────────────────────────────────── */
+  .cita {
+    font-family: var(--nx-font-serif);
+    font-size: 1.5rem;
+    line-height: 1.4;
+    border-left: 3px solid var(--nx-magnet);
+    padding-left: 1.25rem;
+  }
+  @media (min-width: 768px) { .cita { font-size: 1.9rem; } }
+  .fuente {
+    margin-top: 1.25rem;
+    padding-left: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--nx-ink-faint);
+    line-height: 1.5;
+  }
+
+  /* ── qué no hace ──────────────────────────────────────────────── */
+  .intro { color: var(--nx-ink-muted); margin: 0.75rem 0 2rem; }
+  .nohace { display: grid; gap: 1.4rem; }
+  .nohace dt {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+  .nohace dt::before {
+    content: '—';
+    color: var(--nx-magnet);
+    margin-right: 0.5rem;
+  }
+  .nohace dd { color: var(--nx-ink-muted); font-size: 0.95rem; padding-left: 1.4rem; }
+
+  .cierre { background: var(--nx-deep); }
+  .cierre .intro { margin-bottom: 2rem; }
+
+  /* ── la letra ─────────────────────────────────────────────────── */
+  .letra details {
+    border-bottom: 1px solid var(--nx-line);
+    padding: 1.1rem 0;
+  }
+  .letra summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .letra summary::-webkit-details-marker { display: none; }
+  .letra summary::after { content: '+'; color: var(--nx-magnet); font-size: 1.3rem; line-height: 1; }
+  .letra details[open] summary::after { content: '–'; }
+  .letra details p {
+    margin-top: 0.8rem;
+    color: var(--nx-ink-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .letra details p + p { margin-top: 0.8rem; }
+  .letra .muestra { border-bottom: none; }
+</style>
