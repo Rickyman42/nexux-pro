@@ -66,3 +66,23 @@ veterinaria eso es un fleco; para una clínica es un incumplimiento.
 **Las veterinarias no entran en este guardarraíl**: los datos de una mascota no son
 categoría especial. Por eso el primer vertical es veterinaria y no fisioterapia,
 aunque la lista de fisios ya esté recogida.
+
+## Objeción nº1 de las clínicas veterinarias (medida en campo, 21-sep-2026)
+
+Petconnection (Móstoles) contestó al primer WhatsApp con esto:
+
+> "nuestro negocio no puede tener un sistema que dé la cita sola, porque debemos
+> hablar con los tutores primero, ver la gravedad"
+
+**Qué significa:** creen que Lara decide la gravedad. En una clínica eso no se delega,
+y tienen razón en no querer delegarlo. **"Tutor" es el dueño del animal, y está en la
+consulta con el animal delante** — no es una conversación de chat.
+
+**Cómo se responde (y va en la página, no sólo en el mensaje):**
+Lara no decide gravedad. Coge SÓLO lo que el negocio le deje coger (por ejemplo
+revisiones y vacunas) y todo lo demás lo pasa al WhatsApp de la clínica, marcado.
+No les quita el criterio: les quita las interrupciones.
+
+**Regla para el molde:** en cualquier vertical sanitario, el mensaje NUNCA puede
+sugerir que Lara sustituye la consulta ni que valora un caso. Esta objeción sale
+la primera, y si no está respondida de antemano, cierra la conversación.

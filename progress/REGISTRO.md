@@ -2876,3 +2876,172 @@ dos lectores. Los 5 configs que no tenian ningun correo ya tienen el interno.
 2026-09-21 | claude | BUG MIO introducido y corregido en el mismo turno: un <script> normal de Astro NO interpola {}, asi que las dos variables que meti salieron literales al navegador (var NEGOCIO = "" + JSON.stringify(NEGOCIO) + "") y SECTOR habria petado con ReferenceError tumbando el JS entero de la demo. Lo cazo el curl a produccion, no el node --check ni el repaso del codigo. Arreglado pasandolas por define:vars, que esa misma etiqueta ya usaba para API. Leccion: en Astro, lo que va del servidor al navegador se pasa con define:vars, y una pagina que compila no significa que su JS funcione | curl a produccion mostrando ahora const NEGOCIO = "Clinica Veterinaria Arcadia" y SECTOR = "veterinaria" | OK
 2026-09-21 | claude | BLOQUE 3, auditoria del scraper. CONFIRMADO ROTO lo que ya sospechaba: el scraper NO filtra moviles aptos de WhatsApp, se queda el telefono que ponga Google Maps sea lo que sea, y por eso las listas antiguas tienen 1.959 fijos de 3.292 numeros. Tampoco desecha numeros de pago ni valida longitud. No se parchea el scraper (su trabajo es recoger): se anade ~/scripts/limpia_moviles.py, que normaliza a E.164, se queda solo con 6XXXXXXXX y 7[1-9]XXXXXXX, tira fijos 8xx/9xx, numeros de pago y gratuitos 803/806/807/905/907/900/901/902, descarta longitudes malas y duplicados, y DICE EL MOTIVO de cada descarte; ademas ordena la salida por score y filtra SIN_RESERVAS. SEGUNDO FALLO ENCONTRADO, mas grave y no sospechado: el scraper escribia el CSV SOLO al final, asi que una caida a mitad tiraba el trabajo entero; medido el ritmo real de la fase 2 (5 leads por minuto, 1.681 pendientes = 5,6 horas) eso era una bomba de relojeria. Corregido con guarda_parcial() volcando cada 20 leads enriquecidos. Acotado ademas el alcance a lo que sirve manana: solo veterinarias (los fisios son vertical sanitario y quedan en cuarentena por el RGPD art. 9, ni se recogen) y solo las 10 ciudades de la corona sur de Madrid mas Madrid capital, donde Ricardo puede plantarse en persona. Salida nueva leads_veterinarias.csv para no pisar nada | 15/15 casos de sabotaje del filtro superados (movil con espacios, con +34, con 0034, con parentesis; fijo de Madrid, fijo de Baleares, 803, 900, 902, 70x que NO es movil, 8 digitos, 10 digitos, vacio, nulo, texto); py_compile OK; 5 comprobaciones del parche del scraper; proceso relanzado y capturando | PARCIAL (la lista final llega cuando termine la pasada) |
 2026-09-21 | claude | BLOQUE 3 CERRADO con la pasada real de veterinarias del sur de Madrid (11 ciudades, 2 terminos). Numeros: 288 filas de entrada, 38 moviles validos y unicos, y de esos 18 SIN sistema de reservas, que es la lista final en ~/scraper-output/veterinarias_wa.csv. Descartados: 233 fijos que no valen para WhatsApp, 16 duplicados y 1 sin telefono. HALLAZGO ESTRUCTURAL que cambia el plan de manana: el 81% de las veterinarias publica un FIJO, no un movil, porque lo que ponen en Maps es el telefono del mostrador. O sea que el canal de WhatsApp en frio casi no existe en este vertical, y no por culpa del filtro sino por como es el sector. SEGUNDO AVISO DE CALIDAD DE LA LISTA: de esos 18, varios NO son clinicas (Guarderia y Peluqueria Canina, Crematorio de Mascotas, Residencia Canina, Etologo canino, Grupo Emer Equipamiento Veterinario), asi que clinicas de verdad quedan del orden de 6 a 8; los terminos de busqueda arrastran comercios del mundo animal. LA BOLSA QUE SI EXISTE: 142 veterinarias sin sistema de reservas con fijo Y direccion en Maps, concentradas en Fuenlabrada 25, Mostoles 24, Alcorcon 24, Leganes 17, Madrid 14, Getafe 13, Villaviciosa 13 y Pinto 4; alcanzables por telefono o en persona, no por WhatsApp. El guardado parcial funciono: el CSV ya tenia 120 filas a mitad de pasada | salida del limpia_moviles.py con el desglose de descartes por motivo; recuento por ciudad y por tipo de telefono sobre leads_veterinarias.csv | OK
+
+## 2026-09-21 — Quejas reales de las 14 de Móstoles/Alcorcón con WhatsApp
+- BUG GORDO en saca_quejas.py: no ordenaba por peor nota (selector "bajas" vs "baja"),
+  la pestana de resenas se saltaba por usar count() en vez de click(), el boton de ordenar
+  necesita click forzado, y reutilizar un contexto de navegador lo rompia. Perseo pasaba de
+  0 a 17 quejas al arreglarlo. La corrida anterior era un FALSO NEGATIVO entero: descartada.
+- 49 quejas leidas. Solo 5 de 14 negocios tienen dolor real de citas/telefono.
+- Entregado: progress/RUTA-VETERINARIAS-MOSTOLES.md con calle, web, WhatsApp, frase textual
+  del cliente y mensaje personalizado por negocio. 9 marcados como NO escribir.
+- 7 de 14 lecturas quedaron marcadas como no fiables (no se pudo ordenar): pendiente releer.
+- Verificador: 4/4 OK.
+
+## 2026-09-21 (2) — Extractor de fichas veterinarias, con puertas de verificacion
+- ficha_vet.py nuevo. Cuatro bugs encontrados y corregidos, todos silenciosos:
+  1) el orden buscaba "bajas" y Google escribe "baja"; 2) la pestana de resenas se
+  saltaba por usar count() (no espera) en vez de click(); 3) el boton de ordenar
+  necesita foco+Enter, con click no abre el menu; 4) el selector con coma
+  (has-text) casaba con botones envoltorio y .first cogia el equivocado.
+- El buscador de resenas de Maps NO se usa: en headless devuelve la lista entera
+  para cualquier palabra (control: "perro" 20, "whatsapp" 20, "telefono" 20).
+  La tercera fuente de cita_whatsapp pasa a ser la web propia de la clinica.
+- Puertas pasadas: Perseo devuelve sus 1 estrella (orden OK, [1,1,1,1,1], 17 quejas).
+- Ninguna ficha se entrega con "0" a secas: van leidas / de 3 estrellas o menos /
+  con tema de citas, y una incidencia escrita cuando el orden no se pudo aplicar.
+- Separacion por cajas: 15 veterinarias de Mostoles, 9 de otra ciudad, 4 cadenas,
+  15 de otra vertical (incluido un dentista de personas que se colaba).
+- DESCUBRIMIENTO: Google deja de servir resenas de una ficha concreta si se le piden
+  muchas veces seguidas. Control: dos fichas sin tocar (Getafe) cargan 120 mientras
+  las machacadas hoy dan 6. No es la IP ni el codigo. Quitadas las recargas.
+- Entregado progress/VETERINARIAS-MOSTOLES.md con 5 de 15 leidas y 2 mensajes
+  listos (Bicharracos y Rosales, las dos por horarios desactualizados).
+- Verificador: 5/5 OK.
+
+## 2026-09-21 (3) — perrolia.es desatasca la lectura
+- perrolia.py nuevo: lee el directorio perrolia.es. Da municipio limpio, telefono,
+  reparto de estrellas (segunda fuente para contrastar los ceros) y horario.
+- 🔴 HALLAZGO: cuando Google deja de servir resenas de una ficha, entrar por
+  https://www.google.com/maps/place/?q=place_id:XXX SI funciona. Rio Duero paso de
+  5 resenas a 60 solo cambiando la URL. El place_id sale de la ficha de perrolia.
+- 🔴 Contador arreglado: Maps repite nodos al bajar y contabamos repetidas. Bicharracos
+  daba 40 de <=3 estrellas cuando el reparto de Google dice 28. Ahora se descartan por
+  data-review-id antes de contar.
+- Control de estrellas: en una ficha limpia la secuencia sale monotona
+  (1,1,1,1,2,2,3,3,3,3,4...), asi que la lectura de la nota es correcta.
+- perrolia aporta 2 clinicas de Mostoles que el rastreo de Google no encontro:
+  Estoril Veterinary Hospital (3.191 opiniones, ~383 de una estrella) y Mostoles
+  Veterinary Center.
+- Leidas con orden verificado: Rio Duero (6 de citas), Estoril (17), Barcelona (4),
+  Petconnection (3), Bicharracos (3), mas Rosales/Don Vito/Tropican de la pasada previa.
+- Quedan 9 sin leer. PENDIENTE: confirmar si Estoril es franquicia (una resena lo dice).
+
+## 2026-09-21 (4) — Orden por "se puede atacar" y verificacion real del WhatsApp
+- Tres fallos corregidos que marco Ricardo: ordenaba por gancho y no por regla,
+  cita_whatsapp salia vacio (culpa mia: puse website:"" al montar la caja por place_id),
+  y avise de un numero sospechoso en vez de comprobarlo.
+- verifica_wa.py nuevo: abre wa.me con navegador. Si sale el NOMBRE DEL PERFIL, el
+  numero tiene cuenta. Si sale "Chatea en WhatsApp con el <numero>" sin formatear,
+  WhatsApp ni lo reconoce como español: es basura.
+  CONFIRMADO FALSO: Rosales +34773124665 y Medivet +34753143512.
+  CONFIRMADOS: Veracruz, Barcelona, Coimbra, Perseo (cadena).
+- 🔴 "Muy pronto podras gestionar tu cita por WhatsApp" (Huellas) NO es tenerlo:
+  anadido RE_TODAVIA_NO. Era un falso positivo de mi propia regla.
+- 🔴 Contadores: Maps repite nodos, se deduplica por data-review-id.
+- 🔴 El script sobrescribia el json al correr con filtro (perdi 8 fichas). Ahora
+  fusiona y gana la MEJOR lectura de cada negocio, no la ultima.
+- ORO (WhatsApp confirmado + queja leida): Veracruz ("citan a la misma hora a tres
+  personas"), Barcelona, Coimbra (este con dolor flojo, dicho sin adornar).
+- Hoja: scraper-output/veterinarias_mostoles.csv con columnas de seguimiento.
+- 26 de 29 fichas leidas. Quedan Clinica Mascotas y Veterinario en Casa.
+- Verificador: 6/6 OK.
+
+## 2026-09-21 (5) — Cierre de Mostoles, Estoril y correccion de dos diagnosticos mios
+- Estoril Veterinary Hospital ES CADENA: pertenece a AniCura (anicura.es/clinicas/
+  estoril-hospital-veterinario), grupo de 400+ clinicas. Movida a la caja de cadenas.
+- 🔴 RETIRO mi diagnostico de "Google nos tiene en cuarentena por ficha": era falso.
+  Repetido en la misma ficha y en el mismo minuto, el menu de ordenar abre o no abre
+  por azar; cuando no abre, la lista se queda en 10 resenas y el barrido no crece.
+  Prueba: tres pasadas seguidas sobre Clinica Mascotas dieron 10 / 10 / 120 con el
+  mismo codigo y la misma URL.
+- 🔴 Tambien retiro "inner_text rompe la carga": lo di por bueno con UNA bisección.
+  Repetida al reves tres veces, da 120 siempre. Era la misma intermitencia.
+- Arreglo real: reintentar el bloque de lectura RECARGANDO la ficha, hasta 3 veces.
+  Con eso Veterinario en Casa paso de 0 a 43 resenas con orden verificado.
+- Petconnection: cita_whatsapp = SI por la mejor prueba posible, el dueno lo dijo por
+  WhatsApp el 21-sep ("ya tenemos un wa que contesta todo esto"). Mi hoja la tenia
+  como NO. La palabra del negocio manda sobre el scraper.
+- Objecion nº1 del vertical veterinario documentada en COMO-ANADIR-VERTICAL.md:
+  "no puede dar la cita sola, debemos ver la gravedad".
+- Estado: 28 de 29 fichas leidas. Unica pendiente: Clinica Veterinaria Mascotas
+  (240 opiniones en Google, el script solo consigue 3 de forma repetible; a mano
+  carga 120). Defecto abierto, sin tapar.
+
+## 2026-09-21 (6) — Prueba de determinismo: el metodo NO esta listo para skill
+- Dos pasadas identicas, seguidas, sobre las mismas 16 clinicas de Mostoles
+  (fichas_pasadaA.json / fichas_pasadaB.json, contraste con scripts/contrasta.py):
+    identicas en las dos     : 7 de 16
+    con resultado DISTINTO   : 9 de 16
+    lectura buena en las dos : 3
+    buena en una sola        : 8
+    mala en las dos          : 5
+    quedandonose con la mejor de las dos: 11 de 16
+- Ejemplos: Rio Duero OK/60/6 citas en A y NO/5/1 en B. Huellas al reves.
+- VEREDICTO: la lectura de Maps es una moneda al aire. Los guardas funcionan (cuando
+  sale mal lo dice y no inventa ceros), pero el dato no es reproducible a la primera.
+- ARREGLO QUE TOCA, y no esta hecho: la unidad de trabajo no puede ser "una pasada por
+  la lista", tiene que ser "repetir cada clinica hasta que de una lectura verificada",
+  reencolando las fallidas entre pasadas. Con dos pasadas ya subimos de 3 a 11 de 16.
+- Hasta que eso este y de 16 de 16 estable, NO se empaqueta la skill.
+- Clinica Veterinaria Mascotas: descartada del circuito por decision de Ricardo
+  (la contacto por Facebook; no hay forma de contactarla por otra via).
+
+## 2026-09-22 — Reencolado: de 3 a 15 de 16
+- scripts/cierra.py nuevo: la unidad de trabajo pasa a ser "esta ficha hasta que salga
+  bien", reencolando solo las que faltan entre vueltas y guardando la MEJOR lectura.
+- Partiendo de cero sobre las mismas 16 clinicas de Mostoles:
+    vuelta 1:  8 de 16
+    vuelta 2: 11 de 16
+    vuelta 3: 13 de 16
+    vuelta 4: 14 de 16
+    vuelta 5: 14 de 16
+  (una sola pasada daba 3 de 16; ver REGISTRO 21-sep (6))
+- 🔴 El criterio de "cerrada" estaba mal y lo he corregido: exigia orden verificado +20
+  resenas. Villa Animal tiene 20 opiniones en Google y le habiamos leido las 20, o sea
+  completa, y salia como fallo. Ahora: cerrada = leidas >= las que tiene, o 20+ con el
+  orden verificado. Con eso el resultado real es 15 de 16.
+- UNICA SIN CERRAR: Clinica Veterinaria Huellas (5 de 226 opiniones tras 15 intentos).
+- 🔴 Matiz al verificador de WhatsApp: "SIN PERFIL" NO prueba que el numero no exista.
+  Petconnection contesto desde +34661311902 y ese numero sale SIN PERFIL. Lo que si
+  delata un numero inventado es que WhatsApp ni lo formatee como espanol (Rosales
+  +34773124665 -> "NO ES NUMERO ESPANOL"). Separados los dos veredictos.
+- Hoja de Google comprobada por exportacion CSV: 29 filas, 28 columnas, 0 telefonos
+  corrompidos. Yo no la cree; solo la he verificado.
+- 🔴 Dos ficheros que se pisaban a si mismos, mismo patron que ya arregle en ficha_vet:
+  (a) la hoja se quedaba con el WhatsApp de la ficha que mas resenas leyo, y las
+      relecturas salen de cajas sin el campo web, asi que borraban la prueba: la lista
+      de ORO se caia de 4 a 1. Ahora la mejor LECTURA y la mejor PRUEBA se resuelven
+      por separado.
+  (b) verifica_wa.py sobrescribia wa_verificados.json en cada corrida y borraba los
+      numeros comprobados antes. Ahora fusiona. 13 numeros guardados.
+- Estado final: 4 ORO (Petconnection, Veracruz, Barcelona, Coimbra), 12 con queja,
+  15 de 16 fichas cerradas.
+
+## 2026-09-22 (2) — Volcado del CSV a la hoja de Google
+- No hay credenciales de Sheets en la Pi (las GOOGLE_OAUTH_* son del login de la app).
+  El dialogo de importacion de Sheets abre un selector de ficheros nativo que no se
+  puede manejar desde el navegador. Se hizo por portapapeles: Set-Clipboard en Windows
+  con un TSV y Ctrl+V sobre A1.
+- 🔴 ANTES de sobrescribir se comparo la hoja con el CSV nuevo, y menos mal:
+  * el WhatsApp de Petconnection (+34661311902) estaba SOLO en la hoja, escrito a mano;
+    regenerar el CSV lo habria borrado. Fijado en hoja.py (NUMEROS_A_MANO) para que
+    sobreviva a cada corrida.
+  * mi relectura traia los telefonos en formato local y la hoja los tenia en
+    internacional: se conservaron los de la hoja (12 valores).
+- Los valores que empiezan por + o = se pegan con apostrofo delante: Sheets los toma
+  por formula y "+34916133315" se convierte en un numero redondeado. 42 protegidos.
+- Verificado por exportacion: 29 filas, 28 columnas, cabeceras correctas, 0 telefonos
+  rotos, 4 filas ORO, seguimiento de Petconnection intacto. 1 discrepancia cosmetica
+  (Sheets se come el primer par de comillas de que_dijo).
+- 🔴 Error mio durante el proceso: al intentar corregir esa comilla pulse en la caja de
+  nombres sin que tuviera el foco y escribi encima de A1 y A2, cargandome la cabecera y
+  la primera fila. Deshecho con Ctrl+Z x2 y verificado por exportacion.
+
+## 2026-09-22 · Veterinarios a domicilio de Madrid (puerta WhatsApp primero)
+- 13 veterinarios a domicilio sacados del directorio perrolia (solo aparecen con navegador; en el HTML no estan).
+- Puerta barata primero: verifica_wa.py sobre los 13 -> 8 con perfil publico de WhatsApp. Solo a esos se les leyeron resenas.
+- cierra.py domicilio_wa 4 20 -> 6 de 8 cerrados (vuelta 1: 3, vuelta 2: 6). Sin cerrar: "Veterinario a domicilio" (28) y VetFlow (88), por orden no verificado.
+- Con gancho real de agenda: AnagaVets (162 op.), 1 Click Vet (177), Barvet (26). Vet2Go tiene WhatsApp pero su web NO lo ofrece para citas. VetFlow y los 3 pequenos: sin queja aprovechable.
+- Error corregido: dije "ninguno tiene web". Era el hueco de perrolia, no la realidad: 5 tienen web (anagavets.es, 1clickvet.com, barvet.es, vet2go.es, vetflow.es).
+- Entregable: progress/VETERINARIOS-DOMICILIO-MADRID.md

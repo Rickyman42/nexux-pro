@@ -1,156 +1,186 @@
-# Ruta de veterinarias — Móstoles (21-sep-2026)
+# Ruta veterinarias Móstoles/Alcorcón — con queja real y mensaje personalizado
 
-Las **28 de Móstoles sin sistema de reservas**, ordenadas para trabajarlas por
-WhatsApp y dejar la visita como último recurso.
+Fecha: 2026-09-21. Fuente: reseñas de Google ordenadas por peor nota (14 negocios con WhatsApp propio).
+Fichero de quejas: `/home/nexux/scraper-output/quejas_mostoles.json` — 49 quejas leídas.
 
-**De dónde sale el WhatsApp:** no de Google Maps, donde ponen el fijo del
-mostrador, sino **de su propia web** — o el botón de WhatsApp que tienen puesto,
-o el móvil de contacto que publican. Lo verifica `~/scripts/busca_whatsapp.py`.
+## AVISO DE FIABILIDAD
+En 7 de los 14 el lector de reseñas NO pudo ordenar por las peores, así que de ésos sólo vimos las
+"más relevantes" (casi todas buenas). Su "no tiene quejas" NO vale: Barcelona, Medivet Skinpet,
+Perseo Alcorcón, Los Cantos, Clínica Mascotas, Veracruz, Rosales.
+Los 5 con gancho de abajo SÍ salieron de una lectura ordenada y completa.
 
-> ⚠️ **Que lo publiquen para que les escriban sus clientes no es consentimiento
-> para publicidad.** La LSSI pide consentimiento previo para comunicaciones
-> comerciales por medios electrónicos. Es tu decisión; queda dicho una vez.
+---
 
-> 🎯 **Son pocos y no se pueden quemar.** 9 clínicas con WhatsApp es todo lo que
-> hay en Móstoles. Un mensaje por negocio, y el primero tiene que valer.
+# GRUPO A — CON DOLOR REAL DE CITAS (5). Estos son a los que se escribe.
 
+## A1. Peluquería canina Intercan  ⭐ EL MEJOR
+- Calle: C. Alfonso XII, 15, 28934 Móstoles
+- Web: https://peluqueriacaninaintercan.com/ · WhatsApp: +34628730725 · Google: 4,9 (413)
 
-> 🔎 **Dos numeros que conviene mirar antes de escribir:** `+34773124665`
-> (Centro Veterinario Rosales) y `+34753143512` (Medivet). Empiezan por 77 y 75,
-> que son moviles validos pero poco comunes en Espana; pueden ser un trozo de
-> otro numero pillado de la web. Abre su web y confirmalo antes de gastar el
-> unico mensaje que tienes.
+Lo que le duele (cliente de 24 años, 1 estrella):
+> "no te cogen el teléfono, no te contestan al WhatsApp hasta los tres días... entiendo que tengan
+> trabajo, pero el trato al cliente ha perdido mucho"
 
-## A · Clínicas veterinarias con WhatsApp — 9 (empieza por aquí)
+Y otra: pidió cita a primera hora y "al llegar atendieron a 2 personas más por delante de mí".
 
-1. **Clínica Veterinaria Barcelona** — 4.7⭐ (329 reseñas)
-   - WhatsApp: `+34693253828`  _(movil en la web)_
-   - Fijo: `912 36 26 64`  ·  [Maps](https://www.google.com/maps/place/Cl%C3%ADnica+Veterinaria+Barcelona/data=!4m7!3m6!1s0xd418c29b276af4f:0xd9fb23b4e09824d8!8m2!3d40.324437!4d-3.858109!16s%2Fg%2F11xbt28g3!19sChIJT692simMQQ0R2CSY4LQj-9k?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://clinicaveterinariabarcelona.es/
+Por qué encaja: es exactamente lo que hace Lara. Contesta el WhatsApp al momento y la cita queda
+cogida en la agenda, sin que otro se cuele.
 
-2. **Clínica Veterinaria Perseo Móstoles** — 4.6⭐ (369 reseñas)
-   - WhatsApp: `+34606748796`  _(boton de WhatsApp)_
-   - Fijo: `911 72 47 42`  ·  [Maps](https://www.google.com/maps/place/Cl%C3%ADnica+Veterinaria+Perseo+M%C3%B3stoles/data=!4m7!3m6!1s0xd418c355599541b:0xcc6b0ceee40de4e9!8m2!3d40.3058151!4d-3.8653877!16s%2Fg%2F11cmfydxwf!19sChIJG1SZVTWMQQ0R6eQN5O4Ma8w?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://clinicaveterinariaperseo.com/
+Estrategia: el más caliente. Tiene 4,9 y le duele perder ese 4,9. Nada de software: hablarle de que
+no puede coger el móvil con las manos mojadas y un perro en la mesa.
 
-3. **QAnimals Móstoles** — 4.9⭐ (297 reseñas)
-   - WhatsApp: `+34682726881`  _(movil en la web)_
-   - Fijo: `913 76 58 28`  ·  [Maps](https://www.google.com/maps/place/QAnimals+M%C3%B3stoles/data=!4m7!3m6!1s0xd418dbab0533b5f:0xd6c3249d7eac5355!8m2!3d40.31524!4d-3.8445358!16s%2Fg%2F11w8sfgjyf!19sChIJXztTsLqNQQ0RVVOsfp0kw9Y?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.qanimals.com/
+MENSAJE:
+Hola, buenos días. Soy Ricardo, de Móstoles.
+Te escribo a ti en concreto, no es un mensaje en cadena: he estado mirando vuestra ficha de Google y
+tenéis un 4,9 con más de 400 opiniones, y eso no lo tiene casi nadie.
+Justo por eso me ha llamado la atención una cosa. Hay gente que se queja de que no le cogéis el
+teléfono y de que el WhatsApp tarda en contestarse. Y me imagino el motivo: estáis con un perro en la
+mesa y con las manos ocupadas. No es dejadez, es que no se puede estar a todo.
+Yo tengo montado algo para eso. Contesta el WhatsApp por vosotros en el momento, dice los precios, y
+si el cliente quiere cita se la coge en la agenda, sin pisar la de otro. Vosotros lo veis luego,
+cuando podéis.
+¿Te lo enseño? Te paso un enlace y hablas tú mismo con él como si fueras un cliente, un minuto. Y si
+no te convence me lo dices y no te molesto más.
 
-4. **Centro Veterinario Parque Oeste SLU** — 4.9⭐ (467 reseñas)
-   - WhatsApp: `+34686406197`  _(movil en la web)_
-   - Fijo: `916 89 18 83`  ·  [Maps](https://www.google.com/maps/place/Centro+Veterinario+Parque+Oeste+SLU/data=!4m7!3m6!1s0xd418eb8b1561995:0xf0146f3e102cbd5b!8m2!3d40.3463993!4d-3.839805!16s%2Fg%2F1tzzwtq8!19sChIJlRlWsbiOQQ0RW70sED5vFPA?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://www.centroveterinarioparqueoeste.es/
+## A2. Centro Veterinario Mundo Animal
+- Calle: C. Sierra de Albarracín esq. C. del Monte, 28923 Alcorcón
+- Web: http://www.cvmundoanimal.com/ · WhatsApp: +34692672135 · Google: 4,6 (169)
 
-5. **Clínica Veterinaria Los Cantos** — 4.6⭐ (397 reseñas)
-   - WhatsApp: `+34699886898`  _(movil en la web)_
-   - Fijo: `916 43 18 92`  ·  [Maps](https://www.google.com/maps/place/Cl%C3%ADnica+Veterinaria+Los+Cantos/data=!4m7!3m6!1s0xd418eb6c0d251e3:0xf37bdbc57c427964!8m2!3d40.3437178!4d-3.8313059!16s%2Fg%2F1th588w0!19sChIJ41HSwLaOQQ0RZHlCfMXbe_M?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://clinicaveterinariaalcorcon.es/
+Lo que le duele (dos reseñas de 1 estrella):
+> "Pedí cita para la Peluquería con una semana de antelación, tres días antes me dicen que si puedo
+> cambiar la cita, y cuando llego a la nueva cita, DICEN QUE NO LES VA A DAR TIEMPO"
 
-6. **Clínica Veterinaria Mascotas** — 4.3⭐ (240 reseñas)
-   - WhatsApp: `+34649565793`  _(movil en la web)_
-   - Fijo: `916 04 42 33`  ·  [Maps](https://www.google.com/maps/place/Cl%C3%ADnica+Veterinaria+Mascotas/data=!4m7!3m6!1s0xd418dd92943733d:0x3818c7d83775e5f4!8m2!3d40.3227707!4d-3.8804421!16s%2Fg%2F11bywk_r20!19sChIJPXNDKdmNQQ0R9OV1N9jHGDg?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.clinicamascotas.com/
+> "Madrugar y esperar para que salga un tonto y te eche la charla de que hay que coger cita, cosa que
+> ya le dije que no tenía"
 
-7. **Veterinario en Móstoles | Veracruz** — 4.3⭐ (261 reseñas)
-   - WhatsApp: `+34626473880`  _(boton de WhatsApp)_
-   - Fijo: `916 45 48 08`  ·  [Maps](https://www.google.com/maps/place/Veterinario+en+M%C3%B3stoles+%7C+Veracruz/data=!4m7!3m6!1s0xd418c2fa12ca9e9:0x6d3e14bc78b17793!8m2!3d40.3177747!4d-3.8559028!16s%2Fg%2F1tfzj1qm!19sChIJ6aksoS-MQQ0Rk3exeLwUPm0?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://veterinarioveracruzmostoles.com/
+Por qué encaja: lío de agenda de manual. Citas que se mueven, se pisan, y clientes que se plantan
+allí sin saber que hacía falta cita.
 
-8. **CENTRO VETERINARIO MUNDO ANIMAL** — 4.6⭐ (169 reseñas)
-   - WhatsApp: `+34692672135`  _(movil en la web)_
-   - Fijo: `910 41 26 29`  ·  [Maps](https://www.google.com/maps/place/CENTRO+VETERINARIO+MUNDO+ANIMAL/data=!4m7!3m6!1s0xd41894a6118a44d:0x9ed31781c912acc5!8m2!3d40.3477478!4d-3.8237922!16s%2Fg%2F11c60n0zcm!19sChIJTaQYYUqJQQ0RxawSyYEX054?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://www.cvmundoanimal.com/
+Estrategia: no es "no contestáis", es "se os va la agenda". Lara no deja meter dos cosas a la misma
+hora y avisa al cliente de si hace falta cita antes de que se plante en la puerta.
 
-9. **Centro Veterinario Rosales** — 4.5⭐ (46 reseñas)
-   - WhatsApp: `+34773124665`  _(movil en la web)_
-   - Fijo: `916 18 89 90`  ·  [Maps](https://www.google.com/maps/place/Centro+Veterinario+Rosales/data=!4m7!3m6!1s0xd418e62f445cf3f:0xbd2670c3849371b9!8m2!3d40.3381099!4d-3.8669466!16s%2Fg%2F1v0lm1_g!19sChIJP89F9GKOQQ0RuXGThMNwJr0?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.veterinario-mostoles.com/
+MENSAJE:
+Hola, buenos días. Soy Ricardo, vivo aquí al lado.
+Te escribo por una cosa concreta que he visto en vuestras opiniones de Google, no para venderte nada
+raro. Hay un par de clientes molestos porque les movisteis la cita y al final no les dio tiempo de
+atenderles, y otro que se plantó allí de mañana sin saber que hacía falta pedir hora.
+Eso pasa cuando la agenda está en la cabeza y en un cuaderno, y entran llamadas mientras estáis con
+un animal. No es que lo hagáis mal.
+Lo que yo tengo contesta el WhatsApp al momento, le dice al cliente si necesita cita y a qué hora hay
+hueco de verdad, y la apunta. Y no deja meter dos cosas a la misma hora.
+¿Quieres verlo? Te paso un enlace y le escribes tú como si fueras un cliente. Un minuto. Si no lo ves
+claro, me lo dices y ya está.
 
+## A3. Mascotas Borneo (tienda + peluquería)
+- Calle: Av. de Felipe II, 10, 28936 Móstoles
+- Web: no tiene propia (sólo ficha en lomejordelbarrio.com) · WhatsApp: +34608212333 · Google: 4,5 (234)
 
-## B · Otros negocios del sector con WhatsApp — 4 (otro discurso)
+Lo que le duele:
+> "después de casi un año intentando coger cita no ha sido posible"
 
-1. **Medivet Clínica Veterinaria Dermatológica Skinpet Móstoles**  `cadena` — 4.7⭐ (220 reseñas)
-   - WhatsApp: `+34753143512`  _(movil en la web)_
-   - Fijo: `916 47 20 96`  ·  [Maps](https://www.google.com/maps/place/Medivet+Cl%C3%ADnica+Veterinaria+Dermatol%C3%B3gica+Skinpet+M%C3%B3stoles/data=!4m7!3m6!1s0xd418e9cc530a5a7:0xf0a5e7d55693f2e9!8m2!3d40.3299323!4d-3.8546582!16s%2Fg%2F1td498c1!19sChIJp6UwxZyOQQ0R6fKTVtXnpfA?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.medivetgroup.com/es-es/clinicas-veterinarias/skinpet-mostoles/?utm_source=google&utm_medium=organic&utm_campaign=google_lpm_skinpet_m%C3%B3stoles
+> "No actualizaron horario en Agosto. Cerrado del 15 al 31" · "Está cerrado siempre"
 
-2. **Mascotas Borneo**  `otro` — 4.5⭐ (234 reseñas)
-   - WhatsApp: `+34608212333`  _(boton de WhatsApp)_
-   - Fijo: `914 96 95 66`  ·  [Maps](https://www.google.com/maps/place/Mascotas+Borneo/data=!4m7!3m6!1s0xd418c25c2c6f68f:0x25d74996e10bc54!8m2!3d40.3208224!4d-3.8534476!16s%2Fg%2F1tcxfht5!19sChIJj_bGwiWMQQ0RVLwQbpl0XQI?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.lomejordelbarrio.com/mostoles/peluqueria_canina_peluqueria_mascotas/mascotas_borneo
+Por qué encaja a medias: lo de las citas y el horario sí; el resto de sus quejas son de precio y del
+trato del dependiente, y eso no lo arregla nadie desde el móvil.
 
-3. **Peluqueria canina Intercan**  `otro` — 4.9⭐ (413 reseñas)
-   - WhatsApp: `+34628730725`  _(movil en la web)_
-   - Fijo: `916 17 80 17`  ·  [Maps](https://www.google.com/maps/place/Peluqueria+canina+Intercan/data=!4m7!3m6!1s0xd418d8abd7a68d5:0x6f3b4adbeef3c53c!8m2!3d40.3186873!4d-3.874145!16s%2Fg%2F11qh19jrkq!19sChIJ1Wh6vYqNQQ0RPMXz7ttKO28?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://peluqueriacaninaintercan.com/
+Estrategia: entrar por el horario, que es lo menos personal y no le pone a la defensiva. Además no
+tiene web: el WhatsApp es literalmente su única puerta.
 
-4. **Mascolife Mascotas**  `otro` — 4.8⭐ (65 reseñas)
-   - WhatsApp: `+34697217765`  _(movil en la web)_
-   - Fijo: `697 21 77 65`  ·  [Maps](https://www.google.com/maps/place/Mascolife+Mascotas/data=!4m7!3m6!1s0xd418dd6c30e64af:0x6e6a82c3413136bf!8m2!3d40.3179263!4d-3.868198!16s%2Fg%2F11f37ntz3j!19sChIJr2QOw9aNQQ0RvzYxQcOCam4?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://mascolife.es/
+MENSAJE:
+Hola, buenas. Soy Ricardo, de Móstoles.
+Una pregunta rápida: ¿a vosotros os pasa que la gente se planta en la tienda y está cerrado, o que os
+piden cita para la peluquería y se queda la cosa en el aire?
+Lo digo porque lo he visto en un par de opiniones vuestras y me ha dado por preguntar, ya que además
+no tenéis web: todo el que os busca acaba en el WhatsApp o en el teléfono.
+Tengo montado algo que contesta el WhatsApp solo, dice el horario y si estáis abiertos hoy, y si
+alguien quiere hora para la peluquería se la apunta en la agenda.
+Si quieres te paso un enlace y lo pruebas tú escribiendo como un cliente cualquiera. No te cuesta
+nada verlo.
 
+## A4. Clínica Veterinaria Mascotas
+- Calle: C. Larra, 11, 28935 Móstoles
+- Web: https://www.clinicamascotas.com/ · WhatsApp: +34649565793 · Google: 4,3 (240) ← la nota más baja de la lista
 
-## C · Sin WhatsApp localizable — 14 (aquí sí toca acercarse)
+Lo que le duele:
+> "Hemos llamado hace casi 1 hora a la clínica para hacer una consulta, que he creído urgente y la
+> primera sensación que me presenta la veterinaria es de apatía total"
 
-1. **Centro Veterinario Móstoles** — 4.6⭐ (221 reseñas)
-   - Fijo: `916 14 41 82`  ·  [Maps](https://www.google.com/maps/place/Centro+Veterinario+M%C3%B3stoles/data=!4m7!3m6!1s0xd418e79295f3713:0x357b28cd69010ecd!8m2!3d40.3290297!4d-3.8709361!16s%2Fg%2F11b6v7_r9s!19sChIJEzdfKXmOQQ0RzQ4Bac0oezU?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.centroveterinariomostoles.com/
+Por qué encaja a medias: la queja es del TRATO por teléfono, no de que no cojan el teléfono. Eso es
+de persona, no de herramienta. Lo que sí quita Lara es el teléfono sonando en mitad de una consulta,
+que es lo que suele producir ese tono seco.
 
-2. **Clínica Veterinaria Bicharracos** — 4.6⭐ (357 reseñas)
-   - Fijo: `916 64 30 04`  ·  [Maps](https://www.google.com/maps/place/Cl%C3%ADnica+Veterinaria+Bicharracos/data=!4m7!3m6!1s0xd418e75a2dde78f:0x9d7c8f4099bc79bf!8m2!3d40.3269543!4d-3.8828272!16s%2Fg%2F11b81j26n0!19sChIJj-fdonWOQQ0Rv3m8mUCPfJ0?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://es-es.facebook.com/pages/Cl%C3%ADnica-Veterinaria-Bicharracos/723793617692875?rf=255606331175211
+Estrategia: pies de plomo. Nada de "tratáis mal a los clientes". Se entra por "os llaman a deshora
+mientras estáis operando".
+OJO: su lectura de reseñas fue de las que no se pudo ordenar. Puede tener más quejas de citas sin ver.
 
-3. **️ Clínica Veterinaria Puerta del Sur | Móstoles** — 4.7⭐ (242 reseñas)
-   - Fijo: `912 50 08 20`  ·  [Maps](https://www.google.com/maps/place/%EF%B8%8F+Cl%C3%ADnica+Veterinaria+Puerta+del+Sur+%7C+M%C3%B3stoles/data=!4m7!3m6!1s0xd418de01e1f874f:0x52196a7aed9a0211!8m2!3d40.3124522!4d-3.8668499!16s%2Fg%2F11hz6tl1hf!19sChIJT4cfHuCNQQ0REQKa7XpqGVI?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://veterinariapuertadelsur.es/
+MENSAJE:
+Hola, buenos días. Soy Ricardo, de aquí de Móstoles.
+Te escribo por algo que seguro te suena: el teléfono sonando justo cuando estás con un animal encima
+de la mesa. O lo coges a medias y sales cortante sin querer, o no lo coges y el cliente se va a otra
+clínica. No hay manera de hacerlo bien, porque no se puede estar en dos sitios.
+Lo que yo tengo contesta el WhatsApp por vosotros en el momento, con vuestros precios y vuestros
+horarios, y si alguien quiere cita se la apunta. Vosotros lo miráis cuando salís de la consulta, con
+calma.
+¿Te lo enseño en un minuto? Te paso un enlace y le escribes tú como si fueras un cliente. Si no te
+encaja, me lo dices sin problema.
 
-4. **Clínica Veterinaria Río Duero** — 4.6⭐ (402 reseñas)
-   - Fijo: `916 47 23 36`  ·  [Maps](https://www.google.com/maps/place/Cl%C3%ADnica+Veterinaria+R%C3%ADo+Duero/data=!4m7!3m6!1s0xd418dcfffe41091:0xb2ba836a3e6c8723!8m2!3d40.3157036!4d-3.8756483!16s%2Fg%2F1tm13xh1!19sChIJkRDk_8-NQQ0RI4dsPmqDurI?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://www.cvrioduero.com/
+## A5. Mascolife Mascotas
+- Calle: C. de las Palmas, 68, 28938 Móstoles
+- Web: http://mascolife.es/ · WhatsApp: +34697217765 · Google: 4,8 (65)
 
-5. **Veterinaria Don Vito** — 4.7⭐ (319 reseñas)
-   - Fijo: `916 47 55 91`  ·  [Maps](https://www.google.com/maps/place/Veterinaria+Don+Vito/data=!4m7!3m6!1s0xd418c33e75446b7:0xac1718d38df91949!8m2!3d40.3122237!4d-3.8607723!16s%2Fg%2F11dymqr4kx!19sChIJt0ZU5zOMQQ0RSRn5jdMYF6w?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://veterinariadonvito.com/
+Lo que le duele (y encima lo pide de buenas maneras):
+> "Pueden actualizar horario?? Del 10/06 al 25/06 solo abre por las mañanas. No es una crítica"
 
-6. **Farmavet Fauna | Medicamentos Veterinarios**  `otro` — 4.7⭐ (280 reseñas)
-   - Fijo: `912 39 34 86`  ·  [Maps](https://www.google.com/maps/place/Farmavet+Fauna+%7C+Medicamentos+Veterinarios/data=!4m7!3m6!1s0xd418dd0f749000b:0xc93369a0a94429f8!8m2!3d40.3192983!4d-3.8742241!16s%2Fg%2F11gdr1wz23!19sChIJCwBJ99CNQQ0R-ClEqaBpM8k?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://www.farmavetfauna.es/
+Por qué encaja: el negocio más pequeño de la lista y la queja es puro "no sé cuándo estáis".
 
-7. **CLINICA VETERINARIA LORANCA** — 4.7⭐ (543 reseñas)
-   - Fijo: `916 04 70 80`  ·  [Maps](https://www.google.com/maps/place/CLINICA+VETERINARIA+LORANCA/data=!4m7!3m6!1s0xd418c64449845b1:0xdb8f477979c80f25!8m2!3d40.2931556!4d-3.8382466!16s%2Fg%2F1tdh9r6b!19sChIJsUWYRGSMQQ0RJQ_IeXlHj9s?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://www.clinica-veterinaria-loranca.com/
+Estrategia: el más fácil de tratar y el más barato de convencer, pero el que menos factura. Bueno
+para coger rodaje hablando, no para contar con él como venta grande.
 
-8. **Neko Clínica Felina** — 4.5⭐ (425 reseñas)
-   - Fijo: `912 36 80 23`  ·  [Maps](https://www.google.com/maps/place/Neko+Cl%C3%ADnica+Felina/data=!4m7!3m6!1s0xd418ebb0160560d:0xb9869141fc868f98!8m2!3d40.339367!4d-3.8377015!16s%2Fg%2F1vppttjz!19sChIJDVZgAbuOQQ0RmI-G_EGRhrk?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://www.nekovet.com/
+MENSAJE:
+Hola, buenas. Soy Ricardo, de Móstoles.
+Os escribo por una tontería que he visto en vuestras opiniones: un cliente pedía por favor que
+actualizarais el horario porque no sabía si estabais abiertos. Y lo pedía de buenas, ni siquiera se
+quejaba.
+Eso me pasa a mí también: al final el horario se queda viejo en Google y la gente se planta en la
+puerta.
+Tengo algo que contesta el WhatsApp al momento y dice el horario de verdad, el de hoy, y si alguien
+quiere cita se la coge.
+¿Te lo enseño? Te paso un enlace, le escribes tú como si fueras un cliente y lo ves en un minuto. Si
+no lo ves, no pasa nada.
 
-9. **Guardería Y Peluquería Canina Puppy Fashion**  `otro` — 4.7⭐ (240 reseñas)
-   - Fijo: `644 26 87 55`  ·  [Maps](https://www.google.com/maps/place/Guarder%C3%ADa+Y+Peluquer%C3%ADa+Canina+Puppy+Fashion/data=!4m7!3m6!1s0xd418c2501d67363:0x7ab4ac51b9045724!8m2!3d40.3187872!4d-3.8528435!16s%2Fg%2F11bwqbh18w!19sChIJY3PWASWMQQ0RJFcEuVGstHo?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://puppyfashion.es/
+---
 
-10. **Clínica Veterinaria Azahar** — 4.7⭐ (488 reseñas)
-   - Fijo: `912 26 01 06`  ·  [Maps](https://www.google.com/maps/place/Cl%C3%ADnica+Veterinaria+Azahar/data=!4m7!3m6!1s0xd418948a84b978d:0x6f849b0342914d70!8m2!3d40.3439788!4d-3.8150138!16s%2Fg%2F1tx16nj9!19sChIJjZdLqEiJQQ0RcE2RQgObhG8?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.clinicaveterinaria-azahar.es/
+# GRUPO B — SIN GANCHO DE CITAS (9). NO mandar el mensaje de arriba.
 
-11. **Zona Deportiva Club Deportivo Estoril 2**  `otro` — 4.0⭐ (223 reseñas)
-   - Fijo: `916 17 02 89`  ·  [Maps](https://www.google.com/maps/place/Zona+Deportiva+Club+Deportivo+Estoril+2/data=!4m7!3m6!1s0xd418e86b482179b:0x9b8abfa1e523c8c4!8m2!3d40.3303337!4d-3.8626711!16s%2Fg%2F11fmdwkgq3!19sChIJmxeCtIaOQQ0RxMgj5aG_ips?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.clubestoril2.es/
+A éstos sus clientes NO les reprochan nada de citas ni de teléfono. Les reprochan diagnósticos,
+precios y trato médico. Si les escribimos hablando de citas perdidas, les contamos un problema que no
+tienen, y se quema el contacto para siempre.
 
-12. **La Perropeuta**  `otro` — 4.8⭐ (162 reseñas)
-   - Fijo: `660 94 09 63`  ·  [Maps](https://www.google.com/maps/place/La+Perropeuta/data=!4m7!3m6!1s0xd418e7544405591:0xcf6311a96a64469a!8m2!3d40.32631!4d-3.88503!16s%2Fg%2F11hbvr7z92!19sChIJkVVARHWOQQ0RmkZkaqkRY88?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.laperropeuta.com/
+| Negocio | Calle | Web | WhatsApp | Google | De qué se quejan de verdad | Lectura fiable |
+|---|---|---|---|---|---|---|
+| Perseo Móstoles | Av. Vía Láctea 48 / C. Perseo 51, 28938 Móstoles | clinicaveterinariaperseo.com | +34606748796 | 4,6 (369) | 10 quejas, TODAS clínicas: diagnósticos, sobrecostes, un seguro de 250 € | SÍ |
+| Perseo Alcorcón | C. Oslo, 10, 28922 Alcorcón | clinicaveterinariaperseo.com | +34606748796 (el mismo) | 4,6 (254) | no leída | NO |
+| Centro Vet. Parque Oeste | C. Milán, 12, 28922 Alcorcón | centroveterinarioparqueoeste.es | +34686406197 | 4,9 (467) | trato y diagnóstico; nada de citas | SÍ |
+| QAnimals Móstoles | C. Simón Hernández, 81, 28936 Móstoles | qanimals.com | +34682726881 | 4,9 (297) | pedidos y promociones de tienda | SÍ |
+| Clínica Vet. Barcelona | C. Barcelona, 14, 28937 Móstoles | clinicaveterinariabarcelona.es | +34693253828 | 4,7 (329) | medicación puesta por auxiliar; un corte de pelo mal hecho | NO |
+| Medivet Skinpet | C. Nazaret, 2, 28936 Móstoles | medivetgroup.com | +34753143512 | 4,7 (220) | precio de una sedación. Es CADENA: no decide el de la puerta | NO |
+| Clínica Vet. Los Cantos | C. Zamora, 1, 28922 Alcorcón | clinicaveterinariaalcorcon.es | +34699886898 | 4,6 (397) | no leída | NO |
+| Veterinario Veracruz | C. Veracruz, 20, 28936 Móstoles | veterinarioveracruzmostoles.com | +34626473880 | 4,3 (261) | atención médica (el del móvil en la mano) | NO |
+| Centro Vet. Rosales | C. Petunia, 22, 28933 Móstoles | veterinario-mostoles.com | +34773124665 | 4,5 (46) | criterio clínico con un gatito | NO |
 
-13. **Grupo Emer - Equipamiento Veterinario**  `otro` — 5.0⭐ (37 reseñas)
-   - Fijo: `608 29 52 43`  ·  [Maps](https://www.google.com/maps/place/Grupo+Emer+-+Equipamiento+Veterinario/data=!4m7!3m6!1s0xd418f2539d345f3:0xd0e24236dcc4adf1!8m2!3d40.34826!4d-3.88182!16s%2Fg%2F11jl09rr1y!19sChIJ80XTOSWPQQ0R8a3E3DZC4tA?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: http://grupoemer.com/
+Qué hacer con estos nueve:
+1. Los 6 marcados "NO" hay que releerlos bien antes de descartarlos: puede haber quejas de citas sin ver.
+2. Perseo (Móstoles + Alcorcón) es UN solo contacto, no dos: comparten el mismo WhatsApp.
+3. A Medivet no merece la pena escribirle: es cadena, el de la clínica no decide.
+4. Si aun así se les quiere escribir, el mensaje NO puede hablar de citas perdidas.
 
-14. **PECUSAM DISTRIBUCIÓN ZOOSANITARIA SL**  `otro` — 4.2⭐ (29 reseñas)
-   - Fijo: `910 58 54 34`  ·  [Maps](https://www.google.com/maps/place/PECUSAM+DISTRIBUCI%C3%93N+ZOOSANITARIA+SL/data=!4m7!3m6!1s0xd418c159eeb39cd:0xac2ba3dcec7513a7!8m2!3d40.3091914!4d-3.8441369!16s%2Fg%2F11gflxy785!19sChIJzTnrnhWMQQ0RpxN17NyjK6w?authuser=0&hl=es&g_ep=EgoyMDI2MDkxNi4wIJJjKgBIAVAD&rclk=1)
-   - Web: https://www.pecusam.com/
+## Orden de ataque
+1. Intercan — dolor exacto, nota altísima que cuidar
+2. Mundo Animal — lío de agenda evidente
+3. Mascotas Borneo — sin web, el WhatsApp es su única puerta
+4. Mascolife — fácil, pequeño
+5. Clínica Mascotas — con cuidado, terreno delicado
 
-
-## Números repetidos (mismo interlocutor, un solo mensaje)
-
-- `+34606748796` → Clínica Veterinaria Perseo Móstoles · Clinica Veterinaria Perseo Alcorcón
+## Aviso legal
+Escribir por WhatsApp a un negocio ofreciéndole algo es comunicación comercial. Si contestan que no,
+se para y no se insiste. Y no se manda el mismo mensaje en bloque el mismo día.
