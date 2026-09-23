@@ -3155,3 +3155,53 @@ O sea: **el valor de la skill no esta en las quejas, esta en la puerta del Whats
 en no repetir contactos.** Y el mejor objetivo no es la clinica con local: es el
 autonomo con un movil, donde el que contesta es el que decide.
 Si se sigue atacando clinicas por queja, hay que contar con encontrar una por ciudad.
+
+## 2026-09-23 · Veterinarias en Villaviciosa de Odon (primera busqueda pedida por Ricardo)
+
+Primera vez que Ricardo lanza la skill el solo ("Busca veterinarias en Villaviciosa de
+Odon"). Resultado honesto: **1 lead, y ni siquiera esta en Villaviciosa**.
+
+### Lo que la primera pasada habria hecho, y es grave
+La lista de "4 con queja aprovechable" incluia:
+- **La Flaca del Bosque**, que es un BAR ("una experiencia horrible con la camarera Debi,
+  pregunte por el pincho"). Le habriamos ofrecido una recepcionista para su clinica.
+- **Guaw**, tienda de animales.
+- **Clinica Medicodon**, que Google clasifica como "Clinica especializada", no veterinaria.
+
+### La causa era de diseno, no un despiste
+Solo sabia DESCARTAR: una lista negra de palabras (peluqueria canina, crematorio, taxi).
+Si el negocio no llevaba ninguna, entraba. **Nunca comprobaba que SI fuera veterinario.**
+Es la diferencia entre "no he visto nada raro" y "he comprobado que es lo que busco".
+
+Google tenia la respuesta escrita en cada ficha y no la leia: `Restaurante`,
+`Tienda de animales`, `Veterinario`. Ahora la categoria de Google es **requisito
+positivo**. La lista negra se queda como segunda red. Si Google no da categoria, NO se
+descarta: se queda como candidata (nada en silencio, tampoco por falta de dato).
+Caza en esta busqueda: mayorista de medicamentos, servicio de distribucion, clinica de
+fisioterapia, laboratorio de analisis y tienda de animales.
+
+### Otros tres fallos propios de esta tanda
+1. **La categoria intermedia contaba como gancho.** `reparte_quejas` guardaba 'fuerte' Y
+   'media'. Asi paso una queja de "tarifas hospitalarias exorbitantes" como si fuera de
+   citas. Ahora SOLO 'fuerte' cuenta; las dudosas van a `notas`, visibles, con su texto.
+   En Aluche eso movio 25 quejas fuera del recuento y dejo la que si es nuestra.
+2. **El municipio era el buscado, no el real.** Maps devuelve lo de alrededor: Clinica
+   Veterinaria Aluche esta en Madrid y salia etiquetada como Villaviciosa. Si le escribes
+   diciendo que la viste en Villaviciosa, te delatas en la primera linea. Ahora sale de SU
+   direccion, con aviso en `motivo_grupo`.
+3. **Un `\b` mal escapado se convirtio en un caracter de RETROCESO (0x08)** dentro de la
+   expresion regular del codigo postal: buscaba literalmente una tecla de borrar y no
+   casaba nunca. El parche "se aplico" y el fichero compilaba. Lo caza mirar el fichero
+   con `cat -A`, no `ast.parse`. De paso: 602 finales de linea de Windows metidos por mis
+   idas y venidas con scp, limpiados.
+
+### Resultado
+41 negocios · 29 candidatas · 5 cadenas · 7 de otro negocio · 5 con WhatsApp ·
+**1 con queja aprovechable**: Clinica Veterinaria Aluche (+34622673139), **en Madrid**:
+"necesitaba cita para una segunda intervencion y ya fue imposible contactar con la
+veterinaria... es como si hubiera desaparecido".
+
+### Tercera medida de lo mismo
+Mostoles 3 de 20 · Alcorcon 1 de 9 · Villaviciosa 1 de 5 (y fuera del municipio).
+Frente a veterinarios a domicilio 4 de 8 y peluquerias de Villaviciosa 10 de 25.
+**Las clinicas veterinarias con local no dan leads por queja. Tres ciudades, tres veces.**
