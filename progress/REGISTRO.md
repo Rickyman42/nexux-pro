@@ -3205,3 +3205,51 @@ veterinaria... es como si hubiera desaparecido".
 Mostoles 3 de 20 · Alcorcon 1 de 9 · Villaviciosa 1 de 5 (y fuera del municipio).
 Frente a veterinarios a domicilio 4 de 8 y peluquerias de Villaviciosa 10 de 25.
 **Las clinicas veterinarias con local no dan leads por queja. Tres ciudades, tres veces.**
+
+## 2026-09-23 · La hoja y el maestro: sincronizacion en los dos sentidos
+
+DeepSeek aviso de que los contactos no aparecian en la hoja y pidio que se DEMOSTRARA
+que la Pi escribe en ella, no que se afirmara. Tenia razon en exigirlo, y el aviso
+destapo un fallo real -- aunque su diagnostico estaba al reves.
+
+### La prueba que pidio (hecha, no afirmada)
+Escribir una marca unica desde la Pi con la cuenta de servicio, releerla en
+docs.google.com y borrarla. La relectura sale de la exportacion publica, que NO usa la
+credencial: no puede mentir a favor.
+  1. ANTES: la marca no esta -> False
+  2. ESCRITO desde la Pi en la celda T2
+  3. RELEIDO en docs.google.com: la marca esta -> True
+  4. BORRADO y comprobado -> True
+
+### El fallo real, que era el contrario del que se pensaba
+La hoja NO fallaba al recibir. `hoja_google.py` **vaciaba la pestana entera y la
+reescribia**, asi que borraba lo que Ricardo o DeepSeek escribian a mano en las
+columnas de seguimiento. Los contactos "no estaban" porque se los llevaba por delante
+la siguiente pasada. La sincronizacion existia, pero iba en un solo sentido y pisaba
+el trabajo humano.
+
+Arreglado en dos piezas:
+1. **Antes de vaciar** se lee el seguimiento y se devuelve a su fila, cruzando por
+   nombre normalizado Y por cualquiera de sus telefonos. El dato del scraper manda en
+   las columnas del scraper; el humano manda en las suyas.
+2. **El "NO" de `contactado` no es un dato**: lo pone el scraper y solo significa "no
+   lo tengo en mi fichero". Un "SI" escrito por una persona sabe mas y gana.
+3. **Vuelta al maestro**: lo marcado en la hoja se escribe en `contactados.json`, que
+   es lo que el buscador consulta antes de dar un negocio por nuevo. Sin esto, marcar
+   "SI" en la hoja no impedia que saliera como nuevo en la siguiente ciudad.
+
+Prueba de punta a punta: escribir a mano -> verlo en docs.google.com -> reescribir la
+pestana ENTERA -> seguir viendolo. Primera vuelta: `escrito_el` y `que_dijo`
+sobrevivieron pero `contactado` volvia a "NO" (de ahi el arreglo 2). Segunda vuelta:
+VEREDICTO OK. Datos de prueba borrados despues, y comprobado que se fueron.
+
+### Lo que faltaba de verdad
+Los 13 contactos SI existian en `contactados.json` -- Coimbra, Veracruz, Villa Animal,
+AnagaVets, Vet2Go, 1 Click Vet, Barvet... -- pero nunca habian llegado a la hoja.
+Empujados a las cinco pestanas: domicilio 6, Mostoles 7, Alcorcon 3.
+
+### Nota de metodo
+Tres parches seguidos fallaron por lo mismo: los ficheros de la Pi llegaron con
+finales de linea de Windows por mis idas y venidas con scp, y ningun texto buscado
+casaba. Los patchers ahora normalizan CRLF antes de buscar y comprueban al final que
+no quedan ni CRLF ni caracteres de retroceso.
