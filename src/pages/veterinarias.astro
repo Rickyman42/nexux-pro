@@ -23,6 +23,10 @@ import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 
+// NO hay prueba gratis: se paga desde el primer dia y hay 30 dias para pedir la
+// devolucion (src/data/plans.ts). Esta pagina llego a prometer "7 dias de prueba
+// sin tarjeta", que era falso. Si cambia el precio o la garantia se cambia AQUI y
+// en plans.ts, que es el que manda.
 const MEDIDO = '22 de septiembre de 2026';
 const MUESTRA = { clinicas: 20, resenas: 921, malas: 423, deContacto: 3 };
 
@@ -73,7 +77,7 @@ const faq = [
   },
   {
     q: '¿Cuánto cuesta?',
-    a: '29 € al mes, con todo el equipo incluido. Siete días de prueba sin tarjeta.',
+    a: '29 € al mes, precio de lanzamiento congelado de por vida para los 50 primeros (después son 35). Sin cuota por persona y sin permanencia. No hay prueba gratis: se paga desde el primer día y tienes 30 días para pedir la devolución si no encaja. La demo sí la puedes probar sin dar ningún dato. Si necesitas agenda propia por profesional y fichas de clientes, ese es el plan Equipo, 79 €.',
   },
 ];
 
@@ -107,7 +111,7 @@ const jsonLd = {
 
 <Layout
   title="El WhatsApp de tu clínica veterinaria, contestado | Nexux"
-  description="Lara coge la cita mientras tú estás con un animal en la mesa. Contesta a las once de la noche, deja la cita puesta y no opina del animal. 29 €/mes, 7 días de prueba."
+  description="Lara coge la cita mientras tú estás con un animal en la mesa. Contesta a las once de la noche, deja la cita puesta y no opina del animal. 29 €/mes, sin cuota por persona, 30 días de garantía."
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
@@ -128,7 +132,7 @@ const jsonLd = {
           <a class="btn-primary" href="/demo?sector=veterinaria">Ver cómo contesta →</a>
           <a class="btn-ghost" href="#que-no-hace">Qué no hace</a>
         </div>
-        <p class="bajo-boton">29 € al mes · 7 días de prueba sin tarjeta</p>
+        <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
       </div>
     </section>
 
@@ -206,7 +210,7 @@ const jsonLd = {
         <a class="btn-primary grande" href="/demo?sector=veterinaria">
           Probar la demo para veterinarias →
         </a>
-        <p class="bajo-boton">29 € al mes, todo el equipo incluido · 7 días de prueba sin tarjeta</p>
+        <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
       </div>
     </section>
 
