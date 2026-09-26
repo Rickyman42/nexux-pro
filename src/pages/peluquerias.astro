@@ -1,0 +1,415 @@
+---
+// Aterrizaje del WhatsApp que Ricardo manda a las peluquerias.
+//
+// Tercera del juego, con veterinarias.astro y tatuajes.astro. Mismo diseno y mismo
+// orden: se entiende, se prueba, y despues viene la letra.
+//
+// El dolor de aqui NO es la velocidad. Se midio el 26-sep-2026: 837 resenas de 28
+// peluquerias leidas en orden NEUTRAL, y solo 15 llevan alguna queja; de cita, 4.
+// Decir "no contestais" seria mentira y el duenno lo sabe mejor que nosotros.
+//
+// Lo que si aparece es el HORARIO: una clienta alabando a una barberia por abrir en
+// domingo "porque el resto estaban todas cerradas". Esa es la pagina. No vendemos
+// contestar mas rapido: vendemos existir cuando la clienta puede.
+//
+// Las resenas van SIN nombre de negocio ni de persona.
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+// NO hay prueba gratis: se paga desde el primer dia y hay 30 dias para pedir la
+// devolucion (src/data/plans.ts). Esta pagina llego a prometer "7 dias de prueba
+// sin tarjeta", que era falso. Si cambia el precio o la garantia se cambia AQUI y
+// en plans.ts, que es el que manda.
+const MEDIDO = '26 de septiembre de 2026';
+const MUESTRA = { salones: 28, resenas: 837, conQueja: 15, deCita: 4, deHorario: 5 };
+
+const conversacion = [
+  { de: 'cliente', hora: '22:51', texto: 'Hola, ¿tenéis hueco para mechas esta semana? Salgo de trabajar a las siete.' },
+  { de: 'lara', hora: '22:51', texto: 'Buenas noches. Las mechas son unas dos horas, así que esta semana te puedo dar el jueves a las 17:00 o el sábado a las 9:30. ¿Alguna te viene bien?' },
+  { de: 'cliente', hora: '22:52', texto: 'El sábado a las 9:30' },
+  { de: 'lara', hora: '22:52', texto: 'Apuntado: sábado a las 9:30, mechas. Te aviso el viernes para que no se te pase.' },
+];
+
+const loQueHace = [
+  { n: '01', q: 'Existe cuando estáis cerradas', d: 'El domingo por la noche la clienta tiene el móvil en la mano y vosotras la persiana bajada. Ahí contesta ella.' },
+  { n: '02', q: 'Deja la hora puesta', d: 'Mira el hueco que de verdad tenéis, lo ofrece y lo apunta. No promete un tinte donde sólo cabe un corte.' },
+  { n: '03', q: 'Avisa el día antes', d: 'Un recordatorio la víspera y otro una hora antes, para que no se os quede el sillón vacío.' },
+];
+
+const noHace = [
+  ['No lleva tu caja ni tu material', 'Ni TPV, ni fichas de clienta, ni stock de tinte. Sólo los mensajes y la agenda de horas.'],
+  ['No decide por ti', 'Coge únicamente lo que tú le dejes coger. Lo raro, lo largo o lo dudoso te lo pasa marcado para que lo mires.'],
+  ['No atiende Instagram', 'Hoy contesta WhatsApp, Telegram y el chat de tu web. Instagram todavía no, y si por ahí te entra la mitad, esto te sirve a medias. Preferimos decírtelo ahora.'],
+  ['No te sirve si tienes pocos mensajes', 'Si vas contestando sin agobio, esto no te cambia nada.'],
+];
+
+const faq = [
+  {
+    q: '¿Y si la clienta pide algo que no cabe?',
+    a: 'Lara sabe cuánto dura cada cosa, así que no mete unas mechas de dos horas en un hueco ' +
+       'de media. Si lo que pide no entra esa semana, le ofrece lo que sí hay. Y lo raro o lo ' +
+       'dudoso no lo decide: te lo pasa marcado para que lo mires tú.',
+  },
+  {
+    q: '¿Sustituye a mi agenda o a Booksy?',
+    a: 'No hace falta que la sustituya. Lara se ocupa de los mensajes y de apuntar la hora; si ' +
+       'ya llevas tu agenda a tu manera, sigue igual. Lo que cambia es que dejas de mirar el ' +
+       'móvil entre clienta y clienta. Y no cobramos comisión por hora dada.',
+  },
+  {
+    q: '¿De verdad las peluquerías contestáis mal?',
+    a: `No, y lo decimos aunque juegue en nuestra contra. El ${MEDIDO} leímos ` +
+       `${MUESTRA.resenas} reseñas de ${MUESTRA.salones} peluquerías en orden normal: sólo ` +
+       `${MUESTRA.conQueja} llevan alguna queja, y de pedir hora sólo ${MUESTRA.deCita}. ` +
+       'Vuestras clientas no se quejan de que no contestéis. Lo que sí aparece es el horario: ' +
+       'que cuando ellas pueden, vosotras estáis cerradas.',
+  },
+  {
+    q: '¿Y el domingo, o de noche?',
+    a: 'Es cuando más sirve. Tu clienta mira el móvil el domingo por la noche, que es cuando ' +
+       'tiene tiempo, y tú abres el martes. Lara le da la hora en ese momento y tú te la ' +
+       'encuentras apuntada al abrir, en vez de un mensaje de hace día y medio.',
+  },
+  {
+    q: '¿Cuánto cuesta?',
+    a: '29 € al mes, precio de lanzamiento congelado de por vida para los 50 primeros (después son 35). Sin cuota por persona y sin permanencia. No hay prueba gratis: se paga desde el primer día y tienes 30 días para pedir la devolución si no encaja. La demo sí la puedes probar sin dar ningún dato. Si necesitas agenda propia por profesional y fichas de clientes, ese es el plan Equipo, 79 €.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'FAQPage',
+      '@id': 'https://nexux.pro/peluquerias#faq',
+      mainEntity: faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+    {
+      '@type': 'WebPage',
+      '@id': 'https://nexux.pro/peluquerias',
+      url: 'https://nexux.pro/peluquerias',
+      name: 'Recepcionista IA para peluquerías',
+      description:
+        'Lara coge la hora en el WhatsApp de tu peluquería cuando el salón está cerrado ' +
+        'y te la deja apuntada para cuando abras.',
+      inLanguage: 'es',
+      isPartOf: { '@id': 'https://nexux.pro/#website' },
+      about: { '@type': 'Thing', name: 'Recepcionista IA para peluquerías' },
+    },
+  ],
+};
+---
+
+<Layout
+  title="Tu clienta escribe el domingo y tú abres el martes | Nexux"
+  description="Lara coge la hora en tu WhatsApp cuando el salón está cerrado y te la deja apuntada para cuando abras. 29 €/mes, sin comisión por cita, 30 días de garantía."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <Nav />
+
+  <main>
+
+    <!-- ── Lo primero que se ve en el móvil ─────────────────────────── -->
+    <section class="hero">
+      <div class="container-nx hero-in">
+        <span class="eyebrow">Para peluquerías y centros de estética</span>
+        <h1 class="h-display">Tu clienta escribe el domingo. <em>Tú abres el martes.</em></h1>
+        <p class="hero-sub">
+          Lara le da la hora a las once de la noche y te la deja apuntada
+          para cuando levantes la persiana.
+        </p>
+        <div class="acciones">
+          <a class="btn-primary" href="/demo?sector=peluqueria">Ver cómo contesta →</a>
+          <a class="btn-ghost" href="#que-no-hace">Qué no hace</a>
+        </div>
+        <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
+      </div>
+    </section>
+
+    <!-- ── Se entiende sin leer ─────────────────────────────────────── -->
+    <section class="section bg-deep">
+      <div class="container-nx">
+        <p class="eyebrow centrado">Un martes a las 23:14</p>
+        <div class="chat">
+          {conversacion.map((m) => (
+            <div class={`burbuja ${m.de}`}>
+              <p>{m.texto}</p>
+              <span class="hora">{m.hora}</span>
+            </div>
+          ))}
+          <div class="confirmado">Cita de mañana a las 10:30 puesta en el calendario</div>
+        </div>
+        <p class="pie-chat">Ese mensaje, sin Lara, lo lees mañana a las nueve.</p>
+      </div>
+    </section>
+
+    <!-- ── Tres cosas ───────────────────────────────────────────────── -->
+    <section class="section">
+      <div class="container-nx">
+        <div class="tres">
+          {loQueHace.map((c) => (
+            <div class="tarjeta">
+              <span class="num">{c.n}</span>
+              <h3>{c.q}</h3>
+              <p>{c.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Una sola voz real ────────────────────────────────────────── -->
+    <section class="section bg-deep">
+      <div class="container-nx estrecho">
+        <blockquote class="cita">
+          “No se necesita pedir cita con antelación y está abierta un domingo.
+          El resto de peluquerías a las que voy normalmente estaban todas cerradas…”
+        </blockquote>
+        <p class="fuente">
+          Reseña pública de Google sobre una peluquería de Móstoles, leída el
+          {' '}{MEDIDO} en orden normal, sin ir a buscar las malas. No es una queja:
+          es una clienta explicando por qué se fue a otro sitio. Sin el nombre del
+          negocio: no señalamos a uno para venderle a otro.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── Qué NO hace ──────────────────────────────────────────────── -->
+    <section class="section" id="que-no-hace">
+      <div class="container-nx estrecho">
+        <h2 class="h-section">Lo que no hace</h2>
+        <p class="intro">Te lo decimos antes, no después de que lo pruebes.</p>
+        <dl class="nohace">
+          {noHace.map(([t, d]) => (
+            <div>
+              <dt>{t}</dt>
+              <dd>{d}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <!-- ── Cerrar ───────────────────────────────────────────────────── -->
+    <section class="section cierre">
+      <div class="container-nx estrecho centrado">
+        <h2 class="h-section">Escríbele como si fueras un cliente tuyo</h2>
+        <p class="intro">
+          Pídele hora para unas mechas, como si fueras tu clienta un domingo por la noche.
+          Mira qué contesta. Sin registrarte.
+        </p>
+        <a class="btn-primary grande" href="/demo?sector=peluqueria">
+          Probar la demo para peluquerías →
+        </a>
+        <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
+      </div>
+    </section>
+
+    <!-- ── La letra, para quien la busque ───────────────────────────── -->
+    <section class="section letra">
+      <div class="container-nx estrecho">
+        <h2 class="h-section">Preguntas</h2>
+        {faq.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+
+        <details class="muestra">
+          <summary>De dónde sale el dato de esta página</summary>
+          <p>
+            El {MEDIDO} leímos <strong>{MUESTRA.resenas}</strong> reseñas de
+            {' '}<strong>{MUESTRA.salones}</strong> peluquerías de Móstoles y Villaviciosa
+            de Odón, en el orden normal de Google, sin ir a buscar las malas. De esas 837,
+            sólo <strong>{MUESTRA.conQueja}</strong> llevan alguna queja:
+            {' '}<strong>{MUESTRA.deHorario}</strong> hablan del horario,
+            {' '}<strong>{MUESTRA.deCita}</strong> de pedir hora y 2 del teléfono. El resto
+            son de precio, de trato o del resultado.
+          </p>
+          <p>
+            Lo decimos aunque juegue en nuestra contra: <strong>no vamos a escribirte que
+            las peluquerías no contestáis</strong>, porque lo hemos medido y no es verdad.
+            Lo que sí sale, y lo dice una clienta sola, es que cuando ella puede vosotras
+            estáis cerradas. Lo que no sabemos es cuánta gente escribe un domingo, no
+            recibe respuesta y se va a otro salón sin dejar reseña. Eso no lo hemos medido
+            y no vamos a fingir que sí.
+          </p>
+        </details>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .hero { padding: 4.5rem 0 3.5rem; }
+  @media (min-width: 768px) { .hero { padding: 7rem 0 5rem; } }
+  .hero-in { max-width: 760px; }
+  .hero h1 { margin: 1rem 0 1.25rem; }
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--nx-ink-muted);
+    max-width: 34ch;
+    line-height: 1.55;
+  }
+  @media (min-width: 768px) { .hero-sub { font-size: 1.3rem; max-width: 46ch; } }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .bajo-boton {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--nx-ink-faint);
+  }
+  .btn-primary.grande { padding: 1.1rem 2rem; font-size: 1.05rem; }
+
+  .estrecho { max-width: 640px; }
+  .centrado { text-align: center; }
+
+  /* ── conversación ─────────────────────────────────────────────── */
+  .chat {
+    max-width: 440px;
+    margin: 1.5rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .burbuja {
+    padding: 0.8rem 1rem 1.4rem;
+    border-radius: 1rem;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    max-width: 85%;
+  }
+  .burbuja.cliente {
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-line);
+    border-bottom-left-radius: 0.25rem;
+    align-self: flex-start;
+  }
+  .burbuja.lara {
+    background: var(--nx-magnet);
+    color: #fff;
+    border-bottom-right-radius: 0.25rem;
+    align-self: flex-end;
+  }
+  .burbuja .hora {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.5rem;
+    font-size: 0.68rem;
+    opacity: 0.65;
+    font-family: var(--nx-font-mono);
+  }
+  .confirmado {
+    align-self: center;
+    margin-top: 0.5rem;
+    background: var(--nx-magnet-halo);
+    border: 1px solid var(--nx-magnet);
+    color: var(--nx-magnet-deep);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .pie-chat {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+  }
+
+  /* ── tres tarjetas ────────────────────────────────────────────── */
+  .tres { display: grid; gap: 1.5rem; }
+  @media (min-width: 768px) { .tres { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
+  .tarjeta {
+    border-top: 2px solid var(--nx-magnet);
+    padding-top: 1.1rem;
+  }
+  .tarjeta .num {
+    font-family: var(--nx-font-mono);
+    font-size: 0.7rem;
+    color: var(--nx-magnet);
+    letter-spacing: 0.15em;
+  }
+  .tarjeta h3 {
+    font-family: var(--nx-font-serif);
+    font-size: 1.45rem;
+    font-weight: 400;
+    margin: 0.35rem 0 0.5rem;
+  }
+  .tarjeta p { color: var(--nx-ink-muted); font-size: 0.95rem; }
+
+  /* ── cita ─────────────────────────────────────────────────────── */
+  .cita {
+    font-family: var(--nx-font-serif);
+    font-size: 1.5rem;
+    line-height: 1.4;
+    border-left: 3px solid var(--nx-magnet);
+    padding-left: 1.25rem;
+  }
+  @media (min-width: 768px) { .cita { font-size: 1.9rem; } }
+  .fuente {
+    margin-top: 1.25rem;
+    padding-left: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--nx-ink-faint);
+    line-height: 1.5;
+  }
+
+  /* ── qué no hace ──────────────────────────────────────────────── */
+  .intro { color: var(--nx-ink-muted); margin: 0.75rem 0 2rem; }
+  .nohace { display: grid; gap: 1.4rem; }
+  .nohace dt {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+  .nohace dt::before {
+    content: '—';
+    color: var(--nx-magnet);
+    margin-right: 0.5rem;
+  }
+  .nohace dd { color: var(--nx-ink-muted); font-size: 0.95rem; padding-left: 1.4rem; }
+
+  .cierre { background: var(--nx-deep); }
+  .cierre .intro { margin-bottom: 2rem; }
+
+  /* ── la letra ─────────────────────────────────────────────────── */
+  .letra details {
+    border-bottom: 1px solid var(--nx-line);
+    padding: 1.1rem 0;
+  }
+  .letra summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .letra summary::-webkit-details-marker { display: none; }
+  .letra summary::after { content: '+'; color: var(--nx-magnet); font-size: 1.3rem; line-height: 1; }
+  .letra details[open] summary::after { content: '–'; }
+  .letra details p {
+    margin-top: 0.8rem;
+    color: var(--nx-ink-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .letra details p + p { margin-top: 0.8rem; }
+  .letra .muestra { border-bottom: none; }
+</style>
