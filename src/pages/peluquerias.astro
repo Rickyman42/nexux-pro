@@ -24,6 +24,12 @@ import Footer from '../components/Footer.astro';
 const MEDIDO = '26 de septiembre de 2026';
 const MUESTRA = { salones: 28, resenas: 837, conQueja: 15, deCita: 4, deHorario: 5 };
 
+// El momento y la confirmacion salen de aqui, NO del HTML: en el primer clon se
+// quedaron grabados los de la veterinaria y decian 'martes' en una pagina que
+// argumenta sobre el domingo.
+const MOMENTO = 'Un domingo a las 22:51';
+const CONFIRMADO = 'Sábado 9:30, mechas, puesto en el calendario';
+
 const conversacion = [
   { de: 'cliente', hora: '22:51', texto: 'Hola, ¿tenéis hueco para mechas esta semana? Salgo de trabajar a las siete.' },
   { de: 'lara', hora: '22:51', texto: 'Buenas noches. Las mechas son unas dos horas, así que esta semana te puedo dar el jueves a las 17:00 o el sábado a las 9:30. ¿Alguna te viene bien?' },
@@ -135,7 +141,7 @@ const jsonLd = {
     <!-- ── Se entiende sin leer ─────────────────────────────────────── -->
     <section class="section bg-deep">
       <div class="container-nx">
-        <p class="eyebrow centrado">Un martes a las 23:14</p>
+        <p class="eyebrow centrado">{MOMENTO}</p>
         <div class="chat">
           {conversacion.map((m) => (
             <div class={`burbuja ${m.de}`}>
@@ -143,7 +149,7 @@ const jsonLd = {
               <span class="hora">{m.hora}</span>
             </div>
           ))}
-          <div class="confirmado">Cita de mañana a las 10:30 puesta en el calendario</div>
+          <div class="confirmado">{CONFIRMADO}</div>
         </div>
         <p class="pie-chat">Ese mensaje, sin Lara, lo lees mañana a las nueve.</p>
       </div>

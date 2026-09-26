@@ -1,5 +1,7 @@
 ---
 import Layout from './Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 import CalculadoraCitas from '../components/CalculadoraCitas.astro';
 
 export interface Props {
@@ -71,6 +73,7 @@ const jsonldString = JSON.stringify({ '@context': 'https://schema.org', '@graph'
 ---
 
 <Layout title={`${title} | Nexux Pro`} description={description} canonical={canonical}>
+  <Nav />
   <script type="application/ld+json" slot="head" set:html={jsonldString} />
 
   <article class="blogpost section">
@@ -146,6 +149,7 @@ const jsonldString = JSON.stringify({ '@context': 'https://schema.org', '@graph'
       )}
     </div>
   </article>
+  <Footer />
 </Layout>
 
 <style>

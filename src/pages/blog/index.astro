@@ -1,5 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog')).sort(
@@ -8,6 +10,7 @@ const posts = (await getCollection('blog')).sort(
 ---
 
 <Layout title="Blog sobre atención y reservas con IA | Nexux" description="Guías sobre atención al cliente, reservas por WhatsApp y automatización para negocios con cita previa.">
+  <Nav />
   <section class="section blog-section">
     <div class="container-nx">
       <header class="blog-header">
@@ -35,6 +38,7 @@ const posts = (await getCollection('blog')).sort(
       </div>
     </div>
   </section>
+  <Footer />
 </Layout>
 
 <style>
