@@ -17,6 +17,16 @@ const VERTICALES = {
     titulo:  'Demo para clinicas veterinarias',
     sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir cita para mi perro', '¿Cuánto cuesta una vacunación?', '¿Tenéis hueco mañana?'],
   },
+  tatuajes: {
+    negocio: 'Estudio de Tatuaje Corvus',
+    titulo:  'Demo para estudios de tatuaje',
+    sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir cita para ver un diseño', '¿Cuánto cuesta un tatuaje pequeño?', '¿Tenéis hueco el sábado?'],
+  },
+  peluqueria: {
+    negocio: 'Peluqueria Aurora',
+    titulo:  'Demo para peluquerias',
+    sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir hora para un corte', '¿Cuánto cuestan unas mechas?', '¿Tenéis hueco el viernes por la tarde?'],
+  },
 };
 const sectorPedido = String(Astro.url.searchParams.get('sector') || '').toLowerCase();
 const sector  = VERTICALES[sectorPedido] ? sectorPedido : 'generico';
