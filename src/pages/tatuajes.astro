@@ -1,0 +1,418 @@
+---
+// Aterrizaje del WhatsApp que Ricardo manda a los estudios de tatuaje.
+//
+// Hermana de veterinarias.astro y con su mismo orden: primero se entiende QUE es
+// (la conversacion se lee sola), luego se prueba, y despues viene la letra.
+//
+// La diferencia con veterinarias es el DOLOR. Alli lo medimos y no existia: 3 de
+// 921 resenas. Aqui si existe y lo dicen ellos -- el presupuesto que no llega y la
+// cita que no hay manera de coger. Pero NO se publica ningun porcentaje: la mayoria
+// de esas fichas se leyeron "ordenadas por peor nota", que busca lo malo aposta, y
+// un porcentaje sacado de ahi saldria inflado. Se ensena lo que dicen, no cuantos
+// lo dicen. La cita que se publica es de una ficha leida en orden neutral.
+//
+// Lo que Lara NO hace va en la pagina y en primera fila, porque las dos objeciones
+// de un tatuador son evidentes: "el precio lo pongo yo" y "yo trabajo por Instagram".
+// Las dos son ciertas y se dicen antes de que las pregunten.
+//
+// Las resenas van SIN nombre de estudio ni de persona.
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+// NO hay prueba gratis: se paga desde el primer dia y hay 30 dias para pedir la
+// devolucion (src/data/plans.ts). Esta pagina llego a prometer "7 dias de prueba
+// sin tarjeta", que era falso. Si cambia el precio o la garantia se cambia AQUI y
+// en plans.ts, que es el que manda.
+const MEDIDO = '26 de septiembre de 2026';
+const MUESTRA = { estudios: 24, resenas: 807, tienen: 4562, malas: 162, conQueja: 8 };
+
+const conversacion = [
+  { de: 'cliente', hora: '23:41', texto: 'Buenas! Quería algo en el antebrazo, línea fina. ¿Cuánto me costaría?' },
+  { de: 'lara', hora: '23:41', texto: 'Buenas noches. El precio lo pone Iván al ver el diseño, que depende del tamaño y del detalle. Te dejo una consulta para verlo: el jueves a las 18:00 o el sábado a las 12:00.' },
+  { de: 'cliente', hora: '23:42', texto: 'El jueves a las 18:00' },
+  { de: 'lara', hora: '23:42', texto: 'Hecho, jueves a las 18:00 con Iván. ¿Me dices el tamaño más o menos y qué idea llevas, para que lo tenga apuntado?' },
+];
+
+const loQueHace = [
+  { n: '01', q: 'Contesta mientras tatúas', d: 'Estás cuatro horas con una sesión y el móvil boca abajo. Lara contesta en segundos, también a las once de la noche.' },
+  { n: '02', q: 'Deja la consulta puesta', d: 'Pregunta zona, tamaño e idea, ofrece los huecos que de verdad tienes y lo apunta en el calendario.' },
+  { n: '03', q: 'No se inventa el precio', d: 'El presupuesto lo pones tú al ver el diseño. Ella coge los datos y el hueco, y no dice cifras.' },
+];
+
+const noHace = [
+  ['No da presupuestos', 'El precio depende del diseño, del tamaño y de la zona. Eso lo miras tú. Si alguien pregunta cuánto vale, coge la consulta y te lo pasa.'],
+  ['No atiende Instagram', 'Hoy contesta WhatsApp, Telegram y el chat de tu web. Instagram no, y si la mayoría de tus encargos entran por ahí, esto te sirve a medias. Preferimos decírtelo ahora.'],
+  ['No lleva tu estudio', 'Ni consentimientos, ni fichas de cliente, ni material. Sólo los mensajes y la agenda de citas.'],
+  ['No te sirve si tienes pocos mensajes', 'Si vas contestando sin agobio, esto no te cambia nada.'],
+];
+
+const faq = [
+  {
+    q: '¿Va a dar precios por mí?',
+    a: 'No. Un tatuaje no tiene tarifa: depende del diseño, del tamaño, de la zona y de las ' +
+       'horas. Si alguien pregunta cuánto le costaría, Lara le explica que eso lo ves tú, le ' +
+       'deja una consulta y te apunta la idea y el tamaño. El precio sigue siendo tuyo.',
+  },
+  {
+    q: 'Yo trabajo por Instagram. ¿Me sirve?',
+    a: 'A medias, y te lo decimos de frente: hoy Lara contesta WhatsApp, Telegram y el chat ' +
+       'de tu web, pero Instagram no. Si todos tus encargos entran por DM, esto todavía no es ' +
+       'para ti. Si tienes un WhatsApp publicado y ahí se te acumulan los mensajes, sí.',
+  },
+  {
+    q: '¿Cuántos estudios tienen de verdad este problema?',
+    a: `No te vamos a dar un porcentaje, y el motivo está al final de la página. Leímos ` +
+       `${MUESTRA.resenas} reseñas de ${MUESTRA.estudios} estudios de Móstoles el ${MEDIDO}, y ` +
+       `en ${MUESTRA.conQueja} de ellos hay clientes contando que no consiguieron cita o que ` +
+       'esperaron semanas por un presupuesto. Pero fuimos a buscar las peores a propósito, así ' +
+       'que cualquier porcentaje que sacáramos de ahí estaría inflado. Preferimos enseñarte lo ' +
+       'que dicen y que juzgues tú.',
+  },
+  {
+    q: '¿Y mientras estoy tatuando?',
+    a: 'Es justo para eso. Una sesión son horas con el móvil boca abajo, y quien pregunta suele ' +
+       'estar preguntando a varios estudios a la vez. Lara contesta en el momento y te deja la ' +
+       'consulta puesta, en vez de que ese mensaje espere a que termines.',
+  },
+  {
+    q: '¿Cuánto cuesta?',
+    a: '29 € al mes, precio de lanzamiento congelado de por vida para los 50 primeros (después son 35). Sin cuota por persona y sin permanencia. No hay prueba gratis: se paga desde el primer día y tienes 30 días para pedir la devolución si no encaja. La demo sí la puedes probar sin dar ningún dato. Si necesitas agenda propia por profesional y fichas de clientes, ese es el plan Equipo, 79 €.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'FAQPage',
+      '@id': 'https://nexux.pro/tatuajes#faq',
+      mainEntity: faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+    {
+      '@type': 'WebPage',
+      '@id': 'https://nexux.pro/tatuajes',
+      url: 'https://nexux.pro/tatuajes',
+      name: 'Recepcionista IA para estudios de tatuaje',
+      description:
+        'Lara contesta el WhatsApp de tu estudio de tatuaje y deja la consulta puesta ' +
+        'mientras tú estás tatuando. No da presupuestos: el precio lo pones tú.',
+      inLanguage: 'es',
+      isPartOf: { '@id': 'https://nexux.pro/#website' },
+      about: { '@type': 'Thing', name: 'Recepcionista IA para estudios de tatuaje' },
+    },
+  ],
+};
+---
+
+<Layout
+  title="El WhatsApp de tu estudio de tatuaje, contestado | Nexux"
+  description="Lara contesta el WhatsApp de tu estudio mientras tú estás tatuando. Deja la consulta puesta y no da precios: el presupuesto sigue siendo tuyo. 29 €/mes, sin cuota por persona, 30 días de garantía."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <Nav />
+
+  <main>
+
+    <!-- ── Lo primero que se ve en el móvil ─────────────────────────── -->
+    <section class="hero">
+      <div class="container-nx hero-in">
+        <span class="eyebrow">Para estudios de tatuaje</span>
+        <h1 class="h-display">Te escriben mientras tatúas. <em>Que conteste ella.</em></h1>
+        <p class="hero-sub">
+          Lara deja la consulta puesta mientras tú estás con una sesión de cuatro horas.
+          El precio lo sigues poniendo tú.
+        </p>
+        <div class="acciones">
+          <a class="btn-primary" href="/demo?sector=tatuajes">Ver cómo contesta →</a>
+          <a class="btn-ghost" href="#que-no-hace">Qué no hace</a>
+        </div>
+        <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
+      </div>
+    </section>
+
+    <!-- ── Se entiende sin leer ─────────────────────────────────────── -->
+    <section class="section bg-deep">
+      <div class="container-nx">
+        <p class="eyebrow centrado">Un martes a las 23:14</p>
+        <div class="chat">
+          {conversacion.map((m) => (
+            <div class={`burbuja ${m.de}`}>
+              <p>{m.texto}</p>
+              <span class="hora">{m.hora}</span>
+            </div>
+          ))}
+          <div class="confirmado">Cita de mañana a las 10:30 puesta en el calendario</div>
+        </div>
+        <p class="pie-chat">Ese mensaje, sin Lara, lo lees mañana a las nueve.</p>
+      </div>
+    </section>
+
+    <!-- ── Tres cosas ───────────────────────────────────────────────── -->
+    <section class="section">
+      <div class="container-nx">
+        <div class="tres">
+          {loQueHace.map((c) => (
+            <div class="tarjeta">
+              <span class="num">{c.n}</span>
+              <h3>{c.q}</h3>
+              <p>{c.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Una sola voz real ────────────────────────────────────────── -->
+    <section class="section bg-deep">
+      <div class="container-nx estrecho">
+        <blockquote class="cita">
+          “Nos tiramos meses para conseguir concertar cita, a pesar de que publicaban
+          constantemente en redes sociales que tenían huecos disponibles…”
+        </blockquote>
+        <p class="fuente">
+          Reseña pública de Google sobre un estudio de tatuaje de Móstoles, leída el
+          {' '}{MEDIDO} en orden normal, sin ir a buscar las malas. Sin el nombre del
+          estudio: no señalamos a un negocio para venderle a otro.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── Qué NO hace ──────────────────────────────────────────────── -->
+    <section class="section" id="que-no-hace">
+      <div class="container-nx estrecho">
+        <h2 class="h-section">Lo que no hace</h2>
+        <p class="intro">Te lo decimos antes, no después de que lo pruebes.</p>
+        <dl class="nohace">
+          {noHace.map(([t, d]) => (
+            <div>
+              <dt>{t}</dt>
+              <dd>{d}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <!-- ── Cerrar ───────────────────────────────────────────────────── -->
+    <section class="section cierre">
+      <div class="container-nx estrecho centrado">
+        <h2 class="h-section">Escríbele como si fueras un cliente tuyo</h2>
+        <p class="intro">
+          Pregúntale cuánto te costaría un tatuaje, un domingo a las once de la noche.
+          Mira cómo lo resuelve sin perder al cliente. Sin registrarte.
+        </p>
+        <a class="btn-primary grande" href="/demo?sector=tatuajes">
+          Probar la demo para estudios de tatuaje →
+        </a>
+        <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
+      </div>
+    </section>
+
+    <!-- ── La letra, para quien la busque ───────────────────────────── -->
+    <section class="section letra">
+      <div class="container-nx estrecho">
+        <h2 class="h-section">Preguntas</h2>
+        {faq.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+
+        <details class="muestra">
+          <summary>De dónde sale el dato de esta página</summary>
+          <p>
+            El {MEDIDO} leímos reseñas de {MUESTRA.estudios} estudios de tatuaje de
+            Móstoles: <strong>{MUESTRA.resenas}</strong> reseñas distintas de las
+            {' '}<strong>{MUESTRA.tienen}</strong> que tienen entre todos, y
+            {' '}<strong>{MUESTRA.malas}</strong> de ellas son de tres estrellas o menos.
+            En <strong>{MUESTRA.conQueja}</strong> estudios hay clientes contando que no
+            consiguieron cita o que esperaron semanas por un presupuesto.
+          </p>
+          <p>
+            Y ahora lo que casi nadie pone en una página como esta: <strong>no vamos a
+            darte un porcentaje</strong>. La mayoría de esas fichas las leímos ordenadas
+            por las peores notas, o sea buscando lo malo a propósito, así que cualquier
+            porcentaje que sacáramos estaría inflado. La reseña de más arriba sí está
+            leída en orden normal. Y tampoco sabemos cuánta gente pregunta, no recibe
+            respuesta y se tatúa en otro sitio sin escribir nada. Eso no lo hemos medido
+            y no vamos a fingir que sí.
+          </p>
+        </details>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .hero { padding: 4.5rem 0 3.5rem; }
+  @media (min-width: 768px) { .hero { padding: 7rem 0 5rem; } }
+  .hero-in { max-width: 760px; }
+  .hero h1 { margin: 1rem 0 1.25rem; }
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--nx-ink-muted);
+    max-width: 34ch;
+    line-height: 1.55;
+  }
+  @media (min-width: 768px) { .hero-sub { font-size: 1.3rem; max-width: 46ch; } }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .bajo-boton {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--nx-ink-faint);
+  }
+  .btn-primary.grande { padding: 1.1rem 2rem; font-size: 1.05rem; }
+
+  .estrecho { max-width: 640px; }
+  .centrado { text-align: center; }
+
+  /* ── conversación ─────────────────────────────────────────────── */
+  .chat {
+    max-width: 440px;
+    margin: 1.5rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .burbuja {
+    padding: 0.8rem 1rem 1.4rem;
+    border-radius: 1rem;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    max-width: 85%;
+  }
+  .burbuja.cliente {
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-line);
+    border-bottom-left-radius: 0.25rem;
+    align-self: flex-start;
+  }
+  .burbuja.lara {
+    background: var(--nx-magnet);
+    color: #fff;
+    border-bottom-right-radius: 0.25rem;
+    align-self: flex-end;
+  }
+  .burbuja .hora {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.5rem;
+    font-size: 0.68rem;
+    opacity: 0.65;
+    font-family: var(--nx-font-mono);
+  }
+  .confirmado {
+    align-self: center;
+    margin-top: 0.5rem;
+    background: var(--nx-magnet-halo);
+    border: 1px solid var(--nx-magnet);
+    color: var(--nx-magnet-deep);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .pie-chat {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--nx-ink-muted);
+    font-size: 1.05rem;
+  }
+
+  /* ── tres tarjetas ────────────────────────────────────────────── */
+  .tres { display: grid; gap: 1.5rem; }
+  @media (min-width: 768px) { .tres { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
+  .tarjeta {
+    border-top: 2px solid var(--nx-magnet);
+    padding-top: 1.1rem;
+  }
+  .tarjeta .num {
+    font-family: var(--nx-font-mono);
+    font-size: 0.7rem;
+    color: var(--nx-magnet);
+    letter-spacing: 0.15em;
+  }
+  .tarjeta h3 {
+    font-family: var(--nx-font-serif);
+    font-size: 1.45rem;
+    font-weight: 400;
+    margin: 0.35rem 0 0.5rem;
+  }
+  .tarjeta p { color: var(--nx-ink-muted); font-size: 0.95rem; }
+
+  /* ── cita ─────────────────────────────────────────────────────── */
+  .cita {
+    font-family: var(--nx-font-serif);
+    font-size: 1.5rem;
+    line-height: 1.4;
+    border-left: 3px solid var(--nx-magnet);
+    padding-left: 1.25rem;
+  }
+  @media (min-width: 768px) { .cita { font-size: 1.9rem; } }
+  .fuente {
+    margin-top: 1.25rem;
+    padding-left: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--nx-ink-faint);
+    line-height: 1.5;
+  }
+
+  /* ── qué no hace ──────────────────────────────────────────────── */
+  .intro { color: var(--nx-ink-muted); margin: 0.75rem 0 2rem; }
+  .nohace { display: grid; gap: 1.4rem; }
+  .nohace dt {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+  .nohace dt::before {
+    content: '—';
+    color: var(--nx-magnet);
+    margin-right: 0.5rem;
+  }
+  .nohace dd { color: var(--nx-ink-muted); font-size: 0.95rem; padding-left: 1.4rem; }
+
+  .cierre { background: var(--nx-deep); }
+  .cierre .intro { margin-bottom: 2rem; }
+
+  /* ── la letra ─────────────────────────────────────────────────── */
+  .letra details {
+    border-bottom: 1px solid var(--nx-line);
+    padding: 1.1rem 0;
+  }
+  .letra summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .letra summary::-webkit-details-marker { display: none; }
+  .letra summary::after { content: '+'; color: var(--nx-magnet); font-size: 1.3rem; line-height: 1; }
+  .letra details[open] summary::after { content: '–'; }
+  .letra details p {
+    margin-top: 0.8rem;
+    color: var(--nx-ink-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .letra details p + p { margin-top: 0.8rem; }
+  .letra .muestra { border-bottom: none; }
+</style>
