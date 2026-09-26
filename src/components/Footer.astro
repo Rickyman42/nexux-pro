@@ -26,14 +26,13 @@
         </p>
 
         {/*
-          Solo se enlaza lo que se ha comprobado que existe (26-sep-2026).
-          Facebook: facebook.com/nexux.pro -> abre y es la pagina buena ("Nexux.pro",
-          empresa de software, info@nexux.pro). Enlazado.
-          Instagram: instagram.com/nexux.pro -> "Profile no esta disponible", y Google no
-          tiene ni rastro del perfil. NO se enlaza: un icono que lleva a una pagina que no
-          existe es peor que no ponerlo, y ademas ese mismo enlace esta en el sameAs de
-          Layout.astro, donde un enlace muerto rompe la senal de entidad. Cuando el perfil
-          abra, se descomenta la linea de abajo y se revisa el sameAs.
+          Solo se enlaza lo que se ha comprobado que abre (26-sep-2026).
+          Facebook : facebook.com/nexux.pro -> "Nexux.pro", empresa de software.
+          Instagram: OJO, el handle es nexuxpro SIN punto. El de antes, nexux.pro, lo
+          INHABILITO Meta de forma permanente por publicar mucho y muy rapido, y llego a
+          estar en el sameAs apuntando a la nada. El nuevo si abre: "Nexux.pro (@nexuxpro)".
+          Si algun dia vuelve a caer, esto se comenta otra vez Y se quita del sameAs de
+          Layout.astro: una senal de entidad rota es peor que no tenerla.
         */}
         <div class="footer-social">
           <a href="https://www.facebook.com/nexux.pro" target="_blank" rel="noopener me"
@@ -42,8 +41,7 @@
               <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/>
             </svg>
           </a>
-          {/*
-          <a href="https://www.instagram.com/nexux.pro" target="_blank" rel="noopener me"
+          <a href="https://www.instagram.com/nexuxpro" target="_blank" rel="noopener me"
              aria-label="Nexux Pro en Instagram" data-track="footer_instagram">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <rect x="2" y="2" width="20" height="20" rx="5"/>
@@ -51,7 +49,6 @@
               <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
             </svg>
           </a>
-          */}
         </div>
       </div>
 
