@@ -3253,3 +3253,133 @@ Tres parches seguidos fallaron por lo mismo: los ficheros de la Pi llegaron con
 finales de linea de Windows por mis idas y venidas con scp, y ningun texto buscado
 casaba. Los patchers ahora normalizan CRLF antes de buscar y comprueban al final que
 no quedan ni CRLF ni caracteres de retroceso.
+
+2026-09-23 | verificador | informe neutro de la venta por WhatsApp al vertical veterinario (11 envios, 4 respuestas humanas = 36%, 0 ventas) + verificacion de la sincronizacion hoja<->maestro y correccion de Coimbra | progress/INFORME-VENTAS-WA-VETERINARIAS-20260923.md | OK
+
+2026-09-24 | busca.py | tres arreglos con control. (1) AVISO cuando la lectura guardada de
+Maps no trae categoria: el filtro que exige que Google lo llame "Veterinario" estaba APAGADO
+en silencio -- por ahi se colo la podologa "Clinica las Retamas" el 23-sep. Control positivo:
+Alcorcon (datos del 22-sep, 0/47 con categoria) avisa; negativo: Leganes (23-sep, 100%) no.
+(2) normaliza_fijo: un FIJO tambien puede tener WhatsApp Business. Se tiraban todos. 15
+recuperadas entre los cinco municipios, 9/9 controles del normalizador incluidos los que
+deben devolver None (moviles y el id de IONOS 786167780). Medido a mano antes de codear:
+4 de 10 fijos de Fuenlabrada tenian perfil, y el codigo reprodujo exactamente esas 4.
+(3) "mivet" anadida a cadenas: dos centros de MiVet estaban en la hoja de Leganes (16 -> 14).
+Barrido previo: afecta a esos 2 y a nadie mas. Maestro: Los Cantos pasa de DESCARTADA a
+RECUPERADA (fijo 916 43 18 92, perfil "Los Cantos Vet"). | nexux-verify 5/5 | OK
+
+2026-09-24 | leads | Leganes Norte contesta con un automatico que dice literalmente que CIERRAN
+WhatsApp "ya que el volumen de mensajes no nos permite ofrecer la atencion que vuestras mascotas
+merecen". Es el problema que vendemos, medido y admitido por escrito por el propio prospecto, y
+resuelto amputando el canal. Aviso fechado el 16 de enero y todavia puesto: ~8 meses. Derivan
+urgencias a ERVET, SIMBIOSIS y VETSIA. Con esto ya son TRES clinicas de dos municipios (Parque
+Grande y Centauro en Alcorcon, Leganes Norte en Leganes) que derivan a ERVET: refuerza que ERVET
+es una venta aparte y mayor. Tercer MiVet cazado en la hoja de Leganes (vereda.mivet.com): el
+filtro de cadenas no buscaba marcas de 5 letras en la web. Leganes 14 -> 13, Alcorcon cerrado. | OK
+
+2026-09-24 | prueba de cliente | El Naranjo (Fuenlabrada) contesta en 2 MINUTOS con la clinica
+cerrada: enviado 13:52, dos automaticos a las 13:52 y humano a las 13:54. Es el tiempo mas rapido
+medido de la campana (el anterior eran los 12 min de Iberivet). Queda descartado para el angulo de
+"no contestais" y fuera de la tanda de Fuenlabrada del lunes. Dato aparte: tienen automatico de
+bienvenida Y de ausencia y aun asi entro una persona a mano, saludando con "buenos dias" a las
+13:54 y con tres interrogantes - contesta un humano en su hora de comer, no un sistema. | OK
+
+2026-09-24 | posicionamiento | Correccion de Ricardo: el producto NO se vende como "contestamos
+cuando tu no puedes". Se vende como "no tienes que estar con el movil en la mano, esta automatizado".
+Consecuencia directa: una clinica que contesta RAPIDO no es un lead descartado, es un lead bueno con
+otro angulo. El Naranjo contestando en 2 minutos con la clinica cerrada, con una persona entrando a
+mano a las 13:54 despues de dos automaticos, es la demostracion del problema, no su refutacion. Yo
+lo habia apuntado como DESCARTADO: corregido en el maestro y en la cola. Aplica igual a Iberivet
+(12 min a las 21:58), Timanfaya, Centauro, Vetclan y vetMadrid. | OK
+
+2026-09-24 | video | El anuncio publicado en nexux.pro/video/anuncio.mp4 (4,2 MB) NO lleva la
+narracion, y no es un fallo: mezclar.py tiene una opcion --sin-voz que genera "la version para la
+web" y es esa la que esta subida. Solo lleva musica. El que se manda a un cliente por WhatsApp es
+ANUNCIO-56s-VOZ-HUMANA.mp4 (10,6 MB, voz humana), que tiene Ricardo en Windows en Downloads.
+PENDIENTE: le faltan los subtitulos - importante porque en WhatsApp se ve mucho sin sonido. | OK
+
+2026-09-24 | venta | El unico mensaje del dia con reaccion inmediata fue el que NO vendia nada:
+a Carlos (San Anton) se le aviso de que el WhatsApp que publican en Google no es el que dan para
+citas, con un "se arregla en dos minutos, lo mio aparte". Reacciono con dos pulgares arriba a los
+5 minutos (19:01 -> 19:06). Antes, a las 16:32, se le habia mandado el video con subtitulos y no
+hubo respuesta. Regalar un arreglo real funciona mejor que ofrecer el producto. | OK
+
+2026-09-24 | vertical nuevo | Ricardo trae una tarjeta de NINDANSALUD13 (masajista deportivo,
+osteopata, rehabilitacion, quiromasaje, maderoterapia, a domicilio, 687151813) y propone probar.
+Cae en el vertical de SALUD HUMANA que el mismo bloqueo el 22-sep por RGPD art.9. Matiz que
+importa: escribirle a ella no es el problema, VENDERLE si -- si compra, Lara empieza a recibir
+motivos de consulta de sus pacientes, y eso es dato de salud. Acordado: solo prueba de cliente
+desde el numero personal, para medir el vertical sin exponerse. El mensaje de empresa queda
+bloqueado hasta resolver el art.9. Su wa.me da SIN PERFIL: hay que abrir el chat antes. | OK
+
+2026-09-24 | decision | Ricardo decide vender a NINDANSALUD13 (osteopata/rehabilitacion a domicilio)
+saltandose el bloqueo de salud humana que el mismo puso el 22-sep por RGPD art.9. Se lo avise una vez
+y lo reafirmo. IMPORTANTE para quien lea esto despues: el bloqueo de verticales.json SIGUE ACTIVO en
+busca.py; esto es una excepcion puntual a mano sobre un contacto llegado por tarjeta de visita, NO un
+desbloqueo del vertical. El riesgo no es escribirle: es que si compra, Lara empieza a recibir motivos
+de consulta de sus pacientes. | PENDIENTE: el art.9 sigue sin resolver |
+
+2026-09-24 | decision | APARCADOS los objetivos grandes: ERVET y las cadenas (MiVet, Canitas,
+AniCura, Kivet, Medivet, Mascotiti...). Decision de Ricardo: no hay infraestructura para servirlos
+ni los contactos de quien decide, y llegar sin cartera es quemar el contacto. NO volver a
+proponerlos -- yo saque ERVET tres veces el mismo dia.
+
+CONDICION PARA DESAPARCARLOS (las tres, no una):
+ 1. Al menos 3 clientes veterinarios PAGANDO y funcionando.
+ 2. Un caso medido que se pueda ensenar: citas cogidas fuera de horario por uno de ellos, con
+    numeros reales, no supuestos.
+ 3. Resuelto quien decide en cada cadena (razon social en Maps -> BORME, o pagina de franquicias),
+    porque el mostrador de una sede no compra.
+
+Mientras tanto: municipios de la zona sur, uno a uno, clinica de barrio.
+
+## 2026-09-25 (madrugada) - cola de envios del viernes lista
+
+Faltaban por escribir 5 mensajes de empresa. Ya estan en el maestro, listos para copiar:
+
+- Vets Friends: contestan de lujo fuera de horario -> quien lo contesta y a que hora.
+- SOJOVET (a domicilio): el telefono es su recepcion entera y va con el en el coche.
+- La Serna: angulo regalo, el mismo que funciono con San Anton (su WhatsApp publico reenvia a otro numero).
+- Puppy Guau: cierran a mediodia y nadie lee el WhatsApp de 14 a 17. Prueba cerrada sin respuesta.
+- Europa: escrito, pero NO se manda sin abrir antes el chat por si contesto.
+
+Cuidado en los cinco: ninguno menciona nada que solo se sepa por la prueba de cliente
+(horas exactas, el precio de 45 EUR de SOJOVET, el numero al que reenvia La Serna).
+
+Quedan sin mensaje y a proposito: San Anton (no insistir), San Esteban y Leganes Norte
+(ya contestados por Ricardo), Iodocat (hasta el martes), Iberivet (semana del 29-sep),
+Exoticos (visita en persona, no tiene WhatsApp) y ERVET (aparcado).
+
+## 2026-09-25 09:5x - Norivet contesto, derivado a "el responsable"
+
+Clinica Veterinaria Norivet (Leganes, +34684366280), escrita ayer 13:08. Respuesta 20h
+despues: "Hola" (9:56) y "lo pasamos al responsable. Gracias" (9:57). Ni pregunta ni
+rechaza: alguien filtra antes de que lo vea quien decide.
+
+Accion: NO insistir hoy. Si el responsable no escribe en 2-3 dias (revisar sobre el
+27/28-sep), un mensaje corto preguntando si lo vio. Sin video todavia.
+
+## 2026-09-25 ~12:00 - los 8 mensajes de empresa del viernes, ENVIADOS
+
+El Naranjo, AnimaLur, Puppy Guau, Vet's Friends, SOJOVET, Europa, La Serna y
+NINDANSALUD13. AnimaLur: automatico a las 11:42 (alto volumen de consultas) y el perfil
+queda EN LINEA justo despues - alguien lo esta leyendo en directo.
+
+Pendiente de respuesta: los 8. Revisar por la tarde/noche segun vayan contestando.
+Norivet (Leganes) sigue en TIBIO, derivado al responsable el 24-sep, revisar 27/28-sep.
+Iodocat aparcado (no encaja el problema que vendemos). Getafe (9) y Parla (7) recien
+generados, sin tocar hasta el lunes.
+
+## 2026-09-25 ~12:15 - primera tanda de Parla
+
+Elegidas 4 de las 7 candidatas de Parla, con angulo especifico a cada una:
+PARLAVET (ya usan WhatsApp como canal, angulo: quien contesta), Kirovet Shalom (solo
+publican telefono pero contestan por WA sin decirlo), Las Americas (el WA es el movil
+de repuesto, no el principal), Parla Este (mismo mostrador para llamadas y WhatsApp,
+patron El Naranjo/La Serna).
+
+Aparcadas 3: Evidensia Parla Sur (cadena hospitalaria, FALTA en verticales.json - anadir
+"evidensia" a la lista de cadenas de busca.py, pendiente), HGVet Venus (sospecha de
+cadena por la URL, sin confirmar), El Nido (SIN PERFIL en wa.me, abrir el chat antes).
+2026-09-26 | claude | Vertical peluqueria anadido a la demo en los dos sitios que pide progress/COMO-ANADIR-VERTICAL.md: DEMO_CONFIGS de provision-http.js (Peluqueria Aurora, 6 servicios, lunes cerrado) y mapa VERTICALES de demo.astro. NO ESTA VIVO: falta el paso 3 del propio documento (pm2 restart nexux-clients + push/build), y los dos los autoriza Ricardo | node --check OK + evaluado el literal DEMO_CONFIGS de verdad en node: 3 claves (generico|veterinaria|peluqueria), peluqueria con 6 servicios y 7 dias de horario. Control negativo en el backend VIVO: ?sector=peluqueria devuelve exactamente lo mismo que ?sector=sectorquenoexiste (Ana G./Sesion completa), o sea que el proceso no la tiene. Control positivo en produccion: ?sector=veterinaria si devuelve 'Clinica Veterinaria Arcadia', ?sector=peluqueria no devuelve nada. nexux-verify 4/4 | PENDIENTE de dos permisos de Ricardo
+  causa: el reinicio de nexux-clients toca sesiones de WhatsApp de clientes y provision-http.js lleva Stripe dentro (regla de AGENTS.md: parar y avisar); el push a Vercel lo autoriza siempre Ricardo
