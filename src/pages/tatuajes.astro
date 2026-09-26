@@ -30,6 +30,11 @@ const MUESTRA = { estudios: 24, resenas: 807, tienen: 4562, malas: 162, conQueja
 // El momento y la confirmacion salen de aqui, NO del HTML: en el primer clon se
 // quedaron grabados los de la veterinaria y decian 'martes' en una pagina que
 // argumenta sobre el domingo.
+// La foto de la cabecera. Es lo UNICO que cambia entre verticales.
+// Va en gris ya desde el fichero: la pagina la pinta en gris igual, asi que
+// guardar el color era pagar 278 KB por algo que nadie ve. En gris: 51 KB.
+const HERO_IMG = '/img/tatuajes-hero.webp';
+
 const MOMENTO = 'Un domingo a las 23:41';
 const CONFIRMADO = 'Jueves 18:00, consulta con Iván, puesta en el calendario';
 
@@ -125,37 +130,50 @@ const jsonLd = {
 
   <main>
 
-    <!-- ── Lo primero que se ve en el móvil ─────────────────────────── -->
+    <!-- ── Cabecera: titular a la izquierda, el movil al lado ────────── -->
     <section class="hero">
-      <div class="container-nx hero-in">
-        <span class="eyebrow">Para estudios de tatuaje</span>
-        <h1 class="h-display">Te escriben mientras tatúas. <em>Que conteste ella.</em></h1>
-        <p class="hero-sub">
-          Lara deja la consulta puesta mientras tú estás con una sesión de cuatro horas.
-          El precio lo sigues poniendo tú.
-        </p>
-        <div class="acciones">
-          <a class="btn-primary" href="/demo?sector=tatuajes">Ver cómo contesta →</a>
-          <a class="btn-ghost" href="#que-no-hace">Qué no hace</a>
-        </div>
-        <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
-      </div>
-    </section>
+      <div class="hero-foto" style={`background-image:url('${HERO_IMG}')`} aria-hidden="true"></div>
+      <div class="hero-trazo" style={`background-image:url('${HERO_IMG}')`} aria-hidden="true"></div>
+      <div class="hero-tinte" aria-hidden="true"></div>
+      <div class="hero-velo" aria-hidden="true"></div>
 
-    <!-- ── Se entiende sin leer ─────────────────────────────────────── -->
-    <section class="section bg-deep">
-      <div class="container-nx">
-        <p class="eyebrow centrado">{MOMENTO}</p>
-        <div class="chat">
-          {conversacion.map((m) => (
-            <div class={`burbuja ${m.de}`}>
-              <p>{m.texto}</p>
-              <span class="hora">{m.hora}</span>
-            </div>
-          ))}
-          <div class="confirmado">{CONFIRMADO}</div>
+      <div class="container-nx hero-rejilla">
+        <div class="hero-texto">
+          <span class="eyebrow">Para estudios de tatuaje</span>
+          <h1 class="h-display">Te escriben mientras tatúas. <em>Que conteste ella.</em></h1>
+          <p class="hero-sub">
+            Lara deja la consulta puesta mientras tú estás con una sesión de cuatro horas.
+            El precio lo sigues poniendo tú.
+          </p>
+          <div class="acciones">
+            <a class="btn-primary" href="/demo?sector=tatuajes">Ver cómo contesta →</a>
+            <a class="btn-ghost" href="#que-no-hace">Qué no hace</a>
+          </div>
+          <p class="bajo-boton">29 € al mes, sin cuota por persona · 30 días para pedir la devolución</p>
         </div>
-        <p class="pie-chat">Ese mensaje, sin Lara, lo lees mañana a las nueve.</p>
+
+        <div class="hero-movil">
+          <div class="movil">
+            <div class="movil-cabecera">
+              <span class="movil-avatar">L</span>
+              <span>
+                <b>Lara</b>
+                <i>en línea</i>
+              </span>
+            </div>
+            <div class="movil-chat">
+              <p class="movil-dia">{MOMENTO}</p>
+              {conversacion.map((m) => (
+                <div class={`burbuja ${m.de}`}>
+                  <p>{m.texto}</p>
+                  <span class="hora">{m.hora}</span>
+                </div>
+              ))}
+              <div class="confirmado">{CONFIRMADO}</div>
+            </div>
+          </div>
+          <p class="pie-chat">Ese mensaje, sin Lara, lo lees mañana a las nueve.</p>
+        </div>
       </div>
     </section>
 
@@ -260,9 +278,70 @@ const jsonLd = {
 </Layout>
 
 <style>
-  .hero { padding: 4.5rem 0 3.5rem; }
+  /* ── Cabecera de vertical ─────────────────────────────────────────
+     La foto va en gris y encima una capa del verde de marca en
+     mix-blend-mode:color: eso coge el TONO del verde y la LUZ de la foto,
+     o sea monocromo verde de verdad, no un filtro aproximado.
+     `.hero-trazo` es la misma foto muy contrastada en multiply: oscurece
+     los bordes y hace de delineado sin dibujar nada.
+     El velo se mantiene opaco a la IZQUIERDA, que es donde va el titular.
+     Si se abre ahi, gana la foto y se pierde la frase, que es lo que vende. */
+  .hero { position: relative; overflow: hidden; padding: 4.5rem 0 5rem; }
+  .hero-foto, .hero-trazo {
+    position: absolute; inset: -14px;
+    background-size: cover; background-position: center;
+    pointer-events: none;
+  }
+  .hero-foto  { filter: grayscale(1) blur(1px) brightness(1.06) contrast(1.4); opacity: .8; z-index: 1; }
+  .hero-trazo { filter: grayscale(1) brightness(.85) contrast(2.1); opacity: .42; mix-blend-mode: multiply; z-index: 0; }
+  .hero-tinte {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: var(--nx-magnet); mix-blend-mode: color;
+  }
+  .hero-velo {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    background: linear-gradient(100deg,
+      rgba(247,246,243,.96) 0%, rgba(247,246,243,.86) 34%,
+      rgba(247,246,243,.36) 64%, rgba(247,246,243,.06) 100%);
+  }
+  .hero-rejilla {
+    position: relative; z-index: 4;
+    display: grid; grid-template-columns: 1fr; gap: 2.5rem; align-items: center;
+  }
+  @media (min-width: 980px) {
+    .hero { padding: 6rem 0 6.5rem; }
+    .hero-rejilla { grid-template-columns: 1.05fr .95fr; gap: 3.5rem; }
+  }
+  .hero-movil { display: flex; flex-direction: column; align-items: center; }
+  .movil {
+    width: 100%; max-width: 310px; border-radius: 30px; overflow: hidden; background: #fff;
+    border: 1px solid var(--nx-line); box-shadow: 0 30px 70px rgba(20,22,26,.26);
+  }
+  .movil-cabecera {
+    display: flex; align-items: center; gap: .7rem;
+    padding: .8rem .9rem; background: #f0f2f5;
+  }
+  .movil-cabecera > span { display: flex; flex-direction: column; line-height: 1.25; }
+  .movil-cabecera b { font-size: .92rem; }
+  .movil-cabecera i { font-style: normal; font-size: .74rem; color: var(--nx-magnet-deep); }
+  .movil-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex: 0 0 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: #0c1a19;
+    background: linear-gradient(135deg, var(--nx-magnet), var(--nx-magnet-deep));
+  }
+  .movil-chat {
+    padding: 1rem .8rem 1.2rem; background: #ece5dd;
+    display: flex; flex-direction: column; gap: .45rem; min-height: 330px;
+  }
+  .movil-dia {
+    align-self: center; font-size: .7rem; letter-spacing: .04em;
+    background: #f0f2f5; color: var(--nx-ink-muted);
+    padding: .3rem .75rem; border-radius: 8px; margin-bottom: .2rem;
+  }
+
   @media (min-width: 768px) { .hero { padding: 7rem 0 5rem; } }
-  .hero-in { max-width: 760px; }
+  .hero-texto { max-width: 620px; }
   .hero h1 { margin: 1rem 0 1.25rem; }
   .hero-sub {
     font-size: 1.15rem;
