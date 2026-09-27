@@ -14,6 +14,8 @@
 > **Estrategia SEO en 5 capas, con estado ✅/❌ actualizado de cada tarea:**
 > `progress/investigacion/estrategia-seo-20260821.md`. Es el plan de ejecución; antes de proponer "qué
 > hacer ahora" en SEO, mira qué capa está a medias.
+> 📣 **Campaña de WhatsApp a negocios (listas, mensajes por negocio, quién contestó):** léete
+> `/home/nexux/scraper-output/LEEME-CAMPANA-WHATSAPP.md` antes de buscar, escribir o apuntar nada.
 > ⛔ nexux.pro (SaaS B2B) es INDEPENDIENTE de nexux.es (app de citas B2C). No mezclar código, DB, bots ni tokens.
 
 ---
