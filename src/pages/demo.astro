@@ -9,22 +9,26 @@ const VERTICALES = {
   generico: {
     negocio: 'Tu negocio',
     titulo:  'Demo en vivo',
+    previa:  'Escríbele a Lara como si fueras un cliente: te ofrece los huecos reales y deja la cita apuntada. Sin registrarte ni dar datos.',
     // REGLA: ni una palabra de otro sector. Salen de aqui, nunca del HTML.
     sugerencias: ['¿Qué servicios tenéis?', 'Quiero reservar cita', '¿Cuánto cuesta una consulta?', '¿Tenéis hueco mañana?'],
   },
   veterinaria: {
     negocio: 'Clinica Veterinaria Arcadia',
-    titulo:  'Demo para clinicas veterinarias',
+    titulo:  'Demo para clínicas veterinarias',
+    previa:  'Escríbele a Lara como si tuvieras que llevar a tu perro: te ofrece los huecos reales y deja la cita apuntada. Sin registrarte ni dar datos.',
     sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir cita para mi perro', '¿Cuánto cuesta una vacunación?', '¿Tenéis hueco mañana?'],
   },
   tatuajes: {
     negocio: 'Estudio de Tatuaje Corvus',
     titulo:  'Demo para estudios de tatuaje',
+    previa:  'Escríbele como si quisieras tatuarte: Lara coge la idea y el tamaño, ofrece huecos reales y deja la consulta apuntada. El precio lo pone el tatuador.',
     sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir cita para ver un diseño', '¿Cuánto cuesta un tatuaje pequeño?', '¿Tenéis hueco el sábado?'],
   },
   peluqueria: {
     negocio: 'Peluqueria Aurora',
-    titulo:  'Demo para peluquerias',
+    titulo:  'Demo para peluquerías',
+    previa:  'Escríbele como si quisieras pedir hora: Lara te ofrece los huecos reales y te deja la cita apuntada. Sin registrarte ni dar datos.',
     sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir hora para un corte', '¿Cuánto cuestan unas mechas?', '¿Tenéis hueco el viernes por la tarde?'],
   },
 };
@@ -34,6 +38,9 @@ const V       = VERTICALES[sector];
 const NEGOCIO = V.negocio;
 // La generica se indexa; las variantes se reparten por enlace y no deben competir con ella.
 const esVariante = sector !== 'generico';
+// La vista previa del enlace en WhatsApp sale de estas etiquetas. og:url lleva el
+// sector: si apuntara a /demo, quien la lea de ahi se quedaria con la generica.
+const URL_DEMO = 'https://nexux.pro/demo' + (esVariante ? '?sector=' + sector : '');
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -41,7 +48,18 @@ const esVariante = sector !== 'generico';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{V.titulo} — Lara, tu asistente IA | Nexux.pro</title>
-  <meta name="description" content="Habla con Lara en tiempo real y ve como gestiona citas automaticamente." />
+  <meta name="description" content={V.previa} />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:site_name" content="Nexux" />
+  <meta property="og:title" content={`${V.titulo}: así contesta Lara`} />
+  <meta property="og:description" content={V.previa} />
+  <meta property="og:url" content={URL_DEMO} />
+  <meta property="og:image" content="https://nexux.pro/img/nexux-lara-crm.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="1200" />
+  <meta property="og:image:alt" content="Nexux — Recepcionista IA para tu negocio" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://nexux.pro/demo" />
   {esVariante && <meta name="robots" content="noindex, follow" />}
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
