@@ -37,7 +37,7 @@ Muchos negocios con cita previa pierden una parte importante de su agenda por no
 - Respuesta automática a los mensajes 24 horas por WhatsApp, Telegram y web
 - Reserva de citas con IA: agenda, modifica y cancela citas automáticamente
 - Recordatorios automáticos de cita para reducir ausencias
-- Portal de gestión para el dueño: ver conversaciones, tomar el control manual
+- Panel para el dueño con sus citas, sus clientes y un interruptor para encender o apagar a Lara cuando prefiere contestar él
 - Integración con calendario
 
 ## Precio (2026)
