@@ -31,6 +31,12 @@ const VERTICALES = {
     previa:  'Escríbele como si quisieras pedir hora: Lara te ofrece los huecos reales y te deja la cita apuntada. Sin registrarte ni dar datos.',
     sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir hora para un corte', '¿Cuánto cuestan unas mechas?', '¿Tenéis hueco el viernes por la tarde?'],
   },
+  estetica: {
+    negocio: 'Centro de Estetica Jazmin',
+    titulo:  'Demo para centros de estética',
+    previa:  'Escríbele como si quisieras las cejas: Lara te dice el precio, te ofrece los huecos reales y te deja la cita apuntada. Sin registrarte ni dar datos.',
+    sugerencias: ['¿Qué servicios tenéis?', 'Quiero pedir cita para las cejas', '¿Cuánto cuestan las cejas con hilo?', '¿Tenéis hueco por la tarde?'],
+  },
 };
 const sectorPedido = String(Astro.url.searchParams.get('sector') || '').toLowerCase();
 const sector  = VERTICALES[sectorPedido] ? sectorPedido : 'generico';

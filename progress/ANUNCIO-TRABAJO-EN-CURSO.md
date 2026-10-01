@@ -777,6 +777,8 @@ Cobrado hasta hoy en facturas: 18,15 + 18,15 + 36,30 + 36,30 = **108,90 EUR**.
 el panel dice 47,89 de pendiente. No he podido ampliar el rango de fechas del panel
 para cuadrarlo. Queda abierto: no dar por buena ninguna de las dos cifras.
 
+> **CERRADO 1-oct-2026: el descuadre no existe.** Las facturas llevan IVA del 21% (18,15 = 15 + IVA; 36,30 = 30 + IVA). Cobrado 108,90 = 90,00 de base + 18,90 de IVA. 137,89 - 90,00 = 47,89 de pendiente, justo lo que dice el panel. Se comparo gasto SIN IVA con cobrado CON IVA. Pendiente real con IVA: 57,95 EUR. Ver INFORME-OPENAI-ADS-20261001.md.
+
 ## 5. Capacidades de OpenAI Ads que NO conociamos (correos de producto)
 
 Del correo del **3-sep**:
