@@ -305,6 +305,22 @@ const jsonLd = {
   </main>
 
   <Footer />
+  <!-- Campana de WhatsApp (2-oct-2026): cada estudio recibe /tatuajes?de=<estudio>. Si de
+       aqui pasa a la demo, la etiqueta viaja con el como utm_content y la demo la guarda con
+       la conversacion (demo-conversaciones.jsonl). Sin esto, la visita a la demo no se podia
+       atribuir a ningun estudio. Solo letras y numeros: nada de lo que venga en la URL se pinta. -->
+  <script is:inline>
+    (function () {
+      try {
+        var de = new URLSearchParams(location.search).get('de');
+        if (!de || !/^[a-z0-9]{1,24}$/.test(de)) return;
+        var extra = '&utm_source=whatsapp&utm_campaign=tatuajes_2oct&utm_content=' + de;
+        document.querySelectorAll('a[href^="/demo?sector=tatuajes"]').forEach(function (a) {
+          a.setAttribute('href', a.getAttribute('href') + extra);
+        });
+      } catch (e) {}
+    })();
+  </script>
 </Layout>
 
 <style>
