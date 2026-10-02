@@ -38,11 +38,15 @@ const HERO_IMG = '/img/tatuajes-hero.webp';
 const MOMENTO = 'Un domingo a las 23:41';
 const CONFIRMADO = 'Jueves 18:00, consulta con Iván, puesta en el calendario';
 
+// La conversacion es la de verdad, en el orden de verdad (probado el 2-oct-2026): primero
+// pregunta idea y tamano, y la cita no queda puesta hasta que el cliente dice "si".
+// La version anterior la daba por hecha sin ese si, que es justo lo que se corrigio en Lara.
 const conversacion = [
   { de: 'cliente', hora: '23:41', texto: 'Buenas! Quería algo en el antebrazo, línea fina. ¿Cuánto me costaría?' },
-  { de: 'lara', hora: '23:41', texto: 'Buenas noches. El precio lo pone Iván al ver el diseño, que depende del tamaño y del detalle. Te dejo una consulta para verlo: el jueves a las 18:00 o el sábado a las 12:00.' },
-  { de: 'cliente', hora: '23:42', texto: 'El jueves a las 18:00' },
-  { de: 'lara', hora: '23:42', texto: 'Hecho, jueves a las 18:00 con Iván. ¿Me dices el tamaño más o menos y qué idea llevas, para que lo tenga apuntado?' },
+  { de: 'lara', hora: '23:41', texto: 'Buenas noches. El precio lo pone Iván al ver el diseño. ¿Qué idea llevas y de qué tamaño, más o menos? Así te reservo el tiempo justo.' },
+  { de: 'cliente', hora: '23:42', texto: 'Una rama de olivo, unos 10 cm. Soy Sara' },
+  { de: 'lara', hora: '23:42', texto: 'Te dejo una consulta con Iván el jueves a las 18:00 a nombre de Sara. ¿Te la confirmo?' },
+  { de: 'cliente', hora: '23:43', texto: 'Sí' },
 ];
 
 const loQueHace = [
@@ -56,6 +60,16 @@ const noHace = [
   ['No atiende Instagram', 'Hoy contesta WhatsApp, Telegram y el chat de tu web. Instagram no, y si la mayoría de tus encargos entran por ahí, esto te sirve a medias. Preferimos decírtelo ahora.'],
   ['No lleva tu estudio', 'Ni consentimientos, ni fichas de cliente, ni material. Sólo los mensajes y la agenda de citas.'],
   ['No te sirve si tienes pocos mensajes', 'Si vas contestando sin agobio, esto no te cambia nada.'],
+];
+
+// Las dos pegas que nos han puesto de verdad los estudios al escribirles (sep-oct 2026).
+// Se contestan con lo que hace el producto, sin prometer nada que no este comprobado:
+// el interruptor existe en el panel (cliente/[id].astro, "Lara responde") y lo respetan
+// WhatsApp y Telegram (bot_auto). NO prometer "te avisa si piden una persona": la
+// derivacion solo existe en el prompt de Noa, no en el de Lara (comprobado 2-oct).
+const dudas = [
+  ['¿Y el trato con mis clientes?', 'Sigue siendo tuyo. Lara no diseña, no presupuesta y no charla por ti: contesta en el momento y deja la consulta puesta, para que quien te escribe no se quede esperando y se vaya a otro estudio. La conversación de verdad la tienes tú, en la consulta.'],
+  ['¿Y si un día prefiero contestar yo?', 'La apagas desde tu panel con un interruptor y contestas tú desde tu WhatsApp de siempre. La vuelves a encender cuando estés liado.'],
 ];
 
 const faq = [
@@ -88,7 +102,7 @@ const faq = [
   },
   {
     q: '¿Cuánto cuesta?',
-    a: '29 € al mes, precio de lanzamiento congelado de por vida para los 50 primeros (después son 35). Sin cuota por persona y sin permanencia. No hay prueba gratis: se paga desde el primer día y tienes 30 días para pedir la devolución si no encaja. La demo sí la puedes probar sin dar ningún dato. Si necesitas agenda propia por profesional y fichas de clientes, ese es el plan Equipo, 79 €.',
+    a: '29 € al mes, precio de lanzamiento: si entras ahora, mantienes ese precio mientras sigas de alta. Sin cuota por persona y sin permanencia. No hay prueba gratis: se paga desde el primer día y tienes 30 días para pedir la devolución si no encaja. La demo sí la puedes probar sin dar ningún dato. Si necesitas agenda propia por profesional y fichas de clientes, ese es el plan Equipo, 79 €.',
   },
 ];
 
@@ -189,6 +203,22 @@ const jsonLd = {
             </div>
           ))}
         </div>
+      </div>
+    </section>
+
+    <!-- ── Las dos dudas de siempre ─────────────────────────────────── -->
+    <section class="section">
+      <div class="container-nx estrecho">
+        <h2 class="h-section">Lo que nos preguntáis</h2>
+        <p class="intro">Las dos dudas que más nos habéis puesto al escribiros.</p>
+        <dl class="nohace">
+          {dudas.map(([t, d]) => (
+            <div>
+              <dt>{t}</dt>
+              <dd>{d}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
 
