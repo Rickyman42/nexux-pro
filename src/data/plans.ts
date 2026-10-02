@@ -22,10 +22,10 @@ export interface PlanData {
   faqs: PlanFaq[];
 }
 
-/** Precio de lanzamiento. Congelado de por vida para los primeros LAUNCH_SEATS clientes. */
+/** Precio de lanzamiento: quien entra se queda en este precio mientras siga de alta.
+ *  No hay subida anunciada ni cupo de plazas: el '35 EUR' y los '50 primeros' no
+ *  existian y se quitaron el 2-oct-2026 (Ricardo). */
 export const LAUNCH_PRICE = 29;
-export const REGULAR_PRICE = 35;
-export const LAUNCH_SEATS = 50;
 
 /** Plan Equipo: agenda propia por persona y fichas de clientes. */
 export const EQUIPO_PRICE = 79;

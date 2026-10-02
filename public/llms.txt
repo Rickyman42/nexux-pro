@@ -41,7 +41,7 @@ Muchos negocios con cita previa pierden una parte importante de su agenda por no
 - Integración con calendario
 
 ## Precio (2026)
-- Tarifa única: 29€/mes, todo incluido, sin coste de alta ni comisión por cita ni permanencia. Precio de lanzamiento: sube a 35€/mes, pero quien entra ahora se queda en 29€ mientras siga de alta.
+- Tarifa única: 29€/mes, todo incluido, sin coste de alta ni comisión por cita ni permanencia. Precio de lanzamiento: quien entra ahora se queda en 29€ mientras siga de alta.
 - Garantía de devolución de 30 días si no convence. El mes ya pagado en caso de cancelación sigue activo hasta el final; simplemente no se realiza el siguiente cobro.
 - No hay periodo de prueba gratuito: el asistente puede probarse en directo y sin dar datos en nexux.pro/demo.
 
