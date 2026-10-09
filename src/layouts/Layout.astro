@@ -6,6 +6,8 @@ export interface Props {
   description?: string;
   canonical?: string;
   noindex?: boolean;
+  image?: string;
+  imageAlt?: string;
 }
 // Por defecto el canonical se deriva de la URL de la pagina, no de la home:
 // un valor fijo hacia que /blog, /comparativa, /oferta y /demo se declarasen
@@ -16,7 +18,11 @@ const {
   title = 'Recepcionista IA para tu negocio — 29 €/mes | Nexux',
   description = 'Recepcionista IA que contesta por WhatsApp, Telegram y tu web 24 horas y reserva las citas en tu calendario. 29 € al mes, todo incluido, sin permanencia y con 30 días de garantía.',
   canonical = canonicalPorDefecto,
-  noindex = false
+  noindex = false,
+  // Imagen de la vista previa al compartir el enlace (WhatsApp, redes). Sin ella sale la de
+  // siempre, que ensena una peluqueria: un estudio de tatuaje la vio en su mensaje (9-oct-2026).
+  image = 'https://nexux.pro/img/nexux-lara-crm.jpg',
+  imageAlt = 'Nexux — Recepcionista IA para tu negocio'
 } = Astro.props;
 const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
 ---
@@ -33,15 +39,15 @@ const openAiAdsPixelId = import.meta.env.PUBLIC_OPENAI_ADS_PIXEL_ID;
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonical} />
-  <meta property="og:image" content="https://nexux.pro/img/nexux-lara-crm.jpg" />
+  <meta property="og:image" content={image} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="1200" />
-  <meta property="og:image:alt" content="Nexux — Recepcionista IA para tu negocio" />
+  <meta property="og:image:alt" content={imageAlt} />
   <meta property="og:locale" content="es_ES" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content="https://nexux.pro/img/nexux-lara-crm.jpg" />
+  <meta name="twitter:image" content={image} />
   <meta name="twitter:site" content="@nexuxpro" />
   <link rel="canonical" href={canonical} />
     <meta name="msvalidate.01" content="642F949B50E414BE85104C2686A3FCCB" />
