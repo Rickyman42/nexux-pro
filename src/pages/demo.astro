@@ -67,7 +67,8 @@ const URL_DEMO = 'https://nexux.pro/demo' + (esVariante ? '?sector=' + sector : 
   <meta property="og:image:alt" content="Nexux — Recepcionista IA para tu negocio" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://nexux.pro/demo" />
-  {esVariante && <meta name="robots" content="noindex, follow" />}
+  {/* La demo es para usar, no para leer: fuera del indice de Google (decision de Ricardo, 14-oct-2026). */}
+  <meta name="robots" content="noindex, follow" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <style is:global>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
