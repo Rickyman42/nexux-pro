@@ -10,7 +10,7 @@ export default defineConfig({
   output: 'server',
   adapter: vercel(),
   integrations: [sitemap({
-    filter: (page) => !page.includes('/gracias') && !page.includes('/admin') && !page.includes('/acceso-denegado'),
+    filter: (page) => !page.includes('/gracias') && !page.includes('/admin') && !page.includes('/acceso-denegado') && !/\/demo\/?$/.test(page),
   })],
   vite: {
     plugins: [tailwindcss()],
