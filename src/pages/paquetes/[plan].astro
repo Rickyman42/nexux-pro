@@ -35,6 +35,8 @@ const productSchema = {
   name: plan.name,
   description: plan.sub,
   brand: { '@type': 'Brand', name: 'Nexux' },
+  // Google exige imagen para la ficha de comerciante; sin ella el elemento sale "no valido" en Search Console.
+  image: ['https://nexux.pro/img/demo-crm.png'],
   offers: {
     '@type': 'Offer',
     price: plan.price,
@@ -47,6 +49,14 @@ const productSchema = {
     },
     availability: 'https://schema.org/InStock',
     url: canonical,
+    // Los 30 dias de garantia: si no encaja, se devuelve el dinero sin preguntas.
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      applicableCountry: 'ES',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      merchantReturnDays: 30,
+      returnFees: 'https://schema.org/FreeReturn',
+    },
   },
 };
 ---
